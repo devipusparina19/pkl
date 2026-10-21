@@ -1553,107 +1553,93 @@
                     </div>
                 </section>
 
-                {{-- PERINGKAT JENIS NAKES --}}
-                <section class="content-card">
-                    <div class="content-card-header">
-                        <h3>Partisipasi Tenaga Kesehatan</h3>
+{{-- PERINGKAT JENIS NAKES --}}
+<section class="content-card">
+    <div class="content-card-header">
+        <h3>Partisipasi Tenaga Kesehatan</h3>
 
-                        <p class="card-description">
-                            Lima jenis tenaga kesehatan dengan keikutsertaan
-                            tertinggi dan terendah pada filter yang dipilih.
-                        </p>
-                    </div>
+        <p class="card-description">
+            Peringkat jenis tenaga kesehatan berdasarkan jumlah peserta
+            unik yang mengikuti pelatihan sesuai filter yang dipilih.
+        </p>
+    </div>
 
-                    <div class="ranking-grid">
-                        {{-- LIMA TERTINGGI --}}
-                        <div class="ranking-panel ranking-high">
-                            <div class="ranking-heading">
-                                <div class="ranking-icon" aria-hidden="true">↑</div>
+    <div class="ranking-grid">
+        {{-- LIMA TERTINGGI --}}
+        <div class="ranking-panel ranking-high">
+            <div class="ranking-heading">
+                <div class="ranking-icon" aria-hidden="true">↑</div>
 
-                                <div>
-                                    <h4>5 Tertinggi</h4>
-                                    <p>Partisipasi terbanyak</p>
-                                </div>
-                            </div>
-
-                            @php
-                                $topNakes = $topNakes ?? collect();
-                            @endphp
-
-                            @if ($topNakes->isNotEmpty())
-                                <ol class="ranking-list">
-                                    @foreach ($topNakes->take(5) as $nakes)
-                                        <li class="ranking-item">
-                                            <span class="ranking-number">
-                                                {{ $loop->iteration }}
-                                            </span>
-
-                                            <span class="ranking-name">
-                                                {{ $nakes->name ?? $nakes->profession ?? $nakes->jenis_nakes ?? 'Tidak diketahui' }}
-                                            </span>
-
-                                            <span class="ranking-total">
-                                                {{ number_format((int) ($nakes->total ?? $nakes->total_participations ?? 0), 0, ',', '.') }}
-                                                <small>org</small>
-                                            </span>
-                                        </li>
-                                    @endforeach
-                                </ol>
-                            @else
-                                <div class="ranking-empty">
-                                    Data peringkat belum tersedia untuk filter ini.
-                                    Pastikan data profesi peserta sudah sesuai
-                                    dengan master jenis tenaga kesehatan.
-                                </div>
-                            @endif
-                        </div>
-
-                        {{-- LIMA TERENDAH --}}
-                        <div class="ranking-panel ranking-low">
-                            <div class="ranking-heading">
-                                <div class="ranking-icon" aria-hidden="true">↓</div>
-
-                                <div>
-                                    <h4>5 Terendah</h4>
-                                    <p>Partisipasi paling sedikit</p>
-                                </div>
-                            </div>
-
-                            @php
-                                $bottomNakes = $bottomNakes ?? collect();
-                            @endphp
-
-                            @if ($bottomNakes->isNotEmpty())
-                                <ol class="ranking-list">
-                                    @foreach ($bottomNakes->take(5) as $nakes)
-                                        <li class="ranking-item">
-                                            <span class="ranking-number">
-                                                {{ $loop->iteration }}
-                                            </span>
-
-                                            <span class="ranking-name">
-                                                {{ $nakes->name ?? $nakes->profession ?? $nakes->jenis_nakes ?? 'Tidak diketahui' }}
-                                            </span>
-
-                                            <span class="ranking-total">
-                                                {{ number_format((int) ($nakes->total ?? $nakes->total_participations ?? 0), 0, ',', '.') }}
-                                                <small>org</small>
-                                            </span>
-                                        </li>
-                                    @endforeach
-                                </ol>
-                            @else
-                                <div class="ranking-empty">
-                                    Data peringkat belum tersedia untuk filter ini.
-                                    Pastikan data profesi peserta sudah sesuai
-                                    dengan master jenis tenaga kesehatan.
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </section>
+                <div>
+                    <h4>5 Tertinggi</h4>
+                    <p>Peserta terbanyak</p>
+                </div>
             </div>
-        </section>
+
+            @if (isset($topNakes) && $topNakes->isNotEmpty())
+                <ol class="ranking-list">
+                    @foreach ($topNakes as $nakes)
+                        <li class="ranking-item">
+                            <span class="ranking-number">
+                                {{ $loop->iteration }}
+                            </span>
+
+                            <span class="ranking-name">
+                                {{ $nakes->name }}
+                            </span>
+
+                            <span class="ranking-total">
+                                {{ number_format((int) $nakes->total, 0, ',', '.') }}
+                                <small>org</small>
+                            </span>
+                        </li>
+                    @endforeach
+                </ol>
+            @else
+                <div class="ranking-empty">
+                    Belum ada data peserta untuk ditampilkan pada filter ini.
+                </div>
+            @endif
+        </div>
+
+        {{-- LIMA TERENDAH --}}
+        <div class="ranking-panel ranking-low">
+            <div class="ranking-heading">
+                <div class="ranking-icon" aria-hidden="true">↓</div>
+
+                <div>
+                    <h4>5 Terendah</h4>
+                    <p>Peserta paling sedikit</p>
+                </div>
+            </div>
+
+            @if (isset($bottomNakes) && $bottomNakes->isNotEmpty())
+                <ol class="ranking-list">
+                    @foreach ($bottomNakes as $nakes)
+                        <li class="ranking-item">
+                            <span class="ranking-number">
+                                {{ $loop->iteration }}
+                            </span>
+
+                            <span class="ranking-name">
+                                {{ $nakes->name }}
+                            </span>
+
+                            <span class="ranking-total">
+                                {{ number_format((int) $nakes->total, 0, ',', '.') }}
+                                <small>org</small>
+                            </span>
+                        </li>
+                    @endforeach
+                </ol>
+            @else
+                <div class="ranking-empty">
+                    Belum ada data peserta untuk ditampilkan pada filter ini.
+                </div>
+            @endif
+        </div>
+    </div>
+</section>
     </main>
 
     {{-- FOOTER --}}

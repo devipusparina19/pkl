@@ -8,6 +8,7 @@ use App\Models\TrainingHistory;
 use App\Models\District;
 use App\Models\FundingSource;
 use App\Models\TrainingYear;
+use App\Models\HealthWorkerType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,9 @@ class DashboardController extends Controller
         $district = $request->input('district');
         $fundingSource = $request->input('funding_source');
 
+        /*
+         * Data pelatihan mengikuti filter dashboard publik.
+         */
         $base = Training::query()
             ->whereYear('start_date', $year)
             ->when(
@@ -38,19 +42,23 @@ class DashboardController extends Controller
 
         $totalTrainings = (clone $base)->count();
 
+        /*
+         * Total riwayat keikutsertaan pada pelatihan terpilih.
+         */
         $totalParticipations = TrainingHistory::query()
             ->whereIn('training_id', $trainingIds)
             ->count();
 
+        /*
+         * Total tenaga kesehatan unik yang mengikuti pelatihan terpilih.
+         */
         $totalParticipants = TrainingHistory::query()
             ->whereIn('training_id', $trainingIds)
             ->distinct()
             ->count('participant_id');
 
         /*
-         * Pilihan kabupaten/kota/mitra berasal dari master data.
-         * Data lama dari tabel trainings tetap digunakan sebagai
-         * cadangan jika tabel master belum memiliki data aktif.
+         * Pilihan kabupaten/kota/mitra dari master data.
          */
         $districts = District::query()
             ->where('is_active', true)
@@ -67,7 +75,7 @@ class DashboardController extends Controller
         }
 
         /*
-         * Pilihan sumber dana berasal dari master data.
+         * Pilihan sumber dana dari master data.
          */
         $fundingSources = FundingSource::query()
             ->where('is_active', true)
@@ -83,6 +91,9 @@ class DashboardController extends Controller
                 ->pluck('funding_source');
         }
 
+        /*
+         * Statistik jumlah pelatihan berdasarkan kabupaten/kota.
+         */
         $byDistrict = (clone $base)
             ->select('district', DB::raw('COUNT(*) as total'))
             ->whereNotNull('district')
@@ -91,6 +102,9 @@ class DashboardController extends Controller
             ->orderByDesc('total')
             ->get();
 
+        /*
+         * Daftar pelatihan terbaru.
+         */
         $recentTrainings = (clone $base)
             ->withCount('histories')
             ->orderByDesc('start_date')
@@ -98,7 +112,7 @@ class DashboardController extends Controller
             ->get();
 
         /*
-         * Tahun pelatihan diambil dari master data Super Admin.
+         * Tahun pelatihan dari master data.
          */
         $years = TrainingYear::query()
             ->where('is_active', true)
@@ -107,8 +121,7 @@ class DashboardController extends Controller
             ->map(fn ($item) => (int) $item);
 
         /*
-         * Jika master data tahun masih kosong, gunakan tahun
-         * yang tersedia dari data pelatihan.
+         * Cadangan tahun berdasarkan pelatihan yang tersedia.
          */
         if ($years->isEmpty()) {
             $yearsQuery = Training::query()
@@ -137,6 +150,122 @@ class DashboardController extends Controller
 
         $years = $years->unique()->sortDesc()->values();
 
+        /*
+         * =========================================================
+         * JENIS TENAGA KESEHATAN
+         * =========================================================
+         *
+         * Jenis nakes diambil dari kolom participants.profession.
+         * Data hanya dihitung untuk peserta yang memiliki riwayat
+         * pelatihan sesuai filter tahun, kabupaten/kota, dan sumber
+         * dana yang dipilih pada dashboard.
+         *
+         * Tabel health_worker_types digunakan sebagai master jenis
+         * nakes yang dikelola admin.
+         */
+
+        $healthWorkerTypes = HealthWorkerType::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        /*
+         * Hitung tenaga kesehatan unik untuk setiap jenis.
+         * COUNT(DISTINCT ...) mencegah orang yang mengikuti beberapa
+         * pelatihan terhitung berkali-kali dalam jenis yang sama.
+         */
+        $nakesCounts = DB::table('training_histories')
+            ->join(
+                'participants',
+                'participants.id',
+                '=',
+                'training_histories.participant_id'
+            )
+            ->whereIn(
+                'training_histories.training_id',
+                $trainingIds
+            )
+            ->whereNotNull('participants.profession')
+            ->whereRaw("TRIM(participants.profession) != ''")
+            ->selectRaw(
+                'TRIM(participants.profession) as name,
+                COUNT(DISTINCT training_histories.participant_id) as total'
+            )
+            ->groupByRaw('TRIM(participants.profession)')
+            ->orderByDesc('total')
+            ->get()
+            ->keyBy(fn ($item) => mb_strtolower(trim($item->name)));
+
+        /*
+         * Gabungkan master jenis nakes dengan jenis yang benar-benar
+         * ditemukan pada data peserta.
+         *
+         * Jenis yang sudah didaftarkan admin tetapi belum memiliki
+         * peserta akan memiliki total 0.
+         *
+         * Jenis pada data peserta yang belum tercantum di master
+         * tetap ditampilkan agar data lama tidak hilang.
+         */
+        $nakesNames = collect();
+
+        foreach ($healthWorkerTypes as $type) {
+            $name = trim((string) $type->name);
+
+            if ($name !== '') {
+                $nakesNames->put(
+                    mb_strtolower($name),
+                    $name
+                );
+            }
+        }
+
+        foreach ($nakesCounts as $key => $item) {
+            $name = trim((string) $item->name);
+
+            if ($name !== '' && !$nakesNames->has($key)) {
+                $nakesNames->put($key, $name);
+            }
+        }
+
+        /*
+         * Format data agar dapat digunakan oleh Blade:
+         * $item->name dan $item->total.
+         */
+        $nakesByType = $nakesNames
+            ->map(function ($name, $key) use ($nakesCounts) {
+                $count = $nakesCounts->get($key);
+
+                return (object) [
+                    'name' => $name,
+                    'total' => $count ? (int) $count->total : 0,
+                ];
+            })
+            ->sortBy('name')
+            ->values();
+
+        /*
+         * Peringkat jenis nakes terbanyak.
+         */
+        $topNakes = $nakesByType
+            ->filter(fn ($item) => $item->total > 0)
+            ->sortByDesc('total')
+            ->take(5)
+            ->values();
+
+        /*
+         * Peringkat jenis nakes tersedikit.
+         * Jenis dengan jumlah 0 tidak dimasukkan agar peringkat
+         * menunjukkan jenis yang benar-benar memiliki peserta.
+         */
+        $bottomNakes = $nakesByType
+            ->filter(fn ($item) => $item->total > 0)
+            ->sortBy('total')
+            ->take(5)
+            ->values();
+
+        /*
+         * Nama variabel dipertahankan agar kompatibel dengan view.
+         */
         $trainingByDistrict = $byDistrict;
 
         return view('welcome', compact(
@@ -151,7 +280,11 @@ class DashboardController extends Controller
             'totalParticipations',
             'byDistrict',
             'trainingByDistrict',
-            'recentTrainings'
+            'recentTrainings',
+            'healthWorkerTypes',
+            'nakesByType',
+            'topNakes',
+            'bottomNakes'
         ));
     }
 
