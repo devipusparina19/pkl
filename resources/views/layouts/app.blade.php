@@ -20,9 +20,7 @@
             --danger: #991b1b;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -33,25 +31,12 @@
             line-height: 1.6;
         }
 
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
+        a { color: inherit; text-decoration: none; }
 
-        button,
-        input,
-        select,
-        textarea {
-            font: inherit;
-        }
+        button, input, select, textarea { font: inherit; }
+        button { cursor: pointer; }
 
-        button {
-            cursor: pointer;
-        }
-
-        .app-shell {
-            min-height: 100vh;
-        }
+        .app-shell { min-height: 100vh; }
 
         /* SIDEBAR */
         .sidebar {
@@ -84,9 +69,7 @@
             line-height: 1.7;
         }
 
-        .sidebar nav {
-            padding-bottom: 16px;
-        }
+        .sidebar nav { padding-bottom: 16px; }
 
         .nav-label {
             padding: 24px 22px 10px;
@@ -120,9 +103,7 @@
         }
 
         /* GRUP MENU MASTER DATA */
-        .nav-group {
-            margin: 0;
-        }
+        .nav-group { margin: 0; }
 
         .nav-group-summary {
             display: flex;
@@ -142,13 +123,8 @@
             overflow-wrap: anywhere;
         }
 
-        .nav-group-summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .nav-group-summary::marker {
-            content: "";
-        }
+        .nav-group-summary::-webkit-details-marker { display: none; }
+        .nav-group-summary::marker { content: ""; }
 
         .nav-group-summary:hover,
         .nav-group[open] > .nav-group-summary {
@@ -185,9 +161,7 @@
             border-left: 1px solid #ffffff35;
         }
 
-        .nav-group .nav-submenu {
-            margin-top: 0;
-        }
+        .nav-group .nav-submenu { margin-top: 0; }
 
         .nav-sublink {
             display: block;
@@ -225,9 +199,7 @@
             border: 1px solid #ffffff20;
         }
 
-        .logout-button:hover {
-            background: #ffffff2b;
-        }
+        .logout-button:hover { background: #ffffff2b; }
 
         /* AREA KONTEN */
         .main-area {
@@ -254,16 +226,9 @@
             line-height: 1.4;
         }
 
-        .topbar small {
-            color: var(--muted);
-            font-size: 14px;
-        }
+        .topbar small { color: var(--muted); font-size: 14px; }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .user-info { display: flex; align-items: center; gap: 10px; }
 
         .user-chip {
             background: var(--blue-light);
@@ -290,8 +255,7 @@
         }
 
         /* JUDUL HALAMAN */
-        .page-heading,
-        .page-header {
+        .page-heading, .page-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -300,15 +264,13 @@
             margin-bottom: 27px;
         }
 
-        .page-heading h1,
-        .page-header h1 {
+        .page-heading h1, .page-header h1 {
             margin: 0 0 8px;
             font-size: 30px;
             line-height: 1.3;
         }
 
-        .page-heading p,
-        .page-header p {
+        .page-heading p, .page-header p {
             margin: 0;
             color: var(--muted);
             font-size: 15px;
@@ -332,10 +294,7 @@
             margin-bottom: 25px;
         }
 
-        .stat-card,
-        .content-card,
-        .panel,
-        .form-card {
+        .stat-card, .content-card, .panel, .form-card {
             background: white;
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -349,8 +308,7 @@
             line-height: 1.6;
         }
 
-        .stat-number,
-        .stat-value {
+        .stat-number, .stat-value {
             margin-top: 10px;
             font-size: 32px;
             font-weight: 700;
@@ -366,22 +324,15 @@
             line-height: 1.6;
         }
 
-        .content-card,
-        .panel {
-            margin-bottom: 23px;
-            overflow: hidden;
-        }
+        .content-card, .panel { margin-bottom: 23px; overflow: hidden; }
 
-        .content-card h2,
-        .panel h2,
-        .form-card h2 {
+        .content-card h2, .panel h2, .form-card h2 {
             margin: 0 0 12px;
             font-size: 20px;
             line-height: 1.4;
         }
 
-        .content-card p,
-        .panel p {
+        .content-card p, .panel p {
             color: var(--muted);
             font-size: 14px;
             line-height: 1.7;
@@ -409,53 +360,18 @@
             transition: background .15s;
         }
 
-        .btn:hover {
-            background: #1e40af;
-        }
+        .btn:hover { background: #1e40af; }
+        .btn-primary { background: var(--blue); color: white; }
+        .btn-light { background: #eaf0f8; color: var(--navy); }
 
-        .btn-primary {
-            background: var(--blue);
-            color: white;
-        }
+        .btn-light:hover, .btn-secondary:hover { background: #dbe5f2; }
 
-        .btn-light {
-            background: #eaf0f8;
-            color: var(--navy);
-        }
-
-        .btn-light:hover,
-        .btn-secondary:hover {
-            background: #dbe5f2;
-        }
-
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #1e293b;
-        }
-
-        .btn-outline {
-            background: white;
-            color: var(--navy);
-            border-color: #cbd5e1;
-        }
-
-        .btn-outline:hover {
-            background: #f1f5f9;
-        }
-
-        .btn-danger {
-            background: #b91c1c;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #991b1b;
-        }
-
-        .btn-sm {
-            padding: 6px 10px;
-            font-size: 12px;
-        }
+        .btn-secondary { background: #e2e8f0; color: #1e293b; }
+        .btn-outline { background: white; color: var(--navy); border-color: #cbd5e1; }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-danger { background: #b91c1c; color: white; }
+        .btn-danger:hover { background: #991b1b; }
+        .btn-sm { padding: 6px 10px; font-size: 12px; }
 
         .inline-actions {
             display: flex;
@@ -466,9 +382,7 @@
         }
 
         /* FORM */
-        .form-card {
-            margin-bottom: 24px;
-        }
+        .form-card { margin-bottom: 24px; }
 
         .form-grid {
             display: grid;
@@ -476,10 +390,7 @@
             gap: 0 20px;
         }
 
-        .form-group {
-            min-width: 0;
-            margin-bottom: 19px;
-        }
+        .form-group { min-width: 0; margin-bottom: 19px; }
 
         label {
             display: block;
@@ -488,9 +399,7 @@
             font-weight: 600;
         }
 
-        input,
-        select,
-        textarea {
+        input, select, textarea {
             display: block;
             width: 100%;
             min-width: 0;
@@ -502,15 +411,12 @@
             font-size: 14px;
         }
 
-        input:focus,
-        select:focus,
-        textarea:focus {
+        input:focus, select:focus, textarea:focus {
             outline: 2px solid #bfdbfe;
             border-color: var(--blue);
         }
 
-        input[type="checkbox"],
-        input[type="radio"] {
+        input[type="checkbox"], input[type="radio"] {
             display: inline-block;
             width: auto;
         }
@@ -529,12 +435,9 @@
             font-size: 12px;
         }
 
-        .input-error {
-            border-color: #dc2626;
-        }
+        .input-error { border-color: #dc2626; }
 
-        .form-actions,
-        .filter-actions {
+        .form-actions, .filter-actions {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
@@ -553,30 +456,12 @@
             font-size: 14px;
         }
 
-        .alert-success {
-            background: #f0fdf4;
-            color: var(--success);
-            border-color: #bbf7d0;
-        }
-
-        .alert-error,
-        .alert-danger {
-            background: #fef2f2;
-            color: var(--danger);
-            border-color: #fecaca;
-        }
-
-        .alert ul {
-            margin-bottom: 0;
-            padding-left: 22px;
-        }
+        .alert-success { background: #f0fdf4; color: var(--success); border-color: #bbf7d0; }
+        .alert-error, .alert-danger { background: #fef2f2; color: var(--danger); border-color: #fecaca; }
+        .alert ul { margin-bottom: 0; padding-left: 22px; }
 
         /* TABEL */
-        .table-responsive,
-        .table-wrap {
-            width: 100%;
-            overflow-x: auto;
-        }
+        .table-responsive, .table-wrap { width: 100%; overflow-x: auto; }
 
         table {
             width: 100%;
@@ -585,8 +470,7 @@
             font-size: 14px;
         }
 
-        th,
-        td {
+        th, td {
             text-align: left;
             padding: 12px 14px;
             border-bottom: 1px solid var(--border);
@@ -600,13 +484,8 @@
             white-space: nowrap;
         }
 
-        td {
-            line-height: 1.6;
-        }
-
-        tbody tr:hover {
-            background: #f8fbff;
-        }
+        td { line-height: 1.6; }
+        tbody tr:hover { background: #f8fbff; }
 
         .table-actions {
             display: flex;
@@ -615,14 +494,8 @@
             gap: 7px;
         }
 
-        .table-actions form {
-            margin: 0;
-        }
-
-        .table-actions button,
-        .table-actions a {
-            white-space: nowrap;
-        }
+        .table-actions form { margin: 0; }
+        .table-actions button, .table-actions a { white-space: nowrap; }
 
         .badge {
             display: inline-block;
@@ -633,30 +506,11 @@
             white-space: nowrap;
         }
 
-        .badge-admin {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .badge-pimpinan {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-neutral {
-            background: #e2e8f0;
-            color: #334155;
-        }
-
-        .badge-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-secondary {
-            background: #e2e8f0;
-            color: #475569;
-        }
+        .badge-admin { background: #dbeafe; color: #1e40af; }
+        .badge-pimpinan { background: #dcfce7; color: #166534; }
+        .badge-neutral { background: #e2e8f0; color: #334155; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-secondary { background: #e2e8f0; color: #475569; }
 
         /* FILTER DAN PAGINASI */
         .filter-grid {
@@ -674,8 +528,7 @@
             margin-top: 20px;
         }
 
-        .pagination a,
-        .pagination span {
+        .pagination a, .pagination span {
             display: inline-block;
             padding: 7px 11px;
             border: 1px solid var(--border);
@@ -684,24 +537,11 @@
             font-size: 13px;
         }
 
-        .pagination .current {
-            background: var(--navy);
-            border-color: var(--navy);
-            color: white;
-        }
+        .pagination .current { background: var(--navy); border-color: var(--navy); color: white; }
+        .pagination .disabled { color: #94a3b8; background: #f8fafc; }
+        .pagination-wrapper { margin-top: 18px; }
 
-        .pagination .disabled {
-            color: #94a3b8;
-            background: #f8fafc;
-        }
-
-        .pagination-wrapper {
-            margin-top: 18px;
-        }
-
-        .field-stat {
-            margin-top: 18px;
-        }
+        .field-stat { margin-top: 18px; }
 
         .field-stat-line {
             display: flex;
@@ -718,18 +558,9 @@
             overflow: hidden;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: var(--blue);
-            border-radius: 10px;
-        }
+        .progress-fill { height: 100%; background: var(--blue); border-radius: 10px; }
 
-        .empty-state {
-            padding: 24px 16px;
-            color: var(--muted);
-            text-align: center;
-            font-size: 14px;
-        }
+        .empty-state { padding: 24px 16px; color: var(--muted); text-align: center; font-size: 14px; }
 
         .count-pill {
             display: inline-block;
@@ -752,132 +583,42 @@
 
         /* RESPONSIVE */
         @media (max-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
+            .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .dashboard-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 900px) {
-            .sidebar {
-                width: 230px;
-            }
-
-            .main-area {
-                margin-left: 230px;
-            }
-
-            .main-content {
-                padding: 24px 20px;
-            }
-
-            .topbar {
-                padding: 16px 20px;
-            }
-
-            .filter-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .filter-grid .filter-actions {
-                grid-column: 1 / -1;
-            }
+            .sidebar { width: 230px; }
+            .main-area { margin-left: 230px; }
+            .main-content { padding: 24px 20px; }
+            .topbar { padding: 16px 20px; }
+            .filter-grid { grid-template-columns: 1fr 1fr; }
+            .filter-grid .filter-actions { grid-column: 1 / -1; }
         }
 
         @media (max-width: 760px) {
-            .sidebar {
-                position: relative;
-                width: 100%;
-                max-height: none;
-            }
-
-            .brand {
-                padding: 20px;
-            }
-
-            .nav-label {
-                padding-top: 16px;
-            }
-
-            .sidebar-bottom {
-                margin-top: 0;
-            }
-
-            .main-area {
-                margin-left: 0;
-            }
-
-            .topbar {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .main-content {
-                padding: 20px 16px;
-            }
-
-            .stat-card,
-            .content-card,
-            .panel,
-            .form-card {
-                padding: 18px;
-            }
-
-            .stat-number,
-            .stat-value {
-                font-size: 27px;
-            }
-
-            .page-heading h1,
-            .page-header h1 {
-                font-size: 25px;
-            }
-
-            .app-footer {
-                padding: 20px 16px;
-            }
-
-            .nav-group-summary {
-                margin-right: 12px;
-                margin-left: 12px;
-            }
+            .sidebar { position: relative; width: 100%; max-height: none; }
+            .brand { padding: 20px; }
+            .nav-label { padding-top: 16px; }
+            .sidebar-bottom { margin-top: 0; }
+            .main-area { margin-left: 0; }
+            .topbar { align-items: flex-start; flex-direction: column; }
+            .main-content { padding: 20px 16px; }
+            .stat-card, .content-card, .panel, .form-card { padding: 18px; }
+            .stat-number, .stat-value { font-size: 27px; }
+            .page-heading h1, .page-header h1 { font-size: 25px; }
+            .app-footer { padding: 20px 16px; }
+            .nav-group-summary { margin-right: 12px; margin-left: 12px; }
         }
 
         @media (max-width: 560px) {
-            .form-grid,
-            .filter-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-grid .filter-actions {
-                grid-column: auto;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-
-            .page-heading h1,
-            .page-header h1 {
-                font-size: 23px;
-            }
-
-            .inline-actions .btn {
-                flex: 1 1 auto;
-            }
-
-            .user-chip {
-                max-width: 100%;
-            }
-
-            th,
-            td {
-                padding: 10px;
-            }
+            .form-grid, .filter-grid { grid-template-columns: 1fr; }
+            .filter-grid .filter-actions { grid-column: auto; }
+            .stats-grid { grid-template-columns: 1fr; gap: 12px; }
+            .page-heading h1, .page-header h1 { font-size: 23px; }
+            .inline-actions .btn { flex: 1 1 auto; }
+            .user-chip { max-width: 100%; }
+            th, td { padding: 10px; }
         }
     </style>
 </head>
@@ -889,13 +630,12 @@
         $currentUser = auth()->user();
         $role = strtolower(trim((string) ($currentUser?->role ?? '')));
 
-        // Mendukung format role lama dan baru.
-        if ($role === 'super-admin') {
-            $role = 'super_admin';
-        }
+        // Menyamakan format role agar konsisten.
+        $role = str_replace('-', '_', $role);
 
         $roleLabels = [
             'super_admin' => 'Super Admin',
+            'superadmin' => 'Super Admin',
             'admin' => 'Admin',
             'pimpinan' => 'Pimpinan',
             'user' => 'Peserta Pelatihan',
@@ -903,7 +643,7 @@
 
         $roleLabel = $roleLabels[$role] ?? 'Pengguna';
 
-        $isSuperAdmin = $role === 'super_admin';
+        $isSuperAdmin = in_array($role, ['super_admin', 'superadmin'], true);
         $isAdmin = $role === 'admin';
         $isPimpinan = $role === 'pimpinan';
         $isParticipant = $role === 'user';
@@ -937,9 +677,7 @@
                 <a
                     href="{{ route('super-admin.dashboard') }}"
                     class="nav-link {{ request()->routeIs('super-admin.dashboard') ? 'active' : '' }}"
-                    @if (request()->routeIs('super-admin.dashboard'))
-                        aria-current="page"
-                    @endif
+                    @if (request()->routeIs('super-admin.dashboard')) aria-current="page" @endif
                 >
                     ▦ &nbsp; Dashboard
                 </a>
@@ -947,9 +685,7 @@
                 <a
                     href="{{ route('dashboard') }}"
                     class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
-                    @if (request()->routeIs('dashboard'))
-                        aria-current="page"
-                    @endif
+                    @if (request()->routeIs('dashboard')) aria-current="page" @endif
                 >
                     ▦ &nbsp; Dashboard
                 </a>
@@ -959,25 +695,18 @@
             @if ($isSuperAdmin)
                 <div class="nav-label">MANAJEMEN SISTEM</div>
 
-                {{-- KELOLA AKUN --}}
                 @if (Route::has('super-admin.users.index'))
                     <a
                         href="{{ route('super-admin.users.index') }}"
                         class="nav-link {{ request()->routeIs('super-admin.users.*') ? 'active' : '' }}"
-                        @if (request()->routeIs('super-admin.users.*'))
-                            aria-current="page"
-                        @endif
+                        @if (request()->routeIs('super-admin.users.*')) aria-current="page" @endif
                     >
                         👥 &nbsp; Kelola Akun
                     </a>
                 @endif
 
-                {{-- MASTER DATA: MENU BISA DIBUKA DAN DITUTUP --}}
                 @if (Route::has('super-admin.master-data.index'))
-                    <details
-                        class="nav-group"
-                        {{ $isMasterDataActive ? 'open' : '' }}
-                    >
+                    <details class="nav-group" {{ $isMasterDataActive ? 'open' : '' }}>
                         <summary
                             class="nav-group-summary {{ $isMasterDataActive ? 'active' : '' }}"
                             aria-label="Buka atau tutup menu Master Data"
@@ -986,7 +715,6 @@
                                 <span aria-hidden="true">⚙</span>
                                 <span>Master Data</span>
                             </span>
-
                             <span class="nav-chevron" aria-hidden="true">▼</span>
                         </summary>
 
@@ -995,9 +723,7 @@
                                 <a
                                     href="{{ route('super-admin.master-data.index', ['category' => $categoryKey]) }}"
                                     class="nav-sublink {{ $currentCategory === $categoryKey && $isMasterDataActive ? 'active' : '' }}"
-                                    @if ($currentCategory === $categoryKey && $isMasterDataActive)
-                                        aria-current="page"
-                                    @endif
+                                    @if ($currentCategory === $categoryKey && $isMasterDataActive) aria-current="page" @endif
                                 >
                                     {{ $categoryLabel }}
                                 </a>
@@ -1006,34 +732,28 @@
                     </details>
                 @endif
 
-                {{-- ROLE DAN HAK AKSES --}}
                 @if (Route::has('roles.index'))
                     <a
                         href="{{ route('roles.index') }}"
                         class="nav-link {{ request()->routeIs('roles.*') ? 'active' : '' }}"
-                        @if (request()->routeIs('roles.*'))
-                            aria-current="page"
-                        @endif
+                        @if (request()->routeIs('roles.*')) aria-current="page" @endif
                     >
                         🔐 &nbsp; Role dan Hak Akses
                     </a>
                 @endif
 
-                {{-- LOG AKTIVITAS --}}
                 @if (Route::has('activity-logs.index'))
                     <a
                         href="{{ route('activity-logs.index') }}"
                         class="nav-link {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}"
-                        @if (request()->routeIs('activity-logs.*'))
-                            aria-current="page"
-                        @endif
+                        @if (request()->routeIs('activity-logs.*')) aria-current="page" @endif
                     >
                         ▤ &nbsp; Log Aktivitas
                     </a>
                 @endif
             @endif
 
-            {{-- ADMIN --}}
+            {{-- ADMIN: MENGELOLA DATA --}}
             @if ($isAdmin)
                 <div class="nav-label">PENGELOLAAN DATA</div>
 
@@ -1041,9 +761,7 @@
                     <a
                         href="{{ route('participants.index') }}"
                         class="nav-link {{ request()->routeIs('participants.*') ? 'active' : '' }}"
-                        @if (request()->routeIs('participants.*'))
-                            aria-current="page"
-                        @endif
+                        @if (request()->routeIs('participants.*')) aria-current="page" @endif
                     >
                         👥 &nbsp; Data Peserta
                     </a>
@@ -1053,9 +771,7 @@
                     <a
                         href="{{ route('trainings.index') }}"
                         class="nav-link {{ request()->routeIs('trainings.*') ? 'active' : '' }}"
-                        @if (request()->routeIs('trainings.*'))
-                            aria-current="page"
-                        @endif
+                        @if (request()->routeIs('trainings.*')) aria-current="page" @endif
                     >
                         ▤ &nbsp; Data Pelatihan
                     </a>
@@ -1065,9 +781,7 @@
                     <a
                         href="{{ route('imports.index') }}"
                         class="nav-link {{ request()->routeIs('imports.*') ? 'active' : '' }}"
-                        @if (request()->routeIs('imports.*'))
-                            aria-current="page"
-                        @endif
+                        @if (request()->routeIs('imports.*')) aria-current="page" @endif
                     >
                         ⇧ &nbsp; Impor Excel
                     </a>
@@ -1075,54 +789,25 @@
 
                 @if (Route::has('reports.index'))
                     <div class="nav-label">PELAPORAN</div>
-
                     <a
                         href="{{ route('reports.index') }}"
                         class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"
-                        @if (request()->routeIs('reports.*'))
-                            aria-current="page"
-                        @endif
+                        @if (request()->routeIs('reports.*')) aria-current="page" @endif
                     >
                         ▥ &nbsp; Laporan dan Statistik
                     </a>
                 @endif
             @endif
 
-            {{-- PIMPINAN: HANYA MELIHAT DATA --}}
+            {{-- PIMPINAN: DASHBOARD DAN LAPORAN SAJA --}}
             @if ($isPimpinan)
                 <div class="nav-label">PEMANTAUAN</div>
-
-                @if (Route::has('participants.index'))
-                    <a
-                        href="{{ route('participants.index') }}"
-                        class="nav-link {{ request()->routeIs('participants.index', 'participants.show') ? 'active' : '' }}"
-                        @if (request()->routeIs('participants.index', 'participants.show'))
-                            aria-current="page"
-                        @endif
-                    >
-                        👥 &nbsp; Data Peserta
-                    </a>
-                @endif
-
-                @if (Route::has('trainings.index'))
-                    <a
-                        href="{{ route('trainings.index') }}"
-                        class="nav-link {{ request()->routeIs('trainings.index', 'trainings.show') ? 'active' : '' }}"
-                        @if (request()->routeIs('trainings.index', 'trainings.show'))
-                            aria-current="page"
-                        @endif
-                    >
-                        ▤ &nbsp; Data Pelatihan
-                    </a>
-                @endif
 
                 @if (Route::has('reports.index'))
                     <a
                         href="{{ route('reports.index') }}"
                         class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"
-                        @if (request()->routeIs('reports.*'))
-                            aria-current="page"
-                        @endif
+                        @if (request()->routeIs('reports.*')) aria-current="page" @endif
                     >
                         ▥ &nbsp; Laporan Pelatihan
                     </a>
@@ -1137,9 +822,7 @@
                     <a
                         href="{{ route('participant.profile') }}"
                         class="nav-link {{ request()->routeIs('participant.profile') ? 'active' : '' }}"
-                        @if (request()->routeIs('participant.profile'))
-                            aria-current="page"
-                        @endif
+                        @if (request()->routeIs('participant.profile')) aria-current="page" @endif
                     >
                         👤 &nbsp; Profil Saya
                     </a>
@@ -1166,7 +849,7 @@
 
             <div class="user-info">
                 <div class="user-chip">
-                    {{ $currentUser?->name ?? 'Pengguna' }}
+                    {{ $currentUser?->name ?? $currentUser?->username ?? 'Pengguna' }}
                     <span class="role-label">{{ $roleLabel }}</span>
                 </div>
             </div>

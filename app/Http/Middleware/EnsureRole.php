@@ -15,22 +15,33 @@ class EnsureRole
     ): Response {
         $user = $request->user();
 
-        if (! $user) {
+        if (!$user) {
             return redirect()->route('login');
         }
 
-        $userRole = strtolower(trim((string) $user->role));
+        $normalizeRole = static function (string $role): string {
+            $role = strtolower(trim($role));
+            $role = str_replace('-', '_', $role);
+
+            if ($role === 'participant') {
+                return 'user';
+            }
+
+            return $role;
+        };
+
+        $userRole = $normalizeRole((string) $user->role);
+
         $allowedRoles = array_map(
-            fn (string $role) => strtolower(trim($role)),
+            $normalizeRole,
             $roles
         );
 
-        if (! in_array($userRole, $allowedRoles, true)) {
-            abort(
-                403,
-                'Akses ditolak. Role akun kamu tidak memiliki izin untuk halaman ini.'
-            );
-        }
+        abort_unless(
+            in_array($userRole, $allowedRoles, true),
+            403,
+            'Akses ditolak. Akun Anda tidak memiliki izin untuk halaman ini.'
+        );
 
         return $next($request);
     }

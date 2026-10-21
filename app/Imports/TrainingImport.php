@@ -5,393 +5,443 @@ namespace App\Imports;
 use App\Models\Participant;
 use App\Models\Training;
 use App\Models\TrainingHistory;
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
 class TrainingImport implements ToCollection
 {
-    public int $processed = 0;
     public int $createdParticipants = 0;
+    public int $updatedParticipants = 0;
     public int $createdTrainings = 0;
     public int $createdHistories = 0;
-    public int $skipped = 0;
+
     public array $errors = [];
 
     public function __construct(
-        private readonly ?string $batchNumber = null,
-        private readonly ?string $fundingSource = null,
+        public string $batchNumber,
+        public string $fundingSource,
+        public string $trainingName,
+        public string $facilitation = '',
+        public string $organizer = '',
+        public ?string $startDate = null,
+        public ?string $endDate = null,
+        public string $district = '',
     ) {}
 
     public function collection(Collection $rows): void
     {
-        // Metadata workbook berada di bagian atas lembar Excel.
-        $trainingName = $this->cell($rows, 1, 1);
-        $facilitation = $this->cell($rows, 2, 1);
-        $organizer = $this->cell($rows, 3, 1);
-        $dateRange = $this->cell($rows, 4, 1);
+        // Header Excel ada pada baris 7 (indeks 6).
+        $headerRow = $rows->get(6);
 
-        if (! $trainingName) {
-            $this->errors[] = [
-                'baris' => 2,
-                'pesan' => 'Nama pelatihan pada sel A2 tidak ditemukan.',
-            ];
+        if (!$headerRow) {
+            $this->errors[] =
+                'Header peserta tidak ditemukan pada baris 7.';
             return;
         }
 
-        if (! $this->batchNumber || ! $this->fundingSource) {
-            $this->errors[] = [
-                'baris' => 1,
-                'pesan' => 'Angkatan dan sumber dana wajib diisi sebelum impor.',
-            ];
+        $headers = $this->normalizeHeaders($headerRow);
+
+        $nameColumn = $this->findColumn($headers, [
+            'nama lengkap',
+            'nama',
+            'name',
+        ]);
+
+        if ($nameColumn === null) {
+            $this->errors[] =
+                'Kolom NAMA LENGKAP tidak ditemukan.';
+            return;
+        }
+
+        $nipColumn = $this->findColumn($headers, [
+            'nip',
+            'nomor induk pegawai',
+        ]);
+
+        $nikColumn = $this->findColumn($headers, [
+            'nik',
+            'nomor induk kependudukan',
+        ]);
+
+        if ($nipColumn === null && $nikColumn === null) {
+            $this->errors[] =
+                'Kolom NIP atau NIK tidak ditemukan pada Excel.';
             return;
         }
 
         try {
-            [$startDate, $endDate] = $this->parseDateRange($dateRange);
-        } catch (\Throwable $exception) {
-            $this->errors[] = [
-                'baris' => 5,
-                'pesan' => $exception->getMessage(),
-            ];
+            $training = $this->findOrCreateTraining();
+        } catch (\Throwable $e) {
+            $this->errors[] =
+                'Gagal menyimpan data pelatihan: ' . $e->getMessage();
             return;
         }
 
-        $durationDays = $startDate && $endDate
-            ? $startDate->diffInDays($endDate) + 1
-            : 0;
-
-        // Header peserta berada pada baris Excel ke-7.
-        $headerRow = $rows->get(6);
-
-        if (! $headerRow) {
-            $this->errors[] = [
-                'baris' => 7,
-                'pesan' => 'Header peserta pada baris 7 tidak ditemukan.',
-            ];
-            return;
-        }
-
-        $headers = $headerRow->toArray();
-        $headerMap = [];
-
-        foreach ($headers as $column => $header) {
-            $normalized = Str::snake(trim((string) $header));
-
-            if ($normalized !== '') {
-                $headerMap[$normalized] = $column;
-            }
-        }
-
-        $training = null;
-
-        foreach ($rows as $index => $row) {
-            // Lewati metadata dan header, proses mulai baris Excel ke-8.
-            if ($index < 7) {
-                continue;
-            }
-
-            $line = $index + 1;
-            $values = $row->toArray();
+        /*
+         * values() mengatur ulang indeks setelah slice.
+         * Dengan demikian data pertama tetap dilaporkan sebagai
+         * baris Excel 8, bukan baris 15.
+         */
+        foreach ($rows->slice(7)->values() as $index => $row) {
+            $excelRow = $index + 8;
 
             try {
-                $data = [];
+                $data = $this->mapRow($row, $headers);
 
-                foreach ($headerMap as $header => $column) {
-                    $data[$header] = $values[$column] ?? null;
-                }
+                $name = trim((string) ($data['name'] ?? ''));
+                $nip = trim((string) ($data['nip'] ?? ''));
+                $nik = trim((string) ($data['nik'] ?? ''));
 
-                $name = $this->value($data, [
-                    'nama_lengkap',
-                    'nama',
-                    'nama_peserta',
-                ]);
-
-                $nip = $this->value($data, [
-                    'nip',
-                    'nomor_induk_pegawai',
-                    'nomor_induk',
-                ]);
-
-                // Abaikan baris kosong, tetapi laporkan baris berisi data
-                // yang tidak memiliki nama atau NIP.
-                if (! $name && ! $nip) {
+                if ($name === '' && $nip === '' && $nik === '') {
                     continue;
                 }
 
-                if (! $name || ! $nip) {
-                    throw new \RuntimeException(
-                        'Nama lengkap dan NIP wajib diisi.'
-                    );
+                if ($name === '') {
+                    $this->errors[] =
+                        "Baris {$excelRow}: nama peserta kosong.";
+                    continue;
                 }
 
-                $nip = preg_replace('/\s+/', '', $nip);
-                $nik = $this->value($data, ['nik', 'nomor_induk_kependudukan']);
+                if ($nip === '' && $nik === '') {
+                    $this->errors[] =
+                        "Baris {$excelRow}: NIP atau NIK wajib diisi.";
+                    continue;
+                }
 
-                $participant = DB::transaction(function () use (
+                DB::transaction(function () use (
                     $data,
                     $name,
                     $nip,
                     $nik,
-                    &$training,
-                    $trainingName,
-                    $facilitation,
-                    $organizer,
-                    $startDate,
-                    $endDate,
-                    $durationDays
+                    $training
                 ) {
-                    $participant = Participant::where('nip', $nip)->first();
+                    $participant = null;
 
-                    // NIK menjadi kunci pencocokan alternatif bila NIP
-                    // belum ditemukan.
-                    if (! $participant && $nik) {
-                        $participant = Participant::where('nik', $nik)->first();
+                    if ($nip !== '') {
+                        $participant = Participant::where('nip', $nip)
+                            ->first();
                     }
 
-                    $isNewParticipant = ! $participant;
-
-                    if (! $participant) {
-                        $participant = new Participant();
-                    }
-
-                    $participant->nip = $nip;
-                    $participant->name = $name;
-
-                    $this->setIfPresent(
-                        $participant,
-                        'nik',
-                        $nik
-                    );
-
-                    $this->setIfPresent(
-                        $participant,
-                        'gender',
-                        $this->value($data, ['jenis_kelamin', 'gender'])
-                    );
-
-                    $this->setIfPresent(
-                        $participant,
-                        'rank',
-                        $this->value($data, [
-                            'pangkat_golongan',
-                            'pangkat',
-                            'golongan',
-                        ])
-                    );
-
-                    $this->setIfPresent(
-                        $participant,
-                        'profession',
-                        $this->value($data, [
-                            'profesi_nakes',
-                            'profesi',
-                            'jenis_profesi',
-                        ])
-                    );
-
-                    $this->setIfPresent(
-                        $participant,
-                        'email',
-                        $this->value($data, ['email'])
-                    );
-
-                    $this->setIfPresent(
-                        $participant,
-                        'phone',
-                        $this->value($data, [
-                            'nomor_telepon',
-                            'no_telepon',
-                            'telepon',
-                            'phone',
-                        ])
-                    );
-
-                    $this->setIfPresent(
-                        $participant,
-                        'institution',
-                        $this->value($data, [
-                            'instansi_unit_kerja',
-                            'instansi',
-                            'unit_kerja',
-                        ])
-                    );
-
-                    // Jangan menimpa data lama dengan nilai kosong.
-                    if (! $participant->province) {
-                        $participant->province = 'Kalimantan Selatan';
-                    }
-
-                    $participant->save();
-
-                    if ($isNewParticipant) {
-                        $this->createdParticipants++;
-                    }
-
-                    if (! $training) {
-                        $identity = implode('|', [
-                            Str::lower(trim($trainingName)),
-                            $startDate?->toDateString() ?? '',
-                            $endDate?->toDateString() ?? '',
-                            Str::lower(trim((string) $organizer)),
-                            trim($this->batchNumber ?? ''),
-                        ]);
-
-                        $code = 'IMP-' . strtoupper(
-                            substr(hash('sha256', $identity), 0, 24)
-                        );
-
-                        // Cari kode impor yang sama supaya impor ulang
-                        // tidak membuat pelatihan duplikat.
-                        $training = Training::firstOrNew([
-                            'code' => $code,
-                        ]);
-
-                        $isNewTraining = ! $training->exists;
-
-                        $training->name = $trainingName;
-                        $training->batch_number = $this->batchNumber;
-                        $training->funding_source = $this->fundingSource;
-                        $training->organizer = $organizer ?: $training->organizer;
-                        $training->start_date = $startDate;
-                        $training->end_date = $endDate;
-                        $training->duration_days = $durationDays;
-
-                        // Kolom field bukan kolom fasilitasi. Simpan
-                        // keterangan fasilitasi di description.
-                        $training->description = $facilitation
-                            ? 'Fasilitasi: ' . $facilitation
-                            : $training->description;
-
-                        $training->save();
-
-                        if ($isNewTraining) {
-                            $this->createdTrainings++;
+                    if (!$participant && $nik !== '') {
+                        if (Schema::hasColumn('participants', 'nik')) {
+                            $participant = Participant::where('nik', $nik)
+                                ->first();
                         }
                     }
 
-                    $exists = TrainingHistory::where(
-                        'participant_id',
-                        $participant->id
-                    )->where(
-                        'training_id',
-                        $training->id
-                    )->exists();
+                    $isNew = !$participant;
 
-                    if ($exists) {
-                        $this->skipped++;
-                        return $participant;
+                    if (!$participant) {
+                        $participant = new Participant();
                     }
 
-                    TrainingHistory::create([
+                    $participant->name = $name;
+
+                    if ($nip !== '') {
+                        $participant->nip = $nip;
+                    }
+
+                    if (
+                        $nik !== '' &&
+                        Schema::hasColumn(
+                            $participant->getTable(),
+                            'nik'
+                        )
+                    ) {
+                        $participant->nik = $nik;
+                    }
+
+                    $this->setIfColumnExists(
+                        $participant,
+                        'gender',
+                        $data['gender'] ?? null
+                    );
+
+                    $this->setIfColumnExists(
+                        $participant,
+                        'rank',
+                        $data['rank'] ?? null
+                    );
+
+                    $this->setIfColumnExists(
+                        $participant,
+                        'profession',
+                        $data['profession'] ?? null
+                    );
+
+                    $this->setIfColumnExists(
+                        $participant,
+                        'email',
+                        $data['email'] ?? null
+                    );
+
+                    $this->setIfColumnExists(
+                        $participant,
+                        'phone',
+                        $data['phone'] ?? null
+                    );
+
+                    $this->setIfColumnExists(
+                        $participant,
+                        'institution',
+                        $data['institution'] ?? null
+                    );
+
+                    $participant->save();
+
+                    if ($isNew) {
+                        $this->createdParticipants++;
+                    } else {
+                        $this->updatedParticipants++;
+                    }
+
+                    // Cegah riwayat yang sama dibuat berulang.
+                    $history = TrainingHistory::firstOrCreate([
                         'participant_id' => $participant->id,
                         'training_id' => $training->id,
-                        'source_file' => 'Impor Excel',
-                        'status' => 'selesai',
                     ]);
 
-                    $this->createdHistories++;
-
-                    return $participant;
+                    if ($history->wasRecentlyCreated) {
+                        $this->createdHistories++;
+                    }
                 });
-
-                $this->processed++;
-            } catch (\Throwable $exception) {
-                $this->errors[] = [
-                    'baris' => $line,
-                    'pesan' => $exception->getMessage(),
-                ];
+            } catch (\Throwable $e) {
+                $this->errors[] =
+                    "Baris {$excelRow}: " . $e->getMessage();
             }
         }
     }
 
-    private function cell(Collection $rows, int $rowIndex, int $columnIndex): ?string
+    private function normalizeHeaders(Collection $row): array
     {
-        $row = $rows->get($rowIndex);
-        $value = $row?->get($columnIndex);
+        $headers = [];
 
-        if ($value === null || trim((string) $value) === '') {
-            return null;
+        foreach ($row as $index => $value) {
+            $headers[$index] = Str::of((string) $value)
+                ->lower()
+                ->replace(['/', '.', '-', '_'], ' ')
+                ->squish()
+                ->toString();
         }
 
-        return trim((string) $value);
+        return $headers;
     }
 
-    private function value(array $row, array $keys): ?string
-    {
-        foreach ($keys as $key) {
-            $value = $row[Str::snake($key)] ?? null;
-
-            if ($value !== null && trim((string) $value) !== '') {
-                return trim((string) $value);
+    private function findColumn(
+        array $headers,
+        array $aliases
+    ): ?int {
+        foreach ($headers as $index => $header) {
+            if (in_array($header, $aliases, true)) {
+                return $index;
             }
         }
 
         return null;
     }
 
-    private function setIfPresent(
-        Participant $participant,
-        string $attribute,
-        ?string $value
+    private function mapRow(
+        Collection $row,
+        array $headers
+    ): array {
+        $aliases = [
+            'name' => [
+                'nama lengkap',
+                'nama',
+                'name',
+            ],
+            'nip' => [
+                'nip',
+                'nomor induk pegawai',
+            ],
+            'nik' => [
+                'nik',
+                'nomor induk kependudukan',
+            ],
+            'gender' => [
+                'jenis kelamin',
+                'gender',
+                'jk',
+            ],
+            'rank' => [
+                'pangkat golongan',
+                'pangkat gol',
+                'golongan',
+            ],
+            'profession' => [
+                'profesi nakes',
+                'profesi',
+                'jenis tenaga kesehatan',
+            ],
+            'email' => [
+                'email',
+                'alamat email',
+            ],
+            'phone' => [
+                'nomor telepon',
+                'no telepon',
+                'telepon',
+                'no hp',
+                'nomor hp',
+            ],
+            'institution' => [
+                'instansi unit kerja',
+                'instansi',
+                'unit kerja',
+            ],
+        ];
+
+        $result = [];
+
+        foreach ($aliases as $field => $names) {
+            $column = $this->findColumn($headers, $names);
+
+            $value = $column !== null
+                ? ($row[$column] ?? null)
+                : null;
+
+            $result[$field] = $value === null
+                ? null
+                : trim((string) $value);
+        }
+
+        return $result;
+    }
+
+    private function findOrCreateTraining(): Training
+    {
+        $codeSource = implode('|', [
+            $this->trainingName,
+            $this->startDate ?? '',
+            $this->endDate ?? '',
+            $this->organizer,
+            $this->batchNumber,
+            $this->fundingSource,
+            $this->district,
+        ]);
+
+        $code = 'IMP-' . strtoupper(
+            substr(hash('sha256', $codeSource), 0, 16)
+        );
+
+        $training = Training::firstOrNew([
+            'code' => $code,
+        ]);
+
+        $isNew = !$training->exists;
+
+        $training->name = $this->trainingName;
+
+        $this->setTrainingColumn(
+            $training,
+            'batch_number',
+            $this->batchNumber
+        );
+
+        $this->setTrainingColumn(
+            $training,
+            'angkatan',
+            $this->batchNumber
+        );
+
+        $this->setTrainingColumn(
+            $training,
+            'funding_source',
+            $this->fundingSource
+        );
+
+        $this->setTrainingColumn(
+            $training,
+            'sumber_dana',
+            $this->fundingSource
+        );
+
+        // Simpan nama wilayah yang dipilih dari master data.
+        $this->setTrainingColumn(
+            $training,
+            'district',
+            $this->district
+        );
+
+        if ($this->organizer !== '') {
+            $this->setTrainingColumn(
+                $training,
+                'organizer',
+                $this->organizer
+            );
+        }
+
+        if ($this->startDate) {
+            $this->setTrainingColumn(
+                $training,
+                'start_date',
+                $this->startDate
+            );
+        }
+
+        if ($this->endDate) {
+            $this->setTrainingColumn(
+                $training,
+                'end_date',
+                $this->endDate
+            );
+        }
+
+        if ($this->facilitation !== '') {
+            $this->setTrainingColumn(
+                $training,
+                'description',
+                $this->facilitation
+            );
+        }
+
+        if ($this->startDate && $this->endDate) {
+            $start = new \DateTimeImmutable($this->startDate);
+            $end = new \DateTimeImmutable($this->endDate);
+
+            $this->setTrainingColumn(
+                $training,
+                'duration',
+                $start->diff($end)->days + 1
+            );
+        }
+
+        $training->save();
+
+        if ($isNew) {
+            $this->createdTrainings++;
+        }
+
+        return $training;
+    }
+
+    private function setTrainingColumn(
+        Training $training,
+        string $column,
+        mixed $value
     ): void {
-        if ($value !== null && trim($value) !== '') {
-            $participant->{$attribute} = trim($value);
+        if (Schema::hasColumn($training->getTable(), $column)) {
+            $training->{$column} = $value;
         }
     }
 
-    private function parseDateRange(?string $value): array
-    {
-        if (! $value) {
-            throw new \RuntimeException(
-                'Rentang tanggal pelatihan pada sel A5 tidak ditemukan.'
-            );
-        }
-
-        // Mendukung format seperti "18 MEI 2026 - 23 MEI 2026".
-        $parts = preg_split('/\s+-\s+/', trim($value));
-
-        if (count($parts) !== 2) {
-            throw new \RuntimeException(
-                "Format rentang tanggal tidak valid: {$value}"
-            );
-        }
-
-        return [
-            $this->parseIndonesianDate($parts[0]),
-            $this->parseIndonesianDate($parts[1]),
-        ];
-    }
-
-    private function parseIndonesianDate(string $value): Carbon
-    {
-        $value = Str::lower(trim($value));
-
-        $months = [
-            'januari' => 'January',
-            'februari' => 'February',
-            'maret' => 'March',
-            'april' => 'April',
-            'mei' => 'May',
-            'juni' => 'June',
-            'juli' => 'July',
-            'agustus' => 'August',
-            'september' => 'September',
-            'oktober' => 'October',
-            'november' => 'November',
-            'desember' => 'December',
-        ];
-
-        $value = str_replace(array_keys($months), array_values($months), $value);
-
-        try {
-            return Carbon::parse($value);
-        } catch (\Throwable) {
-            throw new \RuntimeException(
-                "Tanggal tidak dapat dibaca: {$value}"
-            );
+    private function setIfColumnExists(
+        Participant $participant,
+        string $column,
+        mixed $value
+    ): void {
+        if (
+            $value !== null &&
+            $value !== '' &&
+            Schema::hasColumn(
+                $participant->getTable(),
+                $column
+            )
+        ) {
+            $participant->{$column} = $value;
         }
     }
 }

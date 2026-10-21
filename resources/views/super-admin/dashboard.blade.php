@@ -12,7 +12,8 @@
             </p>
         </div>
 
-        <a href="{{ route('super-admin.users.create') }}" class="btn btn-primary">
+        <a href="{{ route('super-admin.users.create') }}"
+           class="btn btn-primary">
             + Tambah Akun
         </a>
     </div>
@@ -31,15 +32,23 @@
             <div class="stat-number">
                 {{ number_format($totalPimpinan, 0, ',', '.') }}
             </div>
-            <div class="stat-note">Pengguna untuk pemantauan.</div>
+            <div class="stat-note">Akun untuk pemantauan.</div>
         </div>
 
         <div class="stat-card">
-            <div class="stat-label">Total Akun yang Dikelola</div>
+            <div class="stat-label">Akun Aktif</div>
             <div class="stat-number">
-                {{ number_format($totalPengguna, 0, ',', '.') }}
+                {{ number_format($totalAktif, 0, ',', '.') }}
             </div>
-            <div class="stat-note">Akun Admin dan Pimpinan.</div>
+            <div class="stat-note">Akun Admin dan Pimpinan yang aktif.</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Akun Nonaktif</div>
+            <div class="stat-number">
+                {{ number_format($totalNonaktif, 0, ',', '.') }}
+            </div>
+            <div class="stat-note">Akun Admin dan Pimpinan yang nonaktif.</div>
         </div>
     </div>
 
@@ -47,32 +56,29 @@
         <section class="content-card">
             <h2>Manajemen Pengguna</h2>
             <p>
-                Kelola akun Admin dan Pimpinan tanpa mengubah
-                data peserta maupun data pelatihan.
+                Kelola akun Admin dan Pimpinan. Super Admin tidak
+                mengelola data peserta maupun data pelatihan.
             </p>
-
-            <div class="inline-actions">
-                <a href="{{ route('super-admin.users.index') }}"
-                   class="btn btn-primary">
-                    Kelola Akun
-                </a>
-
-                <a href="{{ route('super-admin.users.create') }}"
-                   class="btn btn-light">
-                    Tambah Akun
-                </a>
-            </div>
+            <p>
+                Gunakan menu Kelola Akun di sidebar untuk melihat
+                dan mengelola akun yang terdaftar.
+            </p>
         </section>
 
         <section class="content-card">
-            <h2>Pengaturan Sistem</h2>
+            <h2>Data Master</h2>
             <p>
-                Pengaturan tahun, provinsi, kabupaten/kota/mitra,
-                sumber dana, dan jenis tenaga kesehatan akan
-                dikelola melalui menu master data.
+                Kelola provinsi, kabupaten/kota/mitra, sumber dana,
+                tahun pelatihan, dan jenis tenaga kesehatan.
             </p>
 
-            <span class="count-pill">Tahap berikutnya</span>
+            <div class="inline-actions">
+                <a href="{{ route('super-admin.master-data.index', [
+                    'category' => 'provinces'
+                ]) }}" class="btn btn-light">
+                    Buka Data Master
+                </a>
+            </div>
         </section>
     </div>
 @endsection

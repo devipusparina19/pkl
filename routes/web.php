@@ -12,7 +12,7 @@ use App\Http\Controllers\SuperAdmin\MasterDataController;
 
 /*
 |--------------------------------------------------------------------------
-| Halaman Publik
+| Halaman publik
 |--------------------------------------------------------------------------
 */
 
@@ -21,7 +21,7 @@ Route::get('/', [DashboardController::class, 'publicIndex'])
 
 /*
 |--------------------------------------------------------------------------
-| Login — pertahankan mekanisme login yang sudah ada
+| Login
 |--------------------------------------------------------------------------
 */
 
@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Dashboard berdasarkan role
+    | Dashboard internal
     |--------------------------------------------------------------------------
     */
 
@@ -60,26 +60,14 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Peserta: daftar dan detail untuk Admin, Pimpinan, Super Admin
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware('role:admin,pimpinan,super_admin')->group(function () {
-        Route::get('/participants', [ParticipantController::class, 'index'])
-            ->name('participants.index');
-
-        Route::get('/participants/{participant}', [ParticipantController::class, 'show'])
-            ->whereNumber('participant')
-            ->name('participants.show');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Peserta: perubahan data hanya Admin
+    | Peserta: hanya Admin
     |--------------------------------------------------------------------------
     */
 
     Route::middleware('role:admin')->group(function () {
+        Route::get('/participants', [ParticipantController::class, 'index'])
+            ->name('participants.index');
+
         Route::get('/participants/create', [ParticipantController::class, 'create'])
             ->name('participants.create');
 
@@ -89,6 +77,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/participants/{participant}/edit', [ParticipantController::class, 'edit'])
             ->whereNumber('participant')
             ->name('participants.edit');
+
+        Route::get('/participants/{participant}', [ParticipantController::class, 'show'])
+            ->whereNumber('participant')
+            ->name('participants.show');
 
         Route::put('/participants/{participant}', [ParticipantController::class, 'update'])
             ->whereNumber('participant')
@@ -101,26 +93,14 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Pelatihan: daftar dan detail untuk Admin, Pimpinan, Super Admin
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware('role:admin,pimpinan,super_admin')->group(function () {
-        Route::get('/trainings', [TrainingController::class, 'index'])
-            ->name('trainings.index');
-
-        Route::get('/trainings/{training}', [TrainingController::class, 'show'])
-            ->whereNumber('training')
-            ->name('trainings.show');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Pelatihan: perubahan data hanya Admin
+    | Pelatihan: hanya Admin
     |--------------------------------------------------------------------------
     */
 
     Route::middleware('role:admin')->group(function () {
+        Route::get('/trainings', [TrainingController::class, 'index'])
+            ->name('trainings.index');
+
         Route::get('/trainings/create', [TrainingController::class, 'create'])
             ->name('trainings.create');
 
@@ -131,16 +111,22 @@ Route::middleware('auth')->group(function () {
             ->whereNumber('training')
             ->name('trainings.edit');
 
+        Route::get('/trainings/{training}', [TrainingController::class, 'show'])
+            ->whereNumber('training')
+            ->name('trainings.show');
+
         Route::put('/trainings/{training}', [TrainingController::class, 'update'])
+            ->whereNumber('training')
             ->name('trainings.update');
 
         Route::patch('/trainings/{training}', [TrainingController::class, 'update'])
+            ->whereNumber('training')
             ->name('trainings.update.patch');
     });
 
     /*
     |--------------------------------------------------------------------------
-    | Impor Excel: hanya Admin
+    | Import Excel: hanya Admin
     |--------------------------------------------------------------------------
     */
 
@@ -149,17 +135,16 @@ Route::middleware('auth')->group(function () {
             ->name('imports.index');
 
         Route::post('/imports', [ImportController::class, 'store'])
-            ->middleware('throttle:10,1')
             ->name('imports.store');
     });
 
     /*
     |--------------------------------------------------------------------------
-    | Laporan: Admin, Pimpinan, dan Super Admin
+    | Laporan: Admin dan Pimpinan
     |--------------------------------------------------------------------------
     */
 
-    Route::middleware('role:admin,pimpinan,super_admin')->group(function () {
+    Route::middleware('role:admin,pimpinan')->group(function () {
         Route::get('/reports', [ReportController::class, 'index'])
             ->name('reports.index');
     });
@@ -216,7 +201,7 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Master Data: hanya Super Admin
+    | Master data: hanya Super Admin
     |--------------------------------------------------------------------------
     */
 

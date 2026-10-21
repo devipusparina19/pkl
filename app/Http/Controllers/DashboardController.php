@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Participant;
 use App\Models\Training;
 use App\Models\TrainingHistory;
+use App\Models\District;
+use App\Models\FundingSource;
+use App\Models\TrainingYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -44,19 +47,41 @@ class DashboardController extends Controller
             ->distinct()
             ->count('participant_id');
 
-        $districts = Training::query()
-            ->whereNotNull('district')
-            ->where('district', '!=', '')
-            ->distinct()
-            ->orderBy('district')
-            ->pluck('district');
+        /*
+         * Pilihan kabupaten/kota/mitra berasal dari master data.
+         * Data lama dari tabel trainings tetap digunakan sebagai
+         * cadangan jika tabel master belum memiliki data aktif.
+         */
+        $districts = District::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name');
 
-        $fundingSources = Training::query()
-            ->whereNotNull('funding_source')
-            ->where('funding_source', '!=', '')
-            ->distinct()
-            ->orderBy('funding_source')
-            ->pluck('funding_source');
+        if ($districts->isEmpty()) {
+            $districts = Training::query()
+                ->whereNotNull('district')
+                ->where('district', '!=', '')
+                ->distinct()
+                ->orderBy('district')
+                ->pluck('district');
+        }
+
+        /*
+         * Pilihan sumber dana berasal dari master data.
+         */
+        $fundingSources = FundingSource::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name');
+
+        if ($fundingSources->isEmpty()) {
+            $fundingSources = Training::query()
+                ->whereNotNull('funding_source')
+                ->where('funding_source', '!=', '')
+                ->distinct()
+                ->orderBy('funding_source')
+                ->pluck('funding_source');
+        }
 
         $byDistrict = (clone $base)
             ->select('district', DB::raw('COUNT(*) as total'))
@@ -72,18 +97,46 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
-        $years = Training::query()
-            ->whereNotNull('start_date')
-            ->selectRaw('YEAR(start_date) as year')
-            ->distinct()
+        /*
+         * Tahun pelatihan diambil dari master data Super Admin.
+         */
+        $years = TrainingYear::query()
+            ->where('is_active', true)
             ->orderByDesc('year')
-            ->pluck('year');
+            ->pluck('year')
+            ->map(fn ($item) => (int) $item);
 
-        if (! $years->contains($year)) {
+        /*
+         * Jika master data tahun masih kosong, gunakan tahun
+         * yang tersedia dari data pelatihan.
+         */
+        if ($years->isEmpty()) {
+            $yearsQuery = Training::query()
+                ->whereNotNull('start_date');
+
+            if (DB::connection()->getDriverName() === 'sqlite') {
+                $yearsQuery->selectRaw(
+                    "CAST(strftime('%Y', start_date) AS INTEGER) as year"
+                );
+            } else {
+                $yearsQuery->selectRaw(
+                    'YEAR(start_date) as year'
+                );
+            }
+
+            $years = $yearsQuery
+                ->distinct()
+                ->orderByDesc('year')
+                ->pluck('year')
+                ->map(fn ($item) => (int) $item);
+        }
+
+        if (!$years->contains($year)) {
             $years->push($year);
         }
 
-        // Nama ini dipertahankan untuk kompatibilitas dengan view lama.
+        $years = $years->unique()->sortDesc()->values();
+
         $trainingByDistrict = $byDistrict;
 
         return view('welcome', compact(
@@ -103,7 +156,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Pintu masuk dashboard berdasarkan role pengguna.
+     * Dashboard internal berdasarkan role.
      */
     public function index()
     {
@@ -111,20 +164,18 @@ class DashboardController extends Controller
 
         abort_unless($user, 403);
 
-        // Normalisasi untuk mengantisipasi variasi penulisan role.
         $role = strtolower(trim((string) $user->role));
+        $role = str_replace('-', '_', $role);
 
-        if ($role === 'super-admin') {
-            $role = 'super_admin';
-        }
-
-        // Dashboard Super Admin memiliki variabel statistik tersendiri.
-        // Arahkan ke controller khusus agar data yang dikirim sesuai view.
         if ($role === 'super_admin') {
             return redirect()->route('super-admin.dashboard');
         }
 
-        abort_unless(in_array($role, ['admin', 'pimpinan'], true), 403);
+        abort_unless(
+            in_array($role, ['admin', 'pimpinan'], true),
+            403,
+            'Akun ini tidak memiliki akses ke dashboard internal.'
+        );
 
         $totalParticipants = Participant::count();
         $totalTrainings = Training::count();

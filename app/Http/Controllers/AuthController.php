@@ -8,9 +8,6 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Menampilkan halaman login internal.
-     */
     public function showLogin()
     {
         return view('auth.login', [
@@ -19,9 +16,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Menampilkan halaman login berdasarkan role.
-     */
     public function showRoleLogin(string $role)
     {
         $this->validateRolePath($role);
@@ -32,11 +26,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Proses login menggunakan username/email yang sama.
-     *
-     * Autentikasi dilakukan melalui kolom email.
-     */
     public function login(Request $request, string $role)
     {
         $this->validateRolePath($role);
@@ -50,7 +39,7 @@ class AuthController extends Controller
             'password.required' => 'Password wajib diisi.',
         ]);
 
-        if (! Auth::attempt([
+        if (!Auth::attempt([
             'email' => $validated['email'],
             'password' => $validated['password'],
         ])) {
@@ -61,10 +50,7 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        /*
-         * Tolak login jika akun dinonaktifkan.
-         */
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             Auth::logout();
 
             $request->session()->invalidate();
@@ -75,18 +61,14 @@ class AuthController extends Controller
             ]);
         }
 
-        /*
-         * Role pada URL menggunakan tanda hubung,
-         * sedangkan role di database menggunakan underscore.
-         *
-         * super-admin -> super_admin
-         */
-        $expectedRole = str_replace('-', '_', $role);
+        $normalizeRole = static function (string $value): string {
+            return str_replace('-', '_', strtolower(trim($value)));
+        };
 
-        /*
-         * Pastikan role akun sesuai dengan halaman login.
-         */
-        if ($user->role !== $expectedRole) {
+        $expectedRole = $normalizeRole($role);
+        $actualRole = $normalizeRole((string) $user->role);
+
+        if ($actualRole !== $expectedRole) {
             Auth::logout();
 
             $request->session()->invalidate();
@@ -97,19 +79,19 @@ class AuthController extends Controller
             ]);
         }
 
-        /*
-         * Regenerasi session setelah login berhasil.
-         */
         $request->session()->regenerate();
 
+        $destination = match ($actualRole) {
+            'super_admin' => 'super-admin.dashboard',
+            'admin', 'pimpinan' => 'dashboard',
+            default => 'public.dashboard',
+        };
+
         return redirect()
-            ->route('dashboard')
+            ->route($destination)
             ->with('success', 'Selamat datang, ' . $user->name . '!');
     }
 
-    /**
-     * Logout pengguna.
-     */
     public function logout(Request $request)
     {
         Auth::logout();
@@ -122,9 +104,6 @@ class AuthController extends Controller
             ->with('success', 'Anda berhasil keluar dari sistem.');
     }
 
-    /**
-     * Memvalidasi role yang diperbolehkan pada URL login.
-     */
     private function validateRolePath(string $role): void
     {
         abort_unless(
@@ -133,9 +112,6 @@ class AuthController extends Controller
         );
     }
 
-    /**
-     * Label role untuk ditampilkan pada halaman login.
-     */
     private function roleLabel(string $role): string
     {
         return match ($role) {

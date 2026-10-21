@@ -11,18 +11,33 @@ class SuperAdminController extends Controller
 {
     public function index()
     {
-        $totalAdmin = User::where('role', 'admin')->count();
-        $totalPimpinan = User::where('role', 'pimpinan')->count();
+        $managedUsers = User::query()
+            ->whereIn('role', ['admin', 'pimpinan']);
 
-        $totalPengguna = User::whereIn('role', [
-            'admin',
-            'pimpinan',
-        ])->count();
+        $totalAdmin = (clone $managedUsers)
+            ->where('role', 'admin')
+            ->count();
+
+        $totalPimpinan = (clone $managedUsers)
+            ->where('role', 'pimpinan')
+            ->count();
+
+        $totalPengguna = (clone $managedUsers)->count();
+
+        $totalAktif = (clone $managedUsers)
+            ->where('is_active', true)
+            ->count();
+
+        $totalNonaktif = (clone $managedUsers)
+            ->where('is_active', false)
+            ->count();
 
         return view('super-admin.dashboard', compact(
             'totalAdmin',
             'totalPimpinan',
-            'totalPengguna'
+            'totalPengguna',
+            'totalAktif',
+            'totalNonaktif'
         ));
     }
 
@@ -37,18 +52,18 @@ class SuperAdminController extends Controller
         $query = User::query()
             ->whereIn('role', ['admin', 'pimpinan']);
 
-        if (! empty($filters['role'])) {
+        if (!empty($filters['role'])) {
             $query->where('role', $filters['role']);
         }
 
-        if (isset($filters['status']) && $filters['status'] !== '') {
+        if (!empty($filters['status'])) {
             $query->where(
                 'is_active',
                 $filters['status'] === 'active'
             );
         }
 
-        if (! empty($filters['search'])) {
+        if (!empty($filters['search'])) {
             $search = $filters['search'];
 
             $query->where(function ($subQuery) use ($search) {
@@ -150,7 +165,7 @@ class SuperAdminController extends Controller
         $user->email = $validated['email'];
         $user->role = $validated['role'];
 
-        if (! empty($validated['password'])) {
+        if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 
@@ -161,9 +176,6 @@ class SuperAdminController extends Controller
             ->with('success', 'Akun berhasil diperbarui.');
     }
 
-    /**
-     * Mengaktifkan atau menonaktifkan akun Admin/Pimpinan.
-     */
     public function toggleUserStatus(User $user)
     {
         $this->ensureManageableUser($user);
@@ -175,10 +187,12 @@ class SuperAdminController extends Controller
             );
         }
 
-        $user->is_active = ! $user->is_active;
+        $user->is_active = !$user->is_active;
         $user->save();
 
-        $status = $user->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        $status = $user->is_active
+            ? 'diaktifkan'
+            : 'dinonaktifkan';
 
         return redirect()
             ->route('super-admin.users.index')

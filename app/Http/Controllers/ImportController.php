@@ -3,154 +3,217 @@
 namespace App\Http\Controllers;
 
 use App\Imports\TrainingImport;
-use Carbon\Carbon;
+use App\Models\District;
+use App\Models\FundingSource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Throwable;
 
 class ImportController extends Controller
 {
     public function index()
     {
-        return view('imports.index');
+        $fundingSources = FundingSource::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $districts = District::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('imports.index', compact(
+            'fundingSources',
+            'districts'
+        ));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'file' => [
-                'required',
-                'file',
-                'mimes:xlsx,xls,csv',
-                'max:10240',
-            ],
-            'angkatan' => [
-                'required',
-                'string',
-                'max:50',
-            ],
-            'sumber_dana' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'file' => [
+            'required',
+            'file',
+            'mimes:xlsx,xls,csv',
+            'max:10240',
+        ],
+        'angkatan' => [
+            'required',
+            'string',
+            'max:100',
+        ],
+        'kabupaten_kota_mitra' => [
+            'required',
+            'string',
+            'max:255',
+            Rule::exists('districts', 'name')
+                ->where('is_active', true),
+        ],
+        'sumber_dana' => [
+            'required',
+            'string',
+            'max:255',
+            Rule::exists('funding_sources', 'name')
+                ->where('is_active', true),
+        ],
+    ], [
+        'file.required' => 'Silakan pilih file Excel.',
+        'file.mimes' => 'File harus berformat XLSX, XLS, atau CSV.',
+        'file.max' => 'Ukuran file maksimal 10 MB.',
+        'angkatan.required' => 'Angkatan wajib diisi.',
+        'kabupaten_kota_mitra.required' =>
+            'Kabupaten/Kota/Mitra wajib dipilih.',
+        'kabupaten_kota_mitra.exists' =>
+            'Kabupaten/Kota/Mitra tidak valid atau tidak aktif.',
+        'sumber_dana.required' =>
+            'Sumber dana wajib dipilih.',
+        'sumber_dana.exists' =>
+            'Sumber dana tidak valid atau tidak aktif.',
+    ]);
 
-        $spreadsheet = null;
+    try {
+        $district = District::where(
+            'name',
+            $request->input('kabupaten_kota_mitra')
+        )
+            ->where('is_active', true)
+            ->firstOrFail();
 
-        try {
-            $file = $request->file('file');
+        $spreadsheet = IOFactory::load(
+            $request->file('file')->getRealPath()
+        );
 
-            $spreadsheet = IOFactory::load($file->getRealPath());
-            $sheet = $spreadsheet->getActiveSheet();
+        $sheet = $spreadsheet->getActiveSheet();
 
-            $trainingName = trim(
-                (string) $sheet->getCell('A2')->getValue()
-            );
+        $trainingName = trim(
+            (string) $sheet->getCell('A2')->getValue()
+        );
 
-            $dateRange = trim(
-                (string) $sheet->getCell('A5')->getFormattedValue()
-            );
+        $facilitation = trim(
+            (string) $sheet->getCell('A3')->getValue()
+        );
 
-            if ($trainingName === '') {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'file' => 'Nama pelatihan tidak ditemukan pada sel A2 Excel.',
-                    ]);
-            }
+        $organizer = trim(
+            (string) $sheet->getCell('A4')->getValue()
+        );
 
-            if ($dateRange === '') {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'file' => 'Rentang tanggal pelatihan tidak ditemukan pada sel A5 Excel.',
-                    ]);
-            }
+        $dateText = trim(
+            (string) $sheet->getCell('A5')->getValue()
+        );
 
-            $dates = preg_split('/\s*[-–—]\s*/u', $dateRange);
-
-            if (! is_array($dates) || count($dates) !== 2) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'file' => 'Format tanggal pada sel A5 harus berupa tanggal mulai - tanggal selesai.',
-                    ]);
-            }
-
-            try {
-                $startDate = $this->parseIndonesianDate($dates[0]);
-                $endDate = $this->parseIndonesianDate($dates[1]);
-            } catch (Throwable $e) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'file' => 'Tanggal pada sel A5 tidak valid. Gunakan format seperti 18 MEI 2026 - 23 MEI 2026.',
-                    ]);
-            }
-
-            if ($endDate->lt($startDate)) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'file' => 'Tanggal selesai tidak boleh lebih awal daripada tanggal mulai.',
-                    ]);
-            }
-
-            $import = new TrainingImport(
-                batchNumber: $validated['angkatan'],
-                fundingSource: $validated['sumber_dana'],
-            );
-
-            Excel::import($import, $file);
-
-            return redirect()
-                ->route('imports.index')
-                ->with('import_summary', [
-                    'processed' => $import->processed,
-                    'participants' => $import->createdParticipants,
-                    'trainings' => $import->createdTrainings,
-                    'histories' => $import->createdHistories,
-                    'skipped' => $import->skipped,
-                    'errors' => $import->errors,
-                ]);
-        } catch (Throwable $e) {
-            report($e);
-
+        if ($trainingName === '') {
             return back()
                 ->withInput()
                 ->withErrors([
-                    'file' => 'Impor gagal diproses. Periksa format Excel dan log Laravel untuk detailnya.',
+                    'file' =>
+                        'Nama pelatihan tidak ditemukan di sel A2.',
                 ]);
-        } finally {
-            if ($spreadsheet !== null) {
-                $spreadsheet->disconnectWorksheets();
-            }
         }
-    }
 
-    private function parseIndonesianDate(string $value): Carbon
+        [$startDate, $endDate] = $this->parseDateRange($dateText);
+
+        $import = new TrainingImport(
+            batchNumber: $request->input('angkatan'),
+            fundingSource: $request->input('sumber_dana'),
+            trainingName: $trainingName,
+            facilitation: $facilitation,
+            organizer: $organizer,
+            startDate: $startDate,
+            endDate: $endDate,
+            district: $district->name,
+        );
+
+        Excel::import($import, $request->file('file'));
+
+        return redirect()
+            ->route('imports.index')
+            ->with('import_result', [
+                'created_participants' => $import->createdParticipants,
+                'updated_participants' => $import->updatedParticipants,
+                'created_trainings' => $import->createdTrainings,
+                'created_histories' => $import->createdHistories,
+                'errors' => $import->errors,
+            ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        throw $e;
+    } catch (\Throwable $e) {
+        Log::error('Import Excel SIRAPIK gagal', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return back()
+            ->withInput()
+            ->withErrors([
+                'file' =>
+                    'Import gagal. Periksa format Excel dan log Laravel.',
+            ]);
+    }
+}
+
+    private function parseDateRange(string $text): array
     {
-        $value = mb_strtolower(trim($value));
+        $text = trim($text);
+
+        if ($text === '') {
+            return [null, null];
+        }
 
         $months = [
-            'januari' => 'january',
-            'februari' => 'february',
-            'maret' => 'march',
-            'april' => 'april',
-            'mei' => 'may',
-            'juni' => 'june',
-            'juli' => 'july',
-            'agustus' => 'august',
-            'september' => 'september',
-            'oktober' => 'october',
-            'november' => 'november',
-            'desember' => 'december',
+            'januari' => 'January',
+            'februari' => 'February',
+            'maret' => 'March',
+            'april' => 'April',
+            'mei' => 'May',
+            'juni' => 'June',
+            'juli' => 'July',
+            'agustus' => 'August',
+            'september' => 'September',
+            'oktober' => 'October',
+            'november' => 'November',
+            'desember' => 'December',
         ];
 
-        $value = strtr($value, $months);
+        $normalized = strtolower($text);
 
-        return Carbon::parse($value);
+        foreach ($months as $indo => $english) {
+            $normalized = str_replace(
+                $indo,
+                $english,
+                $normalized
+            );
+        }
+
+        $normalized = preg_replace('/\s+/', ' ', $normalized);
+
+        $parts = preg_split('/\s*[-–—]\s*/', $normalized);
+
+        if (count($parts) !== 2) {
+            throw new \RuntimeException(
+                'Format tanggal A5 tidak dikenali. Contoh: ' .
+                '18 MEI 2026 - 23 MEI 2026.'
+            );
+        }
+
+        $start = strtotime(trim($parts[0]));
+        $end = strtotime(trim($parts[1]));
+
+        if ($start === false || $end === false) {
+            throw new \RuntimeException(
+                'Tanggal mulai atau tanggal selesai pada A5 tidak valid.'
+            );
+        }
+
+        if ($end < $start) {
+            throw new \RuntimeException(
+                'Tanggal selesai lebih awal daripada tanggal mulai.'
+            );
+        }
+
+        return [
+            date('Y-m-d', $start),
+            date('Y-m-d', $end),
+        ];
     }
 }

@@ -4,28 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SIRAPIK - Bapelkes Kalimantan Selatan</title>
+    <meta name="theme-color" content="#12345a">
+    <meta name="description" content="SIRAPIK - Sistem Informasi Pelatihan Bapelkes Provinsi Kalimantan Selatan.">
+
+    <title>SIRAPIK | Bapelkes Provinsi Kalimantan Selatan</title>
 
     <link rel="stylesheet" href="{{ asset('css/sirapik.css') }}">
 
     <style>
         :root {
-            --navy: #17365d;
-            --navy-dark: #102846;
-            --blue: #245ba7;
-            --blue-hover: #1b477f;
-            --pale: #eef4fb;
-            --ink: #243247;
-            --muted: #637187;
-            --border: #dce4ed;
+            --navy: #12345a;
+            --navy-deep: #0b2340;
+            --navy-light: #1d4c7c;
+            --blue: #2463a6;
+            --blue-hover: #194c87;
+            --blue-soft: #edf4fc;
+            --ink: #26364a;
+            --muted: #68788d;
+            --border: #e0e7ef;
             --surface: #ffffff;
-            --page: #f5f7fa;
-            --green: #237653;
-            --green-bg: #eaf5ef;
-            --red: #a63c3c;
-            --red-bg: #fbefef;
-            --radius: 10px;
-            --shadow: 0 2px 10px rgba(24, 45, 75, .045);
+            --page: #f4f7fb;
+            --green: #207653;
+            --green-soft: #e9f6ef;
+            --red: #b34545;
+            --red-soft: #fbefef;
+            --radius: 12px;
+            --shadow: 0 5px 20px rgba(19, 49, 83, .055);
+            --shadow-hover: 0 12px 28px rgba(19, 49, 83, .10);
         }
 
         *,
@@ -36,17 +41,24 @@
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 24px;
+            scroll-padding-top: 20px;
         }
 
         body {
             margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
             color: var(--ink);
             background: var(--page);
-            font-size: 15px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 14px;
             line-height: 1.65;
             -webkit-font-smoothing: antialiased;
+        }
+
+        body,
+        button,
+        input,
+        select {
+            font-family: "Segoe UI", Arial, sans-serif;
         }
 
         a {
@@ -68,28 +80,26 @@
         a:focus-visible,
         button:focus-visible,
         select:focus-visible {
-            outline: 3px solid rgba(36, 91, 167, .3);
+            outline: 3px solid rgba(36, 99, 166, .28);
             outline-offset: 3px;
         }
 
         .public-container {
-            width: min(1180px, calc(100% - 48px));
+            width: min(1200px, calc(100% - 56px));
             margin-inline: auto;
         }
 
-        /* =========================
-           HEADER / IDENTITAS
-        ========================= */
+        /* HEADER */
 
         .public-nav {
             position: relative;
-            z-index: 2;
-            background: var(--surface);
+            z-index: 10;
+            background: #fff;
             border-bottom: 1px solid var(--border);
         }
 
         .nav-inner {
-            min-height: 78px;
+            min-height: 82px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -104,202 +114,332 @@
         }
 
         .brand-mark {
-            width: 46px;
-            height: 46px;
-            flex: 0 0 46px;
+            width: 48px;
+            height: 48px;
+            flex: 0 0 48px;
             display: grid;
             place-items: center;
-            border-radius: 8px;
-            background: var(--navy);
+            border-radius: 10px;
+            background: linear-gradient(145deg, var(--navy-light), var(--navy-deep));
             color: #fff;
-            font-size: 24px;
+            font-size: 25px;
             font-weight: 800;
             line-height: 1;
+            box-shadow: 0 4px 10px rgba(18, 52, 90, .16);
         }
 
         .brand-title {
             color: var(--navy);
             font-size: 21px;
             font-weight: 800;
-            line-height: 1.3;
-            letter-spacing: .2px;
+            line-height: 1.25;
+            letter-spacing: .5px;
         }
 
         .brand-subtitle {
-            margin-top: 3px;
+            margin-top: 4px;
             color: var(--muted);
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.45;
         }
 
-        /* =========================
-           TOMBOL
-        ========================= */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* BUTTONS */
 
         .btn {
-            min-height: 42px;
+            min-height: 43px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 9px;
             padding: 10px 17px;
             border: 1px solid var(--blue);
-            border-radius: 7px;
+            border-radius: 8px;
             background: var(--blue);
             color: #fff;
-            font-size: 14px;
-            font-weight: 650;
-            line-height: 1.35;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.4;
             cursor: pointer;
-            transition:
-                background-color .18s ease,
-                border-color .18s ease;
+            transition: background .18s ease, border-color .18s ease,
+                        box-shadow .18s ease, transform .18s ease;
         }
 
         .btn:hover {
             background: var(--blue-hover);
             border-color: var(--blue-hover);
+            box-shadow: 0 4px 12px rgba(36, 99, 166, .15);
         }
 
         .btn-outline {
             background: #fff;
             color: var(--navy);
-            border-color: #cbd6e4;
+            border-color: #d4deea;
         }
 
         .btn-outline:hover {
-            background: var(--pale);
-            border-color: #b8c8dc;
+            background: var(--blue-soft);
+            color: var(--navy);
+            border-color: #b9cde3;
         }
 
-        /* =========================
-           BANNER UTAMA
-        ========================= */
+        .btn-arrow {
+            font-size: 17px;
+            line-height: 1;
+        }
+
+        /* HERO */
 
         .hero {
             position: relative;
             isolation: isolate;
             overflow: hidden;
-            background-color: var(--navy-dark);
+            padding: 68px 0 72px;
+            background-color: var(--navy-deep);
             background-image:
                 linear-gradient(
                     105deg,
-                    rgba(13, 36, 65, .78) 0%,
-                    rgba(20, 55, 96, .67) 52%,
-                    rgba(28, 76, 128, .54) 100%
+                    rgba(8, 29, 54, .91) 0%,
+                    rgba(14, 47, 81, .84) 50%,
+                    rgba(20, 64, 105, .69) 100%
                 ),
                 url("{{ asset('images/background-sirapik.jpg') }}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             color: #fff;
-            padding: 58px 0 62px;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 400px;
+            height: 400px;
+            right: -140px;
+            bottom: -250px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 50%;
+            box-shadow:
+                0 0 0 45px rgba(255, 255, 255, .025),
+                0 0 0 90px rgba(255, 255, 255, .02);
+            pointer-events: none;
         }
 
         .hero-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1.45fr) minmax(270px, .75fr);
+            grid-template-columns: minmax(0, 1.45fr) minmax(270px, .72fr);
             align-items: center;
-            gap: 54px;
+            gap: 58px;
         }
 
         .eyebrow {
-            display: inline-block;
-            margin-bottom: 5px;
-            color: #d9e8fa;
-            font-size: 12px;
-            font-weight: 750;
-            letter-spacing: 1.25px;
-            line-height: 1.5;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 8px;
+            color: #c9e1fa;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            line-height: 1.6;
             text-transform: uppercase;
         }
 
+        .eyebrow::before {
+            content: "";
+            width: 26px;
+            height: 2px;
+            background: #91c6fa;
+            border-radius: 5px;
+        }
+
         .hero h1 {
-            max-width: 690px;
-            margin: 10px 0 16px;
-            font-size: clamp(32px, 3.4vw, 42px);
+            max-width: 720px;
+            margin: 12px 0 18px;
+            color: #fff;
+            font-size: clamp(34px, 4vw, 48px);
             font-weight: 750;
-            line-height: 1.2;
-            letter-spacing: -.65px;
+            line-height: 1.18;
+            letter-spacing: -.8px;
             text-wrap: balance;
         }
 
         .hero-description {
-            max-width: 660px;
-            margin: 0 0 24px;
-            color: #edf3fa;
-            font-size: 16px;
-            line-height: 1.8;
+            max-width: 650px;
+            margin: 0 0 27px;
+            color: #e0eaf5;
+            font-size: 15px;
+            line-height: 1.9;
         }
 
         .hero .btn {
-            min-height: 44px;
-            padding-inline: 19px;
+            min-height: 46px;
+            padding-inline: 20px;
             background: #fff;
             border-color: #fff;
             color: var(--navy);
         }
 
         .hero .btn:hover {
-            background: #eaf1fa;
-            border-color: #eaf1fa;
+            background: #edf4fc;
+            border-color: #edf4fc;
+            transform: translateY(-1px);
         }
 
         .hero-note {
-            padding: 23px 24px;
-            border: 1px solid rgba(255, 255, 255, .28);
-            border-radius: 9px;
-            background: rgba(12, 35, 63, .36);
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, .22);
+            border-radius: 14px;
+            background: rgba(7, 29, 54, .43);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, .08);
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-note-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .hero-note-icon {
+            width: 43px;
+            height: 43px;
+            flex: 0 0 43px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, .17);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .10);
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .hero-note-label {
+            color: #bcd6f1;
+            font-size: 10px;
+            font-weight: 750;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
         }
 
         .hero-note strong {
             display: block;
-            margin-bottom: 8px;
+            margin-top: 2px;
             color: #fff;
-            font-size: 17px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 750;
             line-height: 1.5;
         }
 
         .hero-note p {
             margin: 0;
-            color: #edf3fa;
-            font-size: 14px;
-            line-height: 1.8;
+            color: #e0eaf5;
+            font-size: 13px;
+            line-height: 1.85;
         }
 
-        /* =========================
-           BAGIAN DASHBOARD
-        ========================= */
+        .hero-note-divider {
+            height: 1px;
+            margin: 19px 0;
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .hero-note-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #d2e5f8;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            flex: 0 0 7px;
+            border-radius: 50%;
+            background: #75d4a2;
+        }
+
+        /* MAIN DASHBOARD */
 
         .section {
-            padding: 36px 0 42px;
+            padding: 40px 0 48px;
+            scroll-margin-top: 20px;
         }
 
         .section-heading {
-            margin-bottom: 19px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .section-heading-main {
+            min-width: 0;
+        }
+
+        .section-kicker {
+            margin-bottom: 5px;
+            color: var(--blue);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
         }
 
         .section-heading h2 {
             margin: 0 0 5px;
             color: var(--navy);
             font-size: 25px;
-            font-weight: 750;
+            font-weight: 780;
             line-height: 1.4;
-            letter-spacing: -.25px;
+            letter-spacing: -.35px;
         }
 
         .section-heading p {
-            max-width: 760px;
+            max-width: 720px;
             margin: 0;
             color: var(--muted);
-            font-size: 14px;
-            line-height: 1.7;
+            font-size: 13px;
+            line-height: 1.75;
         }
 
-        /* =========================
-           KARTU DAN FILTER
-        ========================= */
+        .data-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            flex-shrink: 0;
+            padding: 7px 11px;
+            border: 1px solid #dce8f5;
+            border-radius: 7px;
+            background: #fff;
+            color: #4d6682;
+            font-size: 11px;
+            font-weight: 650;
+        }
+
+        .data-badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #39976b;
+        }
+
+        /* FILTER */
 
         .filter-card,
         .stat-card,
@@ -312,18 +452,39 @@
         }
 
         .filter-card {
-            padding: 20px;
+            padding: 22px;
+        }
+
+        .filter-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 17px;
+            color: var(--navy);
+            font-size: 14px;
+            font-weight: 750;
+        }
+
+        .filter-title-icon {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 7px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-size: 16px;
         }
 
         .filter-grid {
             display: grid;
             grid-template-columns:
-                minmax(130px, .8fr)
+                minmax(135px, .82fr)
                 minmax(210px, 1.35fr)
-                minmax(160px, 1fr)
+                minmax(170px, 1fr)
                 auto;
             align-items: end;
-            gap: 14px;
+            gap: 15px;
         }
 
         .form-field {
@@ -333,116 +494,149 @@
         .form-field label {
             display: block;
             margin-bottom: 7px;
-            color: var(--ink);
-            font-size: 13px;
-            font-weight: 700;
+            color: #34465d;
+            font-size: 12px;
+            font-weight: 750;
             line-height: 1.5;
         }
 
         .form-field select {
+            display: block;
             width: 100%;
-            min-height: 43px;
-            padding: 9px 34px 9px 11px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            min-width: 0;
+            min-height: 44px;
+            padding: 9px 34px 9px 12px;
+            border: 1px solid #d4deea;
+            border-radius: 7px;
             background-color: #fff;
             color: var(--ink);
-            font-size: 14px;
+            font-size: 12px;
             line-height: 1.5;
+            cursor: pointer;
+            transition: border-color .18s ease, box-shadow .18s ease;
         }
 
         .form-field select:hover {
-            border-color: #9aacc2;
+            border-color: #a8bdd5;
         }
 
         .form-field select:focus {
-            outline: 3px solid rgba(36, 91, 167, .13);
+            outline: none;
             border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(36, 99, 166, .10);
         }
 
         .filter-grid > .btn {
-            min-height: 43px;
+            min-height: 44px;
             white-space: nowrap;
         }
 
-        /* =========================
-           KARTU STATISTIK
-        ========================= */
+        /* STATISTICS */
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 16px;
+            gap: 17px;
             margin-top: 18px;
         }
 
         .stat-card {
             position: relative;
             overflow: hidden;
-            padding: 21px 22px 20px 24px;
+            padding: 23px 24px;
+            transition: box-shadow .2s ease, transform .2s ease;
         }
 
-        .stat-card::before {
-            content: "";
-            position: absolute;
-            inset: 0 auto 0 0;
-            width: 4px;
-            background: var(--blue);
+        .stat-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
 
         .stat-label {
             color: var(--muted);
-            font-size: 13px;
-            font-weight: 650;
-            line-height: 1.5;
-        }
-
-        .stat-value {
-            margin-top: 8px;
-            color: var(--navy);
-            font-size: clamp(29px, 3vw, 34px);
-            font-weight: 780;
-            line-height: 1.25;
-            letter-spacing: -.5px;
-            overflow-wrap: anywhere;
-        }
-
-        .stat-caption {
-            margin-top: 7px;
-            color: var(--muted);
             font-size: 12px;
+            font-weight: 700;
             line-height: 1.6;
         }
 
-        /* =========================
-           TABEL DAN KARTU DATA
-        ========================= */
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-size: 19px;
+        }
+
+        .stat-value {
+            margin-top: 15px;
+            color: var(--navy);
+            font-size: clamp(30px, 3vw, 37px);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -.8px;
+            overflow-wrap: anywhere;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-caption {
+            margin-top: 9px;
+            color: #7a899b;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .stat-caption strong {
+            color: #52647a;
+            font-weight: 700;
+        }
+
+        /* DATA CARDS */
 
         .data-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
             align-items: start;
             gap: 18px;
             margin-top: 18px;
         }
 
         .content-card {
-            padding: 22px;
+            overflow: hidden;
+        }
+
+        .content-card-header {
+            padding: 22px 22px 17px;
+            border-bottom: 1px solid #edf1f6;
         }
 
         .content-card h3 {
             margin: 0;
             color: var(--navy);
-            font-size: 18px;
-            font-weight: 750;
+            font-size: 16px;
+            font-weight: 780;
             line-height: 1.5;
         }
 
         .card-description {
-            margin: 6px 0 0;
+            margin: 5px 0 0;
             color: var(--muted);
-            font-size: 13px;
-            line-height: 1.7;
+            font-size: 12px;
+            line-height: 1.75;
+        }
+
+        .card-body {
+            padding: 0 22px 18px;
         }
 
         .table-wrap {
@@ -453,29 +647,40 @@
 
         table {
             width: 100%;
-            margin-top: 16px;
-            border-collapse: collapse;
-            font-size: 13px;
+            margin-top: 15px;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 12px;
         }
 
         th,
         td {
-            padding: 12px 11px;
+            padding: 12px 10px;
             text-align: left;
-            vertical-align: top;
-            border-bottom: 1px solid #e6ebf1;
+            vertical-align: middle;
+            border-bottom: 1px solid #edf1f5;
         }
 
         th {
-            background: #f3f6fa;
-            color: #40516a;
-            font-size: 12px;
-            font-weight: 750;
-            line-height: 1.55;
+            background: #f5f8fc;
+            color: #52647a;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1.6;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        th:first-child {
+            border-radius: 6px 0 0 6px;
+        }
+
+        th:last-child {
+            border-radius: 0 6px 6px 0;
         }
 
         td {
-            color: #334155;
+            color: #36475c;
             line-height: 1.65;
             overflow-wrap: anywhere;
         }
@@ -484,38 +689,47 @@
             border-bottom: none;
         }
 
-        tbody tr:hover {
-            background: #f8fafc;
+        tbody tr:hover td {
+            background: #f8fbff;
+        }
+
+        .table-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: var(--blue-soft);
+            color: var(--navy);
+            font-size: 11px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
         }
 
         .empty {
-            padding: 22px 12px;
+            padding: 26px 12px !important;
             color: var(--muted);
-            font-size: 13px;
+            font-size: 12px;
             text-align: center;
+            line-height: 1.7;
         }
 
-        /* =========================
-           PERINGKAT JENIS NAKES
-        ========================= */
-
-        .ranking-card {
-            margin-top: 18px;
-        }
+        /* RANKING NAKES */
 
         .ranking-grid {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             align-items: start;
-            gap: 14px;
-            margin-top: 18px;
+            gap: 13px;
+            padding: 19px;
         }
 
         .ranking-panel {
             min-width: 0;
             padding: 16px;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 9px;
             background: #fff;
         }
 
@@ -523,7 +737,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .ranking-icon {
@@ -532,33 +746,33 @@
             flex: 0 0 36px;
             display: grid;
             place-items: center;
-            border-radius: 7px;
+            border-radius: 9px;
             font-size: 19px;
-            font-weight: 750;
+            font-weight: 800;
         }
 
         .ranking-high .ranking-icon {
-            background: var(--green-bg);
+            background: var(--green-soft);
             color: var(--green);
         }
 
         .ranking-low .ranking-icon {
-            background: var(--red-bg);
+            background: var(--red-soft);
             color: var(--red);
         }
 
         .ranking-heading h4 {
             margin: 0;
             color: var(--navy);
-            font-size: 14px;
-            font-weight: 750;
+            font-size: 12px;
+            font-weight: 800;
             line-height: 1.5;
         }
 
         .ranking-heading p {
             margin: 2px 0 0;
             color: var(--muted);
-            font-size: 12px;
+            font-size: 10px;
             line-height: 1.5;
         }
 
@@ -572,9 +786,9 @@
             display: grid;
             grid-template-columns: 27px minmax(0, 1fr) auto;
             align-items: center;
-            gap: 9px;
+            gap: 8px;
             padding: 11px 0;
-            border-bottom: 1px solid #edf0f4;
+            border-bottom: 1px solid #edf1f5;
         }
 
         .ranking-item:last-child {
@@ -586,74 +800,107 @@
             height: 26px;
             display: grid;
             place-items: center;
-            border-radius: 5px;
-            background: #edf3fa;
+            border-radius: 7px;
+            background: #f0f4f9;
+            color: #49617d;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .ranking-item:first-child .ranking-number {
+            background: #e6eef9;
             color: var(--navy);
-            font-size: 12px;
-            font-weight: 750;
         }
 
         .ranking-name {
             min-width: 0;
-            color: #344256;
-            font-size: 12px;
-            font-weight: 600;
+            color: #3d4d61;
+            font-size: 11px;
+            font-weight: 650;
             line-height: 1.6;
             overflow-wrap: anywhere;
         }
 
         .ranking-total {
             color: var(--navy);
-            font-size: 12px;
-            font-weight: 750;
+            font-size: 11px;
+            font-weight: 800;
             white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ranking-total small {
+            color: #8794a5;
+            font-size: 9px;
+            font-weight: 600;
         }
 
         .ranking-empty {
-            padding: 15px;
-            border: 1px solid #e8edf3;
+            padding: 14px;
+            border: 1px dashed #d9e2ec;
             border-radius: 7px;
-            background: #f7f9fc;
+            background: #f8fafc;
             color: var(--muted);
-            font-size: 12px;
-            line-height: 1.75;
+            font-size: 11px;
+            line-height: 1.8;
         }
 
-        /* =========================
-           FOOTER
-        ========================= */
+        /* FOOTER */
 
         .public-footer {
             margin-top: 0;
-            padding: 24px 0;
-            background: var(--navy-dark);
-            color: #e2eaf4;
-            font-size: 12px;
+            padding: 28px 0;
+            background: var(--navy-deep);
+            color: #cfdaea;
+            font-size: 11px;
             line-height: 1.8;
         }
 
         .footer-inner {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 16px 28px;
         }
 
-        .footer-inner strong {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 750;
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        /* =========================
-           TABLET
-        ========================= */
+        .footer-mark {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 36px;
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 800;
+        }
 
-        @media (max-width: 1000px) {
+        .footer-inner strong {
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .footer-copy {
+            max-width: 410px;
+            color: #bdcadd;
+            text-align: right;
+        }
+
+        /* RESPONSIVE: LAPTOP KECIL / TABLET */
+
+        @media (max-width: 1080px) {
             .hero-grid {
-                grid-template-columns: minmax(0, 1.2fr) minmax(240px, .8fr);
-                gap: 30px;
+                grid-template-columns: minmax(0, 1.2fr) minmax(245px, .8fr);
+                gap: 32px;
             }
 
             .filter-grid {
@@ -665,7 +912,11 @@
             }
 
             .data-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .ranking-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
 
@@ -674,33 +925,36 @@
                 width: calc(100% - 36px);
             }
 
+            .nav-inner {
+                min-height: 74px;
+            }
+
             .hero {
-                padding: 43px 0 46px;
+                padding: 48px 0 50px;
                 background-position: center;
             }
 
             .hero-grid {
-                grid-template-columns: 1fr;
-                gap: 24px;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 28px;
             }
 
             .hero h1 {
                 max-width: 620px;
-                font-size: clamp(30px, 6vw, 38px);
+                font-size: clamp(32px, 6vw, 41px);
             }
 
             .hero-description {
-                font-size: 15px;
-                line-height: 1.8;
+                max-width: 620px;
+                font-size: 14px;
             }
 
             .hero-note {
                 max-width: 620px;
-                padding: 18px 20px;
             }
 
             .section {
-                padding: 30px 0 34px;
+                padding: 32px 0 38px;
             }
 
             .section-heading h2 {
@@ -712,34 +966,41 @@
             }
 
             .stat-card {
-                padding: 18px 18px 18px 21px;
-            }
-
-            .content-card {
                 padding: 19px;
             }
 
+            .data-grid {
+                gap: 15px;
+            }
+
+            .content-card-header {
+                padding: 19px 19px 15px;
+            }
+
+            .card-body {
+                padding-inline: 19px;
+            }
+
             .ranking-grid {
-                gap: 12px;
+                padding: 16px;
+                gap: 11px;
             }
         }
 
-        /* =========================
-           TELEPON
-        ========================= */
+        /* RESPONSIVE: HP */
 
         @media (max-width: 540px) {
             body {
-                font-size: 14px;
+                font-size: 13px;
             }
 
             .public-container {
-                width: calc(100% - 28px);
+                width: calc(100% - 30px);
             }
 
             .nav-inner {
-                min-height: 70px;
-                gap: 10px;
+                min-height: 69px;
+                gap: 9px;
             }
 
             .brand {
@@ -750,89 +1011,122 @@
                 width: 39px;
                 height: 39px;
                 flex-basis: 39px;
-                border-radius: 7px;
+                border-radius: 8px;
                 font-size: 21px;
             }
 
             .brand-title {
-                font-size: 18px;
+                font-size: 17px;
             }
 
             .brand-subtitle {
-                max-width: 180px;
+                max-width: 185px;
                 margin-top: 2px;
-                font-size: 11px;
+                font-size: 10px;
                 line-height: 1.4;
             }
 
-            .nav-inner > .btn {
-                min-height: 37px;
+            .nav-actions {
+                gap: 0;
+            }
+
+            .nav-label {
+                display: none;
+            }
+
+            .nav-inner > .nav-actions .btn {
+                min-height: 36px;
                 gap: 4px;
                 padding: 8px 10px;
-                font-size: 12px;
+                font-size: 11px;
                 white-space: nowrap;
             }
 
             .hero {
-                padding: 37px 0 39px;
+                padding: 38px 0 40px;
             }
 
             .eyebrow {
-                font-size: 11px;
-                letter-spacing: 1px;
+                font-size: 10px;
+                letter-spacing: 1.1px;
             }
 
             .hero h1 {
                 margin: 10px 0 13px;
-                font-size: 30px;
-                line-height: 1.25;
-                letter-spacing: -.35px;
+                font-size: clamp(29px, 8vw, 35px);
+                line-height: 1.24;
+                letter-spacing: -.45px;
             }
 
             .hero-description {
-                margin-bottom: 20px;
-                font-size: 14px;
-                line-height: 1.8;
+                margin-bottom: 21px;
+                font-size: 13px;
+                line-height: 1.85;
             }
 
             .hero .btn {
                 min-height: 42px;
                 padding-inline: 15px;
-                font-size: 13px;
+                font-size: 12px;
             }
 
             .hero-note {
-                padding: 16px;
-                border-radius: 8px;
+                padding: 17px;
+                border-radius: 10px;
+            }
+
+            .hero-note-top {
+                gap: 10px;
+                margin-bottom: 13px;
+            }
+
+            .hero-note-icon {
+                width: 38px;
+                height: 38px;
+                flex-basis: 38px;
             }
 
             .hero-note strong {
-                font-size: 15px;
+                font-size: 14px;
             }
 
             .hero-note p {
-                font-size: 13px;
-                line-height: 1.75;
+                font-size: 12px;
+                line-height: 1.8;
+            }
+
+            .hero-note-divider {
+                margin: 14px 0;
             }
 
             .section {
-                padding: 27px 0 30px;
+                padding: 27px 0 31px;
             }
 
             .section-heading {
-                margin-bottom: 16px;
+                align-items: flex-start;
+                margin-bottom: 17px;
             }
 
             .section-heading h2 {
-                font-size: 22px;
+                font-size: 21px;
             }
 
             .section-heading p {
-                font-size: 13px;
+                font-size: 12px;
+            }
+
+            .data-badge {
+                display: none;
             }
 
             .filter-card {
                 padding: 16px;
+            }
+
+            .filter-title {
+                margin-bottom: 14px;
+                font-size: 13px;
             }
 
             .filter-grid {
@@ -841,63 +1135,77 @@
             }
 
             .form-field label {
-                font-size: 13px;
+                margin-bottom: 6px;
+                font-size: 12px;
             }
 
             .form-field select {
-                min-height: 43px;
-                font-size: 13px;
+                min-height: 44px;
+                padding-left: 11px;
+                font-size: 12px;
             }
 
             .filter-grid > .btn {
-                min-height: 42px;
-                font-size: 13px;
+                min-height: 43px;
+                font-size: 12px;
             }
 
             .stats-grid {
                 grid-template-columns: minmax(0, 1fr);
-                gap: 11px;
-                margin-top: 14px;
+                gap: 10px;
+                margin-top: 13px;
             }
 
             .stat-card {
-                padding: 16px 17px 16px 20px;
+                padding: 16px 17px;
+            }
+
+            .stat-icon {
+                width: 36px;
+                height: 36px;
+                flex-basis: 36px;
+                font-size: 17px;
             }
 
             .stat-label {
-                font-size: 13px;
+                font-size: 12px;
             }
 
             .stat-value {
-                margin-top: 5px;
+                margin-top: 8px;
                 font-size: 29px;
             }
 
             .stat-caption {
-                margin-top: 4px;
-                font-size: 12px;
+                margin-top: 5px;
+                font-size: 10px;
             }
 
             .data-grid {
-                gap: 14px;
-                margin-top: 14px;
+                gap: 13px;
+                margin-top: 13px;
             }
 
-            .content-card {
-                padding: 16px;
+            .content-card-header {
+                padding: 16px 16px 13px;
             }
 
             .content-card h3 {
-                font-size: 17px;
+                font-size: 15px;
             }
 
             .card-description {
-                font-size: 12px;
+                font-size: 11px;
+            }
+
+            .card-body {
+                padding: 0 13px 13px;
             }
 
             table {
-                min-width: 290px;
-                font-size: 12px;
+                min-width: 265px;
+                margin-top: 12px;
+                font-size: 11px;
             }
 
             th,
@@ -906,27 +1214,64 @@
             }
 
             th {
-                font-size: 11px;
+                font-size: 9px;
             }
 
             .ranking-grid {
                 grid-template-columns: minmax(0, 1fr);
                 gap: 11px;
-                margin-top: 14px;
+                padding: 13px;
             }
 
             .ranking-panel {
                 padding: 14px;
             }
 
-            .ranking-name,
-            .ranking-total {
+            .ranking-heading h4 {
                 font-size: 12px;
             }
 
+            .ranking-name,
+            .ranking-total {
+                font-size: 11px;
+            }
+
             .footer-inner {
+                align-items: flex-start;
                 flex-direction: column;
-                gap: 12px;
+                gap: 13px;
+            }
+
+            .footer-copy {
+                text-align: left;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .public-container {
+                width: calc(100% - 24px);
+            }
+
+            .brand-subtitle {
+                max-width: 145px;
+                font-size: 9px;
+            }
+
+            .brand-title {
+                font-size: 16px;
+            }
+
+            .nav-inner > .nav-actions .btn {
+                padding-inline: 8px;
+                font-size: 10px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .filter-card {
+                padding: 13px;
             }
         }
 
@@ -939,17 +1284,19 @@
             *::before,
             *::after {
                 transition-duration: .01ms !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
             }
         }
     </style>
 </head>
 
 <body>
-    {{-- NAVIGASI --}}
+    {{-- HEADER --}}
     <header class="public-nav">
         <div class="public-container nav-inner">
-            <div class="brand">
-                <div class="brand-mark">S</div>
+            <a href="{{ route('public.dashboard') }}" class="brand" aria-label="Beranda SIRAPIK">
+                <div class="brand-mark" aria-hidden="true">S</div>
 
                 <div>
                     <div class="brand-title">SIRAPIK</div>
@@ -957,11 +1304,16 @@
                         Bapelkes Provinsi Kalimantan Selatan
                     </div>
                 </div>
-            </div>
-
-            <a class="btn btn-outline" href="{{ route('login') }}">
-                Login Internal <span aria-hidden="true">→</span>
             </a>
+
+            <div class="nav-actions">
+                <span class="nav-label">Portal informasi publik</span>
+
+                <a class="btn btn-outline" href="{{ route('login') }}">
+                    Login Internal
+                    <span class="btn-arrow" aria-hidden="true">→</span>
+                </a>
+            </div>
         </div>
     </header>
 
@@ -978,38 +1330,62 @@
 
                     <p class="hero-description">
                         SIRAPIK menyajikan ringkasan data pelatihan Bapelkes
-                        Kalimantan Selatan berdasarkan tahun, kabupaten/kota
-                        atau mitra, dan sumber dana untuk membantu pemantauan
-                        pelaksanaan pelatihan tenaga kesehatan.
+                        Provinsi Kalimantan Selatan berdasarkan tahun,
+                        kabupaten/kota atau mitra, serta sumber dana.
+                        Informasi ini mendukung pemantauan pelaksanaan
+                        pelatihan tenaga kesehatan secara lebih terarah.
                     </p>
 
                     <a class="btn" href="#dashboard">
-                        Lihat Dashboard <span aria-hidden="true">↓</span>
+                        Lihat Dashboard
+                        <span class="btn-arrow" aria-hidden="true">↓</span>
                     </a>
                 </div>
 
                 <aside class="hero-note">
-                    <strong>Informasi untuk publik</strong>
+                    <div class="hero-note-top">
+                        <div class="hero-note-icon" aria-hidden="true">▤</div>
+
+                        <div>
+                            <div class="hero-note-label">Akses informasi</div>
+                            <strong>Dashboard untuk publik</strong>
+                        </div>
+                    </div>
 
                     <p>
-                        Dashboard ini dapat dibuka tanpa akun. Pengelolaan
-                        data dan fitur administrasi hanya tersedia bagi
-                        petugas yang memiliki akun internal sesuai
-                        kewenangannya.
+                        Ringkasan informasi pelatihan dapat diakses tanpa akun.
+                        Pengelolaan data dan administrasi tersedia bagi petugas
+                        internal sesuai hak akses masing-masing.
                     </p>
+
+                    <div class="hero-note-divider"></div>
+
+                    <div class="hero-note-footer">
+                        <span class="status-dot" aria-hidden="true"></span>
+                        Informasi berdasarkan data yang tercatat di SIRAPIK
+                    </div>
                 </aside>
             </div>
         </section>
 
-        {{-- DASHBOARD PUBLIK --}}
+        {{-- DASHBOARD --}}
         <section class="section public-container" id="dashboard">
             <div class="section-heading">
-                <h2>Dashboard Pelatihan</h2>
+                <div class="section-heading-main">
+                    <div class="section-kicker">Ringkasan data</div>
 
-                <p>
-                    Pilih kriteria untuk melihat ringkasan pelatihan
-                    yang telah tercatat.
-                </p>
+                    <h2>Dashboard Pelatihan</h2>
+
+                    <p>
+                        Gunakan filter di bawah untuk melihat statistik
+                        pelatihan berdasarkan kriteria yang dipilih.
+                    </p>
+                </div>
+
+                <div class="data-badge">
+                    <span class="data-badge-dot" aria-hidden="true"></span>
+                    Data pelatihan
+                </div>
             </div>
 
             {{-- FILTER --}}
@@ -1017,7 +1393,13 @@
                 method="GET"
                 action="{{ route('public.dashboard') }}"
                 class="filter-card"
+                id="dashboard-filter"
             >
+                <div class="filter-title">
+                    <span class="filter-title-icon" aria-hidden="true">⌕</span>
+                    Filter data pelatihan
+                </div>
+
                 <div class="filter-grid">
                     <div class="form-field">
                         <label for="year">Tahun pelatihan</label>
@@ -1074,105 +1456,123 @@
 
                     <button class="btn" type="submit">
                         Terapkan Filter
+                        <span aria-hidden="true">→</span>
                     </button>
                 </div>
             </form>
 
             {{-- STATISTIK --}}
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Jumlah pelatihan</div>
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-label">Jumlah pelatihan</div>
+                        <div class="stat-icon" aria-hidden="true">▤</div>
+                    </div>
 
                     <div class="stat-value">
                         {{ number_format($totalTrainings, 0, ',', '.') }}
                     </div>
 
                     <div class="stat-caption">
-                        Sesuai filter yang dipilih
+                        Jumlah pelatihan sesuai filter yang dipilih
                     </div>
-                </div>
+                </article>
 
-                <div class="stat-card">
-                    <div class="stat-label">Peserta terdaftar</div>
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-label">Peserta terdaftar</div>
+                        <div class="stat-icon" aria-hidden="true">♙</div>
+                    </div>
 
                     <div class="stat-value">
                         {{ number_format($totalParticipants, 0, ',', '.') }}
                     </div>
 
                     <div class="stat-caption">
-                        Peserta unik dari riwayat pelatihan yang cocok
+                        Peserta unik dari riwayat pelatihan yang sesuai filter
                     </div>
-                </div>
+                </article>
 
-                <div class="stat-card">
-                    <div class="stat-label">Tahun laporan</div>
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-label">Tahun laporan</div>
+                        <div class="stat-icon" aria-hidden="true">▦</div>
+                    </div>
 
                     <div class="stat-value">{{ $year }}</div>
 
                     <div class="stat-caption">
-                        Tahun pelaksanaan pelatihan
+                        Tahun pelaksanaan pelatihan yang sedang ditampilkan
                     </div>
-                </div>
+                </article>
             </div>
 
-            {{-- REKAP KABUPATEN/KOTA --}}
+            {{-- REKAP DAN PERINGKAT --}}
             <div class="data-grid">
+                {{-- REKAP WILAYAH --}}
                 <section class="content-card">
-                    <h3>Rekap Kabupaten/Kota/Mitra</h3>
+                    <div class="content-card-header">
+                        <h3>Rekap Kabupaten/Kota/Mitra</h3>
 
-                    <p class="card-description">
-                        Jumlah pelatihan berdasarkan wilayah atau mitra
-                        yang tercatat.
-                    </p>
+                        <p class="card-description">
+                            Jumlah pelatihan berdasarkan wilayah atau mitra
+                            yang tercatat.
+                        </p>
+                    </div>
 
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Kabupaten/Kota/Mitra</th>
-                                    <th>Jumlah pelatihan</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @forelse ($trainingByDistrict as $row)
+                    <div class="card-body">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
                                     <tr>
-                                        <td>{{ $row->district }}</td>
+                                        <th>Kabupaten/Kota/Mitra</th>
+                                        <th>Jumlah</th>
+                                    </tr>
+                                </thead>
 
-                                        <td>
-                                            {{ number_format($row->total, 0, ',', '.') }}
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="2" class="empty">
-                                            Belum ada data untuk filter ini.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                <tbody>
+                                    @forelse ($trainingByDistrict as $row)
+                                        <tr>
+                                            <td>{{ $row->district }}</td>
+                                            <td>
+                                                <span class="table-count">
+                                                    {{ number_format($row->total, 0, ',', '.') }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="2" class="empty">
+                                                Belum ada data untuk filter ini.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
 
                 {{-- PERINGKAT JENIS NAKES --}}
                 <section class="content-card">
-                    <h3>Tenaga Kesehatan (Jenis Nakes)</h3>
+                    <div class="content-card-header">
+                        <h3>Partisipasi Tenaga Kesehatan</h3>
 
-                    <p class="card-description">
-                        Perbandingan jenis tenaga kesehatan berdasarkan
-                        keikutsertaan dalam pelatihan pada filter yang dipilih.
-                    </p>
+                        <p class="card-description">
+                            Lima jenis tenaga kesehatan dengan keikutsertaan
+                            tertinggi dan terendah pada filter yang dipilih.
+                        </p>
+                    </div>
 
                     <div class="ranking-grid">
                         {{-- LIMA TERTINGGI --}}
                         <div class="ranking-panel ranking-high">
                             <div class="ranking-heading">
-                                <div class="ranking-icon">↑</div>
+                                <div class="ranking-icon" aria-hidden="true">↑</div>
 
                                 <div>
                                     <h4>5 Tertinggi</h4>
-                                    <p>Jenis nakes paling aktif</p>
+                                    <p>Partisipasi terbanyak</p>
                                 </div>
                             </div>
 
@@ -1194,16 +1594,16 @@
 
                                             <span class="ranking-total">
                                                 {{ number_format((int) ($nakes->total ?? $nakes->total_participations ?? 0), 0, ',', '.') }}
+                                                <small>org</small>
                                             </span>
                                         </li>
                                     @endforeach
                                 </ol>
                             @else
                                 <div class="ranking-empty">
-                                    Data peringkat jenis nakes belum tersedia.
-                                    Setelah data jenis nakes terhubung,
-                                    lima jenis dengan keikutsertaan tertinggi
-                                    akan ditampilkan di sini.
+                                    Data peringkat belum tersedia untuk filter ini.
+                                    Pastikan data profesi peserta sudah sesuai
+                                    dengan master jenis tenaga kesehatan.
                                 </div>
                             @endif
                         </div>
@@ -1211,11 +1611,11 @@
                         {{-- LIMA TERENDAH --}}
                         <div class="ranking-panel ranking-low">
                             <div class="ranking-heading">
-                                <div class="ranking-icon">↓</div>
+                                <div class="ranking-icon" aria-hidden="true">↓</div>
 
                                 <div>
                                     <h4>5 Terendah</h4>
-                                    <p>Jenis nakes yang jarang aktif</p>
+                                    <p>Partisipasi paling sedikit</p>
                                 </div>
                             </div>
 
@@ -1237,16 +1637,16 @@
 
                                             <span class="ranking-total">
                                                 {{ number_format((int) ($nakes->total ?? $nakes->total_participations ?? 0), 0, ',', '.') }}
+                                                <small>org</small>
                                             </span>
                                         </li>
                                     @endforeach
                                 </ol>
                             @else
                                 <div class="ranking-empty">
-                                    Data peringkat jenis nakes belum tersedia.
-                                    Setelah data jenis nakes terhubung,
-                                    lima jenis dengan keikutsertaan terendah
-                                    akan ditampilkan di sini.
+                                    Data peringkat belum tersedia untuk filter ini.
+                                    Pastikan data profesi peserta sudah sesuai
+                                    dengan master jenis tenaga kesehatan.
                                 </div>
                             @endif
                         </div>
@@ -1259,16 +1659,44 @@
     {{-- FOOTER --}}
     <footer class="public-footer">
         <div class="public-container footer-inner">
-            <div>
-                <strong>SIRAPIK</strong><br>
-                Bapelkes Provinsi Kalimantan Selatan
+            <div class="footer-brand">
+                <div class="footer-mark" aria-hidden="true">S</div>
+
+                <div>
+                    <strong>SIRAPIK</strong><br>
+                    Bapelkes Provinsi Kalimantan Selatan
+                </div>
             </div>
 
-            <div>
+            <div class="footer-copy">
                 © {{ date('Y') }} SIRAPIK.
                 Informasi ditampilkan berdasarkan data yang tersedia.
             </div>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dashboardLink = document.querySelector('a[href="#dashboard"]');
+            const dashboard = document.getElementById('dashboard');
+
+            if (dashboardLink && dashboard) {
+                dashboardLink.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    dashboard.scrollIntoView({
+                        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                            ? 'auto'
+                            : 'smooth',
+                        block: 'start'
+                    });
+
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState(null, '', '#dashboard');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
