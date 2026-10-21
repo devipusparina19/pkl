@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureRole
 {
+    /**
+     * Memastikan pengguna memiliki role yang diizinkan.
+     */
     public function handle(
         Request $request,
         Closure $next,
@@ -16,32 +19,39 @@ class EnsureRole
         $user = $request->user();
 
         if (!$user) {
-            return redirect()->route('login');
+            return redirect()->guest(route('login'));
         }
 
-        $normalizeRole = static function (string $role): string {
-            $role = strtolower(trim($role));
+        $normalizeRole = static function (?string $role): string {
+            $role = strtolower(trim((string) $role));
             $role = str_replace('-', '_', $role);
 
-            if ($role === 'participant') {
-                return 'user';
-            }
-
-            return $role;
+            return match ($role) {
+                'participant' => 'user',
+                default => $role,
+            };
         };
 
-        $userRole = $normalizeRole((string) $user->role);
+        $userRole = $normalizeRole($user->role);
 
         $allowedRoles = array_map(
             $normalizeRole,
             $roles
         );
 
-        abort_unless(
-            in_array($userRole, $allowedRoles, true),
-            403,
-            'Akses ditolak. Akun Anda tidak memiliki izin untuk halaman ini.'
-        );
+        if (
+            $userRole === '' ||
+            !in_array($userRole, $allowedRoles, true)
+        ) {
+            abort(
+                403,
+                'Akses ditolak. Role akun Anda: '
+                . ($userRole !== '' ? $userRole : 'belum diatur')
+                . '. Role yang diizinkan: '
+                . implode(', ', $allowedRoles)
+                . '.'
+            );
+        }
 
         return $next($request);
     }

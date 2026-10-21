@@ -140,22 +140,14 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Laporan: Admin dan Pimpinan
+    | Laporan dan ekspor: Admin dan Pimpinan
     |--------------------------------------------------------------------------
     */
 
     Route::middleware('role:admin,pimpinan')->group(function () {
         Route::get('/reports', [ReportController::class, 'index'])
             ->name('reports.index');
-    });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Ekspor laporan: hanya Admin
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware('role:admin')->group(function () {
         Route::get('/reports/export', [ReportController::class, 'export'])
             ->name('reports.export');
     });
@@ -246,7 +238,6 @@ Route::middleware('auth')->group(function () {
 
             Route::delete('/{category}/{id}', [MasterDataController::class, 'destroy'])
                 ->whereIn('category', $categories)
-                ->whereNumber('id')
                 ->name('destroy');
         });
 });

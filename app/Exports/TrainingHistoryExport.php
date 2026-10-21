@@ -2,79 +2,68 @@
 
 namespace App\Exports;
 
-use App\Models\TrainingHistory;
+use App\Models\Participant;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class TrainingHistoryExport implements
-    FromQuery,
-    WithHeadings,
-    WithMapping,
-    ShouldAutoSize
+class TrainingHistoryExport implements FromQuery, WithHeadings, WithMapping
 {
-    public function __construct(
-        private readonly ?int $year = null,
-        private readonly ?string $nip = null,
-    ) {}
+    protected int $year;
 
-    public function query()
+    protected ?string $search;
+
+    public function __construct(int $year, ?string $search = null)
     {
-        return TrainingHistory::query()
-            ->with(['participant', 'training'])
-            ->when($this->nip, function ($query) {
-                $query->whereHas('participant', function ($participant) {
-                    $participant->where('nip', $this->nip);
+        $this->year = $year;
+        $this->search = $search;
+    }
+
+    public function query(): Builder
+    {
+        $search = trim($this->search ?? '');
+
+        return Participant::query()
+            ->withCount([
+                'histories as participations_count' => function ($query) {
+                    $query->whereHas('training', function ($training) {
+                        $training->whereYear('start_date', $this->year);
+                    });
+                },
+            ])
+            ->when($search !== '', function (Builder $query) use ($search) {
+                $query->where(function (Builder $subQuery) use ($search) {
+                    $subQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('nip', 'like', "%{$search}%");
                 });
             })
-            ->when($this->year, function ($query) {
-                $query->whereHas('training', function ($training) {
-                    $training->whereYear('start_date', $this->year);
-                });
-            })
-            ->orderBy('participant_id')
-            ->orderBy('training_id');
+            ->orderByDesc('participations_count')
+            ->orderBy('name');
     }
 
     public function headings(): array
     {
         return [
-            'NIP',
+            'No.',
             'Nama Peserta',
-            'Instansi',
-            'Unit Kerja',
-            'Kabupaten/Kota',
-            'Nama Pelatihan',
-            'Bidang',
-            'Penyelenggara',
-            'Tanggal Mulai',
-            'Tanggal Selesai',
-            'Durasi Hari',
-            'Nomor Sertifikat',
-            'Status',
+            'NIP',
+            'Jumlah Keikutsertaan',
+            'Tahun Laporan',
         ];
     }
 
-    public function map($history): array
+    public function map($participant): array
     {
-        $participant = $history->participant;
-        $training = $history->training;
+        static $number = 0;
+        $number++;
 
         return [
-            $participant?->nip,
-            $participant?->name,
-            $participant?->institution,
-            $participant?->unit,
-            $participant?->district,
-            $training?->name,
-            $training?->field,
-            $training?->organizer,
-            $training?->start_date?->format('Y-m-d'),
-            $training?->end_date?->format('Y-m-d'),
-            $training?->duration_days,
-            $history->certificate_number,
-            $history->status,
+            $number,
+            $participant->name,
+            $participant->nip,
+            $participant->participations_count,
+            $this->year,
         ];
     }
 }
