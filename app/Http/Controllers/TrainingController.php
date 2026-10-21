@@ -74,19 +74,22 @@ class TrainingController extends Controller
             ->route('trainings.index')
             ->with('success', 'Data pelatihan berhasil diperbarui.');
     }
-
-    public function destroy(Training $training)
-    {
-        if ($training->histories()->exists()) {
-            return redirect()
-                ->route('trainings.index')
-                ->with('error', 'Pelatihan tidak dapat dihapus karena sudah memiliki riwayat peserta.');
-        }
-
-        $training->delete();
-
+ 
+public function destroy(Training $training)
+{
+    if ($training->histories()->exists()) {
         return redirect()
             ->route('trainings.index')
-            ->with('success', 'Data pelatihan berhasil dihapus.');
+            ->with(
+                'error',
+                'Pelatihan tidak dapat dihapus karena sudah memiliki riwayat peserta.'
+            );
     }
+
+    $training->delete();
+
+    return redirect()
+        ->route('trainings.index')
+        ->with('success', 'Data pelatihan berhasil dihapus.');
+}
 }

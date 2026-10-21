@@ -94,7 +94,7 @@ Route::middleware('auth')->group(function () {
     [ParticipantController::class, 'destroy']
 )->name('participants.destroy');
     });
-
+    
     /*
     |--------------------------------------------------------------------------
     | Pelatihan: hanya Admin
@@ -115,10 +115,6 @@ Route::middleware('auth')->group(function () {
             ->whereNumber('training')
             ->name('trainings.edit');
 
-        Route::get('/trainings/{training}', [TrainingController::class, 'show'])
-            ->whereNumber('training')
-            ->name('trainings.show');
-
         Route::put('/trainings/{training}', [TrainingController::class, 'update'])
             ->whereNumber('training')
             ->name('trainings.update');
@@ -126,6 +122,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/trainings/{training}', [TrainingController::class, 'update'])
             ->whereNumber('training')
             ->name('trainings.update.patch');
+
+        Route::delete('/trainings/{training}', [TrainingController::class, 'destroy'])
+            ->whereNumber('training')
+            ->name('trainings.destroy');
     });
 
     /*

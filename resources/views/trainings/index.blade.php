@@ -11,6 +11,18 @@
 </div>
 
 <div class="content-card">
+    
+    @if (session('success'))
+        <div class="alert alert-success" role="status">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
 
     {{-- Pencarian dan tombol aksi --}}
     <form method="GET"
