@@ -17,6 +17,7 @@ class ParticipantController extends Controller
         $search = trim((string) $request->query('search', ''));
 
         $participants = Participant::query()
+            ->with(['histories.training'])
             ->withCount('histories')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($subQuery) use ($search) {
@@ -117,6 +118,28 @@ class ParticipantController extends Controller
         return redirect()
             ->route('participants.show', $participant)
             ->with('success', 'Data peserta berhasil diperbarui.');
+    }
+
+    public function destroy(Participant $participant)
+    {
+        DB::transaction(function () use ($participant) {
+            $userId = $participant->user_id;
+
+            // Hapus riwayat keikutsertaan milik peserta ini.
+            $participant->histories()->delete();
+
+            // Hapus data peserta.
+            $participant->delete();
+
+            // Hapus akun yang terhubung jika ada.
+            if ($userId) {
+                User::whereKey($userId)->delete();
+            }
+        });
+
+        return redirect()
+            ->route('participants.index')
+            ->with('success', 'Data peserta berhasil dihapus.');
     }
 
     private function validateParticipant(

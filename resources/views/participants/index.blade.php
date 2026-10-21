@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Data Peserta')
@@ -16,6 +15,12 @@
     </a>
 </div>
 
+@if (session('success'))
+    <div class="panel" role="status">
+        {{ session('success') }}
+    </div>
+@endif
+
 <div class="panel">
     <form method="GET"
           action="{{ route('participants.index') }}"
@@ -25,7 +30,7 @@
             type="search"
             name="search"
             value="{{ $search }}"
-            placeholder="Cari nama, NIK, NIP, atau instansi..."
+            placeholder="Cari nama, NIK, NIP, instansi, atau kabupaten/kota..."
         >
 
         <button class="btn btn-primary" type="submit">Cari</button>
@@ -48,6 +53,7 @@
                     <th>EMAIL</th>
                     <th>NOMOR TELEPON</th>
                     <th>INSTANSI/UNIT KERJA</th>
+                    <th>KABUPATEN/KOTA/MITRA</th>
                     <th>ANGKATAN</th>
                     <th>SUMBER DANA</th>
                     <th>AKSI</th>
@@ -83,12 +89,15 @@
 
                         <td>
                             {{ $participant->institution ?: '-' }}
+
                             @if ($participant->unit)
                                 <div class="muted">
                                     {{ $participant->unit }}
                                 </div>
                             @endif
                         </td>
+
+                        <td>{{ $participant->district ?: '-' }}</td>
 
                         <td>
                             @forelse ($participant->histories as $history)
@@ -115,17 +124,36 @@
                         </td>
 
                         <td>
-                            <a
-                                class="table-link"
-                                href="{{ route('participants.show', $participant) }}"
-                            >
-                                Lihat →
-                            </a>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <a
+                                    class="table-link"
+                                    href="{{ route('participants.show', $participant) }}"
+                                >
+                                    Lihat →
+                                </a>
+
+                                <form
+                                    action="{{ route('participants.destroy', $participant) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('Yakin ingin menghapus peserta {{ addslashes($participant->name) }}? Data riwayat pelatihannya dan akun yang terhubung juga akan dihapus.');"
+                                >
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-light"
+                                        style="color: #dc2626;"
+                                    >
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="12" class="empty-state">
+                        <td colspan="13" class="empty-state">
                             Belum ada data peserta.
                         </td>
                     </tr>

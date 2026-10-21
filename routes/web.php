@@ -89,6 +89,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/participants/{participant}', [ParticipantController::class, 'update'])
             ->whereNumber('participant')
             ->name('participants.update.patch');
+            Route::delete(
+    '/participants/{participant}',
+    [ParticipantController::class, 'destroy']
+)->name('participants.destroy');
     });
 
     /*
