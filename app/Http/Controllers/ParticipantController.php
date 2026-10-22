@@ -25,7 +25,6 @@ class ParticipantController extends Controller
                         ->orWhere('nip', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%")
                         ->orWhere('institution', 'like', "%{$search}%")
-                        ->orWhere('unit', 'like', "%{$search}%")
                         ->orWhere('district', 'like', "%{$search}%");
                 });
             })
@@ -186,25 +185,7 @@ class ParticipantController extends Controller
                 'max:255',
             ],
 
-            'unit' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
             'district' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'province' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'position' => [
                 'nullable',
                 'string',
                 'max:255',
@@ -230,11 +211,6 @@ class ParticipantController extends Controller
                 'nullable',
                 'string',
                 'max:30',
-            ],
-
-            'notes' => [
-                'nullable',
-                'string',
             ],
         ]);
     }

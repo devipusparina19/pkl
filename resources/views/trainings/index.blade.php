@@ -11,7 +11,7 @@
 </div>
 
 <div class="content-card">
-    
+
     @if (session('success'))
         <div class="alert alert-success" role="status">
             {{ session('success') }}
@@ -33,7 +33,7 @@
             type="text"
             name="search"
             value="{{ $search ?? request('search') }}"
-            placeholder="Cari nama, bidang, atau penyelenggara..."
+            placeholder="Cari nama atau penyelenggara..."
             aria-label="Cari data pelatihan"
             style="flex:1;min-width:220px"
         >
@@ -69,9 +69,7 @@
                 <tr>
                     <th>No.</th>
                     <th>Nama Pelatihan</th>
-                    <th>Bidang</th>
                     <th>Penyelenggara</th>
-                    <th>Lokasi</th>
                     <th>Tanggal Mulai</th>
                     <th>Tanggal Selesai</th>
                     <th>Aksi</th>
@@ -90,15 +88,7 @@
                         </td>
 
                         <td>
-                            {{ $training->field ?? '-' }}
-                        </td>
-
-                        <td>
                             {{ $training->organizer ?? '-' }}
-                        </td>
-
-                        <td>
-                            {{ $training->location ?? '-' }}
                         </td>
 
                         <td>
@@ -146,7 +136,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8"
+                        <td colspan="6"
                             style="text-align:center;padding:28px">
 
                             @if (request()->filled('search'))

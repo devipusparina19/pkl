@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', $participant->exists ? 'Edit Peserta' : 'Tambah Peserta')
@@ -179,21 +178,6 @@
                 @enderror
             </div>
 
-            {{-- Unit Kerja tambahan jika diperlukan --}}
-            <div class="form-field">
-                <label for="unit">Unit Kerja / Puskesmas (Opsional)</label>
-                <input
-                    id="unit"
-                    name="unit"
-                    type="text"
-                    value="{{ old('unit', $participant->unit) }}"
-                    maxlength="255"
-                >
-                @error('unit')
-                    <small class="field-error">{{ $message }}</small>
-                @enderror
-            </div>
-
             {{-- Angkatan --}}
             <div class="form-field">
                 <label for="angkatan">Angkatan</label>
@@ -226,60 +210,18 @@
                 @enderror
             </div>
 
-            {{-- Kabupaten/Kota --}}
+            {{-- Kabupaten/Kota/Mitra --}}
             <div class="form-field">
-                <label for="district">Kabupaten/Kota</label>
+                <label for="district">Kabupaten/Kota/Mitra</label>
                 <input
                     id="district"
                     name="district"
                     type="text"
                     value="{{ old('district', $participant->district) }}"
                     maxlength="255"
+                    placeholder="Contoh: Kabupaten Banjar"
                 >
                 @error('district')
-                    <small class="field-error">{{ $message }}</small>
-                @enderror
-            </div>
-
-            {{-- Provinsi --}}
-            <div class="form-field">
-                <label for="province">Provinsi</label>
-                <input
-                    id="province"
-                    name="province"
-                    type="text"
-                    value="{{ old('province', $participant->province ?? 'Kalimantan Selatan') }}"
-                    maxlength="255"
-                >
-                @error('province')
-                    <small class="field-error">{{ $message }}</small>
-                @enderror
-            </div>
-
-            {{-- Jabatan --}}
-            <div class="form-field">
-                <label for="position">Jabatan</label>
-                <input
-                    id="position"
-                    name="position"
-                    type="text"
-                    value="{{ old('position', $participant->position) }}"
-                    maxlength="255"
-                >
-                @error('position')
-                    <small class="field-error">{{ $message }}</small>
-                @enderror
-            </div>
-
-            {{-- Catatan --}}
-            <div class="form-field full-width">
-                <label for="notes">Catatan</label>
-                <textarea
-                    id="notes"
-                    name="notes"
-                    rows="3"
-                >{{ old('notes', $participant->notes) }}</textarea>
-                @error('notes')
                     <small class="field-error">{{ $message }}</small>
                 @enderror
             </div>

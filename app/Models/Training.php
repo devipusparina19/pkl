@@ -12,14 +12,11 @@ class Training extends Model
         'name',
         'batch_number',
         'funding_source',
-        'field',
         'organizer',
         'start_date',
         'end_date',
         'duration_days',
-        'location',
         'district',
-        'description',
     ];
 
     protected function casts(): array

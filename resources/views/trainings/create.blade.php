@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Tambah Pelatihan')
@@ -30,21 +29,6 @@
         </div>
 
         <div class="form-group">
-            <label for="field">Bidang Pelatihan</label>
-            <input
-                id="field"
-                type="text"
-                name="field"
-                value="{{ old('field') }}"
-                maxlength="150"
-                placeholder="Contoh: Manajemen Kesehatan"
-            >
-            @error('field')
-                <p style="color:#b91c1c">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="form-group">
             <label for="organizer">Penyelenggara</label>
             <input
                 id="organizer"
@@ -55,21 +39,6 @@
                 placeholder="Nama instansi penyelenggara"
             >
             @error('organizer')
-                <p style="color:#b91c1c">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="form-group">
-            <label for="location">Lokasi Pelatihan</label>
-            <input
-                id="location"
-                type="text"
-                name="location"
-                value="{{ old('location') }}"
-                maxlength="255"
-                placeholder="Contoh: Banjarmasin"
-            >
-            @error('location')
                 <p style="color:#b91c1c">{{ $message }}</p>
             @enderror
         </div>
@@ -97,19 +66,6 @@
                 value="{{ old('end_date') }}"
             >
             @error('end_date')
-                <p style="color:#b91c1c">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="form-group">
-            <label for="description">Keterangan</label>
-            <textarea
-                id="description"
-                name="description"
-                rows="4"
-                placeholder="Keterangan tambahan jika diperlukan"
-            >{{ old('description') }}</textarea>
-            @error('description')
                 <p style="color:#b91c1c">{{ $message }}</p>
             @enderror
         </div>

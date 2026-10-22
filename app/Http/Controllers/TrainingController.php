@@ -16,8 +16,7 @@ class TrainingController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('organizer', 'like', "%{$search}%")
-                      ->orWhere('field', 'like', "%{$search}%");
+                      ->orWhere('organizer', 'like', "%{$search}%");
                 });
             })
             ->orderByDesc('start_date')
@@ -36,12 +35,9 @@ class TrainingController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'field' => ['nullable', 'string', 'max:150'],
             'organizer' => ['nullable', 'string', 'max:255'],
-            'location' => ['nullable', 'string', 'max:255'],
             'start_date' => ['required', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'description' => ['nullable', 'string'],
         ]);
 
         Training::create($validated);
@@ -60,12 +56,9 @@ class TrainingController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'field' => ['nullable', 'string', 'max:150'],
             'organizer' => ['nullable', 'string', 'max:255'],
-            'location' => ['nullable', 'string', 'max:255'],
             'start_date' => ['required', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'description' => ['nullable', 'string'],
         ]);
 
         $training->update($validated);
@@ -74,22 +67,22 @@ class TrainingController extends Controller
             ->route('trainings.index')
             ->with('success', 'Data pelatihan berhasil diperbarui.');
     }
- 
-public function destroy(Training $training)
-{
-    if ($training->histories()->exists()) {
+
+    public function destroy(Training $training)
+    {
+        if ($training->histories()->exists()) {
+            return redirect()
+                ->route('trainings.index')
+                ->with(
+                    'error',
+                    'Pelatihan tidak dapat dihapus karena sudah memiliki riwayat peserta.'
+                );
+        }
+
+        $training->delete();
+
         return redirect()
             ->route('trainings.index')
-            ->with(
-                'error',
-                'Pelatihan tidak dapat dihapus karena sudah memiliki riwayat peserta.'
-            );
+            ->with('success', 'Data pelatihan berhasil dihapus.');
     }
-
-    $training->delete();
-
-    return redirect()
-        ->route('trainings.index')
-        ->with('success', 'Data pelatihan berhasil dihapus.');
-}
 }

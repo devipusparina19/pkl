@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Profil Peserta')
@@ -94,28 +93,13 @@
         </div>
 
         <div>
-            <span>Instansi</span>
+            <span>Instansi/Unit Kerja</span>
             <strong>{{ $participant->institution ?: '-' }}</strong>
         </div>
 
         <div>
-            <span>Unit Kerja</span>
-            <strong>{{ $participant->unit ?: '-' }}</strong>
-        </div>
-
-        <div>
-            <span>Kabupaten/Kota</span>
+            <span>Kabupaten/Kota/Mitra</span>
             <strong>{{ $participant->district ?: '-' }}</strong>
-        </div>
-
-        <div>
-            <span>Provinsi</span>
-            <strong>{{ $participant->province ?: '-' }}</strong>
-        </div>
-
-        <div>
-            <span>Jabatan</span>
-            <strong>{{ $participant->position ?: '-' }}</strong>
         </div>
 
         <div>

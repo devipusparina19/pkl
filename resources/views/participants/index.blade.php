@@ -21,6 +21,12 @@
     </div>
 @endif
 
+@if (session('error'))
+    <div class="panel" role="alert">
+        {{ session('error') }}
+    </div>
+@endif
+
 <div class="panel">
     <form method="GET"
           action="{{ route('participants.index') }}"
@@ -87,15 +93,7 @@
 
                         <td>{{ $participant->phone ?: '-' }}</td>
 
-                        <td>
-                            {{ $participant->institution ?: '-' }}
-
-                            @if ($participant->unit)
-                                <div class="muted">
-                                    {{ $participant->unit }}
-                                </div>
-                            @endif
-                        </td>
+                        <td>{{ $participant->institution ?: '-' }}</td>
 
                         <td>{{ $participant->district ?: '-' }}</td>
 
@@ -124,17 +122,19 @@
                         </td>
 
                         <td>
-                            <div style="display: flex; gap: 8px; align-items: center;">
+                            <div style="display:flex; gap:8px; align-items:center; white-space:nowrap;">
                                 <a
-                                    class="table-link"
+                                    class="btn btn-light"
                                     href="{{ route('participants.show', $participant) }}"
+                                    style="text-decoration:none;"
                                 >
-                                    Lihat →
+                                    Lihat
                                 </a>
 
                                 <form
                                     action="{{ route('participants.destroy', $participant) }}"
                                     method="POST"
+                                    style="margin:0;"
                                     onsubmit="return confirm('Yakin ingin menghapus peserta {{ addslashes($participant->name) }}? Data riwayat pelatihannya dan akun yang terhubung juga akan dihapus.');"
                                 >
                                     @csrf
@@ -143,7 +143,7 @@
                                     <button
                                         type="submit"
                                         class="btn btn-light"
-                                        style="color: #dc2626;"
+                                        style="color:#dc2626;"
                                     >
                                         Hapus
                                     </button>
@@ -154,7 +154,11 @@
                 @empty
                     <tr>
                         <td colspan="13" class="empty-state">
-                            Belum ada data peserta.
+                            @if ($search !== '')
+                                Data peserta tidak ditemukan.
+                            @else
+                                Belum ada data peserta.
+                            @endif
                         </td>
                     </tr>
                 @endforelse
