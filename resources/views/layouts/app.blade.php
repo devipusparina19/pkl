@@ -3,124 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>@yield('title', 'Dashboard') - SIRAPIK</title>
 
     <style>
         :root {
             --navy: #12315b;
             --navy-dark: #0b2344;
-            --blue: #1d4ed8;
-            --blue-light: #eff6ff;
+            --blue: #2563a6;
+            --blue-light: #edf4fc;
             --text: #1e293b;
             --muted: #64748b;
-            --border: #e2e8f0;
-            --bg: #f4f7fb;
+            --border: #dce4ee;
+            --bg: #f3f6fa;
             --success: #166534;
             --danger: #991b1b;
+            --sidebar-width: 286px;
         }
 
         * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
+            font-family: "Segoe UI", Inter, Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
             font-size: 16px;
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
         a { color: inherit; text-decoration: none; }
-
         button, input, select, textarea { font: inherit; }
         button { cursor: pointer; }
-
         .app-shell { min-height: 100vh; }
+
+        /* IKON SVG */
+        .icon {
+            width: 21px;
+            height: 21px;
+            flex: 0 0 21px;
+            display: inline-block;
+            vertical-align: middle;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .icon-sm {
+            width: 17px;
+            height: 17px;
+            flex-basis: 17px;
+        }
 
         /* SIDEBAR */
         .sidebar {
             position: fixed;
             inset: 0 auto 0 0;
-            width: 270px;
-            background: var(--navy);
-            color: white;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #12315b 0%, #0b2344 100%);
+            color: #fff;
             display: flex;
             flex-direction: column;
-            z-index: 10;
+            z-index: 100;
             overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 5px 0 24px rgba(15, 35, 65, .08);
+            border-right: 1px solid rgba(255,255,255,.08);
+            scrollbar-width: thin;
+            scrollbar-color: #49627f transparent;
         }
 
         .brand {
-            padding: 27px 24px;
-            border-bottom: 1px solid #ffffff20;
+            padding: 29px 25px 25px;
+            border-bottom: 1px solid rgba(255,255,255,.13);
         }
 
         .brand h2 {
-            margin: 0 0 7px;
-            font-size: 27px;
-            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 12px;
+            font-size: 29px;
+            font-weight: 800;
+            letter-spacing: 1.6px;
+            line-height: 1.2;
+        }
+
+        .brand-mark {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 12px;
+            background: rgba(255,255,255,.10);
+            color: #fff;
+        }
+
+        .brand-mark .icon {
+            width: 25px;
+            height: 25px;
         }
 
         .brand p {
             margin: 0;
-            color: #cbd5e1;
-            font-size: 14px;
-            line-height: 1.7;
+            padding-left: 2px;
+            color: #c5d4e8;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.8;
+            letter-spacing: .15px;
         }
 
-        .sidebar nav { padding-bottom: 16px; }
+        .sidebar nav {
+            padding: 12px 13px 20px;
+        }
 
         .nav-label {
-            padding: 24px 22px 10px;
-            color: #c1d1e5;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
+            padding: 21px 12px 9px;
+            color: #aebfd5;
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: 1.35px;
+            line-height: 1.5;
         }
 
         .nav-link {
-            display: block;
-            margin: 4px 12px;
-            padding: 13px 15px;
-            color: #e2e8f0;
-            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            min-height: 48px;
+            margin: 4px 0;
+            padding: 12px 13px;
+            color: #dbe6f3;
+            border: 1px solid transparent;
+            border-radius: 9px;
             font-size: 15px;
-            line-height: 1.5;
-            transition: background .15s;
+            font-weight: 550;
+            line-height: 1.45;
+            transition: background .18s ease, color .18s ease,
+                        border-color .18s ease, transform .18s ease;
             overflow-wrap: anywhere;
         }
 
-        .nav-link:hover,
-        .nav-link.active {
-            background: #ffffff19;
-            color: white;
+        .nav-link .icon {
+            color: #b5c9e1;
+            transition: color .18s ease;
         }
 
-        .nav-link.active {
-            border-left: 4px solid #93c5fd;
-            padding-left: 11px;
+        .nav-link:hover {
+            background: rgba(255,255,255,.075);
+            color: #fff;
+            transform: translateX(2px);
         }
 
-        /* GRUP MENU MASTER DATA */
-        .nav-group { margin: 0; }
+        .nav-link:hover .icon { color: #fff; }
+
+        .nav-link.active {
+            background: #fff;
+            color: #12315b;
+            border-color: rgba(255,255,255,.65);
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        }
+
+        .nav-link.active .icon { color: #1d5a99; }
+
+        /* MASTER DATA */
+        .nav-group { margin: 4px 0; }
 
         .nav-group-summary {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            margin: 4px 12px;
-            padding: 13px 15px;
-            color: #e2e8f0;
+            min-height: 48px;
+            margin: 0;
+            padding: 12px 13px;
+            color: #dbe6f3;
             border: 1px solid transparent;
-            border-radius: 8px;
+            border-radius: 9px;
             font-size: 15px;
-            line-height: 1.5;
+            font-weight: 550;
+            line-height: 1.45;
             cursor: pointer;
             list-style: none;
-            transition: background .15s, color .15s;
-            overflow-wrap: anywhere;
+            transition: background .18s ease, color .18s ease;
         }
 
         .nav-group-summary::-webkit-details-marker { display: none; }
@@ -128,133 +199,206 @@
 
         .nav-group-summary:hover,
         .nav-group[open] > .nav-group-summary {
-            background: #ffffff19;
-            color: white;
+            background: rgba(255,255,255,.075);
+            color: #fff;
         }
 
         .nav-group-summary.active {
-            border-left: 4px solid #93c5fd;
-            padding-left: 11px;
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            border-color: rgba(255,255,255,.10);
         }
 
         .nav-group-title {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 13px;
             min-width: 0;
         }
 
+        .nav-group-title .icon { color: #b5c9e1; }
+
         .nav-chevron {
-            flex-shrink: 0;
-            font-size: 11px;
-            transition: transform .18s ease;
+            flex: 0 0 auto;
+            width: 17px;
+            height: 17px;
+            transition: transform .2s ease;
         }
 
         .nav-group[open] > .nav-group-summary .nav-chevron {
             transform: rotate(180deg);
         }
 
-        /* SUBMENU SIDEBAR */
         .nav-submenu {
-            margin: 0 12px 8px 24px;
-            padding-left: 10px;
-            border-left: 1px solid #ffffff35;
+            margin: 5px 0 9px 24px;
+            padding: 4px 0 4px 15px;
+            border-left: 1px solid rgba(255,255,255,.24);
         }
 
-        .nav-group .nav-submenu { margin-top: 0; }
-
         .nav-sublink {
-            display: block;
-            padding: 9px 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-height: 39px;
             margin: 3px 0;
-            color: #cbd5e1;
-            border-radius: 6px;
+            padding: 9px 11px;
+            color: #c2d1e4;
+            border-radius: 7px;
             font-size: 13px;
-            line-height: 1.5;
+            font-weight: 500;
+            line-height: 1.45;
+            transition: background .18s ease, color .18s ease;
             overflow-wrap: anywhere;
         }
 
-        .nav-sublink:hover,
-        .nav-sublink.active {
-            background: #ffffff19;
-            color: #ffffff;
+        .nav-sublink::before {
+            content: "";
+            width: 5px;
+            height: 5px;
+            flex: 0 0 5px;
+            margin-right: 10px;
+            border-radius: 50%;
+            background: #7f9bbd;
+        }
+
+        .nav-sublink:hover {
+            background: rgba(255,255,255,.08);
+            color: #fff;
         }
 
         .nav-sublink.active {
-            border-left: 3px solid #93c5fd;
-            padding-left: 9px;
+            background: rgba(255,255,255,.14);
+            color: #fff;
+            font-weight: 700;
         }
 
+        .nav-sublink.active::before {
+            width: 6px;
+            height: 6px;
+            flex-basis: 6px;
+            background: #93c5fd;
+        }
+
+        /* LOGOUT */
         .sidebar-bottom {
             margin-top: auto;
-            padding: 16px 12px;
-            border-top: 1px solid #ffffff20;
+            padding: 16px 16px 19px;
+            border-top: 1px solid rgba(255,255,255,.13);
+            background: rgba(4,20,42,.18);
         }
+
+        .sidebar-bottom form { margin: 0; }
 
         .logout-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 11px;
             width: 100%;
-            background: #ffffff18;
-            color: white;
-            text-align: left;
-            border: 1px solid #ffffff20;
+            min-height: 47px;
+            padding: 11px 14px;
+            background: rgba(255,255,255,.07);
+            color: #f1f5f9;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,.17);
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 650;
+            transition: background .18s ease, border-color .18s ease;
         }
 
-        .logout-button:hover { background: #ffffff2b; }
+        .logout-button:hover {
+            background: rgba(220,38,38,.18);
+            border-color: rgba(252,165,165,.45);
+        }
 
         /* AREA KONTEN */
         .main-area {
-            margin-left: 270px;
+            margin-left: var(--sidebar-width);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
         .topbar {
-            min-height: 82px;
-            padding: 17px 32px;
-            background: white;
+            min-height: 88px;
+            padding: 18px 34px;
+            background: #fff;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 18px;
+            box-shadow: 0 2px 8px rgba(15,23,42,.025);
         }
 
         .topbar h2 {
-            margin: 0;
-            font-size: 21px;
+            margin: 0 0 3px;
+            font-size: 22px;
+            font-weight: 750;
+            letter-spacing: -.35px;
             line-height: 1.4;
+            color: #152d4d;
         }
 
-        .topbar small { color: var(--muted); font-size: 14px; }
+        .topbar small {
+            color: var(--muted);
+            font-size: 13px;
+        }
 
-        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
 
         .user-chip {
-            background: var(--blue-light);
-            color: var(--navy);
-            padding: 10px 15px;
-            border-radius: 8px;
+            position: relative;
+            padding: 10px 16px 10px 45px;
+            background: #f1f6fc;
+            color: #17375e;
+            border: 1px solid #e0eaf5;
+            border-radius: 10px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
+            line-height: 1.45;
             overflow-wrap: anywhere;
+        }
+
+        .user-chip::before {
+            content: "";
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            width: 23px;
+            height: 23px;
+            transform: translateY(-50%);
+            border-radius: 7px;
+            background: #dbeafe;
+        }
+
+        .user-chip::after {
+            content: "";
+            position: absolute;
+            left: 20px;
+            top: calc(50% - 7px);
+            width: 9px;
+            height: 9px;
+            border: 1.7px solid #24558b;
+            border-radius: 50%;
         }
 
         .role-label {
             display: block;
             margin-top: 3px;
+            color: #647b96;
             font-size: 12px;
-            font-weight: 400;
-            color: var(--muted);
+            font-weight: 500;
         }
 
         .main-content {
             flex: 1;
-            padding: 32px;
             min-width: 0;
+            padding: 32px;
         }
 
-        /* JUDUL HALAMAN */
+        /* JUDUL */
         .page-heading, .page-header {
             display: flex;
             align-items: center;
@@ -266,7 +410,10 @@
 
         .page-heading h1, .page-header h1 {
             margin: 0 0 8px;
+            color: #17375e;
             font-size: 30px;
+            font-weight: 750;
+            letter-spacing: -.5px;
             line-height: 1.3;
         }
 
@@ -282,8 +429,8 @@
             margin-bottom: 8px;
             color: var(--blue);
             font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
+            font-weight: 750;
+            letter-spacing: 1.1px;
         }
 
         /* KARTU */
@@ -295,11 +442,11 @@
         }
 
         .stat-card, .content-card, .panel, .form-card {
-            background: white;
+            background: #fff;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 13px;
             padding: 24px;
-            box-shadow: 0 3px 12px #0f172a05;
+            box-shadow: 0 4px 15px rgba(15,23,42,.035);
         }
 
         .stat-label {
@@ -310,10 +457,10 @@
 
         .stat-number, .stat-value {
             margin-top: 10px;
-            font-size: 32px;
-            font-weight: 700;
-            line-height: 1.3;
             color: var(--navy);
+            font-size: 32px;
+            font-weight: 750;
+            line-height: 1.3;
             overflow-wrap: anywhere;
         }
 
@@ -328,7 +475,9 @@
 
         .content-card h2, .panel h2, .form-card h2 {
             margin: 0 0 12px;
+            color: #17375e;
             font-size: 20px;
+            font-weight: 700;
             line-height: 1.4;
         }
 
@@ -346,26 +495,31 @@
 
         /* TOMBOL */
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             border: 1px solid transparent;
-            border-radius: 7px;
+            border-radius: 8px;
             background: var(--blue);
             color: white;
             padding: 10px 16px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 650;
             line-height: 1.5;
             cursor: pointer;
             text-align: center;
-            transition: background .15s;
+            transition: background .18s ease, box-shadow .18s ease;
         }
 
-        .btn:hover { background: #1e40af; }
+        .btn:hover {
+            background: #1e40af;
+            box-shadow: 0 3px 9px rgba(37,99,235,.15);
+        }
+
         .btn-primary { background: var(--blue); color: white; }
         .btn-light { background: #eaf0f8; color: var(--navy); }
-
         .btn-light:hover, .btn-secondary:hover { background: #dbe5f2; }
-
         .btn-secondary { background: #e2e8f0; color: #1e293b; }
         .btn-outline { background: white; color: var(--navy); border-color: #cbd5e1; }
         .btn-outline:hover { background: #f1f5f9; }
@@ -396,7 +550,7 @@
             display: block;
             margin-bottom: 7px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 650;
         }
 
         input, select, textarea {
@@ -405,14 +559,14 @@
             min-width: 0;
             padding: 11px 12px;
             border: 1px solid #cbd5e1;
-            border-radius: 7px;
+            border-radius: 8px;
             background: white;
             color: var(--text);
             font-size: 14px;
         }
 
         input:focus, select:focus, textarea:focus {
-            outline: 2px solid #bfdbfe;
+            outline: 3px solid #dbeafe;
             border-color: var(--blue);
         }
 
@@ -448,7 +602,7 @@
         /* NOTIFIKASI */
         .alert {
             padding: 15px 18px;
-            border-radius: 8px;
+            border-radius: 9px;
             margin-bottom: 22px;
             background: #eff6ff;
             color: #1e40af;
@@ -456,8 +610,18 @@
             font-size: 14px;
         }
 
-        .alert-success { background: #f0fdf4; color: var(--success); border-color: #bbf7d0; }
-        .alert-error, .alert-danger { background: #fef2f2; color: var(--danger); border-color: #fecaca; }
+        .alert-success {
+            background: #f0fdf4;
+            color: var(--success);
+            border-color: #bbf7d0;
+        }
+
+        .alert-error, .alert-danger {
+            background: #fef2f2;
+            color: var(--danger);
+            border-color: #fecaca;
+        }
+
         .alert ul { margin-bottom: 0; padding-left: 22px; }
 
         /* TABEL */
@@ -478,9 +642,9 @@
         }
 
         th {
-            background: #f8fafc;
+            background: #f5f8fc;
             color: #475569;
-            font-weight: 700;
+            font-weight: 750;
             white-space: nowrap;
         }
 
@@ -532,15 +696,19 @@
             display: inline-block;
             padding: 7px 11px;
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 7px;
             background: white;
             font-size: 13px;
         }
 
-        .pagination .current { background: var(--navy); border-color: var(--navy); color: white; }
+        .pagination .current {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: white;
+        }
+
         .pagination .disabled { color: #94a3b8; background: #f8fafc; }
         .pagination-wrapper { margin-top: 18px; }
-
         .field-stat { margin-top: 18px; }
 
         .field-stat-line {
@@ -558,9 +726,18 @@
             overflow: hidden;
         }
 
-        .progress-fill { height: 100%; background: var(--blue); border-radius: 10px; }
+        .progress-fill {
+            height: 100%;
+            background: var(--blue);
+            border-radius: 10px;
+        }
 
-        .empty-state { padding: 24px 16px; color: var(--muted); text-align: center; font-size: 14px; }
+        .empty-state {
+            padding: 24px 16px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 14px;
+        }
 
         .count-pill {
             display: inline-block;
@@ -588,8 +765,7 @@
         }
 
         @media (max-width: 900px) {
-            .sidebar { width: 230px; }
-            .main-area { margin-left: 230px; }
+            :root { --sidebar-width: 245px; }
             .main-content { padding: 24px 20px; }
             .topbar { padding: 16px 20px; }
             .filter-grid { grid-template-columns: 1fr 1fr; }
@@ -597,8 +773,15 @@
         }
 
         @media (max-width: 760px) {
-            .sidebar { position: relative; width: 100%; max-height: none; }
+            .sidebar {
+                position: relative;
+                width: 100%;
+                max-height: none;
+                overflow: visible;
+            }
+
             .brand { padding: 20px; }
+            .sidebar nav { padding: 10px 12px 16px; }
             .nav-label { padding-top: 16px; }
             .sidebar-bottom { margin-top: 0; }
             .main-area { margin-left: 0; }
@@ -608,7 +791,6 @@
             .stat-number, .stat-value { font-size: 27px; }
             .page-heading h1, .page-header h1 { font-size: 25px; }
             .app-footer { padding: 20px 16px; }
-            .nav-group-summary { margin-right: 12px; margin-left: 12px; }
         }
 
         @media (max-width: 560px) {
@@ -620,6 +802,14 @@
             .user-chip { max-width: 100%; }
             th, td { padding: 10px; }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+                animation-duration: .01ms !important;
+            }
+        }
     </style>
 </head>
 
@@ -629,8 +819,6 @@
     @php
         $currentUser = auth()->user();
         $role = strtolower(trim((string) ($currentUser?->role ?? '')));
-
-        // Menyamakan format role agar konsisten.
         $role = str_replace('-', '_', $role);
 
         $roleLabels = [
@@ -660,9 +848,68 @@
         $isMasterDataActive = request()->routeIs('super-admin.master-data.*');
     @endphp
 
+    {{-- SVG ikon inline agar tidak membutuhkan library tambahan --}}
+    <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+        <symbol id="icon-building" viewBox="0 0 24 24">
+            <path d="M3 21h18M5 21V5l7-2 7 2v16M9 8h1m4 0h1M9 12h1m4 0h1M9 16h1m4 0h1M11 21v-3h2v3"/>
+        </symbol>
+        <symbol id="icon-dashboard" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </symbol>
+        <symbol id="icon-users" viewBox="0 0 24 24">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+            <circle cx="9.5" cy="7" r="4"/>
+            <path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </symbol>
+        <symbol id="icon-settings" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.6a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.6-1.4-2.4L7.3 15a8 8 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.6a8 8 0 0 1 1.7-1l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.6 1.4 2.4-1.4 1.1a8 8 0 0 1-.1 2Z" transform="translate(-1 -1)"/>
+        </symbol>
+        <symbol id="icon-shield" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/>
+            <path d="m9 12 2 2 4-4"/>
+        </symbol>
+        <symbol id="icon-activity" viewBox="0 0 24 24">
+            <path d="M3 3v18h18"/>
+            <path d="m7 14 4-4 4 3 5-7"/>
+        </symbol>
+        <symbol id="icon-training" viewBox="0 0 24 24">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+            <path d="M8 7h8M8 11h8"/>
+        </symbol>
+        <symbol id="icon-upload" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <path d="m17 8-5-5-5 5M12 3v12"/>
+        </symbol>
+        <symbol id="icon-report" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
+            <path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/>
+        </symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 21a8 8 0 0 1 16 0"/>
+        </symbol>
+        <symbol id="icon-chevron" viewBox="0 0 24 24">
+            <path d="m6 9 6 6 6-6"/>
+        </symbol>
+        <symbol id="icon-logout" viewBox="0 0 24 24">
+            <path d="M10 17l5-5-5-5M15 12H3"/>
+            <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/>
+        </symbol>
+    </svg>
+
     <aside class="sidebar">
         <div class="brand">
-            <h2>SIRAPIK</h2>
+            <h2>
+                <span class="brand-mark">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-building"/></svg>
+                </span>
+                <span>SIRAPIK</span>
+            </h2>
             <p>
                 Sistem Informasi Riwayat Pelatihan<br>
                 Bapelkes Kalimantan Selatan
@@ -679,7 +926,8 @@
                     class="nav-link {{ request()->routeIs('super-admin.dashboard') ? 'active' : '' }}"
                     @if (request()->routeIs('super-admin.dashboard')) aria-current="page" @endif
                 >
-                    ▦ &nbsp; Dashboard
+                    <svg class="icon" aria-hidden="true"><use href="#icon-dashboard"/></svg>
+                    <span>Dashboard</span>
                 </a>
             @elseif (Route::has('dashboard'))
                 <a
@@ -687,7 +935,8 @@
                     class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
                     @if (request()->routeIs('dashboard')) aria-current="page" @endif
                 >
-                    ▦ &nbsp; Dashboard
+                    <svg class="icon" aria-hidden="true"><use href="#icon-dashboard"/></svg>
+                    <span>Dashboard</span>
                 </a>
             @endif
 
@@ -701,7 +950,8 @@
                         class="nav-link {{ request()->routeIs('super-admin.users.*') ? 'active' : '' }}"
                         @if (request()->routeIs('super-admin.users.*')) aria-current="page" @endif
                     >
-                        👥 &nbsp; Kelola Akun
+                        <svg class="icon" aria-hidden="true"><use href="#icon-users"/></svg>
+                        <span>Kelola Akun</span>
                     </a>
                 @endif
 
@@ -712,10 +962,10 @@
                             aria-label="Buka atau tutup menu Master Data"
                         >
                             <span class="nav-group-title">
-                                <span aria-hidden="true">⚙</span>
+                                <svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg>
                                 <span>Master Data</span>
                             </span>
-                            <span class="nav-chevron" aria-hidden="true">▼</span>
+                            <svg class="icon icon-sm nav-chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
                         </summary>
 
                         <div class="nav-submenu">
@@ -738,7 +988,8 @@
                         class="nav-link {{ request()->routeIs('roles.*') ? 'active' : '' }}"
                         @if (request()->routeIs('roles.*')) aria-current="page" @endif
                     >
-                        🔐 &nbsp; Role dan Hak Akses
+                        <svg class="icon" aria-hidden="true"><use href="#icon-shield"/></svg>
+                        <span>Role dan Hak Akses</span>
                     </a>
                 @endif
 
@@ -748,12 +999,13 @@
                         class="nav-link {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}"
                         @if (request()->routeIs('activity-logs.*')) aria-current="page" @endif
                     >
-                        ▤ &nbsp; Log Aktivitas
+                        <svg class="icon" aria-hidden="true"><use href="#icon-activity"/></svg>
+                        <span>Log Aktivitas</span>
                     </a>
                 @endif
             @endif
 
-            {{-- ADMIN: MENGELOLA DATA --}}
+            {{-- ADMIN --}}
             @if ($isAdmin)
                 <div class="nav-label">PENGELOLAAN DATA</div>
 
@@ -763,7 +1015,8 @@
                         class="nav-link {{ request()->routeIs('participants.*') ? 'active' : '' }}"
                         @if (request()->routeIs('participants.*')) aria-current="page" @endif
                     >
-                        👥 &nbsp; Data Peserta
+                        <svg class="icon" aria-hidden="true"><use href="#icon-users"/></svg>
+                        <span>Data Peserta</span>
                     </a>
                 @endif
 
@@ -773,7 +1026,8 @@
                         class="nav-link {{ request()->routeIs('trainings.*') ? 'active' : '' }}"
                         @if (request()->routeIs('trainings.*')) aria-current="page" @endif
                     >
-                        ▤ &nbsp; Data Pelatihan
+                        <svg class="icon" aria-hidden="true"><use href="#icon-training"/></svg>
+                        <span>Data Pelatihan</span>
                     </a>
                 @endif
 
@@ -783,7 +1037,8 @@
                         class="nav-link {{ request()->routeIs('imports.*') ? 'active' : '' }}"
                         @if (request()->routeIs('imports.*')) aria-current="page" @endif
                     >
-                        ⇧ &nbsp; Impor Excel
+                        <svg class="icon" aria-hidden="true"><use href="#icon-upload"/></svg>
+                        <span>Impor Excel</span>
                     </a>
                 @endif
 
@@ -794,12 +1049,13 @@
                         class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"
                         @if (request()->routeIs('reports.*')) aria-current="page" @endif
                     >
-                        ▥ &nbsp; Laporan dan Statistik
+                        <svg class="icon" aria-hidden="true"><use href="#icon-report"/></svg>
+                        <span>Laporan dan Statistik</span>
                     </a>
                 @endif
             @endif
 
-            {{-- PIMPINAN: DASHBOARD DAN LAPORAN SAJA --}}
+            {{-- PIMPINAN --}}
             @if ($isPimpinan)
                 <div class="nav-label">PEMANTAUAN</div>
 
@@ -809,12 +1065,13 @@
                         class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"
                         @if (request()->routeIs('reports.*')) aria-current="page" @endif
                     >
-                        ▥ &nbsp; Laporan Pelatihan
+                        <svg class="icon" aria-hidden="true"><use href="#icon-report"/></svg>
+                        <span>Laporan Pelatihan</span>
                     </a>
                 @endif
             @endif
 
-            {{-- PESERTA, JIKA ROLE INI DIGUNAKAN --}}
+            {{-- PESERTA --}}
             @if ($isParticipant)
                 <div class="nav-label">AKUN PESERTA</div>
 
@@ -824,7 +1081,8 @@
                         class="nav-link {{ request()->routeIs('participant.profile') ? 'active' : '' }}"
                         @if (request()->routeIs('participant.profile')) aria-current="page" @endif
                     >
-                        👤 &nbsp; Profil Saya
+                        <svg class="icon" aria-hidden="true"><use href="#icon-user"/></svg>
+                        <span>Profil Saya</span>
                     </a>
                 @endif
             @endif
@@ -834,7 +1092,8 @@
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="btn logout-button">
-                    ↪ &nbsp; Keluar dari Sistem
+                    <svg class="icon" aria-hidden="true"><use href="#icon-logout"/></svg>
+                    <span>Keluar dari Sistem</span>
                 </button>
             </form>
         </div>

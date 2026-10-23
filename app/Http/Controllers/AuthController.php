@@ -2,20 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * Halaman login umum.
+     */
     public function showLogin()
     {
         return view('auth.login', [
-            'loginRole' => null,
-            'loginRoleLabel' => 'Internal',
+            'loginRole' => 'admin',
+            'loginRoleLabel' => 'Admin',
         ]);
     }
 
+    /**
+     * Halaman login berdasarkan role.
+     */
     public function showRoleLogin(string $role)
     {
         $this->validateRolePath($role);
@@ -26,61 +35,98 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Proses autentikasi pengguna.
+     */
     public function login(Request $request, string $role)
     {
         $this->validateRolePath($role);
 
+        // Validasi sesuai name input pada halaman login.
         $validated = $request->validate([
-            'email' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
         ], [
-            'email.required' => 'Username/email wajib diisi.',
-            'email.max' => 'Username/email maksimal 255 karakter.',
+            'username.required' => 'Username atau email wajib diisi.',
+            'username.string' => 'Username atau email harus berupa teks.',
+            'username.max' => 'Username atau email maksimal 255 karakter.',
             'password.required' => 'Password wajib diisi.',
+            'password.string' => 'Password tidak valid.',
         ]);
 
-        if (!Auth::attempt([
-            'email' => $validated['email'],
-            'password' => $validated['password'],
-        ])) {
+        $identifier = trim($validated['username']);
+
+        /*
+         * Cari pengguna berdasarkan email.
+         * Jika kolom username tersedia, cari berdasarkan username juga.
+         */
+        $userQuery = User::query()->where(function ($query) use ($identifier) {
+            $query->where('email', $identifier);
+
+            if (Schema::hasColumn('users', 'username')) {
+                $query->orWhere('username', $identifier);
+            }
+        });
+
+        $user = $userQuery->first();
+
+        /*
+         * Jangan membuat sesi jika pengguna tidak ditemukan
+         * atau password tidak cocok.
+         */
+        if (
+            !$user ||
+            !is_string($user->password) ||
+            !Hash::check($validated['password'], $user->password)
+        ) {
             throw ValidationException::withMessages([
-                'email' => 'Username/email atau password tidak sesuai.',
+                'username' => 'Username/email atau password tidak sesuai.',
             ]);
         }
 
-        $user = Auth::user();
-
-        if (!$user->is_active) {
-            Auth::logout();
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
+        /*
+         * Pastikan akun aktif.
+         */
+        if (!(bool) $user->is_active) {
             throw ValidationException::withMessages([
-                'email' => 'Akun Anda sedang dinonaktifkan. Silakan hubungi Super Admin.',
+                'username' => 'Akun Anda sedang dinonaktifkan. Silakan hubungi Super Admin.',
             ]);
         }
 
-        $normalizeRole = static function (string $value): string {
-            return str_replace('-', '_', strtolower(trim($value)));
+        /*
+         * Normalisasi role:
+         * super-admin menjadi super_admin.
+         */
+        $normalizeRole = static function (?string $value): string {
+            return str_replace(
+                '-',
+                '_',
+                strtolower(trim((string) $value))
+            );
         };
 
         $expectedRole = $normalizeRole($role);
-        $actualRole = $normalizeRole((string) $user->role);
+        $actualRole = $normalizeRole($user->role);
 
+        /*
+         * Pastikan role pilihan pada halaman login cocok
+         * dengan role yang tersimpan di database.
+         */
         if ($actualRole !== $expectedRole) {
-            Auth::logout();
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
             throw ValidationException::withMessages([
-                'email' => 'Jenis akun tidak sesuai dengan role akun yang terdaftar.',
+                'username' => 'Jenis akun tidak sesuai dengan role akun yang terdaftar.',
             ]);
         }
 
+        /*
+         * Login pengguna dan regenerasi session untuk keamanan.
+         */
+        Auth::login($user);
         $request->session()->regenerate();
 
+        /*
+         * Tentukan dashboard tujuan berdasarkan role.
+         */
         $destination = match ($actualRole) {
             'super_admin' => 'super-admin.dashboard',
             'admin', 'pimpinan' => 'dashboard',
@@ -92,6 +138,9 @@ class AuthController extends Controller
             ->with('success', 'Selamat datang, ' . $user->name . '!');
     }
 
+    /**
+     * Logout pengguna.
+     */
     public function logout(Request $request)
     {
         Auth::logout();
@@ -104,20 +153,31 @@ class AuthController extends Controller
             ->with('success', 'Anda berhasil keluar dari sistem.');
     }
 
+    /**
+     * Batasi role yang diperbolehkan pada URL login.
+     */
     private function validateRolePath(string $role): void
     {
         abort_unless(
-            in_array($role, ['super-admin', 'admin', 'pimpinan'], true),
+            in_array($role, [
+                'super-admin',
+                'admin',
+                'pimpinan',
+            ], true),
             404
         );
     }
 
+    /**
+     * Label role untuk halaman login.
+     */
     private function roleLabel(string $role): string
     {
         return match ($role) {
             'super-admin' => 'Super Admin',
             'admin' => 'Admin',
             'pimpinan' => 'Pimpinan',
+            default => 'Internal',
         };
     }
 }

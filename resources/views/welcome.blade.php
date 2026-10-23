@@ -20,17 +20,17 @@
             --blue-hover: #194c87;
             --blue-soft: #edf4fc;
             --ink: #26364a;
-            --muted: #68788d;
-            --border: #e0e7ef;
+            --muted: #64748b;
+            --border: #dce4ee;
             --surface: #ffffff;
-            --page: #f4f7fb;
+            --page: #f3f6fa;
             --green: #207653;
             --green-soft: #e9f6ef;
             --red: #b34545;
             --red-soft: #fbefef;
             --radius: 12px;
-            --shadow: 0 5px 20px rgba(19, 49, 83, .055);
-            --shadow-hover: 0 12px 28px rgba(19, 49, 83, .10);
+            --shadow: 0 4px 18px rgba(19, 49, 83, .055);
+            --shadow-hover: 0 10px 26px rgba(19, 49, 83, .10);
         }
 
         *,
@@ -41,7 +41,7 @@
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 20px;
+            scroll-padding-top: 24px;
         }
 
         body {
@@ -49,9 +49,10 @@
             color: var(--ink);
             background: var(--page);
             font-family: "Segoe UI", Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.65;
+            font-size: 16px;
+            line-height: 1.7;
             -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
         body,
@@ -80,12 +81,16 @@
         a:focus-visible,
         button:focus-visible,
         select:focus-visible {
-            outline: 3px solid rgba(36, 99, 166, .28);
+            outline: 3px solid rgba(36, 99, 166, .32);
             outline-offset: 3px;
         }
 
+        img {
+            max-width: 100%;
+        }
+
         .public-container {
-            width: min(1200px, calc(100% - 56px));
+            width: min(1480px, calc(100% - 64px));
             margin-inline: auto;
         }
 
@@ -99,7 +104,7 @@
         }
 
         .nav-inner {
-            min-height: 82px;
+            min-height: 86px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -114,15 +119,15 @@
         }
 
         .brand-mark {
-            width: 48px;
-            height: 48px;
-            flex: 0 0 48px;
+            width: 49px;
+            height: 49px;
+            flex: 0 0 49px;
             display: grid;
             place-items: center;
             border-radius: 10px;
             background: linear-gradient(145deg, var(--navy-light), var(--navy-deep));
             color: #fff;
-            font-size: 25px;
+            font-size: 26px;
             font-weight: 800;
             line-height: 1;
             box-shadow: 0 4px 10px rgba(18, 52, 90, .16);
@@ -130,49 +135,52 @@
 
         .brand-title {
             color: var(--navy);
-            font-size: 21px;
+            font-size: 23px;
             font-weight: 800;
             line-height: 1.25;
-            letter-spacing: .5px;
+            letter-spacing: .4px;
         }
 
         .brand-subtitle {
             margin-top: 4px;
             color: var(--muted);
-            font-size: 12px;
-            line-height: 1.45;
+            font-size: 13px;
+            line-height: 1.5;
         }
 
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 18px;
         }
 
         .nav-label {
             color: var(--muted);
-            font-size: 12px;
+            font-size: 14px;
         }
 
         /* BUTTONS */
 
         .btn {
-            min-height: 43px;
+            min-height: 46px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 9px;
-            padding: 10px 17px;
+            padding: 11px 19px;
             border: 1px solid var(--blue);
             border-radius: 8px;
             background: var(--blue);
             color: #fff;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             line-height: 1.4;
+            text-align: center;
             cursor: pointer;
-            transition: background .18s ease, border-color .18s ease,
-                        box-shadow .18s ease, transform .18s ease;
+            transition: background .18s ease,
+                        border-color .18s ease,
+                        box-shadow .18s ease,
+                        transform .18s ease;
         }
 
         .btn:hover {
@@ -184,17 +192,17 @@
         .btn-outline {
             background: #fff;
             color: var(--navy);
-            border-color: #d4deea;
+            border-color: #cbd7e5;
         }
 
         .btn-outline:hover {
             background: var(--blue-soft);
             color: var(--navy);
-            border-color: #b9cde3;
+            border-color: #a9bfd9;
         }
 
         .btn-arrow {
-            font-size: 17px;
+            font-size: 18px;
             line-height: 1;
         }
 
@@ -204,14 +212,14 @@
             position: relative;
             isolation: isolate;
             overflow: hidden;
-            padding: 68px 0 72px;
+            padding: clamp(58px, 6vw, 92px) 0;
             background-color: var(--navy-deep);
             background-image:
                 linear-gradient(
                     105deg,
-                    rgba(8, 29, 54, .91) 0%,
-                    rgba(14, 47, 81, .84) 50%,
-                    rgba(20, 64, 105, .69) 100%
+                    rgba(8, 29, 54, .93) 0%,
+                    rgba(14, 47, 81, .86) 52%,
+                    rgba(20, 64, 105, .72) 100%
                 ),
                 url("{{ asset('images/background-sirapik.jpg') }}");
             background-size: cover;
@@ -224,11 +232,11 @@
             content: "";
             position: absolute;
             z-index: -1;
-            width: 400px;
-            height: 400px;
-            right: -140px;
-            bottom: -250px;
-            border: 1px solid rgba(255, 255, 255, .12);
+            width: 440px;
+            height: 440px;
+            right: -160px;
+            bottom: -280px;
+            border: 1px solid rgba(255, 255, 255, .13);
             border-radius: 50%;
             box-shadow:
                 0 0 0 45px rgba(255, 255, 255, .025),
@@ -238,18 +246,22 @@
 
         .hero-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1.45fr) minmax(270px, .72fr);
+            grid-template-columns: minmax(0, 1.5fr) minmax(300px, .75fr);
             align-items: center;
-            gap: 58px;
+            gap: clamp(36px, 5vw, 76px);
+        }
+
+        .hero-copy {
+            min-width: 0;
         }
 
         .eyebrow {
             display: inline-flex;
             align-items: center;
-            gap: 9px;
-            margin-bottom: 8px;
-            color: #c9e1fa;
-            font-size: 11px;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: #d0e4f9;
+            font-size: 13px;
             font-weight: 800;
             letter-spacing: 1.5px;
             line-height: 1.6;
@@ -258,34 +270,34 @@
 
         .eyebrow::before {
             content: "";
-            width: 26px;
+            width: 28px;
             height: 2px;
             background: #91c6fa;
             border-radius: 5px;
         }
 
         .hero h1 {
-            max-width: 720px;
-            margin: 12px 0 18px;
+            max-width: 850px;
+            margin: 10px 0 20px;
             color: #fff;
-            font-size: clamp(34px, 4vw, 48px);
-            font-weight: 750;
-            line-height: 1.18;
+            font-size: clamp(38px, 4.2vw, 58px);
+            font-weight: 760;
+            line-height: 1.19;
             letter-spacing: -.8px;
             text-wrap: balance;
         }
 
         .hero-description {
-            max-width: 650px;
-            margin: 0 0 27px;
+            max-width: 760px;
+            margin: 0 0 30px;
             color: #e0eaf5;
-            font-size: 15px;
+            font-size: 17px;
             line-height: 1.9;
         }
 
         .hero .btn {
-            min-height: 46px;
-            padding-inline: 20px;
+            min-height: 49px;
+            padding-inline: 22px;
             background: #fff;
             border-color: #fff;
             color: var(--navy);
@@ -298,10 +310,11 @@
         }
 
         .hero-note {
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, .22);
+            min-width: 0;
+            padding: clamp(22px, 2.5vw, 32px);
+            border: 1px solid rgba(255, 255, 255, .23);
             border-radius: 14px;
-            background: rgba(7, 29, 54, .43);
+            background: rgba(7, 29, 54, .48);
             box-shadow: 0 12px 35px rgba(0, 0, 0, .08);
             backdrop-filter: blur(5px);
         }
@@ -309,36 +322,36 @@
         .hero-note-top {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 17px;
+            gap: 13px;
+            margin-bottom: 18px;
         }
 
         .hero-note-icon {
-            width: 43px;
-            height: 43px;
-            flex: 0 0 43px;
+            width: 45px;
+            height: 45px;
+            flex: 0 0 45px;
             display: grid;
             place-items: center;
-            border: 1px solid rgba(255, 255, 255, .17);
+            border: 1px solid rgba(255, 255, 255, .19);
             border-radius: 10px;
             background: rgba(255, 255, 255, .10);
             color: #fff;
-            font-size: 20px;
+            font-size: 22px;
         }
 
         .hero-note-label {
-            color: #bcd6f1;
-            font-size: 10px;
+            color: #c5dcf4;
+            font-size: 12px;
             font-weight: 750;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px;
             text-transform: uppercase;
         }
 
         .hero-note strong {
             display: block;
-            margin-top: 2px;
+            margin-top: 3px;
             color: #fff;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 750;
             line-height: 1.5;
         }
@@ -346,29 +359,30 @@
         .hero-note p {
             margin: 0;
             color: #e0eaf5;
-            font-size: 13px;
-            line-height: 1.85;
+            font-size: 15px;
+            line-height: 1.9;
         }
 
         .hero-note-divider {
             height: 1px;
-            margin: 19px 0;
-            background: rgba(255, 255, 255, .15);
+            margin: 21px 0;
+            background: rgba(255, 255, 255, .16);
         }
 
         .hero-note-footer {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            align-items: flex-start;
+            gap: 9px;
             color: #d2e5f8;
-            font-size: 11px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.7;
         }
 
         .status-dot {
-            width: 7px;
-            height: 7px;
-            flex: 0 0 7px;
+            width: 8px;
+            height: 8px;
+            flex: 0 0 8px;
+            margin-top: 7px;
             border-radius: 50%;
             background: #75d4a2;
         }
@@ -376,7 +390,7 @@
         /* MAIN DASHBOARD */
 
         .section {
-            padding: 40px 0 48px;
+            padding: clamp(34px, 4vw, 54px) 0;
             scroll-margin-top: 20px;
         }
 
@@ -384,8 +398,8 @@
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 22px;
+            gap: 22px;
+            margin-bottom: 24px;
         }
 
         .section-heading-main {
@@ -393,53 +407,53 @@
         }
 
         .section-kicker {
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             color: var(--blue);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             letter-spacing: 1.3px;
             text-transform: uppercase;
         }
 
         .section-heading h2 {
-            margin: 0 0 5px;
+            margin: 0 0 7px;
             color: var(--navy);
-            font-size: 25px;
+            font-size: clamp(25px, 2.4vw, 32px);
             font-weight: 780;
-            line-height: 1.4;
+            line-height: 1.35;
             letter-spacing: -.35px;
         }
 
         .section-heading p {
-            max-width: 720px;
+            max-width: 780px;
             margin: 0;
             color: var(--muted);
-            font-size: 13px;
-            line-height: 1.75;
+            font-size: 15px;
+            line-height: 1.8;
         }
 
         .data-badge {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
+            gap: 8px;
             flex-shrink: 0;
-            padding: 7px 11px;
+            padding: 9px 13px;
             border: 1px solid #dce8f5;
             border-radius: 7px;
             background: #fff;
             color: #4d6682;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 650;
         }
 
         .data-badge-dot {
-            width: 6px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: #39976b;
         }
 
-        /* FILTER */
+        /* CARDS */
 
         .filter-card,
         .stat-card,
@@ -451,40 +465,43 @@
             box-shadow: var(--shadow);
         }
 
+        /* FILTER */
+
         .filter-card {
-            padding: 22px;
+            padding: clamp(19px, 2.3vw, 29px);
         }
 
         .filter-title {
             display: flex;
             align-items: center;
-            gap: 9px;
-            margin-bottom: 17px;
+            gap: 11px;
+            margin-bottom: 21px;
             color: var(--navy);
-            font-size: 14px;
+            font-size: 17px;
             font-weight: 750;
         }
 
         .filter-title-icon {
-            width: 30px;
-            height: 30px;
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
             display: grid;
             place-items: center;
-            border-radius: 7px;
+            border-radius: 8px;
             background: var(--blue-soft);
             color: var(--blue);
-            font-size: 16px;
+            font-size: 20px;
         }
 
         .filter-grid {
             display: grid;
             grid-template-columns:
-                minmax(135px, .82fr)
-                minmax(210px, 1.35fr)
-                minmax(170px, 1fr)
+                minmax(145px, .8fr)
+                minmax(220px, 1.35fr)
+                minmax(185px, 1fr)
                 auto;
             align-items: end;
-            gap: 15px;
+            gap: 17px;
         }
 
         .form-field {
@@ -493,9 +510,9 @@
 
         .form-field label {
             display: block;
-            margin-bottom: 7px;
+            margin-bottom: 8px;
             color: #34465d;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 750;
             line-height: 1.5;
         }
@@ -504,13 +521,13 @@
             display: block;
             width: 100%;
             min-width: 0;
-            min-height: 44px;
-            padding: 9px 34px 9px 12px;
-            border: 1px solid #d4deea;
+            min-height: 49px;
+            padding: 10px 36px 10px 13px;
+            border: 1px solid #cbd7e5;
             border-radius: 7px;
             background-color: #fff;
             color: var(--ink);
-            font-size: 12px;
+            font-size: 14px;
             line-height: 1.5;
             cursor: pointer;
             transition: border-color .18s ease, box-shadow .18s ease;
@@ -527,7 +544,7 @@
         }
 
         .filter-grid > .btn {
-            min-height: 44px;
+            min-height: 49px;
             white-space: nowrap;
         }
 
@@ -536,14 +553,14 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 17px;
-            margin-top: 18px;
+            gap: 20px;
+            margin-top: 22px;
         }
 
         .stat-card {
             position: relative;
             overflow: hidden;
-            padding: 23px 24px;
+            padding: clamp(20px, 2.3vw, 29px);
             transition: box-shadow .2s ease, transform .2s ease;
         }
 
@@ -556,44 +573,44 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 14px;
         }
 
         .stat-label {
             color: var(--muted);
-            font-size: 12px;
+            font-size: 15px;
             font-weight: 700;
-            line-height: 1.6;
+            line-height: 1.65;
         }
 
         .stat-icon {
-            width: 40px;
-            height: 40px;
-            flex: 0 0 40px;
+            width: 45px;
+            height: 45px;
+            flex: 0 0 45px;
             display: grid;
             place-items: center;
             border-radius: 10px;
             background: var(--blue-soft);
             color: var(--blue);
-            font-size: 19px;
+            font-size: 22px;
         }
 
         .stat-value {
-            margin-top: 15px;
+            margin-top: 16px;
             color: var(--navy);
-            font-size: clamp(30px, 3vw, 37px);
+            font-size: clamp(32px, 3vw, 43px);
             font-weight: 800;
             line-height: 1.2;
-            letter-spacing: -.8px;
+            letter-spacing: -.7px;
             overflow-wrap: anywhere;
             font-variant-numeric: tabular-nums;
         }
 
         .stat-caption {
-            margin-top: 9px;
-            color: #7a899b;
-            font-size: 11px;
-            line-height: 1.7;
+            margin-top: 10px;
+            color: #758499;
+            font-size: 13px;
+            line-height: 1.75;
         }
 
         .stat-caption strong {
@@ -601,14 +618,14 @@
             font-weight: 700;
         }
 
-        /* DATA CARDS */
+        /* DATA TABLES */
 
         .data-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+            grid-template-columns: minmax(0, .9fr) minmax(0, 1.25fr);
             align-items: start;
-            gap: 18px;
-            margin-top: 18px;
+            gap: 21px;
+            margin-top: 22px;
         }
 
         .content-card {
@@ -616,58 +633,59 @@
         }
 
         .content-card-header {
-            padding: 22px 22px 17px;
+            padding: 24px 25px 19px;
             border-bottom: 1px solid #edf1f6;
         }
 
         .content-card h3 {
             margin: 0;
             color: var(--navy);
-            font-size: 16px;
+            font-size: 19px;
             font-weight: 780;
             line-height: 1.5;
         }
 
         .card-description {
-            margin: 5px 0 0;
+            margin: 7px 0 0;
             color: var(--muted);
-            font-size: 12px;
-            line-height: 1.75;
+            font-size: 14px;
+            line-height: 1.8;
         }
 
         .card-body {
-            padding: 0 22px 18px;
+            padding: 0 23px 21px;
         }
 
         .table-wrap {
             width: 100%;
             overflow-x: auto;
             overscroll-behavior-x: contain;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
-            margin-top: 15px;
+            margin-top: 17px;
             border-collapse: separate;
             border-spacing: 0;
-            font-size: 12px;
+            font-size: 14px;
         }
 
         th,
         td {
-            padding: 12px 10px;
+            padding: 14px 12px;
             text-align: left;
             vertical-align: middle;
             border-bottom: 1px solid #edf1f5;
         }
 
         th {
-            background: #f5f8fc;
+            background: #f2f6fb;
             color: #52647a;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             line-height: 1.6;
-            letter-spacing: .3px;
+            letter-spacing: .35px;
             text-transform: uppercase;
         }
 
@@ -681,7 +699,7 @@
 
         td {
             color: #36475c;
-            line-height: 1.65;
+            line-height: 1.7;
             overflow-wrap: anywhere;
         }
 
@@ -697,37 +715,37 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 30px;
-            padding: 4px 8px;
+            min-width: 35px;
+            padding: 5px 9px;
             border-radius: 6px;
             background: var(--blue-soft);
             color: var(--navy);
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 800;
             font-variant-numeric: tabular-nums;
         }
 
         .empty {
-            padding: 26px 12px !important;
+            padding: 28px 13px !important;
             color: var(--muted);
-            font-size: 12px;
+            font-size: 14px;
             text-align: center;
-            line-height: 1.7;
+            line-height: 1.8;
         }
 
-        /* RANKING NAKES */
+        /* RANKING TENAGA KESEHATAN */
 
         .ranking-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             align-items: start;
-            gap: 13px;
-            padding: 19px;
+            gap: 17px;
+            padding: 22px;
         }
 
         .ranking-panel {
             min-width: 0;
-            padding: 16px;
+            padding: 19px;
             border: 1px solid var(--border);
             border-radius: 9px;
             background: #fff;
@@ -736,18 +754,18 @@
         .ranking-heading {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 13px;
         }
 
         .ranking-icon {
-            width: 36px;
-            height: 36px;
-            flex: 0 0 36px;
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
             display: grid;
             place-items: center;
             border-radius: 9px;
-            font-size: 19px;
+            font-size: 22px;
             font-weight: 800;
         }
 
@@ -764,15 +782,15 @@
         .ranking-heading h4 {
             margin: 0;
             color: var(--navy);
-            font-size: 12px;
+            font-size: 15px;
             font-weight: 800;
             line-height: 1.5;
         }
 
         .ranking-heading p {
-            margin: 2px 0 0;
+            margin: 3px 0 0;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -784,10 +802,10 @@
 
         .ranking-item {
             display: grid;
-            grid-template-columns: 27px minmax(0, 1fr) auto;
+            grid-template-columns: 32px minmax(0, 1fr) auto;
             align-items: center;
-            gap: 8px;
-            padding: 11px 0;
+            gap: 11px;
+            padding: 13px 0;
             border-bottom: 1px solid #edf1f5;
         }
 
@@ -796,14 +814,14 @@
         }
 
         .ranking-number {
-            width: 26px;
-            height: 26px;
+            width: 30px;
+            height: 30px;
             display: grid;
             place-items: center;
             border-radius: 7px;
             background: #f0f4f9;
             color: #49617d;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 800;
         }
 
@@ -815,15 +833,15 @@
         .ranking-name {
             min-width: 0;
             color: #3d4d61;
-            font-size: 11px;
+            font-size: 14px;
             font-weight: 650;
-            line-height: 1.6;
+            line-height: 1.65;
             overflow-wrap: anywhere;
         }
 
         .ranking-total {
             color: var(--navy);
-            font-size: 11px;
+            font-size: 14px;
             font-weight: 800;
             white-space: nowrap;
             font-variant-numeric: tabular-nums;
@@ -831,17 +849,17 @@
 
         .ranking-total small {
             color: #8794a5;
-            font-size: 9px;
+            font-size: 11px;
             font-weight: 600;
         }
 
         .ranking-empty {
-            padding: 14px;
+            padding: 17px;
             border: 1px dashed #d9e2ec;
             border-radius: 7px;
             background: #f8fafc;
             color: var(--muted);
-            font-size: 11px;
+            font-size: 13px;
             line-height: 1.8;
         }
 
@@ -849,10 +867,10 @@
 
         .public-footer {
             margin-top: 0;
-            padding: 28px 0;
+            padding: 32px 0;
             background: var(--navy-deep);
             color: #cfdaea;
-            font-size: 11px;
+            font-size: 13px;
             line-height: 1.8;
         }
 
@@ -861,45 +879,49 @@
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 16px 28px;
+            gap: 18px 28px;
         }
 
         .footer-brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 13px;
         }
 
         .footer-mark {
-            width: 36px;
-            height: 36px;
+            width: 41px;
+            height: 41px;
             display: grid;
             place-items: center;
-            flex: 0 0 36px;
+            flex: 0 0 41px;
             border: 1px solid rgba(255, 255, 255, .18);
             border-radius: 8px;
             color: #fff;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
         }
 
         .footer-inner strong {
             color: #fff;
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 800;
         }
 
         .footer-copy {
-            max-width: 410px;
+            max-width: 460px;
             color: #bdcadd;
             text-align: right;
         }
 
-        /* RESPONSIVE: LAPTOP KECIL / TABLET */
+        /* LAPTOP / TABLET LANDSCAPE */
 
-        @media (max-width: 1080px) {
+        @media (max-width: 1100px) {
+            .public-container {
+                width: calc(100% - 48px);
+            }
+
             .hero-grid {
-                grid-template-columns: minmax(0, 1.2fr) minmax(245px, .8fr);
+                grid-template-columns: minmax(0, 1.2fr) minmax(270px, .8fr);
                 gap: 32px;
             }
 
@@ -914,24 +936,25 @@
             .data-grid {
                 grid-template-columns: minmax(0, 1fr);
             }
-
-            .ranking-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
         }
 
+        /* TABLET PORTRAIT */
+
         @media (max-width: 760px) {
+            body {
+                font-size: 15px;
+            }
+
             .public-container {
-                width: calc(100% - 36px);
+                width: calc(100% - 38px);
             }
 
             .nav-inner {
-                min-height: 74px;
+                min-height: 76px;
             }
 
             .hero {
                 padding: 48px 0 50px;
-                background-position: center;
             }
 
             .hero-grid {
@@ -940,58 +963,67 @@
             }
 
             .hero h1 {
-                max-width: 620px;
-                font-size: clamp(32px, 6vw, 41px);
+                max-width: 650px;
+                font-size: clamp(34px, 6vw, 44px);
             }
 
             .hero-description {
-                max-width: 620px;
-                font-size: 14px;
+                max-width: 680px;
+                font-size: 16px;
             }
 
             .hero-note {
-                max-width: 620px;
+                max-width: 680px;
             }
 
             .section {
-                padding: 32px 0 38px;
+                padding: 35px 0 40px;
             }
 
             .section-heading h2 {
-                font-size: 23px;
+                font-size: 27px;
             }
 
             .stats-grid {
-                gap: 12px;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px;
             }
 
             .stat-card {
-                padding: 19px;
+                padding: 20px;
+            }
+
+            .stat-value {
+                font-size: 34px;
             }
 
             .data-grid {
-                gap: 15px;
+                gap: 16px;
             }
 
             .content-card-header {
-                padding: 19px 19px 15px;
+                padding: 21px 21px 16px;
             }
 
             .card-body {
-                padding-inline: 19px;
+                padding-inline: 18px;
             }
 
             .ranking-grid {
-                padding: 16px;
-                gap: 11px;
+                padding: 17px;
+                gap: 12px;
+            }
+
+            .ranking-panel {
+                padding: 15px;
             }
         }
 
-        /* RESPONSIVE: HP */
+        /* HP */
 
         @media (max-width: 540px) {
             body {
-                font-size: 13px;
+                font-size: 15px;
             }
 
             .public-container {
@@ -999,8 +1031,8 @@
             }
 
             .nav-inner {
-                min-height: 69px;
-                gap: 9px;
+                min-height: 72px;
+                gap: 10px;
             }
 
             .brand {
@@ -1008,22 +1040,22 @@
             }
 
             .brand-mark {
-                width: 39px;
-                height: 39px;
-                flex-basis: 39px;
+                width: 40px;
+                height: 40px;
+                flex-basis: 40px;
                 border-radius: 8px;
                 font-size: 21px;
             }
 
             .brand-title {
-                font-size: 17px;
+                font-size: 18px;
             }
 
             .brand-subtitle {
-                max-width: 185px;
+                max-width: 175px;
                 margin-top: 2px;
                 font-size: 10px;
-                line-height: 1.4;
+                line-height: 1.45;
             }
 
             .nav-actions {
@@ -1035,85 +1067,97 @@
             }
 
             .nav-inner > .nav-actions .btn {
-                min-height: 36px;
-                gap: 4px;
+                min-height: 39px;
+                gap: 5px;
                 padding: 8px 10px;
                 font-size: 11px;
                 white-space: nowrap;
             }
 
             .hero {
-                padding: 38px 0 40px;
+                padding: 39px 0 41px;
             }
 
             .eyebrow {
-                font-size: 10px;
-                letter-spacing: 1.1px;
+                font-size: 11px;
+                letter-spacing: 1px;
             }
 
             .hero h1 {
-                margin: 10px 0 13px;
-                font-size: clamp(29px, 8vw, 35px);
-                line-height: 1.24;
+                margin: 10px 0 15px;
+                font-size: clamp(31px, 8vw, 39px);
+                line-height: 1.23;
                 letter-spacing: -.45px;
             }
 
             .hero-description {
-                margin-bottom: 21px;
-                font-size: 13px;
+                margin-bottom: 22px;
+                font-size: 15px;
                 line-height: 1.85;
             }
 
             .hero .btn {
-                min-height: 42px;
-                padding-inline: 15px;
-                font-size: 12px;
+                min-height: 45px;
+                padding-inline: 16px;
+                font-size: 13px;
             }
 
             .hero-note {
-                padding: 17px;
+                padding: 18px;
                 border-radius: 10px;
             }
 
             .hero-note-top {
                 gap: 10px;
-                margin-bottom: 13px;
+                margin-bottom: 14px;
             }
 
             .hero-note-icon {
-                width: 38px;
-                height: 38px;
-                flex-basis: 38px;
+                width: 39px;
+                height: 39px;
+                flex-basis: 39px;
+            }
+
+            .hero-note-label {
+                font-size: 11px;
             }
 
             .hero-note strong {
-                font-size: 14px;
+                font-size: 16px;
             }
 
             .hero-note p {
-                font-size: 12px;
+                font-size: 14px;
                 line-height: 1.8;
             }
 
             .hero-note-divider {
-                margin: 14px 0;
+                margin: 15px 0;
+            }
+
+            .hero-note-footer {
+                font-size: 12px;
             }
 
             .section {
-                padding: 27px 0 31px;
+                padding: 29px 0 33px;
             }
 
             .section-heading {
                 align-items: flex-start;
-                margin-bottom: 17px;
+                margin-bottom: 18px;
+            }
+
+            .section-kicker {
+                font-size: 11px;
             }
 
             .section-heading h2 {
-                font-size: 21px;
+                font-size: 24px;
             }
 
             .section-heading p {
-                font-size: 12px;
+                font-size: 14px;
             }
 
             .data-badge {
@@ -1121,125 +1165,163 @@
             }
 
             .filter-card {
-                padding: 16px;
+                padding: 17px;
+                border-radius: 10px;
             }
 
             .filter-title {
-                margin-bottom: 14px;
-                font-size: 13px;
+                margin-bottom: 16px;
+                font-size: 15px;
+            }
+
+            .filter-title-icon {
+                width: 31px;
+                height: 31px;
+                flex-basis: 31px;
             }
 
             .filter-grid {
                 grid-template-columns: minmax(0, 1fr);
-                gap: 13px;
+                gap: 14px;
             }
 
             .form-field label {
-                margin-bottom: 6px;
-                font-size: 12px;
+                margin-bottom: 7px;
+                font-size: 14px;
             }
 
             .form-field select {
-                min-height: 44px;
-                padding-left: 11px;
-                font-size: 12px;
+                min-height: 48px;
+                padding-left: 12px;
+                font-size: 14px;
             }
 
             .filter-grid > .btn {
-                min-height: 43px;
-                font-size: 12px;
+                min-height: 47px;
+                font-size: 14px;
             }
 
             .stats-grid {
                 grid-template-columns: minmax(0, 1fr);
-                gap: 10px;
-                margin-top: 13px;
+                gap: 12px;
+                margin-top: 15px;
             }
 
             .stat-card {
-                padding: 16px 17px;
+                padding: 18px;
             }
 
             .stat-icon {
-                width: 36px;
-                height: 36px;
-                flex-basis: 36px;
-                font-size: 17px;
+                width: 39px;
+                height: 39px;
+                flex-basis: 39px;
+                font-size: 19px;
             }
 
             .stat-label {
-                font-size: 12px;
+                font-size: 14px;
             }
 
             .stat-value {
-                margin-top: 8px;
-                font-size: 29px;
+                margin-top: 9px;
+                font-size: 32px;
             }
 
             .stat-caption {
-                margin-top: 5px;
-                font-size: 10px;
+                margin-top: 6px;
+                font-size: 12px;
             }
 
             .data-grid {
-                gap: 13px;
-                margin-top: 13px;
+                gap: 14px;
+                margin-top: 15px;
             }
 
             .content-card-header {
-                padding: 16px 16px 13px;
+                padding: 18px 17px 14px;
             }
 
             .content-card h3 {
-                font-size: 15px;
+                font-size: 17px;
             }
 
             .card-description {
-                font-size: 11px;
+                font-size: 13px;
             }
 
             .card-body {
-                padding: 0 13px 13px;
+                padding: 0 13px 14px;
             }
 
             table {
-                min-width: 265px;
-                margin-top: 12px;
-                font-size: 11px;
+                min-width: 290px;
+                margin-top: 13px;
+                font-size: 13px;
             }
 
             th,
             td {
-                padding: 10px 8px;
+                padding: 11px 9px;
             }
 
             th {
-                font-size: 9px;
+                font-size: 11px;
+            }
+
+            .table-count {
+                font-size: 12px;
+            }
+
+            .empty {
+                font-size: 13px;
             }
 
             .ranking-grid {
                 grid-template-columns: minmax(0, 1fr);
-                gap: 11px;
+                gap: 12px;
                 padding: 13px;
             }
 
             .ranking-panel {
-                padding: 14px;
+                padding: 15px;
             }
 
             .ranking-heading h4 {
+                font-size: 14px;
+            }
+
+            .ranking-heading p {
                 font-size: 12px;
             }
 
             .ranking-name,
             .ranking-total {
-                font-size: 11px;
+                font-size: 13px;
+            }
+
+            .ranking-number {
+                width: 28px;
+                height: 28px;
+            }
+
+            .ranking-item {
+                grid-template-columns: 30px minmax(0, 1fr) auto;
+                gap: 8px;
+            }
+
+            .ranking-empty {
+                font-size: 13px;
+            }
+
+            .public-footer {
+                padding: 25px 0;
+                font-size: 12px;
             }
 
             .footer-inner {
                 align-items: flex-start;
                 flex-direction: column;
-                gap: 13px;
+                gap: 14px;
             }
 
             .footer-copy {
@@ -1247,18 +1329,31 @@
             }
         }
 
+        /* HP KECIL */
+
         @media (max-width: 360px) {
             .public-container {
                 width: calc(100% - 24px);
             }
 
-            .brand-subtitle {
-                max-width: 145px;
-                font-size: 9px;
+            .brand {
+                gap: 7px;
+            }
+
+            .brand-mark {
+                width: 35px;
+                height: 35px;
+                flex-basis: 35px;
+                font-size: 19px;
             }
 
             .brand-title {
                 font-size: 16px;
+            }
+
+            .brand-subtitle {
+                max-width: 130px;
+                font-size: 9px;
             }
 
             .nav-inner > .nav-actions .btn {
@@ -1267,11 +1362,19 @@
             }
 
             .hero h1 {
-                font-size: 28px;
+                font-size: 29px;
             }
 
             .filter-card {
                 padding: 13px;
+            }
+
+            .ranking-grid {
+                padding: 10px;
+            }
+
+            .ranking-panel {
+                padding: 12px;
             }
         }
 
@@ -1295,7 +1398,10 @@
     {{-- HEADER --}}
     <header class="public-nav">
         <div class="public-container nav-inner">
-            <a href="{{ route('public.dashboard') }}" class="brand" aria-label="Beranda SIRAPIK">
+            <a href="{{ route('public.dashboard') }}"
+               class="brand"
+               aria-label="Beranda SIRAPIK">
+
                 <div class="brand-mark" aria-hidden="true">S</div>
 
                 <div>
@@ -1321,7 +1427,7 @@
         {{-- HERO --}}
         <section class="hero">
             <div class="public-container hero-grid">
-                <div>
+                <div class="hero-copy">
                     <div class="eyebrow">Sistem Informasi Pelatihan</div>
 
                     <h1>
@@ -1362,7 +1468,9 @@
 
                     <div class="hero-note-footer">
                         <span class="status-dot" aria-hidden="true"></span>
-                        Informasi berdasarkan data yang tercatat di SIRAPIK
+                        <span>
+                            Informasi berdasarkan data yang tercatat di SIRAPIK
+                        </span>
                     </div>
                 </aside>
             </div>
@@ -1553,93 +1661,98 @@
                     </div>
                 </section>
 
-{{-- PERINGKAT JENIS NAKES --}}
-<section class="content-card">
-    <div class="content-card-header">
-        <h3>Partisipasi Tenaga Kesehatan</h3>
+                {{-- PERINGKAT TENAGA KESEHATAN --}}
+                <section class="content-card">
+                    <div class="content-card-header">
+                        <h3>Partisipasi Tenaga Kesehatan</h3>
 
-        <p class="card-description">
-            Peringkat jenis tenaga kesehatan berdasarkan jumlah peserta
-            unik yang mengikuti pelatihan sesuai filter yang dipilih.
-        </p>
-    </div>
+                        <p class="card-description">
+                            Peringkat jenis tenaga kesehatan berdasarkan jumlah
+                            peserta unik yang mengikuti pelatihan sesuai filter
+                            yang dipilih.
+                        </p>
+                    </div>
 
-    <div class="ranking-grid">
-        {{-- LIMA TERTINGGI --}}
-        <div class="ranking-panel ranking-high">
-            <div class="ranking-heading">
-                <div class="ranking-icon" aria-hidden="true">↑</div>
+                    <div class="ranking-grid">
+                        {{-- LIMA TERTINGGI --}}
+                        <div class="ranking-panel ranking-high">
+                            <div class="ranking-heading">
+                                <div class="ranking-icon" aria-hidden="true">↑</div>
 
-                <div>
-                    <h4>5 Tertinggi</h4>
-                    <p>Peserta terbanyak</p>
-                </div>
+                                <div>
+                                    <h4>5 Tertinggi</h4>
+                                    <p>Peserta terbanyak</p>
+                                </div>
+                            </div>
+
+                            @if (isset($topNakes) && $topNakes->isNotEmpty())
+                                <ol class="ranking-list">
+                                    @foreach ($topNakes as $nakes)
+                                        <li class="ranking-item">
+                                            <span class="ranking-number">
+                                                {{ $loop->iteration }}
+                                            </span>
+
+                                            <span class="ranking-name">
+                                                {{ $nakes->name }}
+                                            </span>
+
+                                            <span class="ranking-total">
+                                                {{ number_format((int) $nakes->total, 0, ',', '.') }}
+                                                <small>org</small>
+                                            </span>
+                                        </li>
+                                    @endforeach
+                                </ol>
+                            @else
+                                <div class="ranking-empty">
+                                    Belum ada data peserta untuk ditampilkan
+                                    pada filter ini.
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- LIMA TERENDAH --}}
+                        <div class="ranking-panel ranking-low">
+                            <div class="ranking-heading">
+                                <div class="ranking-icon" aria-hidden="true">↓</div>
+
+                                <div>
+                                    <h4>5 Terendah</h4>
+                                    <p>Peserta paling sedikit</p>
+                                </div>
+                            </div>
+
+                            @if (isset($bottomNakes) && $bottomNakes->isNotEmpty())
+                                <ol class="ranking-list">
+                                    @foreach ($bottomNakes as $nakes)
+                                        <li class="ranking-item">
+                                            <span class="ranking-number">
+                                                {{ $loop->iteration }}
+                                            </span>
+
+                                            <span class="ranking-name">
+                                                {{ $nakes->name }}
+                                            </span>
+
+                                            <span class="ranking-total">
+                                                {{ number_format((int) $nakes->total, 0, ',', '.') }}
+                                                <small>org</small>
+                                            </span>
+                                        </li>
+                                    @endforeach
+                                </ol>
+                            @else
+                                <div class="ranking-empty">
+                                    Belum ada data peserta untuk ditampilkan
+                                    pada filter ini.
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </section>
             </div>
-
-            @if (isset($topNakes) && $topNakes->isNotEmpty())
-                <ol class="ranking-list">
-                    @foreach ($topNakes as $nakes)
-                        <li class="ranking-item">
-                            <span class="ranking-number">
-                                {{ $loop->iteration }}
-                            </span>
-
-                            <span class="ranking-name">
-                                {{ $nakes->name }}
-                            </span>
-
-                            <span class="ranking-total">
-                                {{ number_format((int) $nakes->total, 0, ',', '.') }}
-                                <small>org</small>
-                            </span>
-                        </li>
-                    @endforeach
-                </ol>
-            @else
-                <div class="ranking-empty">
-                    Belum ada data peserta untuk ditampilkan pada filter ini.
-                </div>
-            @endif
-        </div>
-
-        {{-- LIMA TERENDAH --}}
-        <div class="ranking-panel ranking-low">
-            <div class="ranking-heading">
-                <div class="ranking-icon" aria-hidden="true">↓</div>
-
-                <div>
-                    <h4>5 Terendah</h4>
-                    <p>Peserta paling sedikit</p>
-                </div>
-            </div>
-
-            @if (isset($bottomNakes) && $bottomNakes->isNotEmpty())
-                <ol class="ranking-list">
-                    @foreach ($bottomNakes as $nakes)
-                        <li class="ranking-item">
-                            <span class="ranking-number">
-                                {{ $loop->iteration }}
-                            </span>
-
-                            <span class="ranking-name">
-                                {{ $nakes->name }}
-                            </span>
-
-                            <span class="ranking-total">
-                                {{ number_format((int) $nakes->total, 0, ',', '.') }}
-                                <small>org</small>
-                            </span>
-                        </li>
-                    @endforeach
-                </ol>
-            @else
-                <div class="ranking-empty">
-                    Belum ada data peserta untuk ditampilkan pada filter ini.
-                </div>
-            @endif
-        </div>
-    </div>
-</section>
+        </section>
     </main>
 
     {{-- FOOTER --}}
@@ -1671,14 +1784,18 @@
                     event.preventDefault();
 
                     dashboard.scrollIntoView({
-                        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-                            ? 'auto'
-                            : 'smooth',
+                        behavior: window.matchMedia(
+                            '(prefers-reduced-motion: reduce)'
+                        ).matches ? 'auto' : 'smooth',
                         block: 'start'
                     });
 
                     if (window.history && window.history.replaceState) {
-                        window.history.replaceState(null, '', '#dashboard');
+                        window.history.replaceState(
+                            null,
+                            '',
+                            '#dashboard'
+                        );
                     }
                 });
             }

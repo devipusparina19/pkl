@@ -16,8 +16,13 @@ use App\Http\Controllers\SuperAdmin\MasterDataController;
 |--------------------------------------------------------------------------
 */
 
+// Halaman utama
 Route::get('/', [DashboardController::class, 'publicIndex'])
     ->name('public.dashboard');
+
+// URL dashboard publik yang digunakan di browser
+Route::get('/dashboard-publik', [DashboardController::class, 'publicIndex'])
+    ->name('public.dashboard.alternate');
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +51,7 @@ Route::middleware('guest')->group(function () {
 */
 
 Route::middleware('auth')->group(function () {
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 
@@ -65,6 +71,7 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::middleware('role:admin')->group(function () {
+
         Route::get('/participants', [ParticipantController::class, 'index'])
             ->name('participants.index');
 
@@ -89,12 +96,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('/participants/{participant}', [ParticipantController::class, 'update'])
             ->whereNumber('participant')
             ->name('participants.update.patch');
-            Route::delete(
-    '/participants/{participant}',
-    [ParticipantController::class, 'destroy']
-)->name('participants.destroy');
+
+        Route::delete('/participants/{participant}', [ParticipantController::class, 'destroy'])
+            ->whereNumber('participant')
+            ->name('participants.destroy');
     });
-    
+
     /*
     |--------------------------------------------------------------------------
     | Pelatihan: hanya Admin
@@ -102,6 +109,7 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::middleware('role:admin')->group(function () {
+
         Route::get('/trainings', [TrainingController::class, 'index'])
             ->name('trainings.index');
 
@@ -135,6 +143,7 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::middleware('role:admin')->group(function () {
+
         Route::get('/imports', [ImportController::class, 'index'])
             ->name('imports.index');
 
@@ -149,6 +158,7 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::middleware('role:admin,pimpinan')->group(function () {
+
         Route::get('/reports', [ReportController::class, 'index'])
             ->name('reports.index');
 
@@ -166,6 +176,7 @@ Route::middleware('auth')->group(function () {
         ->prefix('super-admin')
         ->name('super-admin.')
         ->group(function () {
+
             Route::get('/dashboard', [SuperAdminController::class, 'index'])
                 ->name('dashboard');
 
@@ -205,6 +216,7 @@ Route::middleware('auth')->group(function () {
         ->prefix('super-admin/master-data')
         ->name('super-admin.master-data.')
         ->group(function () {
+
             $categories = [
                 'provinces',
                 'districts',
@@ -242,6 +254,7 @@ Route::middleware('auth')->group(function () {
 
             Route::delete('/{category}/{id}', [MasterDataController::class, 'destroy'])
                 ->whereIn('category', $categories)
+                ->whereNumber('id')
                 ->name('destroy');
         });
 });
