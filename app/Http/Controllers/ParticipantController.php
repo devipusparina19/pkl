@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Participant;
 use App\Models\User;
+use App\Models\District;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ParticipantController extends Controller
@@ -55,48 +54,34 @@ class ParticipantController extends Controller
         return view('participants.show', compact('participant'));
     }
 
-    public function create()
-    {
-        return view('participants.form', [
-            'participant' => new Participant(),
-        ]);
-    }
-
-    public function store(Request $request)
-    {
-        $data = $this->validateParticipant($request);
-
-        $temporaryPassword = Str::random(12);
-
-        $participant = DB::transaction(function () use (
-            $data,
-            $temporaryPassword
-        ) {
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($temporaryPassword),
-                'role' => 'user',
-            ]);
-
-            return Participant::create([
-                ...$data,
-                'user_id' => $user->id,
-            ]);
-        });
-
-        return redirect()
-            ->route('participants.show', $participant)
-            ->with('success', 'Peserta dan akun pengguna berhasil dibuat.')
-            ->with('new_account_email', $data['email'])
-            ->with('new_account_password', $temporaryPassword);
-    }
-
+    /**
+     * Menampilkan form edit peserta.
+     */
     public function edit(Participant $participant)
     {
-        return view('participants.form', compact('participant'));
+        $districts = District::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name');
+
+        // Pertahankan pilihan lama jika kabupaten sudah tidak aktif.
+        if (
+            $participant->district &&
+            !$districts->contains($participant->district)
+        ) {
+            $districts->push($participant->district);
+            $districts = $districts->sort()->values();
+        }
+
+        return view('participants.form', compact(
+            'participant',
+            'districts'
+        ));
     }
 
+    /**
+     * Memperbarui data peserta.
+     */
     public function update(
         Request $request,
         Participant $participant
@@ -119,18 +104,17 @@ class ParticipantController extends Controller
             ->with('success', 'Data peserta berhasil diperbarui.');
     }
 
+    /**
+     * Menghapus peserta beserta riwayat dan akun terkait.
+     */
     public function destroy(Participant $participant)
     {
         DB::transaction(function () use ($participant) {
             $userId = $participant->user_id;
 
-            // Hapus riwayat keikutsertaan milik peserta ini.
             $participant->histories()->delete();
-
-            // Hapus data peserta.
             $participant->delete();
 
-            // Hapus akun yang terhubung jika ada.
             if ($userId) {
                 User::whereKey($userId)->delete();
             }
@@ -141,6 +125,9 @@ class ParticipantController extends Controller
             ->with('success', 'Data peserta berhasil dihapus.');
     }
 
+    /**
+     * Validasi untuk pembaruan data peserta.
+     */
     private function validateParticipant(
         Request $request,
         ?Participant $participant = null

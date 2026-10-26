@@ -87,12 +87,16 @@
                 <label for="gender">Jenis Kelamin</label>
                 <select id="gender" name="gender">
                     <option value="">-- Pilih Jenis Kelamin --</option>
-                    <option value="L"
-                        {{ old('gender', $participant->gender) === 'L' ? 'selected' : '' }}>
+                    <option
+                        value="L"
+                        {{ old('gender', $participant->gender) === 'L' ? 'selected' : '' }}
+                    >
                         Laki-laki
                     </option>
-                    <option value="P"
-                        {{ old('gender', $participant->gender) === 'P' ? 'selected' : '' }}>
+                    <option
+                        value="P"
+                        {{ old('gender', $participant->gender) === 'P' ? 'selected' : '' }}
+                    >
                         Perempuan
                     </option>
                 </select>
@@ -203,7 +207,7 @@
                     type="text"
                     value="{{ old('sumber_dana') }}"
                     maxlength="255"
-                    placeholder="Contoh: Dinas Kesehatan Kabupaten Banjar"
+                    placeholder="Contoh: APBN"
                 >
                 @error('sumber_dana')
                     <small class="field-error">{{ $message }}</small>
@@ -212,15 +216,23 @@
 
             {{-- Kabupaten/Kota/Mitra --}}
             <div class="form-field">
-                <label for="district">Kabupaten/Kota/Mitra</label>
-                <input
-                    id="district"
-                    name="district"
-                    type="text"
-                    value="{{ old('district', $participant->district) }}"
-                    maxlength="255"
-                    placeholder="Contoh: Kabupaten Banjar"
-                >
+                <label for="district">Kabupaten/Kota/Mitra *</label>
+
+                <select id="district" name="district" required>
+                    <option value="">-- Pilih Kabupaten/Kota/Mitra --</option>
+
+                    @foreach ($districts as $district)
+                        <option
+                            value="{{ $district }}"
+                            @selected(
+                                (string) old('district', $participant->district) === (string) $district
+                            )
+                        >
+                            {{ $district }}
+                        </option>
+                    @endforeach
+                </select>
+
                 @error('district')
                     <small class="field-error">{{ $message }}</small>
                 @enderror
@@ -229,7 +241,10 @@
         </div>
 
         <div class="form-actions">
-            <a class="btn btn-light" href="{{ route('participants.index') }}">
+            <a
+                class="btn btn-light"
+                href="{{ route('participants.index') }}"
+            >
                 Batal
             </a>
 

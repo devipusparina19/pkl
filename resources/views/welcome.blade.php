@@ -1588,7 +1588,7 @@
 
                 <article class="stat-card">
                     <div class="stat-top">
-                        <div class="stat-label">Peserta terdaftar</div>
+                        <div class="stat-label">Peserta yang sudah di latih</div>
                         <div class="stat-icon" aria-hidden="true">♙</div>
                     </div>
 
@@ -1597,7 +1597,7 @@
                     </div>
 
                     <div class="stat-caption">
-                        Peserta unik dari riwayat pelatihan yang sesuai filter
+                        Jumlah peserta yang sudah dilatih per individu
                     </div>
                 </article>
 

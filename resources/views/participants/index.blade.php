@@ -7,12 +7,8 @@
     <div>
         <div class="eyebrow">DATA MASTER</div>
         <h1>Data Peserta</h1>
-        <p>Kelola data peserta pelatihan.</p>
+        <p>Data peserta yang berasal dari hasil Impor Excel.</p>
     </div>
-
-    <a class="btn btn-primary" href="{{ route('participants.create') }}">
-        + Tambah Peserta
-    </a>
 </div>
 
 @if (session('success'))
@@ -70,9 +66,7 @@
                 @forelse ($participants as $participant)
                     <tr>
                         <td>{{ $participant->name ?: '-' }}</td>
-
                         <td>{{ $participant->nik ?: '-' }}</td>
-
                         <td>{{ $participant->nip ?: '-' }}</td>
 
                         <td>
@@ -86,15 +80,10 @@
                         </td>
 
                         <td>{{ $participant->rank ?: '-' }}</td>
-
                         <td>{{ $participant->profession ?: '-' }}</td>
-
                         <td>{{ $participant->email ?: '-' }}</td>
-
                         <td>{{ $participant->phone ?: '-' }}</td>
-
                         <td>{{ $participant->institution ?: '-' }}</td>
-
                         <td>{{ $participant->district ?: '-' }}</td>
 
                         <td>
@@ -131,6 +120,14 @@
                                     Lihat
                                 </a>
 
+                                <a
+                                    class="btn btn-light"
+                                    href="{{ route('participants.edit', $participant) }}"
+                                    style="text-decoration:none;"
+                                >
+                                    Edit
+                                </a>
+
                                 <form
                                     action="{{ route('participants.destroy', $participant) }}"
                                     method="POST"
@@ -158,6 +155,7 @@
                                 Data peserta tidak ditemukan.
                             @else
                                 Belum ada data peserta.
+                                Silakan lakukan Impor Excel terlebih dahulu.
                             @endif
                         </td>
                     </tr>

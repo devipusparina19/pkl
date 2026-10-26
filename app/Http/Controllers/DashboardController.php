@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     /**
-     * Dashboard publik pada halaman utama.
+     * Dashboard publik.
      */
     public function publicIndex(Request $request)
     {
@@ -24,45 +24,28 @@ class DashboardController extends Controller
         $district = $request->input('district');
         $fundingSource = $request->input('funding_source');
 
-        /*
-         * Filter data pelatihan.
-         */
         $base = Training::query()
             ->whereYear('start_date', $year)
-            ->when(
-                $district,
-                fn ($query) => $query->where('district', $district)
+            ->when($district, fn ($query) =>
+                $query->where('district', $district)
             )
-            ->when(
-                $fundingSource,
-                fn ($query) => $query->where(
-                    'funding_source',
-                    $fundingSource
-                )
+            ->when($fundingSource, fn ($query) =>
+                $query->where('funding_source', $fundingSource)
             );
 
         $trainingIds = (clone $base)->select('id');
 
         $totalTrainings = (clone $base)->count();
 
-        /*
-         * Total riwayat keikutsertaan.
-         */
         $totalParticipations = TrainingHistory::query()
             ->whereIn('training_id', $trainingIds)
             ->count();
 
-        /*
-         * Total peserta unik.
-         */
         $totalParticipants = TrainingHistory::query()
             ->whereIn('training_id', $trainingIds)
             ->distinct()
             ->count('participant_id');
 
-        /*
-         * Pilihan kabupaten/kota.
-         */
         $districts = District::query()
             ->where('is_active', true)
             ->orderBy('name')
@@ -77,9 +60,6 @@ class DashboardController extends Controller
                 ->pluck('district');
         }
 
-        /*
-         * Pilihan sumber dana.
-         */
         $fundingSources = FundingSource::query()
             ->where('is_active', true)
             ->orderBy('name')
@@ -94,9 +74,6 @@ class DashboardController extends Controller
                 ->pluck('funding_source');
         }
 
-        /*
-         * Statistik pelatihan berdasarkan kabupaten/kota.
-         */
         $byDistrict = (clone $base)
             ->select('district', DB::raw('COUNT(*) as total'))
             ->whereNotNull('district')
@@ -105,27 +82,18 @@ class DashboardController extends Controller
             ->orderByDesc('total')
             ->get();
 
-        /*
-         * Daftar pelatihan terbaru.
-         */
         $recentTrainings = (clone $base)
             ->withCount('histories')
             ->orderByDesc('start_date')
             ->limit(8)
             ->get();
 
-        /*
-         * Pilihan tahun pelatihan.
-         */
         $years = TrainingYear::query()
             ->where('is_active', true)
             ->orderByDesc('year')
             ->pluck('year')
             ->map(fn ($item) => (int) $item);
 
-        /*
-         * Cadangan tahun dari data pelatihan.
-         */
         if ($years->isEmpty()) {
             $yearsQuery = Training::query()
                 ->whereNotNull('start_date');
@@ -135,9 +103,7 @@ class DashboardController extends Controller
                     "CAST(strftime('%Y', start_date) AS INTEGER) as year"
                 );
             } else {
-                $yearsQuery->selectRaw(
-                    'YEAR(start_date) as year'
-                );
+                $yearsQuery->selectRaw('YEAR(start_date) as year');
             }
 
             $years = $yearsQuery
@@ -153,17 +119,11 @@ class DashboardController extends Controller
 
         $years = $years->unique()->sortDesc()->values();
 
-        /*
-         * Master jenis tenaga kesehatan.
-         */
         $healthWorkerTypes = HealthWorkerType::query()
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
-        /*
-         * Hitung peserta unik berdasarkan profesi.
-         */
         $nakesCounts = DB::table('training_histories')
             ->join(
                 'participants',
@@ -171,34 +131,25 @@ class DashboardController extends Controller
                 '=',
                 'training_histories.participant_id'
             )
-            ->whereIn(
-                'training_histories.training_id',
-                $trainingIds
-            )
+            ->whereIn('training_histories.training_id', $trainingIds)
             ->whereNotNull('participants.profession')
             ->whereRaw("TRIM(participants.profession) != ''")
             ->selectRaw(
                 'TRIM(participants.profession) as name,
-                COUNT(DISTINCT training_histories.participant_id) as total'
+                 COUNT(DISTINCT training_histories.participant_id) as total'
             )
             ->groupByRaw('TRIM(participants.profession)')
             ->orderByDesc('total')
             ->get()
             ->keyBy(fn ($item) => mb_strtolower(trim($item->name)));
 
-        /*
-         * Gabungkan master jenis tenaga kesehatan dengan data peserta.
-         */
         $nakesNames = collect();
 
         foreach ($healthWorkerTypes as $type) {
             $name = trim((string) $type->name);
 
             if ($name !== '') {
-                $nakesNames->put(
-                    mb_strtolower($name),
-                    $name
-                );
+                $nakesNames->put(mb_strtolower($name), $name);
             }
         }
 
@@ -210,49 +161,32 @@ class DashboardController extends Controller
             }
         }
 
-        /*
-         * Format data untuk Blade.
-         */
         $nakesByType = $nakesNames
             ->map(function ($name, $key) use ($nakesCounts) {
                 $count = $nakesCounts->get($key);
 
                 return (object) [
                     'name' => $name,
-                    'total' => $count
-                        ? (int) $count->total
-                        : 0,
+                    'total' => $count ? (int) $count->total : 0,
                 ];
             })
             ->sortBy('name')
             ->values();
 
-        /*
-         * Lima jenis tenaga kesehatan terbanyak.
-         */
         $topNakes = $nakesByType
             ->filter(fn ($item) => $item->total > 0)
             ->sortByDesc('total')
             ->take(5)
             ->values();
 
-        /*
-         * Lima jenis tenaga kesehatan tersedikit.
-         */
         $bottomNakes = $nakesByType
             ->filter(fn ($item) => $item->total > 0)
             ->sortBy('total')
             ->take(5)
             ->values();
 
-        /*
-         * Nama variabel kompatibel dengan view.
-         */
         $trainingByDistrict = $byDistrict;
 
-        /*
-         * Tampilkan halaman utama welcome.blade.php.
-         */
         return view('welcome', compact(
             'year',
             'district',
@@ -274,9 +208,9 @@ class DashboardController extends Controller
     }
 
     /**
-     * Dashboard internal berdasarkan role.
+     * Dashboard internal Admin dan Pimpinan.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
@@ -295,40 +229,106 @@ class DashboardController extends Controller
             'Akun ini tidak memiliki akses ke dashboard internal.'
         );
 
-        $totalParticipants = Participant::count();
-        $totalTrainings = Training::count();
-        $totalParticipations = TrainingHistory::count();
+        /*
+         * FILTER TAHUN DAN URUTAN
+         */
+        $year = (int) $request->input('year', now()->year);
+        $sort = $request->input('sort', 'desc');
 
-        $year = now()->year;
+        if (!in_array($sort, ['asc', 'desc'], true)) {
+            $sort = 'desc';
+        }
 
-        $participationsThisYear = TrainingHistory::query()
-            ->whereHas(
-                'training',
-                fn ($query) => $query->whereYear(
-                    'start_date',
-                    $year
-                )
-            )
+        $selectedProfession = trim(
+            (string) $request->input('profession', '')
+        );
+
+        /*
+         * PILIHAN TAHUN
+         */
+        $years = TrainingYear::query()
+            ->where('is_active', true)
+            ->orderByDesc('year')
+            ->pluck('year')
+            ->map(fn ($item) => (int) $item);
+
+        if ($years->isEmpty()) {
+            $yearsQuery = Training::query()
+                ->whereNotNull('start_date');
+
+            if (DB::connection()->getDriverName() === 'sqlite') {
+                $yearsQuery->selectRaw(
+                    "CAST(strftime('%Y', start_date) AS INTEGER) as year"
+                );
+            } else {
+                $yearsQuery->selectRaw('YEAR(start_date) as year');
+            }
+
+            $years = $yearsQuery
+                ->distinct()
+                ->orderByDesc('year')
+                ->pluck('year')
+                ->map(fn ($item) => (int) $item);
+        }
+
+        if (!$years->contains($year)) {
+            $years->push($year);
+        }
+
+        $years = $years->unique()->sortDesc()->values();
+
+        /*
+         * STATISTIK BERDASARKAN TAHUN TERPILIH
+         *
+         * Peserta dihitung jika mengikuti pelatihan pada tahun itu.
+         * Pelatihan dihitung berdasarkan tanggal mulai pelatihan.
+         * Keikutsertaan dihitung dari riwayat pelatihan pada tahun itu.
+         */
+        $trainingIdsThisYear = Training::query()
+            ->whereYear('start_date', $year)
+            ->select('id');
+
+        $totalTrainings = Training::query()
+            ->whereYear('start_date', $year)
             ->count();
 
-        $frequentParticipants = Participant::withCount([
-            'histories as participations_count' => fn ($query) =>
-                $query->whereHas(
-                    'training',
-                    fn ($trainingQuery) =>
-                        $trainingQuery->whereYear(
-                            'start_date',
-                            $year
-                        )
-                ),
-        ])
-            ->orderByDesc('participations_count')
+        $totalParticipations = TrainingHistory::query()
+            ->whereIn('training_id', $trainingIdsThisYear)
+            ->count();
+
+        $totalParticipants = TrainingHistory::query()
+            ->whereIn('training_id', $trainingIdsThisYear)
+            ->distinct()
+            ->count('participant_id');
+
+        $totalTrainingsSelectedYear = $totalTrainings;
+        $participationsThisYear = $totalParticipations;
+
+        /*
+         * JUMLAH PELATIHAN SETIAP PESERTA
+         *
+         * Semua peserta tetap dapat ditampilkan.
+         * Peserta yang tidak mengikuti pelatihan pada tahun terpilih
+         * tetap memiliki participations_count = 0.
+         */
+        $frequentParticipants = Participant::query()
+            ->withCount([
+                'histories as participations_count' => fn ($query) =>
+                    $query->whereHas('training', fn ($trainingQuery) =>
+                        $trainingQuery->whereYear('start_date', $year)
+                    ),
+            ])
+            ->orderBy('participations_count', $sort)
             ->orderBy('name')
             ->limit(8)
             ->get();
 
+        /*
+         * STATISTIK BIDANG PELATIHAN PADA TAHUN TERPILIH
+         */
         $fieldStats = Training::query()
             ->select('field', DB::raw('COUNT(*) as total'))
+            ->whereYear('start_date', $year)
             ->whereNotNull('field')
             ->where('field', '!=', '')
             ->groupBy('field')
@@ -336,23 +336,68 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
-        $recentHistories = TrainingHistory::with([
-            'participant',
-            'training',
-        ])
-            ->latest()
-            ->limit(8)
-            ->get();
+        /*
+         * PILIHAN PROFESI DARI MASTER DATA
+         */
+        $professionOptions = HealthWorkerType::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name');
+
+        /*
+         * DAFTAR PESERTA TERLATIH BERDASARKAN TAHUN DAN PROFESI
+         */
+        $trainedParticipants = collect();
+
+        $professionExists = $selectedProfession !== ''
+            && $professionOptions->contains(
+                fn ($profession) =>
+                    mb_strtolower(trim((string) $profession))
+                    === mb_strtolower($selectedProfession)
+            );
+
+        if ($professionExists) {
+            $trainedParticipants = Participant::query()
+                ->whereRaw('LOWER(TRIM(profession)) = ?', [
+                    mb_strtolower($selectedProfession),
+                ])
+                ->whereHas('histories', fn ($query) =>
+                    $query->whereHas('training', fn ($trainingQuery) =>
+                        $trainingQuery->whereYear('start_date', $year)
+                    )
+                )
+                ->withCount([
+                    'histories as participations_count' => fn ($query) =>
+                        $query->whereHas('training', fn ($trainingQuery) =>
+                            $trainingQuery->whereYear('start_date', $year)
+                        ),
+                ])
+                ->orderBy('name')
+                ->get();
+        } else {
+            $selectedProfession = '';
+        }
+
+        /*
+         * Riwayat terbaru sudah digantikan oleh bagian profesi.
+         */
+        $recentHistories = collect();
 
         $data = compact(
             'totalParticipants',
             'totalTrainings',
             'totalParticipations',
             'participationsThisYear',
+            'totalTrainingsSelectedYear',
             'frequentParticipants',
             'fieldStats',
             'recentHistories',
-            'year'
+            'year',
+            'years',
+            'sort',
+            'selectedProfession',
+            'professionOptions',
+            'trainedParticipants'
         );
 
         if ($role === 'admin') {

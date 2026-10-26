@@ -16,11 +16,9 @@ use App\Http\Controllers\SuperAdmin\MasterDataController;
 |--------------------------------------------------------------------------
 */
 
-// Halaman utama
 Route::get('/', [DashboardController::class, 'publicIndex'])
     ->name('public.dashboard');
 
-// URL dashboard publik yang digunakan di browser
 Route::get('/dashboard-publik', [DashboardController::class, 'publicIndex'])
     ->name('public.dashboard.alternate');
 
@@ -67,6 +65,7 @@ Route::middleware('auth')->group(function () {
     /*
     |--------------------------------------------------------------------------
     | Peserta: hanya Admin
+    | Tambah manual dinonaktifkan.
     |--------------------------------------------------------------------------
     */
 
@@ -74,12 +73,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/participants', [ParticipantController::class, 'index'])
             ->name('participants.index');
-
-        Route::get('/participants/create', [ParticipantController::class, 'create'])
-            ->name('participants.create');
-
-        Route::post('/participants', [ParticipantController::class, 'store'])
-            ->name('participants.store');
 
         Route::get('/participants/{participant}/edit', [ParticipantController::class, 'edit'])
             ->whereNumber('participant')
@@ -105,6 +98,7 @@ Route::middleware('auth')->group(function () {
     /*
     |--------------------------------------------------------------------------
     | Pelatihan: hanya Admin
+    | Tambah manual dinonaktifkan.
     |--------------------------------------------------------------------------
     */
 
@@ -112,12 +106,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/trainings', [TrainingController::class, 'index'])
             ->name('trainings.index');
-
-        Route::get('/trainings/create', [TrainingController::class, 'create'])
-            ->name('trainings.create');
-
-        Route::post('/trainings', [TrainingController::class, 'store'])
-            ->name('trainings.store');
 
         Route::get('/trainings/{training}/edit', [TrainingController::class, 'edit'])
             ->whereNumber('training')

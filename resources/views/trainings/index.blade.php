@@ -6,7 +6,7 @@
 <div class="page-header">
     <h1>Data Pelatihan</h1>
     <p>
-        Kelola daftar pelatihan dari input manual maupun hasil import Excel.
+        Data pelatihan yang berasal dari hasil Impor Excel.
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         </div>
     @endif
 
-    {{-- Pencarian dan tombol aksi --}}
+    {{-- Pencarian data pelatihan --}}
     <form method="GET"
           action="{{ route('trainings.index') }}"
           style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
@@ -46,12 +46,6 @@
            class="btn btn-secondary">
             Reset
         </a>
-
-        @if (\Illuminate\Support\Facades\Route::has('trainings.create'))
-            <a href="{{ route('trainings.create') }}" class="btn">
-                + Tambah Pelatihan
-            </a>
-        @endif
     </form>
 
     {{-- Informasi hasil pencarian --}}
@@ -104,34 +98,30 @@
                         </td>
 
                         <td style="white-space:nowrap">
-                            @if (\Illuminate\Support\Facades\Route::has('trainings.edit'))
-                                <a
-                                    class="btn btn-secondary"
-                                    href="{{ route('trainings.edit', $training) }}"
-                                >
-                                    Edit
-                                </a>
-                            @endif
+                            <a
+                                class="btn btn-secondary"
+                                href="{{ route('trainings.edit', $training) }}"
+                            >
+                                Edit
+                            </a>
 
-                            @if (\Illuminate\Support\Facades\Route::has('trainings.destroy'))
-                                <form
-                                    method="POST"
-                                    action="{{ route('trainings.destroy', $training) }}"
-                                    style="display:inline"
-                                    onsubmit="return confirm('Yakin ingin menghapus pelatihan ini?')"
-                                >
-                                    @csrf
-                                    @method('DELETE')
+                            <form
+                                method="POST"
+                                action="{{ route('trainings.destroy', $training) }}"
+                                style="display:inline"
+                                onsubmit="return confirm('Yakin ingin menghapus pelatihan ini?')"
+                            >
+                                @csrf
+                                @method('DELETE')
 
-                                    <button
-                                        class="btn"
-                                        type="submit"
-                                        style="background:#b91c1c"
-                                    >
-                                        Hapus
-                                    </button>
-                                </form>
-                            @endif
+                                <button
+                                    class="btn"
+                                    type="submit"
+                                    style="background:#b91c1c"
+                                >
+                                    Hapus
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty
@@ -144,8 +134,7 @@
                                 Coba gunakan kata kunci lain.
                             @else
                                 Belum ada data pelatihan.
-                                Silakan tambah data manual atau lakukan
-                                import Excel terlebih dahulu.
+                                Silakan lakukan Impor Excel terlebih dahulu.
                             @endif
                         </td>
                     </tr>
