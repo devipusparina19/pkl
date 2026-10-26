@@ -55,6 +55,8 @@ class ImportController extends Controller
                 'required',
                 'string',
                 'max:255',
+                Rule::exists('funding_sources', 'name')
+                    ->where('is_active', true),
             ],
         ], [
             'file.required' => 'Silakan pilih file Excel.',
@@ -79,33 +81,23 @@ class ImportController extends Controller
                 ->where('is_active', true)
                 ->firstOrFail();
 
-            $fundingSource = FundingSource::where(
-                'name',
-                $request->input('sumber_dana')
-            )
-                ->where('is_active', true)
-                ->firstOrFail();
+            $filePath = $request->file('file')->getRealPath();
 
-            $spreadsheet = IOFactory::load(
-                $request->file('file')->getRealPath()
-            );
-
+            $spreadsheet = IOFactory::load($filePath);
             $sheet = $spreadsheet->getActiveSheet();
 
             /*
-             * Excel:
-             * Baris 2 = nama pelatihan
-             * Baris 3 = fasilitasi
-             * Baris 5 = rentang tanggal
-             *
-             * Cari seluruh sel pada baris terkait agar tidak
-             * bergantung pada C2, C3, atau C5 saja.
+             * BARIS 2: NAMA PELATIHAN
              */
-            $trainingName = $this->readRowText($sheet, 2);
-
-            $facilitation = $this->readRowText($sheet, 3);
-
-            $dateText = $this->readRowText($sheet, 5);
+            $trainingName = $this->getRowValue(
+                $sheet,
+                2,
+                [
+                    'nama pelatihan',
+                    'judul pelatihan',
+                    'nama kegiatan',
+                ]
+            );
 
             if ($trainingName === '') {
                 return back()
@@ -116,43 +108,78 @@ class ImportController extends Controller
                     ]);
             }
 
-            [$startDate, $endDate] = $this->parseDateRange($dateText);
+            /*
+             * BARIS 3: KERJA SAMA
+             */
+            $cooperation = $this->getRowValue(
+                $sheet,
+                3,
+                [
+                    'kerja sama',
+                    'kerjasama',
+                    'mitra kerja sama',
+                    'mitra kerjasama',
+                ]
+            );
 
             /*
-             * Kolom KERJA SAMA dibaca oleh TrainingImport
-             * dari header tabel peserta pada baris 7.
-             * Nilai kerja sama diteruskan untuk disimpan
-             * ke kolom trainings.organizer oleh TrainingImport.
+             * BARIS 5: RENTANG TANGGAL PELATIHAN
+             */
+            $dateText = $this->getRowValue(
+                $sheet,
+                5,
+                [
+                    'tanggal pelaksanaan',
+                    'tanggal pelatihan',
+                    'waktu pelaksanaan',
+                    'tanggal',
+                ]
+            );
+
+            [$startDate, $endDate] = $this->parseDateRange(
+                $dateText
+            );
+
+            /*
+             * Pertahankan informasi kerja sama yang dibaca
+             * dari baris 3 dan teruskan ke TrainingImport.
              */
             $import = new TrainingImport(
                 batchNumber: $request->input('angkatan'),
-                fundingSource: $fundingSource->name,
+                fundingSource: $request->input('sumber_dana'),
                 trainingName: $trainingName,
-                facilitation: $facilitation,
-                organizer: '',
+                facilitation: '',
+                organizer: $cooperation,
                 startDate: $startDate,
                 endDate: $endDate,
                 district: $district->name,
             );
 
-            Excel::import($import, $request->file('file'));
+            Excel::import(
+                $import,
+                $request->file('file')
+            );
 
             return redirect()
                 ->route('imports.index')
                 ->with('import_result', [
-                    'created_participants' => $import->createdParticipants,
-                    'updated_participants' => $import->updatedParticipants,
-                    'created_trainings' => $import->createdTrainings,
-                    'created_histories' => $import->createdHistories,
+                    'created_participants' =>
+                        $import->createdParticipants,
+                    'updated_participants' =>
+                        $import->updatedParticipants,
+                    'created_trainings' =>
+                        $import->createdTrainings,
+                    'created_histories' =>
+                        $import->createdHistories,
                     'errors' => $import->errors,
                 ]);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
+
         } catch (\Throwable $e) {
             Log::error('Import Excel SIRAPIK gagal', [
                 'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -166,28 +193,144 @@ class ImportController extends Controller
     }
 
     /**
-     * Membaca teks pertama yang terisi pada baris Excel.
+     * Membaca nilai dari baris Excel tertentu.
+     *
+     * Mendukung:
+     * - Nilai langsung pada baris tersebut.
+     * - Label dan nilai di sel yang berbeda.
+     * - Label dan nilai dalam satu sel, misalnya:
+     *   "Kerja Sama: Dinas Kesehatan Kabupaten Banjar".
      */
-    private function readRowText($sheet, int $rowNumber): string
-    {
-        $highestColumn = Coordinate::columnIndexFromString(
+    private function getRowValue(
+        $sheet,
+        int $rowNumber,
+        array $labels
+    ): string {
+        $lastColumn = Coordinate::columnIndexFromString(
             $sheet->getHighestDataColumn()
         );
 
-        for ($column = 1; $column <= $highestColumn; $column++) {
-            $cellAddress = Coordinate::stringFromColumnIndex($column)
-                . $rowNumber;
+        $cells = [];
 
-            $value = trim((string) $sheet
-                ->getCell($cellAddress)
-                ->getFormattedValue());
+        for ($col = 1; $col <= $lastColumn; $col++) {
+            $value = trim(
+                (string) $sheet
+                    ->getCell([$col, $rowNumber])
+                    ->getFormattedValue()
+            );
 
-            if ($value !== '') {
+            $cells[$col] = $value;
+        }
+
+        $normalizedLabels = array_map(
+            fn ($label) => $this->normalizeText($label),
+            $labels
+        );
+
+        /*
+         * Cari label pada baris yang ditentukan.
+         */
+        foreach ($cells as $col => $value) {
+            if ($value === '') {
+                continue;
+            }
+
+            $normalizedValue = $this->normalizeText($value);
+
+            foreach ($normalizedLabels as $label) {
+                /*
+                 * Format satu sel:
+                 * "Nama Pelatihan: Pelatihan ABC"
+                 */
+                if (
+                    str_starts_with(
+                        $normalizedValue,
+                        $label . ' '
+                    ) ||
+                    $normalizedValue === $label
+                ) {
+                    foreach ($labels as $originalLabel) {
+                        $pattern = '/^' .
+                            preg_quote($originalLabel, '/') .
+                            '\s*[:\-]\s*(.+)$/iu';
+
+                        if (
+                            preg_match(
+                                $pattern,
+                                $value,
+                                $matches
+                            )
+                        ) {
+                            $inlineValue = trim($matches[1]);
+
+                            if ($inlineValue !== '') {
+                                return $inlineValue;
+                            }
+                        }
+                    }
+
+                    /*
+                     * Format label di satu sel dan nilai
+                     * di sel sebelah kanan pada baris sama.
+                     */
+                    for (
+                        $nextCol = $col + 1;
+                        $nextCol <= $lastColumn;
+                        $nextCol++
+                    ) {
+                        if ($cells[$nextCol] !== '') {
+                            return $cells[$nextCol];
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
+         * Jika tidak ditemukan label, ambil nilai pertama
+         * yang bukan label pada baris tersebut.
+         */
+        foreach ($cells as $value) {
+            if ($value === '') {
+                continue;
+            }
+
+            $normalizedValue = $this->normalizeText($value);
+
+            $isLabel = false;
+
+            foreach ($normalizedLabels as $label) {
+                if (
+                    $normalizedValue === $label ||
+                    str_starts_with(
+                        $normalizedValue,
+                        $label . ' '
+                    )
+                ) {
+                    $isLabel = true;
+                    break;
+                }
+            }
+
+            if (!$isLabel) {
                 return $value;
             }
         }
 
         return '';
+    }
+
+    private function normalizeText(string $text): string
+    {
+        $text = mb_strtolower(trim($text));
+
+        $text = str_replace(
+            [':', '/', '-', '_'],
+            ' ',
+            $text
+        );
+
+        return preg_replace('/\s+/', ' ', $text) ?? $text;
     }
 
     private function parseDateRange(string $text): array
@@ -213,7 +356,7 @@ class ImportController extends Controller
             'desember' => 'December',
         ];
 
-        $normalized = strtolower($text);
+        $normalized = mb_strtolower($text);
 
         foreach ($months as $indo => $english) {
             $normalized = str_replace(
@@ -223,13 +366,20 @@ class ImportController extends Controller
             );
         }
 
-        $normalized = preg_replace('/\s+/', ' ', $normalized);
+        $normalized = preg_replace(
+            '/\s+/',
+            ' ',
+            $normalized
+        );
 
-        $parts = preg_split('/\s*[-–—]\s*/', $normalized);
+        $parts = preg_split(
+            '/\s*[-–—]\s*/',
+            $normalized
+        );
 
         if (count($parts) !== 2) {
             throw new \RuntimeException(
-                'Format tanggal pada bagian atas Excel tidak dikenali. ' .
+                'Format tanggal pada baris 5 Excel tidak dikenali. ' .
                 'Contoh: 18 MEI 2026 - 23 MEI 2026.'
             );
         }
@@ -239,7 +389,7 @@ class ImportController extends Controller
 
         if ($start === false || $end === false) {
             throw new \RuntimeException(
-                'Tanggal mulai atau tanggal selesai pada Excel tidak valid.'
+                'Tanggal mulai atau tanggal selesai pada baris 5 Excel tidak valid.'
             );
         }
 
