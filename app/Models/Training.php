@@ -10,6 +10,7 @@ class Training extends Model
     protected $fillable = [
         'code',
         'name',
+        'field',
         'batch_number',
         'funding_source',
         'organizer',
@@ -17,6 +18,8 @@ class Training extends Model
         'end_date',
         'duration_days',
         'district',
+        'location',
+        'description',
     ];
 
     protected function casts(): array
@@ -29,6 +32,9 @@ class Training extends Model
 
     public function histories(): HasMany
     {
-        return $this->hasMany(TrainingHistory::class, 'training_id');
+        return $this->hasMany(
+            TrainingHistory::class,
+            'training_id'
+        );
     }
 }

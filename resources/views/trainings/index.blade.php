@@ -24,17 +24,18 @@
         </div>
     @endif
 
-    {{-- Pencarian data pelatihan --}}
-    <form method="GET"
-          action="{{ route('trainings.index') }}"
-          style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px">
-
+    {{-- Pencarian berdasarkan nama pelatihan atau kerja sama --}}
+    <form
+        method="GET"
+        action="{{ route('trainings.index') }}"
+        style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px"
+    >
         <input
             type="text"
             name="search"
             value="{{ $search ?? request('search') }}"
-            placeholder="Cari nama atau penyelenggara..."
-            aria-label="Cari data pelatihan"
+            placeholder="Cari nama atau kerja sama..."
+            aria-label="Cari nama pelatihan atau kerja sama"
             style="flex:1;min-width:220px"
         >
 
@@ -42,8 +43,10 @@
             Cari
         </button>
 
-        <a href="{{ route('trainings.index') }}"
-           class="btn btn-secondary">
+        <a
+            href="{{ route('trainings.index') }}"
+            class="btn btn-secondary"
+        >
             Reset
         </a>
     </form>
@@ -63,7 +66,7 @@
                 <tr>
                     <th>No.</th>
                     <th>Nama Pelatihan</th>
-                    <th>Penyelenggara</th>
+                    <th>Kerja Sama</th>
                     <th>Tanggal Mulai</th>
                     <th>Tanggal Selesai</th>
                     <th>Aksi</th>
@@ -78,11 +81,11 @@
                         </td>
 
                         <td>
-                            {{ $training->name ?? '-' }}
+                            {{ $training->name ?: '-' }}
                         </td>
 
                         <td>
-                            {{ $training->organizer ?? '-' }}
+                            {{ $training->organizer ?: '-' }}
                         </td>
 
                         <td>
@@ -126,9 +129,10 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6"
-                            style="text-align:center;padding:28px">
-
+                        <td
+                            colspan="6"
+                            style="text-align:center;padding:28px"
+                        >
                             @if (request()->filled('search'))
                                 Data pelatihan tidak ditemukan.
                                 Coba gunakan kata kunci lain.

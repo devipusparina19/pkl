@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class ImportController extends Controller
 {
@@ -29,128 +30,165 @@ class ImportController extends Controller
         ));
     }
 
-public function store(Request $request)
-{
-    $request->validate([
-        'file' => [
-            'required',
-            'file',
-            'mimes:xlsx,xls,csv',
-            'max:10240',
-        ],
-        'angkatan' => [
-            'required',
-            'string',
-            'max:100',
-        ],
-        'kabupaten_kota_mitra' => [
-            'required',
-            'string',
-            'max:255',
-            Rule::exists('districts', 'name')
-                ->where('is_active', true),
-        ],
-        'sumber_dana' => [
-            'required',
-            'string',
-            'max:255',
-            Rule::exists('funding_sources', 'name')
-                ->where('is_active', true),
-        ],
-    ], [
-        'file.required' => 'Silakan pilih file Excel.',
-        'file.mimes' => 'File harus berformat XLSX, XLS, atau CSV.',
-        'file.max' => 'Ukuran file maksimal 10 MB.',
-        'angkatan.required' => 'Angkatan wajib diisi.',
-        'kabupaten_kota_mitra.required' =>
-            'Kabupaten/Kota/Mitra wajib dipilih.',
-        'kabupaten_kota_mitra.exists' =>
-            'Kabupaten/Kota/Mitra tidak valid atau tidak aktif.',
-        'sumber_dana.required' =>
-            'Sumber dana wajib dipilih.',
-        'sumber_dana.exists' =>
-            'Sumber dana tidak valid atau tidak aktif.',
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'file' => [
+                'required',
+                'file',
+                'mimes:xlsx,xls,csv',
+                'max:10240',
+            ],
+            'angkatan' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'kabupaten_kota_mitra' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::exists('districts', 'name')
+                    ->where('is_active', true),
+            ],
+            'sumber_dana' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+        ], [
+            'file.required' => 'Silakan pilih file Excel.',
+            'file.mimes' => 'File harus berformat XLSX, XLS, atau CSV.',
+            'file.max' => 'Ukuran file maksimal 10 MB.',
+            'angkatan.required' => 'Angkatan wajib diisi.',
+            'kabupaten_kota_mitra.required' =>
+                'Kabupaten/Kota/Mitra wajib dipilih.',
+            'kabupaten_kota_mitra.exists' =>
+                'Kabupaten/Kota/Mitra tidak valid atau tidak aktif.',
+            'sumber_dana.required' =>
+                'Sumber dana wajib dipilih.',
+            'sumber_dana.exists' =>
+                'Sumber dana tidak valid atau tidak aktif.',
+        ]);
 
-    try {
-        $district = District::where(
-            'name',
-            $request->input('kabupaten_kota_mitra')
-        )
-            ->where('is_active', true)
-            ->firstOrFail();
+        try {
+            $district = District::where(
+                'name',
+                $request->input('kabupaten_kota_mitra')
+            )
+                ->where('is_active', true)
+                ->firstOrFail();
 
-        $spreadsheet = IOFactory::load(
-            $request->file('file')->getRealPath()
-        );
+            $fundingSource = FundingSource::where(
+                'name',
+                $request->input('sumber_dana')
+            )
+                ->where('is_active', true)
+                ->firstOrFail();
 
-        $sheet = $spreadsheet->getActiveSheet();
+            $spreadsheet = IOFactory::load(
+                $request->file('file')->getRealPath()
+            );
 
-        $trainingName = trim(
-            (string) $sheet->getCell('A2')->getValue()
-        );
+            $sheet = $spreadsheet->getActiveSheet();
 
-        $facilitation = trim(
-            (string) $sheet->getCell('A3')->getValue()
-        );
+            /*
+             * Excel:
+             * Baris 2 = nama pelatihan
+             * Baris 3 = fasilitasi
+             * Baris 5 = rentang tanggal
+             *
+             * Cari seluruh sel pada baris terkait agar tidak
+             * bergantung pada C2, C3, atau C5 saja.
+             */
+            $trainingName = $this->readRowText($sheet, 2);
 
-        $organizer = trim(
-            (string) $sheet->getCell('A4')->getValue()
-        );
+            $facilitation = $this->readRowText($sheet, 3);
 
-        $dateText = trim(
-            (string) $sheet->getCell('A5')->getValue()
-        );
+            $dateText = $this->readRowText($sheet, 5);
 
-        if ($trainingName === '') {
+            if ($trainingName === '') {
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'file' =>
+                            'Nama pelatihan tidak ditemukan pada baris 2 Excel.',
+                    ]);
+            }
+
+            [$startDate, $endDate] = $this->parseDateRange($dateText);
+
+            /*
+             * Kolom KERJA SAMA dibaca oleh TrainingImport
+             * dari header tabel peserta pada baris 7.
+             * Nilai kerja sama diteruskan untuk disimpan
+             * ke kolom trainings.organizer oleh TrainingImport.
+             */
+            $import = new TrainingImport(
+                batchNumber: $request->input('angkatan'),
+                fundingSource: $fundingSource->name,
+                trainingName: $trainingName,
+                facilitation: $facilitation,
+                organizer: '',
+                startDate: $startDate,
+                endDate: $endDate,
+                district: $district->name,
+            );
+
+            Excel::import($import, $request->file('file'));
+
+            return redirect()
+                ->route('imports.index')
+                ->with('import_result', [
+                    'created_participants' => $import->createdParticipants,
+                    'updated_participants' => $import->updatedParticipants,
+                    'created_trainings' => $import->createdTrainings,
+                    'created_histories' => $import->createdHistories,
+                    'errors' => $import->errors,
+                ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            Log::error('Import Excel SIRAPIK gagal', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return back()
                 ->withInput()
                 ->withErrors([
                     'file' =>
-                        'Nama pelatihan tidak ditemukan di sel A2.',
+                        'Import gagal: ' . $e->getMessage(),
                 ]);
         }
+    }
 
-        [$startDate, $endDate] = $this->parseDateRange($dateText);
-
-        $import = new TrainingImport(
-            batchNumber: $request->input('angkatan'),
-            fundingSource: $request->input('sumber_dana'),
-            trainingName: $trainingName,
-            facilitation: $facilitation,
-            organizer: $organizer,
-            startDate: $startDate,
-            endDate: $endDate,
-            district: $district->name,
+    /**
+     * Membaca teks pertama yang terisi pada baris Excel.
+     */
+    private function readRowText($sheet, int $rowNumber): string
+    {
+        $highestColumn = Coordinate::columnIndexFromString(
+            $sheet->getHighestDataColumn()
         );
 
-        Excel::import($import, $request->file('file'));
+        for ($column = 1; $column <= $highestColumn; $column++) {
+            $cellAddress = Coordinate::stringFromColumnIndex($column)
+                . $rowNumber;
 
-        return redirect()
-            ->route('imports.index')
-            ->with('import_result', [
-                'created_participants' => $import->createdParticipants,
-                'updated_participants' => $import->updatedParticipants,
-                'created_trainings' => $import->createdTrainings,
-                'created_histories' => $import->createdHistories,
-                'errors' => $import->errors,
-            ]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        throw $e;
-    } catch (\Throwable $e) {
-        Log::error('Import Excel SIRAPIK gagal', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ]);
+            $value = trim((string) $sheet
+                ->getCell($cellAddress)
+                ->getFormattedValue());
 
-        return back()
-            ->withInput()
-            ->withErrors([
-                'file' =>
-                    'Import gagal. Periksa format Excel dan log Laravel.',
-            ]);
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        return '';
     }
-}
 
     private function parseDateRange(string $text): array
     {
@@ -191,8 +229,8 @@ public function store(Request $request)
 
         if (count($parts) !== 2) {
             throw new \RuntimeException(
-                'Format tanggal A5 tidak dikenali. Contoh: ' .
-                '18 MEI 2026 - 23 MEI 2026.'
+                'Format tanggal pada bagian atas Excel tidak dikenali. ' .
+                'Contoh: 18 MEI 2026 - 23 MEI 2026.'
             );
         }
 
@@ -201,7 +239,7 @@ public function store(Request $request)
 
         if ($start === false || $end === false) {
             throw new \RuntimeException(
-                'Tanggal mulai atau tanggal selesai pada A5 tidak valid.'
+                'Tanggal mulai atau tanggal selesai pada Excel tidak valid.'
             );
         }
 

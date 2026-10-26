@@ -33,10 +33,10 @@ class TrainingImport implements ToCollection
 
     public function collection(Collection $rows): void
     {
-        // Header Excel ada pada baris 7 (indeks 6).
+        // Header peserta berada pada baris Excel ke-7.
         $headerRow = $rows->get(6);
 
-        if (!$headerRow) {
+        if (!$headerRow instanceof Collection) {
             $this->errors[] =
                 'Header peserta tidak ditemukan pada baris 7.';
             return;
@@ -46,15 +46,10 @@ class TrainingImport implements ToCollection
 
         $nameColumn = $this->findColumn($headers, [
             'nama lengkap',
+            'nama peserta',
             'nama',
             'name',
         ]);
-
-        if ($nameColumn === null) {
-            $this->errors[] =
-                'Kolom NAMA LENGKAP tidak ditemukan.';
-            return;
-        }
 
         $nipColumn = $this->findColumn($headers, [
             'nip',
@@ -66,11 +61,59 @@ class TrainingImport implements ToCollection
             'nomor induk kependudukan',
         ]);
 
+        $cooperationColumn = $this->findColumn($headers, [
+            'kerja sama',
+            'kerjasama',
+            'kerja sama dengan',
+        ]);
+
+        if ($nameColumn === null) {
+            $this->errors[] =
+                'Kolom NAMA tidak ditemukan pada baris 7 Excel.';
+            return;
+        }
+
         if ($nipColumn === null && $nikColumn === null) {
             $this->errors[] =
                 'Kolom NIP atau NIK tidak ditemukan pada Excel.';
             return;
         }
+
+        if ($cooperationColumn === null) {
+            $this->errors[] =
+                'Kolom KERJA SAMA tidak ditemukan pada baris 7 Excel.';
+            return;
+        }
+
+        /*
+         * Ambil nilai KERJA SAMA pertama yang terisi.
+         * Nilai tersebut berlaku untuk data pelatihan ini.
+         */
+        $cooperation = '';
+
+        foreach ($rows->slice(7) as $row) {
+            if (!$row instanceof Collection) {
+                continue;
+            }
+
+            $value = trim(
+                (string) ($row->get($cooperationColumn) ?? '')
+            );
+
+            if ($value !== '') {
+                $cooperation = $value;
+                break;
+            }
+        }
+
+        if ($cooperation === '') {
+            $this->errors[] =
+                'Kolom KERJA SAMA ditemukan, tetapi nilainya kosong.';
+            return;
+        }
+
+        // Kolom KERJA SAMA Excel disimpan sebagai organizer.
+        $this->organizer = $cooperation;
 
         try {
             $training = $this->findOrCreateTraining();
@@ -81,12 +124,14 @@ class TrainingImport implements ToCollection
         }
 
         /*
-         * values() mengatur ulang indeks setelah slice.
-         * Dengan demikian data pertama tetap dilaporkan sebagai
-         * baris Excel 8, bukan baris 15.
+         * Proses peserta dimulai dari baris Excel ke-8.
          */
         foreach ($rows->slice(7)->values() as $index => $row) {
             $excelRow = $index + 8;
+
+            if (!$row instanceof Collection) {
+                continue;
+            }
 
             try {
                 $data = $this->mapRow($row, $headers);
@@ -117,7 +162,7 @@ class TrainingImport implements ToCollection
                     $nip,
                     $nik,
                     $training
-                ) {
+                ): void {
                     $participant = null;
 
                     if ($nip !== '') {
@@ -125,11 +170,13 @@ class TrainingImport implements ToCollection
                             ->first();
                     }
 
-                    if (!$participant && $nik !== '') {
-                        if (Schema::hasColumn('participants', 'nik')) {
-                            $participant = Participant::where('nik', $nik)
-                                ->first();
-                        }
+                    if (
+                        !$participant &&
+                        $nik !== '' &&
+                        Schema::hasColumn('participants', 'nik')
+                    ) {
+                        $participant = Participant::where('nik', $nik)
+                            ->first();
                     }
 
                     $isNew = !$participant;
@@ -144,15 +191,11 @@ class TrainingImport implements ToCollection
                         $participant->nip = $nip;
                     }
 
-                    if (
-                        $nik !== '' &&
-                        Schema::hasColumn(
-                            $participant->getTable(),
-                            'nik'
-                        )
-                    ) {
-                        $participant->nik = $nik;
-                    }
+                    $this->setIfColumnExists(
+                        $participant,
+                        'nik',
+                        $nik
+                    );
 
                     $this->setIfColumnExists(
                         $participant,
@@ -198,7 +241,7 @@ class TrainingImport implements ToCollection
                         $this->updatedParticipants++;
                     }
 
-                    // Cegah riwayat yang sama dibuat berulang.
+                    // Hindari riwayat peserta-pelatihan duplikat.
                     $history = TrainingHistory::firstOrCreate([
                         'participant_id' => $participant->id,
                         'training_id' => $training->id,
@@ -250,6 +293,7 @@ class TrainingImport implements ToCollection
         $aliases = [
             'name' => [
                 'nama lengkap',
+                'nama peserta',
                 'nama',
                 'name',
             ],
@@ -300,7 +344,7 @@ class TrainingImport implements ToCollection
             $column = $this->findColumn($headers, $names);
 
             $value = $column !== null
-                ? ($row[$column] ?? null)
+                ? $row->get($column)
                 : null;
 
             $result[$field] = $value === null
@@ -314,13 +358,13 @@ class TrainingImport implements ToCollection
     private function findOrCreateTraining(): Training
     {
         $codeSource = implode('|', [
-            $this->trainingName,
+            trim($this->trainingName),
             $this->startDate ?? '',
             $this->endDate ?? '',
-            $this->organizer,
-            $this->batchNumber,
-            $this->fundingSource,
-            $this->district,
+            trim($this->organizer),
+            trim($this->batchNumber),
+            trim($this->fundingSource),
+            trim($this->district),
         ]);
 
         $code = 'IMP-' . strtoupper(
@@ -359,20 +403,18 @@ class TrainingImport implements ToCollection
             $this->fundingSource
         );
 
-        // Simpan nama wilayah yang dipilih dari master data.
         $this->setTrainingColumn(
             $training,
             'district',
             $this->district
         );
 
-        if ($this->organizer !== '') {
-            $this->setTrainingColumn(
-                $training,
-                'organizer',
-                $this->organizer
-            );
-        }
+        // PENTING: kerja sama Excel disimpan di kolom organizer.
+        $this->setTrainingColumn(
+            $training,
+            'organizer',
+            $this->organizer
+        );
 
         if ($this->startDate) {
             $this->setTrainingColumn(
@@ -402,10 +444,13 @@ class TrainingImport implements ToCollection
             $start = new \DateTimeImmutable($this->startDate);
             $end = new \DateTimeImmutable($this->endDate);
 
+            $duration = $start->diff($end)->days + 1;
+
+            // Nama kolom yang sesuai dengan migration.
             $this->setTrainingColumn(
                 $training,
-                'duration',
-                $start->diff($end)->days + 1
+                'duration_days',
+                $duration
             );
         }
 
@@ -436,10 +481,7 @@ class TrainingImport implements ToCollection
         if (
             $value !== null &&
             $value !== '' &&
-            Schema::hasColumn(
-                $participant->getTable(),
-                $column
-            )
+            Schema::hasColumn($participant->getTable(), $column)
         ) {
             $participant->{$column} = $value;
         }
