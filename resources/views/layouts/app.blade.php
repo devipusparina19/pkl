@@ -80,32 +80,25 @@
             border-bottom: 1px solid rgba(255,255,255,.13);
         }
 
-        .brand h2 {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 0 0 12px;
-            font-size: 29px;
-            font-weight: 800;
-            letter-spacing: 1.6px;
-            line-height: 1.2;
-        }
+        
+.brand h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 12px;
+    font-size: 29px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+    line-height: 1.2;
+}
 
-        .brand-mark {
-            width: 43px;
-            height: 43px;
-            display: grid;
-            place-items: center;
-            border: 1px solid rgba(255,255,255,.22);
-            border-radius: 12px;
-            background: rgba(255,255,255,.10);
-            color: #fff;
-        }
-
-        .brand-mark .icon {
-            width: 25px;
-            height: 25px;
-        }
+.brand-logo {
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    object-fit: contain;
+    display: block;
+}
 
         .brand p {
             margin: 0;
@@ -903,18 +896,22 @@
     </svg>
 
     <aside class="sidebar">
-        <div class="brand">
-            <h2>
-                <span class="brand-mark">
-                    <svg class="icon" aria-hidden="true"><use href="#icon-building"/></svg>
-                </span>
-                <span>SIRAPIK</span>
-            </h2>
-            <p>
-                Sistem Informasi Riwayat Pelatihan<br>
-                Bapelkes Kalimantan Selatan
-            </p>
-        </div>
+        
+<div class="brand">
+    <h2>
+        <img
+            src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+            alt="Logo Provinsi Kalimantan Selatan"
+            class="brand-logo"
+        >
+        <span>SIRAPIK</span>
+    </h2>
+
+    <p>
+        Sistem Informasi Riwayat Pelatihan<br>
+        Bapelkes Kalimantan Selatan
+    </p>
+</div>
 
         <nav>
             <div class="nav-label">MENU UTAMA</div>

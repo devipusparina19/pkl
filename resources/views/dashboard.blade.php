@@ -713,10 +713,10 @@
                 <label for="participant-sort">Urutkan Jumlah Pelatihan</label>
                 <select id="participant-sort" name="sort">
                     <option value="asc" {{ $sort === 'asc' ? 'selected' : '' }}>
-                        Paling sedikit ke paling banyak
+                        Jumlah Pelatihan Tertinggi
                     </option>
                     <option value="desc" {{ $sort === 'desc' ? 'selected' : '' }}>
-                        Paling banyak ke paling sedikit
+                        Jumlah Pelatihan Terendah
                     </option>
                 </select>
             </div>

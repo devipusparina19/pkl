@@ -1402,7 +1402,13 @@
                class="brand"
                aria-label="Beranda SIRAPIK">
 
-                <div class="brand-mark" aria-hidden="true">S</div>
+                <div class="brand-mark">
+    <img
+        src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+        alt="Logo Provinsi Kalimantan Selatan"
+        class="provinsi-logo"
+    >
+</div>
 
                 <div>
                     <div class="brand-title">SIRAPIK</div>
@@ -1759,7 +1765,13 @@
     <footer class="public-footer">
         <div class="public-container footer-inner">
             <div class="footer-brand">
-                <div class="footer-mark" aria-hidden="true">S</div>
+                <div class="footer-mark">
+    <img
+        src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+        alt="Logo Provinsi Kalimantan Selatan"
+        class="provinsi-logo"
+    >
+</div>
 
                 <div>
                     <strong>SIRAPIK</strong><br>

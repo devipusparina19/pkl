@@ -168,21 +168,27 @@
             gap: 14px;
         }
 
-        .brand-logo {
-            flex: 0 0 56px;
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255, 255, 255, .40);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, .10);
-            box-shadow: inset 0 0 15px rgba(255, 255, 255, .06);
-            color: var(--white);
-            font-size: 28px;
-            font-weight: 800;
-        }
+.brand-logo {
+    flex: 0 0 56px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .40);
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 3px 10px rgba(0, 15, 35, .15);
+}
+
+.brand-logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 5px;
+}
 
         .brand-heading h2 {
             margin: 0 0 5px;
@@ -605,14 +611,17 @@
                 min-height: 250px;
                 padding: 23px;
             }
+ 
+.brand-logo {
+    flex-basis: 46px;
+    width: 46px;
+    height: 46px;
+    border-radius: 11px;
+}
 
-            .brand-logo {
-                flex-basis: 46px;
-                width: 46px;
-                height: 46px;
-                border-radius: 11px;
-                font-size: 23px;
-            }
+.brand-logo img {
+    padding: 4px;
+}
 
             .brand-heading h2 {
                 font-size: 20px;
@@ -727,14 +736,20 @@
 <main class="login-layout">
 
     <section class="login-brand">
-        <header class="brand-header">
-            <div class="brand-logo" aria-hidden="true">S</div>
+        
+<header class="brand-header">
+    <div class="brand-logo">
+        <img
+            src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+            alt="Logo SIRAPIK"
+        >
+    </div>
 
-            <div class="brand-heading">
-                <h2>SIRAPIK</h2>
-                <p>Bapelkes Provinsi Kalimantan Selatan</p>
-            </div>
-        </header>
+    <div class="brand-heading">
+        <h2>SIRAPIK</h2>
+        <p>Bapelkes Provinsi Kalimantan Selatan</p>
+    </div>
+</header>
 
         <div class="brand-content">
             <span class="brand-label">Sistem Informasi</span>
