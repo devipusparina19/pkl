@@ -79,20 +79,20 @@
                     <div id="selectedFile" class="selected-file" hidden></div>
                 </div>
 
+                {{-- ANGKATAN: OPSIONAL, TANPA TANDA BINTANG --}}
                 <div class="form-group">
-                    <label for="angkatan">Angkatan <span class="required">*</span></label>
+                    <label for="angkatan">Angkatan</label>
                     <input
                         type="text"
                         name="angkatan"
                         id="angkatan"
                         class="form-control"
-                        value="{{ old('angkatan', '1') }}"
-                        placeholder="Contoh: 1"
+                        value="{{ old('angkatan') }}"
+                        placeholder="Kosongkan jika tidak ada angkatan"
                         maxlength="100"
-                        required
                     >
                     <small class="field-help">
-                        Isi nomor atau nama angkatan pelatihan.
+                        Opsional. Jika dikosongkan, angkatan akan ditampilkan sebagai tanda strip (-) pada data peserta.
                     </small>
                 </div>
 

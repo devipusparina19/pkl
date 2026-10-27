@@ -90,12 +90,19 @@
                             @forelse ($participant->histories as $history)
                                 @if ($history->training)
                                     <div>
-                                        {{ $history->training->batch_number ?? '-' }}
+                                        {{ filled($history->training->batch_number)
+                                            ? $history->training->batch_number
+                                            : '-' }}
                                     </div>
                                 @endif
                             @empty
                                 -
                             @endforelse
+
+                            @if ($participant->histories->isNotEmpty() &&
+                                $participant->histories->every(fn ($history) => !$history->training))
+                                -
+                            @endif
                         </td>
 
                         <td>

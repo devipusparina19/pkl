@@ -39,11 +39,14 @@ class ImportController extends Controller
                 'mimes:xlsx,xls,csv',
                 'max:10240',
             ],
+
+            // Angkatan boleh dikosongkan.
             'angkatan' => [
-                'required',
+                'nullable',
                 'string',
                 'max:100',
             ],
+
             'kabupaten_kota_mitra' => [
                 'required',
                 'string',
@@ -51,6 +54,7 @@ class ImportController extends Controller
                 Rule::exists('districts', 'name')
                     ->where('is_active', true),
             ],
+
             'sumber_dana' => [
                 'required',
                 'string',
@@ -62,7 +66,9 @@ class ImportController extends Controller
             'file.required' => 'Silakan pilih file Excel.',
             'file.mimes' => 'File harus berformat XLSX, XLS, atau CSV.',
             'file.max' => 'Ukuran file maksimal 10 MB.',
-            'angkatan.required' => 'Angkatan wajib diisi.',
+
+            // Tidak ada validasi angkatan.required lagi.
+
             'kabupaten_kota_mitra.required' =>
                 'Kabupaten/Kota/Mitra wajib dipilih.',
             'kabupaten_kota_mitra.exists' =>
@@ -141,11 +147,15 @@ class ImportController extends Controller
             );
 
             /*
-             * Pertahankan informasi kerja sama yang dibaca
-             * dari baris 3 dan teruskan ke TrainingImport.
+             * Angkatan kosong disimpan sebagai string kosong.
+             * Field lainnya tetap seperti sebelumnya.
              */
+            $batchNumber = trim(
+                (string) $request->input('angkatan', '')
+            );
+
             $import = new TrainingImport(
-                batchNumber: $request->input('angkatan'),
+                batchNumber: $batchNumber,
                 fundingSource: $request->input('sumber_dana'),
                 trainingName: $trainingName,
                 facilitation: '',
@@ -194,12 +204,6 @@ class ImportController extends Controller
 
     /**
      * Membaca nilai dari baris Excel tertentu.
-     *
-     * Mendukung:
-     * - Nilai langsung pada baris tersebut.
-     * - Label dan nilai di sel yang berbeda.
-     * - Label dan nilai dalam satu sel, misalnya:
-     *   "Kerja Sama: Dinas Kesehatan Kabupaten Banjar".
      */
     private function getRowValue(
         $sheet,
@@ -213,13 +217,11 @@ class ImportController extends Controller
         $cells = [];
 
         for ($col = 1; $col <= $lastColumn; $col++) {
-            $value = trim(
+            $cells[$col] = trim(
                 (string) $sheet
                     ->getCell([$col, $rowNumber])
                     ->getFormattedValue()
             );
-
-            $cells[$col] = $value;
         }
 
         $normalizedLabels = array_map(
@@ -227,9 +229,6 @@ class ImportController extends Controller
             $labels
         );
 
-        /*
-         * Cari label pada baris yang ditentukan.
-         */
         foreach ($cells as $col => $value) {
             if ($value === '') {
                 continue;
@@ -238,29 +237,23 @@ class ImportController extends Controller
             $normalizedValue = $this->normalizeText($value);
 
             foreach ($normalizedLabels as $label) {
-                /*
-                 * Format satu sel:
-                 * "Nama Pelatihan: Pelatihan ABC"
-                 */
                 if (
+                    $normalizedValue === $label ||
                     str_starts_with(
                         $normalizedValue,
                         $label . ' '
-                    ) ||
-                    $normalizedValue === $label
+                    )
                 ) {
                     foreach ($labels as $originalLabel) {
                         $pattern = '/^' .
                             preg_quote($originalLabel, '/') .
                             '\s*[:\-]\s*(.+)$/iu';
 
-                        if (
-                            preg_match(
-                                $pattern,
-                                $value,
-                                $matches
-                            )
-                        ) {
+                        if (preg_match(
+                            $pattern,
+                            $value,
+                            $matches
+                        )) {
                             $inlineValue = trim($matches[1]);
 
                             if ($inlineValue !== '') {
@@ -269,10 +262,6 @@ class ImportController extends Controller
                         }
                     }
 
-                    /*
-                     * Format label di satu sel dan nilai
-                     * di sel sebelah kanan pada baris sama.
-                     */
                     for (
                         $nextCol = $col + 1;
                         $nextCol <= $lastColumn;
@@ -286,17 +275,12 @@ class ImportController extends Controller
             }
         }
 
-        /*
-         * Jika tidak ditemukan label, ambil nilai pertama
-         * yang bukan label pada baris tersebut.
-         */
         foreach ($cells as $value) {
             if ($value === '') {
                 continue;
             }
 
             $normalizedValue = $this->normalizeText($value);
-
             $isLabel = false;
 
             foreach ($normalizedLabels as $label) {

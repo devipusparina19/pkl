@@ -18,7 +18,7 @@
     <div class="stat-card">
         <div class="stat-label">Peserta Perlu Ditinjau</div>
         <div class="stat-value">{{ $participantsToReview }}</div>
-        <div class="stat-label">Ambang: {{ $minimum }} pelatihan per tahun</div>
+        <div class="stat-label">Limit Reached: {{ $minimum }} pelatihan per tahun</div>
     </div>
 </div>
 
@@ -34,7 +34,7 @@
         </div>
 
         <div class="form-group" style="flex:1;min-width:120px">
-            <label for="minimum">Ambang peninjauan</label>
+            <label for="minimum">Status</label>
             <input id="minimum" type="number" name="minimum"
                    min="1" max="100" value="{{ $minimum }}">
         </div>
@@ -86,11 +86,11 @@
                         <td>
                             @if ($participant->participations_count >= $minimum)
                                 <span style="color:#92400e;font-weight:600">
-                                    Perlu ditinjau
+                                    Limit Reached
                                 </span>
                             @else
                                 <span style="color:#166534">
-                                    Dalam ambang
+                                    Eligible
                                 </span>
                             @endif
                         </td>
