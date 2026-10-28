@@ -386,6 +386,7 @@
             border-radius: 50%;
             background: #75d4a2;
         }
+ 
 
         /* MAIN DASHBOARD */
 
@@ -1418,14 +1419,14 @@
                 </div>
             </a>
 
-            <div class="nav-actions">
-                <span class="nav-label">Portal informasi publik</span>
+          <div class="nav-actions">
+    <span class="nav-label">Portal informasi publik</span>
 
-                <a class="btn btn-outline" href="{{ route('login') }}">
-                    Login Internal
-                    <span class="btn-arrow" aria-hidden="true">→</span>
-                </a>
-            </div>
+    <a href="{{ route('public.training-history') }}" class="btn">
+        Riwayat Pelatihan
+        <span aria-hidden="true">→</span>
+    </a>
+</div>
         </div>
     </header>
 

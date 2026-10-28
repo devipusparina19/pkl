@@ -7,9 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TrainingHistory extends Model
 {
-    /**
-     * Kolom riwayat pelatihan yang boleh diisi.
-     */
     protected $fillable = [
         'participant_id',
         'training_id',
@@ -20,7 +17,7 @@ class TrainingHistory extends Model
     ];
 
     /**
-     * Peserta yang mengikuti pelatihan.
+     * Peserta pemilik riwayat pelatihan.
      */
     public function participant(): BelongsTo
     {
@@ -28,7 +25,7 @@ class TrainingHistory extends Model
     }
 
     /**
-     * Data pelatihan yang diikuti.
+     * Data pelatihan yang diikuti peserta.
      */
     public function training(): BelongsTo
     {

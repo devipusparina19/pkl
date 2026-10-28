@@ -9,18 +9,42 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\MasterDataController;
+use App\Http\Controllers\PublicTrainingHistoryController;
 
 /*
 |--------------------------------------------------------------------------
-| Halaman publik
+| Halaman Publik
 |--------------------------------------------------------------------------
 */
 
+// Dashboard publik
 Route::get('/', [DashboardController::class, 'publicIndex'])
     ->name('public.dashboard');
 
+// Alternatif URL dashboard publik
 Route::get('/dashboard-publik', [DashboardController::class, 'publicIndex'])
     ->name('public.dashboard.alternate');
+
+// Halaman formulir pencarian riwayat pelatihan
+Route::get('/riwayat-pelatihan', [
+    PublicTrainingHistoryController::class,
+    'index',
+])->name('public.training-history');
+
+// Proses pencarian riwayat pelatihan
+Route::post('/riwayat-pelatihan', [
+    PublicTrainingHistoryController::class,
+    'lookup',
+])
+    ->middleware('throttle:10,1')
+    ->name('public.training-history.lookup');
+
+// Halaman hasil pencarian riwayat pelatihan
+Route::get('/riwayat-pelatihan/hasil', [
+    PublicTrainingHistoryController::class,
+    'result',
+])->name('public.training-history.result');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +53,7 @@ Route::get('/dashboard-publik', [DashboardController::class, 'publicIndex'])
 */
 
 Route::middleware('guest')->group(function () {
+
     Route::get('/login', [AuthController::class, 'showLogin'])
         ->name('login');
 
@@ -42,30 +67,27 @@ Route::middleware('guest')->group(function () {
         ->name('login.store');
 });
 
+
 /*
 |--------------------------------------------------------------------------
-| Semua halaman yang memerlukan login
+| Halaman Internal yang Memerlukan Login
 |--------------------------------------------------------------------------
 */
 
 Route::middleware('auth')->group(function () {
 
+    // Logout
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Dashboard internal
-    |--------------------------------------------------------------------------
-    */
-
+    // Dashboard internal
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
+
     /*
     |--------------------------------------------------------------------------
-    | Peserta: hanya Admin
-    | Tambah manual dinonaktifkan.
+    | Data Peserta: Admin
     |--------------------------------------------------------------------------
     */
 
@@ -74,31 +96,46 @@ Route::middleware('auth')->group(function () {
         Route::get('/participants', [ParticipantController::class, 'index'])
             ->name('participants.index');
 
-        Route::get('/participants/{participant}/edit', [ParticipantController::class, 'edit'])
+        Route::get('/participants/{participant}/edit', [
+            ParticipantController::class,
+            'edit',
+        ])
             ->whereNumber('participant')
             ->name('participants.edit');
 
-        Route::get('/participants/{participant}', [ParticipantController::class, 'show'])
+        Route::get('/participants/{participant}', [
+            ParticipantController::class,
+            'show',
+        ])
             ->whereNumber('participant')
             ->name('participants.show');
 
-        Route::put('/participants/{participant}', [ParticipantController::class, 'update'])
+        Route::put('/participants/{participant}', [
+            ParticipantController::class,
+            'update',
+        ])
             ->whereNumber('participant')
             ->name('participants.update');
 
-        Route::patch('/participants/{participant}', [ParticipantController::class, 'update'])
+        Route::patch('/participants/{participant}', [
+            ParticipantController::class,
+            'update',
+        ])
             ->whereNumber('participant')
             ->name('participants.update.patch');
 
-        Route::delete('/participants/{participant}', [ParticipantController::class, 'destroy'])
+        Route::delete('/participants/{participant}', [
+            ParticipantController::class,
+            'destroy',
+        ])
             ->whereNumber('participant')
             ->name('participants.destroy');
     });
 
+
     /*
     |--------------------------------------------------------------------------
-    | Pelatihan: hanya Admin
-    | Tambah manual dinonaktifkan.
+    | Data Pelatihan: Admin
     |--------------------------------------------------------------------------
     */
 
@@ -107,26 +144,39 @@ Route::middleware('auth')->group(function () {
         Route::get('/trainings', [TrainingController::class, 'index'])
             ->name('trainings.index');
 
-        Route::get('/trainings/{training}/edit', [TrainingController::class, 'edit'])
+        Route::get('/trainings/{training}/edit', [
+            TrainingController::class,
+            'edit',
+        ])
             ->whereNumber('training')
             ->name('trainings.edit');
 
-        Route::put('/trainings/{training}', [TrainingController::class, 'update'])
+        Route::put('/trainings/{training}', [
+            TrainingController::class,
+            'update',
+        ])
             ->whereNumber('training')
             ->name('trainings.update');
 
-        Route::patch('/trainings/{training}', [TrainingController::class, 'update'])
+        Route::patch('/trainings/{training}', [
+            TrainingController::class,
+            'update',
+        ])
             ->whereNumber('training')
             ->name('trainings.update.patch');
 
-        Route::delete('/trainings/{training}', [TrainingController::class, 'destroy'])
+        Route::delete('/trainings/{training}', [
+            TrainingController::class,
+            'destroy',
+        ])
             ->whereNumber('training')
             ->name('trainings.destroy');
     });
 
+
     /*
     |--------------------------------------------------------------------------
-    | Import Excel: hanya Admin
+    | Import Excel: Admin
     |--------------------------------------------------------------------------
     */
 
@@ -139,9 +189,10 @@ Route::middleware('auth')->group(function () {
             ->name('imports.store');
     });
 
+
     /*
     |--------------------------------------------------------------------------
-    | Laporan dan ekspor: Admin dan Pimpinan
+    | Laporan dan Ekspor: Admin dan Pimpinan
     |--------------------------------------------------------------------------
     */
 
@@ -154,9 +205,10 @@ Route::middleware('auth')->group(function () {
             ->name('reports.export');
     });
 
+
     /*
     |--------------------------------------------------------------------------
-    | Super Admin: dashboard dan pengelolaan akun
+    | Super Admin: Dashboard dan Pengelolaan Akun
     |--------------------------------------------------------------------------
     */
 
@@ -171,32 +223,49 @@ Route::middleware('auth')->group(function () {
             Route::get('/users', [SuperAdminController::class, 'users'])
                 ->name('users.index');
 
-            Route::get('/users/create', [SuperAdminController::class, 'createUser'])
-                ->name('users.create');
+            Route::get('/users/create', [
+                SuperAdminController::class,
+                'createUser',
+            ])->name('users.create');
 
-            Route::post('/users', [SuperAdminController::class, 'storeUser'])
-                ->name('users.store');
+            Route::post('/users', [
+                SuperAdminController::class,
+                'storeUser',
+            ])->name('users.store');
 
-            Route::get('/users/{user}/edit', [SuperAdminController::class, 'editUser'])
+            Route::get('/users/{user}/edit', [
+                SuperAdminController::class,
+                'editUser',
+            ])
                 ->whereNumber('user')
                 ->name('users.edit');
 
-            Route::patch('/users/{user}/status', [SuperAdminController::class, 'toggleUserStatus'])
+            Route::patch('/users/{user}/status', [
+                SuperAdminController::class,
+                'toggleUserStatus',
+            ])
                 ->whereNumber('user')
                 ->name('users.status');
 
-            Route::put('/users/{user}', [SuperAdminController::class, 'updateUser'])
+            Route::put('/users/{user}', [
+                SuperAdminController::class,
+                'updateUser',
+            ])
                 ->whereNumber('user')
                 ->name('users.update');
 
-            Route::delete('/users/{user}', [SuperAdminController::class, 'destroyUser'])
+            Route::delete('/users/{user}', [
+                SuperAdminController::class,
+                'destroyUser',
+            ])
                 ->whereNumber('user')
                 ->name('users.destroy');
         });
 
+
     /*
     |--------------------------------------------------------------------------
-    | Master data: hanya Super Admin
+    | Master Data: Super Admin
     |--------------------------------------------------------------------------
     */
 
@@ -213,34 +282,55 @@ Route::middleware('auth')->group(function () {
                 'health-worker-types',
             ];
 
-            Route::get('/{category}', [MasterDataController::class, 'index'])
+            Route::get('/{category}', [
+                MasterDataController::class,
+                'index',
+            ])
                 ->whereIn('category', $categories)
                 ->name('index');
 
-            Route::get('/{category}/create', [MasterDataController::class, 'create'])
+            Route::get('/{category}/create', [
+                MasterDataController::class,
+                'create',
+            ])
                 ->whereIn('category', $categories)
                 ->name('create');
 
-            Route::post('/{category}', [MasterDataController::class, 'store'])
+            Route::post('/{category}', [
+                MasterDataController::class,
+                'store',
+            ])
                 ->whereIn('category', $categories)
                 ->name('store');
 
-            Route::get('/{category}/{id}/edit', [MasterDataController::class, 'edit'])
+            Route::get('/{category}/{id}/edit', [
+                MasterDataController::class,
+                'edit',
+            ])
                 ->whereIn('category', $categories)
                 ->whereNumber('id')
                 ->name('edit');
 
-            Route::put('/{category}/{id}', [MasterDataController::class, 'update'])
+            Route::put('/{category}/{id}', [
+                MasterDataController::class,
+                'update',
+            ])
                 ->whereIn('category', $categories)
                 ->whereNumber('id')
                 ->name('update');
 
-            Route::patch('/{category}/{id}/status', [MasterDataController::class, 'toggleStatus'])
+            Route::patch('/{category}/{id}/status', [
+                MasterDataController::class,
+                'toggleStatus',
+            ])
                 ->whereIn('category', $categories)
                 ->whereNumber('id')
                 ->name('status');
 
-            Route::delete('/{category}/{id}', [MasterDataController::class, 'destroy'])
+            Route::delete('/{category}/{id}', [
+                MasterDataController::class,
+                'destroy',
+            ])
                 ->whereIn('category', $categories)
                 ->whereNumber('id')
                 ->name('destroy');
