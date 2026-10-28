@@ -612,7 +612,7 @@
                     </span>
                     <span class="stat-index">01 / DATA</span>
                 </div>
-                <div class="stat-label">Total Peserta Terdaftar</div>
+                <div class="stat-label">Total Peserta Terlatih</div>
                 <div class="stat-value">
                     {{ number_format((int) $totalParticipants, 0, ',', '.') }}
                 </div>
