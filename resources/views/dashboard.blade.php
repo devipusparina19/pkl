@@ -199,6 +199,70 @@
         border-top: 1px solid #edf1f6;
     }
 
+    /* Diagram donat jenis kelamin */
+    .dashboard-admin .gender-card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dashboard-admin .gender-chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 135px;
+        margin: 0 auto 12px;
+    }
+
+    .dashboard-admin .gender-chart-wrapper canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .dashboard-admin .gender-legend {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 5px;
+    }
+
+    .dashboard-admin .gender-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-width: 0;
+        padding: 9px 7px;
+        background: #f7f9fc;
+        border: 1px solid #e7edf4;
+        border-radius: 9px;
+    }
+
+    .dashboard-admin .gender-dot {
+        flex: 0 0 9px;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+    }
+
+    .dashboard-admin .gender-legend-label {
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .dashboard-admin .gender-legend-value {
+        display: block;
+        color: var(--ink);
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .dashboard-admin .gender-total {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
     .dashboard-admin .content-card {
         min-width: 0;
         margin-bottom: 22px;
@@ -562,6 +626,20 @@
     $fieldStats = $fieldStats ?? collect();
     $professionOptions = $professionOptions ?? collect();
     $trainedParticipants = $trainedParticipants ?? collect();
+
+    $genderStats = $genderStats ?? ['L' => 0, 'P' => 0];
+
+    $maleCount = (int) ($genderStats['L'] ?? 0);
+    $femaleCount = (int) ($genderStats['P'] ?? 0);
+    $genderTotal = $maleCount + $femaleCount;
+
+    $malePercent = $genderTotal > 0
+        ? round(($maleCount / $genderTotal) * 100, 1)
+        : 0;
+
+    $femalePercent = $genderTotal > 0
+        ? round(($femaleCount / $genderTotal) * 100, 1)
+        : 0;
 @endphp
 
 <div class="dashboard-admin">
@@ -594,11 +672,12 @@
         <div class="section-intro">
             <span class="section-kicker">Ringkasan data</span>
             <h2 id="summary-title">Gambaran Umum SIRAPIK</h2>
-            <p>Ringkasan data peserta dan pelatihan yang tercatat di sistem.</p>
+            <p>Ringkasan data peserta dan pelatihan tahun {{ $year }}.</p>
         </div>
 
         <div class="stats-grid">
 
+            {{-- KARTU 01 --}}
             <div class="stat-card"
                  style="--stat-accent:#2457a7;--stat-soft:#eaf1fc;">
                 <div class="stat-topline">
@@ -612,13 +691,16 @@
                     </span>
                     <span class="stat-index">01 / DATA</span>
                 </div>
-                <div class="stat-label">Total Peserta Terlatih</div>
+                <div class="stat-label">Peserta Terlatih Tahun {{ $year }}</div>
                 <div class="stat-value">
                     {{ number_format((int) $totalParticipants, 0, ',', '.') }}
                 </div>
-                <div class="stat-caption">Jumlah seluruh peserta dalam sistem.</div>
+                <div class="stat-caption">
+                    Jumlah peserta unik yang mengikuti pelatihan pada tahun terpilih.
+                </div>
             </div>
 
+            {{-- KARTU 02 --}}
             <div class="stat-card"
                  style="--stat-accent:#087f8c;--stat-soft:#e5f6f4;">
                 <div class="stat-topline">
@@ -632,13 +714,16 @@
                     </span>
                     <span class="stat-index">02 / PROGRAM</span>
                 </div>
-                <div class="stat-label">Total Pelatihan</div>
+                <div class="stat-label">Total Pelatihan Tahun {{ $year }}</div>
                 <div class="stat-value">
                     {{ number_format((int) $totalTrainings, 0, ',', '.') }}
                 </div>
-                <div class="stat-caption">Jumlah seluruh program pelatihan.</div>
+                <div class="stat-caption">
+                    Jumlah pelatihan berdasarkan tanggal mulai pada tahun terpilih.
+                </div>
             </div>
 
+            {{-- KARTU 03 --}}
             <div class="stat-card"
                  style="--stat-accent:#8b65bd;--stat-soft:#f1eafb;">
                 <div class="stat-topline">
@@ -651,31 +736,75 @@
                     </span>
                     <span class="stat-index">03 / RIWAYAT</span>
                 </div>
-                <div class="stat-label">Total Keikutsertaan</div>
+                <div class="stat-label">Total Keikutsertaan Tahun {{ $year }}</div>
                 <div class="stat-value">
                     {{ number_format((int) $totalParticipations, 0, ',', '.') }}
                 </div>
-                <div class="stat-caption">Akumulasi keikutsertaan seluruh tahun.</div>
+                <div class="stat-caption">
+                    Jumlah catatan keikutsertaan pada pelatihan tahun terpilih.
+                </div>
             </div>
 
-            <div class="stat-card"
+            {{-- KARTU 04: DIAGRAM DONAT --}}
+            <div class="stat-card gender-card"
                  style="--stat-accent:#bd8530;--stat-soft:#fbf2e2;">
+
                 <div class="stat-topline">
                     <span class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="1.8" stroke-linecap="round">
-                            <rect x="3" y="5" width="18" height="16" rx="2"/>
-                            <path d="M16 3v4M8 3v4M3 10h18M9 15l2 2 4-4"/>
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <circle cx="9" cy="8" r="4"/>
+                            <path d="M2 21v-2a7 7 0 0 1 14 0v2"/>
+                            <path d="M16 5h6m-3-3v6"/>
+                            <path d="M17 14a5 5 0 0 1 5 5v2"/>
                         </svg>
                     </span>
-                    <span class="stat-index">04 / TAHUN</span>
+                    <span class="stat-index">04 / GENDER</span>
                 </div>
-                <div class="stat-label">Keikutsertaan Tahun {{ $year }}</div>
-                <div class="stat-value">
-                    {{ number_format((int) $participationsThisYear, 0, ',', '.') }}
+
+                <div class="stat-label">
+                    Persentase Jenis Kelamin Peserta Terlatih
                 </div>
-                <div class="stat-caption">
-                    Jumlah keikutsertaan pada tahun yang dipilih melalui filter.
+
+                <div class="gender-chart-wrapper">
+                    <canvas
+                        id="genderDonutChart"
+                        role="img"
+                        aria-label="Diagram donat jenis kelamin peserta terlatih tahun {{ $year }}">
+                    </canvas>
+                </div>
+
+                <div class="gender-legend">
+                    <div class="gender-legend-item">
+                        <span class="gender-dot" style="background:#2457a7;"></span>
+                        <div>
+                            <div class="gender-legend-label">Laki-laki</div>
+                            <span class="gender-legend-value">
+                                {{ number_format($malePercent, 1, ',', '.') }}%
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="gender-legend-item">
+                        <span class="gender-dot" style="background:#087f8c;"></span>
+                        <div>
+                            <div class="gender-legend-label">Perempuan</div>
+                            <span class="gender-legend-value">
+                                {{ number_format($femalePercent, 1, ',', '.') }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gender-total">
+                    Peserta unik yang mengikuti pelatihan tahun {{ $year }}:
+                    <strong>
+                        {{ number_format($genderTotal, 0, ',', '.') }} peserta
+                    </strong>
                 </div>
             </div>
 
@@ -713,10 +842,10 @@
                 <label for="participant-sort">Urutkan Jumlah Pelatihan</label>
                 <select id="participant-sort" name="sort">
                     <option value="asc" {{ $sort === 'asc' ? 'selected' : '' }}>
-                        Jumlah Pelatihan Tertinggi
+                        Jumlah Pelatihan Terendah
                     </option>
                     <option value="desc" {{ $sort === 'desc' ? 'selected' : '' }}>
-                        Jumlah Pelatihan Terendah
+                        Jumlah Pelatihan Tertinggi
                     </option>
                 </select>
             </div>
@@ -729,9 +858,7 @@
                 Terapkan
             </button>
 
-            <a href="{{ url()->current() }}" class="reset-button">
-                Reset
-            </a>
+            <a href="{{ url()->current() }}" class="reset-button">Reset</a>
         </form>
 
         <div class="table-responsive">
@@ -816,7 +943,6 @@
                 </select>
             </div>
 
-            {{-- Pertahankan filter urutan yang dipilih pada bagian sebelumnya. --}}
             <input type="hidden" name="sort" value="{{ $sort }}">
 
             <button type="submit" class="filter-button">
@@ -827,9 +953,7 @@
                 Tampilkan Peserta
             </button>
 
-            <a href="{{ url()->current() }}" class="reset-button">
-                Reset
-            </a>
+            <a href="{{ url()->current() }}" class="reset-button">Reset</a>
         </form>
 
         @if ($selectedProfession !== '')
@@ -903,4 +1027,70 @@
     </section>
 
 </div>
+
+{{-- LIBRARY CHART.JS --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{{-- DIAGRAM DONAT JENIS KELAMIN --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('genderDonutChart');
+
+    if (!canvas || typeof Chart === 'undefined') {
+        return;
+    }
+
+    const maleCount = Number(@json($maleCount));
+    const femaleCount = Number(@json($femaleCount));
+    const total = maleCount + femaleCount;
+
+    new Chart(canvas, {
+        type: 'doughnut',
+
+        data: {
+            labels: ['Laki-laki', 'Perempuan'],
+
+            datasets: [{
+                data: [maleCount, femaleCount],
+                backgroundColor: ['#2457a7', '#087f8c'],
+                borderColor: '#ffffff',
+                borderWidth: 3,
+                hoverOffset: 5
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const value = Number(context.raw) || 0;
+                            const percentage = total > 0
+                                ? (value / total * 100).toLocaleString(
+                                    'id-ID',
+                                    { maximumFractionDigits: 1 }
+                                )
+                                : '0';
+
+                            return context.label + ': '
+                                + value.toLocaleString('id-ID')
+                                + ' peserta ('
+                                + percentage
+                                + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
 @endsection

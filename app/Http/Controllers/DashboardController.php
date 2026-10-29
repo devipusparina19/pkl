@@ -279,10 +279,6 @@ class DashboardController extends Controller
 
         /*
          * STATISTIK BERDASARKAN TAHUN TERPILIH
-         *
-         * Peserta dihitung jika mengikuti pelatihan pada tahun itu.
-         * Pelatihan dihitung berdasarkan tanggal mulai pelatihan.
-         * Keikutsertaan dihitung dari riwayat pelatihan pada tahun itu.
          */
         $trainingIdsThisYear = Training::query()
             ->whereYear('start_date', $year)
@@ -305,11 +301,65 @@ class DashboardController extends Controller
         $participationsThisYear = $totalParticipations;
 
         /*
+ * STATISTIK JENIS KELAMIN PESERTA TERLATIH
+ *
+ * Sumber jenis kelamin: participants.gender.
+ * Sumber keikutsertaan: training_histories.
+ * Tahun pelatihan: trainings.start_date.
+ *
+ * Peserta dihitung satu kali per tahun,
+ * meskipun mengikuti beberapa pelatihan.
+ * Mendukung nilai gender L/P maupun Laki-laki/Perempuan.
+ */
+$genderCounts = DB::table('training_histories')
+    ->join(
+        'trainings',
+        'trainings.id',
+        '=',
+        'training_histories.training_id'
+    )
+    ->join(
+        'participants',
+        'participants.id',
+        '=',
+        'training_histories.participant_id'
+    )
+    ->whereYear('trainings.start_date', $year)
+    ->whereRaw("
+        LOWER(TRIM(participants.gender)) IN (
+            'l',
+            'p',
+            'laki-laki',
+            'laki laki',
+            'laki',
+            'perempuan'
+        )
+    ")
+    ->selectRaw("
+        CASE
+            WHEN LOWER(TRIM(participants.gender))
+                IN ('l', 'laki-laki', 'laki laki', 'laki')
+                THEN 'L'
+            WHEN LOWER(TRIM(participants.gender))
+                IN ('p', 'perempuan')
+                THEN 'P'
+        END AS gender_code,
+        COUNT(DISTINCT training_histories.participant_id) AS total
+    ")
+    ->groupBy('gender_code')
+    ->get()
+    ->keyBy('gender_code');
+
+$maleRow = $genderCounts->get('L');
+$femaleRow = $genderCounts->get('P');
+
+$genderStats = [
+    'L' => (int) ($maleRow->total ?? 0),
+    'P' => (int) ($femaleRow->total ?? 0),
+];
+
+        /*
          * JUMLAH PELATIHAN SETIAP PESERTA
-         *
-         * Semua peserta tetap dapat ditampilkan.
-         * Peserta yang tidak mengikuti pelatihan pada tahun terpilih
-         * tetap memiliki participations_count = 0.
          */
         $frequentParticipants = Participant::query()
             ->withCount([
@@ -383,6 +433,9 @@ class DashboardController extends Controller
          */
         $recentHistories = collect();
 
+        /*
+         * DATA YANG DIKIRIM KE VIEW DASHBOARD
+         */
         $data = compact(
             'totalParticipants',
             'totalTrainings',
@@ -397,7 +450,8 @@ class DashboardController extends Controller
             'sort',
             'selectedProfession',
             'professionOptions',
-            'trainedParticipants'
+            'trainedParticipants',
+            'genderStats'
         );
 
         if ($role === 'admin') {
