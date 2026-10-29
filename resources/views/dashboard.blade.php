@@ -204,37 +204,38 @@
         display: flex;
         flex-direction: column;
     }
+    
+.dashboard-admin .gender-chart-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 145px;
+    height: 125px;
+    margin: 8px auto 12px;
+}
 
-    .dashboard-admin .gender-chart-wrapper {
-        position: relative;
-        width: 100%;
-        height: 135px;
-        margin: 0 auto 12px;
-    }
+.dashboard-admin .gender-chart-wrapper canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
 
-    .dashboard-admin .gender-chart-wrapper canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-    }
+.dashboard-admin .gender-legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 5px;
+}
 
-    .dashboard-admin .gender-legend {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        margin-top: 5px;
-    }
-
-    .dashboard-admin .gender-legend-item {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        min-width: 0;
-        padding: 9px 7px;
-        background: #f7f9fc;
-        border: 1px solid #e7edf4;
-        border-radius: 9px;
-    }
+.dashboard-admin .gender-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    padding: 9px 7px;
+    background: #f7f9fc;
+    border: 1px solid #e7edf4;
+    border-radius: 9px;
+}
 
     .dashboard-admin .gender-dot {
         flex: 0 0 9px;
@@ -1043,54 +1044,52 @@ document.addEventListener('DOMContentLoaded', function () {
     const maleCount = Number(@json($maleCount));
     const femaleCount = Number(@json($femaleCount));
     const total = maleCount + femaleCount;
+    
+new Chart(canvas, {
+    type: 'pie',
 
-    new Chart(canvas, {
-        type: 'doughnut',
+    data: {
+        labels: ['Laki-laki', 'Perempuan'],
+        datasets: [{
+            data: [maleCount, femaleCount],
+            backgroundColor: ['#FFD21F', '#F44336'],
+            borderColor: '#FFFFFF',
+            borderWidth: 2,
+            hoverOffset: 4
+        }]
+    },
 
-        data: {
-            labels: ['Laki-laki', 'Perempuan'],
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
 
-            datasets: [{
-                data: [maleCount, femaleCount],
-                backgroundColor: ['#2457a7', '#087f8c'],
-                borderColor: '#ffffff',
-                borderWidth: 3,
-                hoverOffset: 5
-            }]
-        },
+        plugins: {
+            legend: {
+                display: false
+            },
 
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '68%',
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        const value = Number(context.raw) || 0;
+                        const percentage = total > 0
+                            ? (value / total * 100).toLocaleString(
+                                'id-ID',
+                                { maximumFractionDigits: 1 }
+                            )
+                            : '0';
 
-            plugins: {
-                legend: {
-                    display: false
-                },
-
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            const value = Number(context.raw) || 0;
-                            const percentage = total > 0
-                                ? (value / total * 100).toLocaleString(
-                                    'id-ID',
-                                    { maximumFractionDigits: 1 }
-                                )
-                                : '0';
-
-                            return context.label + ': '
-                                + value.toLocaleString('id-ID')
-                                + ' peserta ('
-                                + percentage
-                                + '%)';
-                        }
+                        return context.label + ': '
+                            + value.toLocaleString('id-ID')
+                            + ' peserta ('
+                            + percentage
+                            + '%)';
                     }
                 }
             }
         }
-    });
+    }
+});
 });
 </script>
 @endsection
