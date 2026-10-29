@@ -131,6 +131,8 @@
                                             @break
                                         @case('mitra')
                                             Mitra
+                                        @case('mandiri')
+                                            Mandiri
                                             @break
                                         @default
                                             {{ ucfirst($item->type ?? '-') }}

@@ -1536,10 +1536,10 @@
                     </div>
 
                     <div class="form-field">
-                        <label for="district">Kabupaten/Kota/Mitra</label>
+                        <label for="district">Kabupaten/Kota/Mitra/Mandiri</label>
 
                         <select name="district" id="district">
-                            <option value="">Semua Kabupaten/Kota/Mitra</option>
+                            <option value="">Semua Kabupaten/Kota/Mitra/Mandiri</option>
 
                             @foreach ($districts as $item)
                                 <option
@@ -1627,7 +1627,7 @@
                 {{-- REKAP WILAYAH --}}
                 <section class="content-card">
                     <div class="content-card-header">
-                        <h3>Rekap Kabupaten/Kota/Mitra</h3>
+                        <h3>Rekap Kabupaten/Kota/Mitra/Mandiri</h3>
 
                         <p class="card-description">
                             Jumlah pelatihan berdasarkan wilayah atau mitra
@@ -1640,7 +1640,7 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Kabupaten/Kota/Mitra</th>
+                                        <th>Kabupaten/Kota/Mitra/Mandiri</th>
                                         <th>Jumlah</th>
                                     </tr>
                                 </thead>

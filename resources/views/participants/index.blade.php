@@ -55,7 +55,7 @@
                     <th>EMAIL</th>
                     <th>NOMOR TELEPON</th>
                     <th>INSTANSI/UNIT KERJA</th>
-                    <th>KABUPATEN/KOTA/MITRA</th>
+                    <th>KABUPATEN/KOTA/MITRA/MANDIRI</th>
                     <th>ANGKATAN</th>
                     <th>SUMBER DANA</th>
                     <th>AKSI</th>

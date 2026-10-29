@@ -216,10 +216,10 @@
 
             {{-- Kabupaten/Kota/Mitra --}}
             <div class="form-field">
-                <label for="district">Kabupaten/Kota/Mitra *</label>
+                <label for="district">Kabupaten/Kota/Mitra/Mandiri *</label>
 
                 <select id="district" name="district" required>
-                    <option value="">-- Pilih Kabupaten/Kota/Mitra --</option>
+                    <option value="">-- Pilih Kabupaten/Kota/Mitra/Mandiri --</option>
 
                     @foreach ($districts as $district)
                         <option

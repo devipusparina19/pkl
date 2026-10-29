@@ -26,7 +26,7 @@ class MasterDataController extends Controller
             'singular' => 'provinsi',
         ],
         'districts' => [
-            'title' => 'Kabupaten/Kota/Mitra',
+            'title' => 'Kabupaten/Kota/Mitra/Mandiri',
             'model' => District::class,
             'singular' => 'wilayah',
         ],
@@ -210,7 +210,7 @@ class MasterDataController extends Controller
         ) {
             return back()->with(
                 'error',
-                'Provinsi tidak dapat dihapus karena masih memiliki data kabupaten, kota, atau mitra. Nonaktifkan provinsi jika sudah tidak digunakan.'
+                'Provinsi tidak dapat dihapus karena masih memiliki data kabupaten, kota, mitra atau mandiri. Nonaktifkan provinsi jika sudah tidak digunakan.'
             );
         }
 
@@ -249,7 +249,7 @@ class MasterDataController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'type' => [
                     'required',
-                    Rule::in(['kabupaten', 'kota', 'mitra']),
+                    Rule::in(['kabupaten', 'kota', 'mitra', 'mandiri']),
                 ],
                 'is_active' => ['required', 'boolean'],
             ],

@@ -59,7 +59,7 @@
             </div>
 
             <div class="form-group">
-                <label for="name">Nama Wilayah/Mitra <span>*</span></label>
+                <label for="name">Nama Wilayah/Mitra/Mandiri <span>*</span></label>
                 <input
                     type="text"
                     name="name"
@@ -93,6 +93,10 @@
                     <option value="mitra"
                         @selected(old('type', $item->type) === 'mitra')>
                         Mitra
+                    </option>
+                    <option value="mandiri"
+                        @selected(old('type', $item->type) === 'mandiri')>
+                        Mandiri
                     </option>
                 </select>
 

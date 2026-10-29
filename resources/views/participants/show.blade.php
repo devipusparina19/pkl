@@ -98,7 +98,7 @@
         </div>
 
         <div>
-            <span>Kabupaten/Kota/Mitra</span>
+            <span>Kabupaten/Kota/Mitra/Mandiri</span>
             <strong>{{ $participant->district ?: '-' }}</strong>
         </div>
 

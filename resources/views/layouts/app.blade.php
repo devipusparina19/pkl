@@ -831,7 +831,7 @@
 
         $masterDataCategories = [
             'provinces' => 'Provinsi',
-            'districts' => 'Kabupaten/Kota/Mitra',
+            'districts' => 'Kabupaten/Kota/Mitra/Mandiri',
             'funding-sources' => 'Sumber Dana',
             'training-years' => 'Tahun Pelatihan',
             'health-worker-types' => 'Jenis Tenaga Kesehatan',

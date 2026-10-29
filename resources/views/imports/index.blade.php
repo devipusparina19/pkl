@@ -97,14 +97,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="kabupaten_kota_mitra">Kabupaten/Kota/Mitra <span class="required">*</span></label>
+                    <label for="kabupaten_kota_mitra">Kabupaten/Kota/Mitra/Mandiri <span class="required">*</span></label>
                     <select
                         name="kabupaten_kota_mitra"
                         id="kabupaten_kota_mitra"
                         class="form-control form-select"
                         required
                     >
-                        <option value="">-- Pilih Kabupaten/Kota/Mitra --</option>
+                        <option value="">-- Pilih Kabupaten/Kota/Mitra/Mandiri --</option>
 
                         @foreach ($districts ?? collect() as $district)
                             <option

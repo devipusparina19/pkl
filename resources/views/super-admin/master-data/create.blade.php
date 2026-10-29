@@ -55,7 +55,7 @@
             </div>
 
             <div class="form-group">
-                <label for="name">Nama Wilayah/Mitra <span>*</span></label>
+                <label for="name">Nama Wilayah/Mitra/Mandiri <span>*</span></label>
                 <input
                     type="text"
                     name="name"
@@ -83,6 +83,9 @@
                     </option>
                     <option value="mitra" @selected(old('type') === 'mitra')>
                         Mitra
+                    </option>
+                    <option value="mitra" @selected(old('type') === 'mitra')>
+                        Mandiri
                     </option>
                 </select>
 
