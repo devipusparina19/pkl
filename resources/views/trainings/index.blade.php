@@ -12,19 +12,33 @@
 
 <div class="content-card">
 
+    {{-- Notifikasi berhasil --}}
     @if (session('success'))
         <div class="alert alert-success" role="status">
             {{ session('success') }}
         </div>
     @endif
 
+    {{-- Notifikasi gagal --}}
     @if (session('error'))
         <div class="alert alert-danger" role="alert">
             {{ session('error') }}
         </div>
     @endif
 
-    {{-- Pencarian berdasarkan nama pelatihan atau kerja sama --}}
+    {{-- Validasi --}}
+    @if ($errors->any())
+        <div class="alert alert-danger" role="alert">
+            <strong>Terjadi kesalahan.</strong>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    {{-- Pencarian dan filter tahun --}}
     <form
         method="GET"
         action="{{ route('trainings.index') }}"
@@ -33,14 +47,31 @@
         <input
             type="text"
             name="search"
-            value="{{ $search ?? request('search') }}"
-            placeholder="Cari nama atau kerja sama..."
-            aria-label="Cari nama pelatihan atau kerja sama"
+            value="{{ $search ?? '' }}"
+            placeholder="Cari nama, kerja sama, angkatan, atau sumber dana..."
+            aria-label="Cari data pelatihan"
             style="flex:1;min-width:220px"
         >
 
+        <select
+            name="year"
+            aria-label="Filter tahun pelatihan"
+            style="min-width:150px"
+        >
+            <option value="">Semua Tahun</option>
+
+            @foreach ($years as $availableYear)
+                <option
+                    value="{{ $availableYear }}"
+                    @selected((string) ($year ?? '') === (string) $availableYear)
+                >
+                    {{ $availableYear }}
+                </option>
+            @endforeach
+        </select>
+
         <button class="btn" type="submit">
-            Cari
+            Terapkan
         </button>
 
         <a
@@ -51,11 +82,20 @@
         </a>
     </form>
 
-    {{-- Informasi hasil pencarian --}}
-    @if (request()->filled('search'))
+    {{-- Informasi filter aktif --}}
+    @if (request()->filled('search') || request()->filled('year'))
         <p style="margin-bottom:16px;color:#64748b;font-size:13px">
-            Hasil pencarian untuk:
-            <strong>{{ request('search') }}</strong>
+            Menampilkan data
+            @if (request()->filled('search'))
+                dengan pencarian:
+                <strong>{{ request('search') }}</strong>
+            @endif
+
+            @if (request()->filled('year'))
+                {{ request()->filled('search') ? 'dan' : 'untuk' }}
+                tahun:
+                <strong>{{ request('year') }}</strong>
+            @endif
         </p>
     @endif
 
@@ -67,6 +107,8 @@
                     <th>No.</th>
                     <th>Nama Pelatihan</th>
                     <th>Kerja Sama</th>
+                    <th>Angkatan</th>
+                    <th>Sumber Dana</th>
                     <th>Tanggal Mulai</th>
                     <th>Tanggal Selesai</th>
                     <th>Aksi</th>
@@ -86,6 +128,18 @@
 
                         <td>
                             {{ $training->organizer ?: '-' }}
+                        </td>
+
+                        <td>
+                            {{ filled($training->batch_number)
+                                ? $training->batch_number
+                                : '-' }}
+                        </td>
+
+                        <td>
+                            {{ filled($training->funding_source)
+                                ? $training->funding_source
+                                : '-' }}
                         </td>
 
                         <td>
@@ -130,12 +184,12 @@
                 @empty
                     <tr>
                         <td
-                            colspan="6"
+                            colspan="8"
                             style="text-align:center;padding:28px"
                         >
-                            @if (request()->filled('search'))
+                            @if (request()->filled('search') || request()->filled('year'))
                                 Data pelatihan tidak ditemukan.
-                                Coba gunakan kata kunci lain.
+                                Coba ubah pencarian atau pilih tahun lainnya.
                             @else
                                 Belum ada data pelatihan.
                                 Silakan lakukan Impor Excel terlebih dahulu.
@@ -147,9 +201,9 @@
         </table>
     </div>
 
-    {{-- Pagination tetap membawa kata kunci pencarian --}}
+    {{-- Pagination mempertahankan pencarian dan filter tahun --}}
     <div style="margin-top:20px">
-        {{ $trainings->appends(request()->query())->links() }}
+        {{ $trainings->links() }}
     </div>
 
 </div>

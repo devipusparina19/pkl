@@ -8,26 +8,47 @@ use Illuminate\Http\Request;
 class TrainingController extends Controller
 {
     /**
-     * Menampilkan daftar pelatihan dan pencarian.
+     * Menampilkan daftar pelatihan, pencarian, dan filter tahun.
      */
     public function index(Request $request)
     {
-        $search = $request->input('search');
+        $search = trim((string) $request->input('search', ''));
+        $year = $request->input('year', '');
 
+        // Daftar tahun yang tersedia berdasarkan tanggal mulai pelatihan.
+        $years = Training::query()
+            ->whereNotNull('start_date')
+            ->selectRaw('YEAR(start_date) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+
+        // Query utama data pelatihan.
         $trainings = Training::query()
-            ->when($search, function ($query, $search) {
+            ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('organizer', 'like', "%{$search}%");
+                        ->orWhere('organizer', 'like', "%{$search}%")
+                        ->orWhere('batch_number', 'like', "%{$search}%")
+                        ->orWhere('funding_source', 'like', "%{$search}%");
                 });
             })
+            ->when(
+                $year !== '' && ctype_digit((string) $year),
+                function ($query) use ($year) {
+                    $query->whereYear('start_date', (int) $year);
+                }
+            )
             ->orderByDesc('start_date')
+            ->orderByDesc('id')
             ->paginate(10)
             ->withQueryString();
 
         return view('trainings.index', compact(
             'trainings',
-            'search'
+            'search',
+            'year',
+            'years'
         ));
     }
 
@@ -58,7 +79,10 @@ class TrainingController extends Controller
         $training->update($validated);
 
         return redirect()
-            ->route('trainings.index')
+            ->route('trainings.index', array_filter([
+                'search' => $request->query('search'),
+                'year' => $request->query('year'),
+            ]))
             ->with('success', 'Data pelatihan berhasil diperbarui.');
     }
 
