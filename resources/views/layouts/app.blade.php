@@ -830,12 +830,13 @@
         $isParticipant = $role === 'user';
 
         $masterDataCategories = [
-            'provinces' => 'Provinsi',
-            'districts' => 'Kabupaten/Kota/Mitra/Mandiri',
-            'funding-sources' => 'Sumber Dana',
-            'training-years' => 'Tahun Pelatihan',
-            'health-worker-types' => 'Jenis Tenaga Kesehatan',
-        ];
+    'provinces' => 'Provinsi',
+    'districts' => 'Kabupaten/Kota/Mitra/Mandiri',
+    'funding-sources' => 'Sumber Dana',
+    'training-years' => 'Tahun Pelatihan',
+    'training-categories' => 'Kategori Pelatihan',
+    'health-worker-types' => 'Jenis Tenaga Kesehatan',
+];
 
         $currentCategory = request()->route('category');
         $isMasterDataActive = request()->routeIs('super-admin.master-data.*');

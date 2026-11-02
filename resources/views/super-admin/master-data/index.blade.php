@@ -3,15 +3,26 @@
 @section('content')
 @php
     $columns = match ($category) {
-        'provinces' => ['name' => 'Nama Provinsi'],
+        'provinces' => [
+            'name' => 'Nama Provinsi',
+        ],
         'districts' => [
             'name' => 'Nama Wilayah',
             'type' => 'Jenis',
             'province' => 'Provinsi',
         ],
-        'funding-sources' => ['name' => 'Nama Sumber Dana'],
-        'training-years' => ['year' => 'Tahun'],
-        'health-worker-types' => ['name' => 'Nama Jenis Tenaga Kesehatan'],
+        'funding-sources' => [
+            'name' => 'Nama Sumber Dana',
+        ],
+        'training-years' => [
+            'year' => 'Tahun',
+        ],
+        'health-worker-types' => [
+            'name' => 'Nama Jenis Tenaga Kesehatan',
+        ],
+        'training-categories' => [
+            'name' => 'Nama Kategori Pelatihan',
+        ],
         default => [],
     };
 @endphp
@@ -84,7 +95,10 @@
         </div>
 
         <div class="filter-actions">
-            <button type="submit" class="btn btn-primary">Terapkan</button>
+            <button type="submit" class="btn btn-primary">
+                Terapkan
+            </button>
+
             <a href="{{ route('super-admin.master-data.index', ['category' => $category]) }}"
                class="btn btn-light">
                 Reset
@@ -126,14 +140,19 @@
                                         @case('kabupaten')
                                             Kabupaten
                                             @break
+
                                         @case('kota')
                                             Kota
                                             @break
+
                                         @case('mitra')
                                             Mitra
+                                            @break
+
                                         @case('mandiri')
                                             Mandiri
                                             @break
+
                                         @default
                                             {{ ucfirst($item->type ?? '-') }}
                                     @endswitch
@@ -149,9 +168,13 @@
 
                         <td>
                             @if ($item->is_active)
-                                <span class="badge badge-success">Aktif</span>
+                                <span class="badge badge-success">
+                                    Aktif
+                                </span>
                             @else
-                                <span class="badge badge-secondary">Nonaktif</span>
+                                <span class="badge badge-secondary">
+                                    Nonaktif
+                                </span>
                             @endif
                         </td>
 

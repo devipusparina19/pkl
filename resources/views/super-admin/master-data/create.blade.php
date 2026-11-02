@@ -56,6 +56,7 @@
 
             <div class="form-group">
                 <label for="name">Nama Wilayah/Mitra/Mandiri <span>*</span></label>
+
                 <input
                     type="text"
                     name="name"
@@ -73,7 +74,11 @@
             <div class="form-group">
                 <label for="type">Jenis Wilayah <span>*</span></label>
 
-                <select name="type" id="type" class="form-control" required>
+                <select
+                    name="type"
+                    id="type"
+                    class="form-control @error('type') input-error @enderror"
+                    required>
                     <option value="">-- Pilih Jenis --</option>
                     <option value="kabupaten" @selected(old('type') === 'kabupaten')>
                         Kabupaten
@@ -84,7 +89,7 @@
                     <option value="mitra" @selected(old('type') === 'mitra')>
                         Mitra
                     </option>
-                    <option value="mitra" @selected(old('type') === 'mitra')>
+                    <option value="mandiri" @selected(old('type') === 'mandiri')>
                         Mandiri
                     </option>
                 </select>
@@ -97,6 +102,7 @@
         @elseif ($category === 'training-years')
             <div class="form-group">
                 <label for="year">Tahun Pelatihan <span>*</span></label>
+
                 <input
                     type="number"
                     name="year"
@@ -118,12 +124,14 @@
                     'provinces' => 'Nama Provinsi',
                     'funding-sources' => 'Nama Sumber Dana',
                     'health-worker-types' => 'Nama Jenis Tenaga Kesehatan',
+                    'training-categories' => 'Nama Kategori Pelatihan',
                     default => 'Nama',
                 };
             @endphp
 
             <div class="form-group">
                 <label for="name">{{ $fieldLabel }} <span>*</span></label>
+
                 <input
                     type="text"
                     name="name"

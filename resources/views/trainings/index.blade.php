@@ -5,9 +5,7 @@
 @section('content')
 <div class="page-header">
     <h1>Data Pelatihan</h1>
-    <p>
-        Data pelatihan yang berasal dari hasil Impor Excel.
-    </p>
+    <p>Data pelatihan yang berasal dari hasil Impor Excel.</p>
 </div>
 
 <div class="content-card">
@@ -26,7 +24,7 @@
         </div>
     @endif
 
-    {{-- Validasi --}}
+    {{-- Pesan validasi --}}
     @if ($errors->any())
         <div class="alert alert-danger" role="alert">
             <strong>Terjadi kesalahan.</strong>
@@ -48,7 +46,7 @@
             type="text"
             name="search"
             value="{{ $search ?? '' }}"
-            placeholder="Cari nama, kerja sama, angkatan, atau sumber dana..."
+            placeholder="Cari nama, kategori, kerja sama, angkatan, atau sumber dana..."
             aria-label="Cari data pelatihan"
             style="flex:1;min-width:220px"
         >
@@ -63,7 +61,9 @@
             @foreach ($years as $availableYear)
                 <option
                     value="{{ $availableYear }}"
-                    @selected((string) ($year ?? '') === (string) $availableYear)
+                    @selected(
+                        (string) ($year ?? '') === (string) $availableYear
+                    )
                 >
                     {{ $availableYear }}
                 </option>
@@ -86,6 +86,7 @@
     @if (request()->filled('search') || request()->filled('year'))
         <p style="margin-bottom:16px;color:#64748b;font-size:13px">
             Menampilkan data
+
             @if (request()->filled('search'))
                 dengan pencarian:
                 <strong>{{ request('search') }}</strong>
@@ -99,16 +100,18 @@
         </p>
     @endif
 
-    {{-- Tabel data pelatihan --}}
+    {{-- Tabel Data Pelatihan --}}
     <div class="table-responsive">
         <table>
             <thead>
                 <tr>
                     <th>No.</th>
                     <th>Nama Pelatihan</th>
+                    <th>Kategori</th>
                     <th>Kerja Sama</th>
                     <th>Angkatan</th>
                     <th>Sumber Dana</th>
+                    <th>JPL</th>
                     <th>Tanggal Mulai</th>
                     <th>Tanggal Selesai</th>
                     <th>Aksi</th>
@@ -118,42 +121,60 @@
             <tbody>
                 @forelse ($trainings as $training)
                     <tr>
+                        {{-- Nomor urut --}}
                         <td>
                             {{ $trainings->firstItem() + $loop->index }}
                         </td>
 
+                        {{-- Nama pelatihan --}}
                         <td>
                             {{ $training->name ?: '-' }}
                         </td>
 
+                        {{-- Kategori dari Master Data --}}
+                        <td>
+                            {{ $training->category?->name ?? '-' }}
+                        </td>
+
+                        {{-- Kerja sama / penyelenggara --}}
                         <td>
                             {{ $training->organizer ?: '-' }}
                         </td>
 
+                        {{-- Angkatan --}}
                         <td>
                             {{ filled($training->batch_number)
                                 ? $training->batch_number
                                 : '-' }}
                         </td>
 
+                        {{-- Sumber dana --}}
                         <td>
-                            {{ filled($training->funding_source)
-                                ? $training->funding_source
+                            {{ $training->funding_source ?: '-' }}
+                        </td>
+
+                        {{-- Jumlah JPL --}}
+                        <td>
+                            {{ $training->jpl !== null
+                                ? $training->jpl
                                 : '-' }}
                         </td>
 
+                        {{-- Tanggal mulai --}}
                         <td>
                             {{ $training->start_date
-                                ? \Illuminate\Support\Carbon::parse($training->start_date)->format('d-m-Y')
+                                ? $training->start_date->format('d-m-Y')
                                 : '-' }}
                         </td>
 
+                        {{-- Tanggal selesai --}}
                         <td>
                             {{ $training->end_date
-                                ? \Illuminate\Support\Carbon::parse($training->end_date)->format('d-m-Y')
+                                ? $training->end_date->format('d-m-Y')
                                 : '-' }}
                         </td>
 
+                        {{-- Aksi --}}
                         <td style="white-space:nowrap">
                             <a
                                 class="btn btn-secondary"
@@ -183,10 +204,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td
-                            colspan="8"
-                            style="text-align:center;padding:28px"
-                        >
+                        <td colspan="10" style="text-align:center;padding:28px">
                             @if (request()->filled('search') || request()->filled('year'))
                                 Data pelatihan tidak ditemukan.
                                 Coba ubah pencarian atau pilih tahun lainnya.
@@ -201,7 +219,7 @@
         </table>
     </div>
 
-    {{-- Pagination mempertahankan pencarian dan filter tahun --}}
+    {{-- Pagination --}}
     <div style="margin-top:20px">
         {{ $trainings->links() }}
     </div>

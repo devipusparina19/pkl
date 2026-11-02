@@ -17,21 +17,17 @@ use App\Http\Controllers\PublicTrainingHistoryController;
 |--------------------------------------------------------------------------
 */
 
-// Dashboard publik
 Route::get('/', [DashboardController::class, 'publicIndex'])
     ->name('public.dashboard');
 
-// Alternatif URL dashboard publik
 Route::get('/dashboard-publik', [DashboardController::class, 'publicIndex'])
     ->name('public.dashboard.alternate');
 
-// Halaman formulir pencarian riwayat pelatihan
 Route::get('/riwayat-pelatihan', [
     PublicTrainingHistoryController::class,
     'index',
 ])->name('public.training-history');
 
-// Proses pencarian riwayat pelatihan
 Route::post('/riwayat-pelatihan', [
     PublicTrainingHistoryController::class,
     'lookup',
@@ -39,7 +35,6 @@ Route::post('/riwayat-pelatihan', [
     ->middleware('throttle:10,1')
     ->name('public.training-history.lookup');
 
-// Halaman hasil pencarian riwayat pelatihan
 Route::get('/riwayat-pelatihan/hasil', [
     PublicTrainingHistoryController::class,
     'result',
@@ -53,7 +48,6 @@ Route::get('/riwayat-pelatihan/hasil', [
 */
 
 Route::middleware('guest')->group(function () {
-
     Route::get('/login', [AuthController::class, 'showLogin'])
         ->name('login');
 
@@ -70,17 +64,15 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Halaman Internal yang Memerlukan Login
+| Halaman Internal
 |--------------------------------------------------------------------------
 */
 
 Route::middleware('auth')->group(function () {
 
-    // Logout
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 
-    // Dashboard internal
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
@@ -280,6 +272,7 @@ Route::middleware('auth')->group(function () {
                 'funding-sources',
                 'training-years',
                 'health-worker-types',
+                'training-categories',
             ];
 
             Route::get('/{category}', [

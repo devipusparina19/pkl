@@ -8,17 +8,15 @@ use App\Models\FundingSource;
 use App\Models\HealthWorkerType;
 use App\Models\Province;
 use App\Models\TrainingYear;
+use App\Models\TrainingCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class MasterDataController extends Controller
 {
-    /**
-     * Daftar kategori yang boleh dikelola.
-     */
     private const CATEGORIES = [
         'provinces' => [
             'title' => 'Provinsi',
@@ -45,11 +43,13 @@ class MasterDataController extends Controller
             'model' => HealthWorkerType::class,
             'singular' => 'jenis tenaga kesehatan',
         ],
+        'training-categories' => [
+            'title' => 'Kategori Pelatihan',
+            'model' => TrainingCategory::class,
+            'singular' => 'kategori pelatihan',
+        ],
     ];
 
-    /**
-     * Menampilkan daftar master data.
-     */
     public function index(Request $request, string $category): View
     {
         $config = $this->categoryConfig($category);
@@ -66,7 +66,7 @@ class MasterDataController extends Controller
             $query->with('province');
         }
 
-        if (! empty($filters['search'])) {
+        if (!empty($filters['search'])) {
             $search = $filters['search'];
 
             $query->where(function ($builder) use ($search, $category) {
@@ -84,7 +84,7 @@ class MasterDataController extends Controller
             });
         }
 
-        if (isset($filters['status']) && $filters['status'] !== '') {
+        if (isset($filters['status'])) {
             $query->where(
                 'is_active',
                 $filters['status'] === 'active'
@@ -107,9 +107,6 @@ class MasterDataController extends Controller
         ]);
     }
 
-    /**
-     * Menampilkan formulir tambah.
-     */
     public function create(string $category): View
     {
         $config = $this->categoryConfig($category);
@@ -121,9 +118,6 @@ class MasterDataController extends Controller
         ]);
     }
 
-    /**
-     * Menyimpan data master baru.
-     */
     public function store(Request $request, string $category): RedirectResponse
     {
         $config = $this->categoryConfig($category);
@@ -137,9 +131,6 @@ class MasterDataController extends Controller
             ->with('success', $config['title'] . ' berhasil ditambahkan.');
     }
 
-    /**
-     * Menampilkan formulir edit.
-     */
     public function edit(string $category, int $id): View
     {
         $config = $this->categoryConfig($category);
@@ -153,9 +144,6 @@ class MasterDataController extends Controller
         ]);
     }
 
-    /**
-     * Memperbarui data master.
-     */
     public function update(
         Request $request,
         string $category,
@@ -163,7 +151,12 @@ class MasterDataController extends Controller
     ): RedirectResponse {
         $config = $this->categoryConfig($category);
         $item = $this->findItem($category, $id);
-        $validated = $this->validateData($request, $category, $item->id);
+
+        $validated = $this->validateData(
+            $request,
+            $category,
+            $item->id
+        );
 
         $item->update($validated);
 
@@ -172,17 +165,14 @@ class MasterDataController extends Controller
             ->with('success', $config['title'] . ' berhasil diperbarui.');
     }
 
-    /**
-     * Mengaktifkan atau menonaktifkan referensi.
-     */
     public function toggleStatus(
         string $category,
         int $id
     ): RedirectResponse {
-        $config = $this->categoryConfig($category);
+        $this->categoryConfig($category);
         $item = $this->findItem($category, $id);
 
-        $item->is_active = ! $item->is_active;
+        $item->is_active = !$item->is_active;
         $item->save();
 
         $message = $item->is_active
@@ -194,9 +184,6 @@ class MasterDataController extends Controller
             ->with('success', $message);
     }
 
-    /**
-     * Menghapus data master yang tidak sedang menjadi induk relasi.
-     */
     public function destroy(
         string $category,
         int $id
@@ -210,7 +197,17 @@ class MasterDataController extends Controller
         ) {
             return back()->with(
                 'error',
-                'Provinsi tidak dapat dihapus karena masih memiliki data kabupaten, kota, mitra atau mandiri. Nonaktifkan provinsi jika sudah tidak digunakan.'
+                'Provinsi tidak dapat dihapus karena masih memiliki data wilayah. Nonaktifkan provinsi jika sudah tidak digunakan.'
+            );
+        }
+
+        if (
+            $category === 'training-categories'
+            && $item->trainings()->exists()
+        ) {
+            return back()->with(
+                'error',
+                'Kategori tidak dapat dihapus karena sudah digunakan oleh data pelatihan. Nonaktifkan kategori jika sudah tidak digunakan.'
             );
         }
 
@@ -221,9 +218,6 @@ class MasterDataController extends Controller
             ->with('success', $config['title'] . ' berhasil dihapus.');
     }
 
-    /**
-     * Validasi berdasarkan kategori.
-     */
     private function validateData(
         Request $request,
         string $category,
@@ -285,12 +279,21 @@ class MasterDataController extends Controller
                 'is_active' => ['required', 'boolean'],
             ],
 
+            'training-categories' => [
+                'name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('training_categories', 'name')->ignore($ignoreId),
+                ],
+                'is_active' => ['required', 'boolean'],
+            ],
+
             default => abort(404),
         };
 
         $validated = $request->validate($rules);
 
-        // Pastikan nama wilayah tidak ganda untuk provinsi dan jenis yang sama.
         if ($category === 'districts') {
             $uniqueQuery = District::query()
                 ->where('province_id', $validated['province_id'])
@@ -302,7 +305,7 @@ class MasterDataController extends Controller
             }
 
             if ($uniqueQuery->exists()) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     'name' => 'Nama wilayah dengan jenis tersebut sudah ada di provinsi yang dipilih.',
                 ]);
             }
@@ -311,9 +314,6 @@ class MasterDataController extends Controller
         return $validated;
     }
 
-    /**
-     * Memastikan kategori yang diminta diizinkan.
-     */
     private function categoryConfig(string $category): array
     {
         abort_unless(isset(self::CATEGORIES[$category]), 404);
@@ -321,9 +321,6 @@ class MasterDataController extends Controller
         return self::CATEGORIES[$category];
     }
 
-    /**
-     * Mencari item berdasarkan kategori dan ID.
-     */
     private function findItem(string $category, int $id): object
     {
         $config = $this->categoryConfig($category);
@@ -332,9 +329,6 @@ class MasterDataController extends Controller
         return $model::query()->findOrFail($id);
     }
 
-    /**
-     * Daftar provinsi aktif untuk formulir wilayah.
-     */
     private function activeProvinces()
     {
         return Province::query()

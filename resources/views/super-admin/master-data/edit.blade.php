@@ -60,6 +60,7 @@
 
             <div class="form-group">
                 <label for="name">Nama Wilayah/Mitra/Mandiri <span>*</span></label>
+
                 <input
                     type="text"
                     name="name"
@@ -108,6 +109,7 @@
         @elseif ($category === 'training-years')
             <div class="form-group">
                 <label for="year">Tahun Pelatihan <span>*</span></label>
+
                 <input
                     type="number"
                     name="year"
@@ -129,12 +131,14 @@
                     'provinces' => 'Nama Provinsi',
                     'funding-sources' => 'Nama Sumber Dana',
                     'health-worker-types' => 'Nama Jenis Tenaga Kesehatan',
+                    'training-categories' => 'Nama Kategori Pelatihan',
                     default => 'Nama',
                 };
             @endphp
 
             <div class="form-group">
                 <label for="name">{{ $fieldLabel }} <span>*</span></label>
+
                 <input
                     type="text"
                     name="name"
