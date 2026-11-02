@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\TrainingImport;
 use App\Models\District;
 use App\Models\FundingSource;
+use App\Models\TrainingCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -14,25 +15,39 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class ImportController extends Controller
 {
+    /**
+     * Menampilkan halaman import Excel.
+     */
     public function index()
     {
-        $fundingSources = FundingSource::where('is_active', true)
+        $fundingSources = FundingSource::query()
+            ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
-        $districts = District::where('is_active', true)
+        $districts = District::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $categories = TrainingCategory::query()
+            ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
         return view('imports.index', compact(
             'fundingSources',
-            'districts'
+            'districts',
+            'categories'
         ));
     }
 
+    /**
+     * Memproses import Excel.
+     */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'file' => [
                 'required',
                 'file',
@@ -40,7 +55,6 @@ class ImportController extends Controller
                 'max:10240',
             ],
 
-            // Angkatan boleh dikosongkan.
             'angkatan' => [
                 'nullable',
                 'string',
@@ -62,28 +76,47 @@ class ImportController extends Controller
                 Rule::exists('funding_sources', 'name')
                     ->where('is_active', true),
             ],
+
+            // Kategori opsional.
+            'training_category_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('training_categories', 'id')
+                    ->where('is_active', true),
+            ],
+
+            // JPL opsional.
+            'jpl' => [
+                'nullable',
+                'integer',
+                'min:0',
+            ],
         ], [
             'file.required' => 'Silakan pilih file Excel.',
             'file.mimes' => 'File harus berformat XLSX, XLS, atau CSV.',
             'file.max' => 'Ukuran file maksimal 10 MB.',
 
-            // Tidak ada validasi angkatan.required lagi.
-
             'kabupaten_kota_mitra.required' =>
                 'Kabupaten/Kota/Mitra wajib dipilih.',
             'kabupaten_kota_mitra.exists' =>
                 'Kabupaten/Kota/Mitra tidak valid atau tidak aktif.',
+
             'sumber_dana.required' =>
                 'Sumber dana wajib dipilih.',
             'sumber_dana.exists' =>
                 'Sumber dana tidak valid atau tidak aktif.',
+
+            'training_category_id.exists' =>
+                'Kategori pelatihan tidak valid atau tidak aktif.',
+            'jpl.integer' =>
+                'JPL harus berupa angka.',
+            'jpl.min' =>
+                'JPL tidak boleh kurang dari 0.',
         ]);
 
         try {
-            $district = District::where(
-                'name',
-                $request->input('kabupaten_kota_mitra')
-            )
+            $district = District::query()
+                ->where('name', $validated['kabupaten_kota_mitra'])
                 ->where('is_active', true)
                 ->firstOrFail();
 
@@ -147,22 +180,34 @@ class ImportController extends Controller
             );
 
             /*
-             * Angkatan kosong disimpan sebagai string kosong.
-             * Field lainnya tetap seperti sebelumnya.
+             * Data tambahan dari form import.
              */
             $batchNumber = trim(
-                (string) $request->input('angkatan', '')
+                (string) ($validated['angkatan'] ?? '')
             );
 
+            $trainingCategoryId = $validated['training_category_id']
+                ?? null;
+
+            $jpl = $validated['jpl'] ?? null;
+
+            /*
+             * Membuat proses import.
+             *
+             * TrainingImport perlu menerima dua parameter tambahan:
+             * trainingCategoryId dan jpl.
+             */
             $import = new TrainingImport(
                 batchNumber: $batchNumber,
-                fundingSource: $request->input('sumber_dana'),
+                fundingSource: $validated['sumber_dana'],
                 trainingName: $trainingName,
                 facilitation: '',
                 organizer: $cooperation,
                 startDate: $startDate,
                 endDate: $endDate,
                 district: $district->name,
+                trainingCategoryId: $trainingCategoryId,
+                jpl: $jpl,
             );
 
             Excel::import(
@@ -196,8 +241,7 @@ class ImportController extends Controller
             return back()
                 ->withInput()
                 ->withErrors([
-                    'file' =>
-                        'Import gagal: ' . $e->getMessage(),
+                    'file' => 'Import gagal: ' . $e->getMessage(),
                 ]);
         }
     }
@@ -239,21 +283,14 @@ class ImportController extends Controller
             foreach ($normalizedLabels as $label) {
                 if (
                     $normalizedValue === $label ||
-                    str_starts_with(
-                        $normalizedValue,
-                        $label . ' '
-                    )
+                    str_starts_with($normalizedValue, $label . ' ')
                 ) {
                     foreach ($labels as $originalLabel) {
                         $pattern = '/^' .
                             preg_quote($originalLabel, '/') .
                             '\s*[:\-]\s*(.+)$/iu';
 
-                        if (preg_match(
-                            $pattern,
-                            $value,
-                            $matches
-                        )) {
+                        if (preg_match($pattern, $value, $matches)) {
                             $inlineValue = trim($matches[1]);
 
                             if ($inlineValue !== '') {
@@ -286,10 +323,7 @@ class ImportController extends Controller
             foreach ($normalizedLabels as $label) {
                 if (
                     $normalizedValue === $label ||
-                    str_starts_with(
-                        $normalizedValue,
-                        $label . ' '
-                    )
+                    str_starts_with($normalizedValue, $label . ' ')
                 ) {
                     $isLabel = true;
                     break;
@@ -304,6 +338,9 @@ class ImportController extends Controller
         return '';
     }
 
+    /**
+     * Menormalkan teks untuk pencocokan label Excel.
+     */
     private function normalizeText(string $text): string
     {
         $text = mb_strtolower(trim($text));
@@ -317,6 +354,9 @@ class ImportController extends Controller
         return preg_replace('/\s+/', ' ', $text) ?? $text;
     }
 
+    /**
+     * Membaca rentang tanggal pelatihan.
+     */
     private function parseDateRange(string $text): array
     {
         $text = trim($text);

@@ -29,6 +29,8 @@ class TrainingImport implements ToCollection
         public ?string $startDate = null,
         public ?string $endDate = null,
         public string $district = '',
+        public ?int $trainingCategoryId = null,
+        public ?int $jpl = null,
     ) {}
 
     public function collection(Collection $rows): void
@@ -44,15 +46,20 @@ class TrainingImport implements ToCollection
         $headers = $this->normalizeHeaders($headerRow);
 
         $nameColumn = $this->findColumn($headers, [
-            'nama lengkap', 'nama peserta', 'nama', 'name',
+            'nama lengkap',
+            'nama peserta',
+            'nama',
+            'name',
         ]);
 
         $nipColumn = $this->findColumn($headers, [
-            'nip', 'nomor induk pegawai',
+            'nip',
+            'nomor induk pegawai',
         ]);
 
         $nikColumn = $this->findColumn($headers, [
-            'nik', 'nomor induk kependudukan',
+            'nik',
+            'nomor induk kependudukan',
         ]);
 
         if ($nameColumn === null) {
@@ -114,6 +121,7 @@ class TrainingImport implements ToCollection
                 ): void {
                     $participant = null;
 
+                    // Cari peserta berdasarkan NIP.
                     if (
                         $nip !== '' &&
                         Schema::hasColumn('participants', 'nip')
@@ -124,6 +132,7 @@ class TrainingImport implements ToCollection
                         )->first();
                     }
 
+                    // Jika tidak ditemukan, cari berdasarkan NIK.
                     if (
                         !$participant &&
                         $nik !== '' &&
@@ -206,6 +215,7 @@ class TrainingImport implements ToCollection
                         $this->updatedParticipants++;
                     }
 
+                    // Buat riwayat tanpa menggandakan data yang sudah ada.
                     $history = TrainingHistory::firstOrCreate([
                         'participant_id' => $participant->id,
                         'training_id' => $training->id,
@@ -222,6 +232,9 @@ class TrainingImport implements ToCollection
         }
     }
 
+    /**
+     * Normalisasi nama kolom Excel.
+     */
     private function normalizeHeaders(Collection $row): array
     {
         $headers = [];
@@ -237,6 +250,9 @@ class TrainingImport implements ToCollection
         return $headers;
     }
 
+    /**
+     * Mencari posisi kolom berdasarkan beberapa kemungkinan nama.
+     */
     private function findColumn(
         array $headers,
         array $aliases
@@ -259,39 +275,58 @@ class TrainingImport implements ToCollection
         return null;
     }
 
+    /**
+     * Mengambil data peserta dari setiap baris Excel.
+     */
     private function mapRow(
         Collection $row,
         array $headers
     ): array {
         $aliases = [
             'name' => [
-                'nama lengkap', 'nama peserta', 'nama', 'name',
+                'nama lengkap',
+                'nama peserta',
+                'nama',
+                'name',
             ],
             'nip' => [
-                'nip', 'nomor induk pegawai',
+                'nip',
+                'nomor induk pegawai',
             ],
             'nik' => [
-                'nik', 'nomor induk kependudukan',
+                'nik',
+                'nomor induk kependudukan',
             ],
             'gender' => [
-                'jenis kelamin', 'gender', 'jk',
+                'jenis kelamin',
+                'gender',
+                'jk',
             ],
             'rank' => [
-                'pangkat golongan', 'pangkat gol', 'golongan',
+                'pangkat golongan',
+                'pangkat gol',
+                'golongan',
             ],
             'profession' => [
-                'profesi nakes', 'profesi',
+                'profesi nakes',
+                'profesi',
                 'jenis tenaga kesehatan',
             ],
             'email' => [
-                'email', 'alamat email',
+                'email',
+                'alamat email',
             ],
             'phone' => [
-                'nomor telepon', 'no telepon', 'telepon',
-                'no hp', 'nomor hp',
+                'nomor telepon',
+                'no telepon',
+                'telepon',
+                'no hp',
+                'nomor hp',
             ],
             'institution' => [
-                'instansi unit kerja', 'instansi', 'unit kerja',
+                'instansi unit kerja',
+                'instansi',
+                'unit kerja',
             ],
         ];
 
@@ -299,7 +334,9 @@ class TrainingImport implements ToCollection
 
         foreach ($aliases as $field => $names) {
             $column = $this->findColumn($headers, $names);
-            $value = $column !== null ? $row->get($column) : null;
+            $value = $column !== null
+                ? $row->get($column)
+                : null;
 
             $result[$field] = $value === null
                 ? null
@@ -309,10 +346,16 @@ class TrainingImport implements ToCollection
         return $result;
     }
 
+    /**
+     * Mencari atau membuat data pelatihan.
+     */
     private function findOrCreateTraining(): Training
     {
         $batchNumber = trim($this->batchNumber);
 
+        // Kode dibuat dari identitas utama pelatihan.
+        // Kategori dan JPL tidak dimasukkan agar perubahan
+        // kategori/JPL tidak membuat pelatihan duplikat.
         $codeSource = implode('|', [
             trim($this->trainingName),
             $this->startDate ?? '',
@@ -335,9 +378,10 @@ class TrainingImport implements ToCollection
 
         $training->name = $this->trainingName;
 
-        // Angkatan kosong disimpan sebagai string kosong.
-        // Ini menghindari masalah jika kolom database NOT NULL.
-        $storedBatch = $batchNumber !== '' ? $batchNumber : '';
+        // Angkatan boleh kosong.
+        $storedBatch = $batchNumber !== ''
+            ? $batchNumber
+            : '';
 
         $this->setTrainingColumn(
             $training,
@@ -351,6 +395,7 @@ class TrainingImport implements ToCollection
             $storedBatch
         );
 
+        // Sumber dana.
         $this->setTrainingColumn(
             $training,
             'funding_source',
@@ -363,18 +408,35 @@ class TrainingImport implements ToCollection
             $this->fundingSource
         );
 
+        // Wilayah atau kabupaten/kota/mitra.
         $this->setTrainingColumn(
             $training,
             'district',
             $this->district
         );
 
+        // Penyelenggara atau kerja sama.
         $this->setTrainingColumn(
             $training,
             'organizer',
             $this->organizer
         );
 
+        // Kategori pelatihan bersifat opsional.
+        $this->setTrainingColumn(
+            $training,
+            'training_category_id',
+            $this->trainingCategoryId
+        );
+
+        // JPL bersifat opsional.
+        $this->setTrainingColumn(
+            $training,
+            'jpl',
+            $this->jpl
+        );
+
+        // Tanggal mulai.
         if ($this->startDate) {
             $this->setTrainingColumn(
                 $training,
@@ -383,6 +445,7 @@ class TrainingImport implements ToCollection
             );
         }
 
+        // Tanggal selesai.
         if ($this->endDate) {
             $this->setTrainingColumn(
                 $training,
@@ -391,6 +454,7 @@ class TrainingImport implements ToCollection
             );
         }
 
+        // Keterangan atau deskripsi.
         if ($this->facilitation !== '') {
             $this->setTrainingColumn(
                 $training,
@@ -399,9 +463,11 @@ class TrainingImport implements ToCollection
             );
         }
 
+        // Hitung durasi secara inklusif.
         if ($this->startDate && $this->endDate) {
             $start = new \DateTimeImmutable($this->startDate);
             $end = new \DateTimeImmutable($this->endDate);
+
             $duration = $start->diff($end)->days + 1;
 
             $this->setTrainingColumn(
@@ -420,16 +486,27 @@ class TrainingImport implements ToCollection
         return $training;
     }
 
+    /**
+     * Mengisi kolom pelatihan jika kolom tersedia di database.
+     */
     private function setTrainingColumn(
         Training $training,
         string $column,
         mixed $value
     ): void {
-        if (Schema::hasColumn($training->getTable(), $column)) {
+        if (
+            Schema::hasColumn(
+                $training->getTable(),
+                $column
+            )
+        ) {
             $training->{$column} = $value;
         }
     }
 
+    /**
+     * Mengisi kolom peserta jika kolom tersedia dan nilainya ada.
+     */
     private function setIfColumnExists(
         Participant $participant,
         string $column,
@@ -438,7 +515,10 @@ class TrainingImport implements ToCollection
         if (
             $value !== null &&
             $value !== '' &&
-            Schema::hasColumn($participant->getTable(), $column)
+            Schema::hasColumn(
+                $participant->getTable(),
+                $column
+            )
         ) {
             $participant->{$column} = $value;
         }

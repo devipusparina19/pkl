@@ -1,16 +1,22 @@
 @extends('layouts.app')
 
+@section('title', 'Import Data Peserta Pelatihan')
+
 @section('content')
 <div class="import-page">
     <div class="page-heading">
         <div>
             <h1>Import Data Peserta Pelatihan</h1>
-            <p>Unggah Excel dan tentukan angkatan, wilayah/mitra, serta sumber dana pelatihan.</p>
+            <p>
+                Unggah Excel dan tentukan angkatan, wilayah/mitra,
+                sumber dana, kategori, serta JPL pelatihan.
+            </p>
         </div>
     </div>
 
+    {{-- Pesan validasi --}}
     @if ($errors->any())
-        <div class="alert alert-danger">
+        <div class="alert alert-danger" role="alert">
             <strong>Import belum dapat diproses.</strong>
             <ul>
                 @foreach ($errors->all() as $error)
@@ -20,16 +26,30 @@
         </div>
     @endif
 
+    {{-- Hasil import --}}
     @if (session('import_result'))
         @php($result = session('import_result'))
 
-        <div class="alert alert-success">
+        <div class="alert alert-success" role="status">
             <strong>Import selesai diproses.</strong>
+
             <ul>
-                <li>Peserta baru: {{ $result['created_participants'] ?? 0 }}</li>
-                <li>Peserta diperbarui: {{ $result['updated_participants'] ?? 0 }}</li>
-                <li>Pelatihan baru: {{ $result['created_trainings'] ?? 0 }}</li>
-                <li>Riwayat pelatihan baru: {{ $result['created_histories'] ?? 0 }}</li>
+                <li>
+                    Peserta baru:
+                    {{ $result['created_participants'] ?? 0 }}
+                </li>
+                <li>
+                    Peserta diperbarui:
+                    {{ $result['updated_participants'] ?? 0 }}
+                </li>
+                <li>
+                    Pelatihan baru:
+                    {{ $result['created_trainings'] ?? 0 }}
+                </li>
+                <li>
+                    Riwayat pelatihan baru:
+                    {{ $result['created_histories'] ?? 0 }}
+                </li>
             </ul>
 
             @if (!empty($result['errors']))
@@ -48,6 +68,7 @@
     <div class="import-card">
         <div class="card-heading">
             <div class="card-icon" aria-hidden="true">⇧</div>
+
             <div>
                 <h2>Unggah file Excel</h2>
                 <p>Periksa pilihan data sebelum memulai import.</p>
@@ -63,8 +84,13 @@
             @csrf
 
             <div class="form-grid">
+
+                {{-- FILE EXCEL --}}
                 <div class="form-group full-width">
-                    <label for="file">File Excel <span class="required">*</span></label>
+                    <label for="file">
+                        File Excel <span class="required">*</span>
+                    </label>
+
                     <input
                         type="file"
                         name="file"
@@ -73,15 +99,23 @@
                         accept=".xlsx,.xls,.csv"
                         required
                     >
+
                     <small class="field-help">
-                        Format yang didukung: XLSX, XLS, atau CSV. Maksimal 10 MB.
+                        Format yang didukung: XLSX, XLS, atau CSV.
+                        Maksimal 10 MB.
                     </small>
-                    <div id="selectedFile" class="selected-file" hidden></div>
+
+                    <div
+                        id="selectedFile"
+                        class="selected-file"
+                        hidden
+                    ></div>
                 </div>
 
-                {{-- ANGKATAN: OPSIONAL, TANPA TANDA BINTANG --}}
+                {{-- ANGKATAN --}}
                 <div class="form-group">
                     <label for="angkatan">Angkatan</label>
+
                     <input
                         type="text"
                         name="angkatan"
@@ -91,82 +125,171 @@
                         placeholder="Kosongkan jika tidak ada angkatan"
                         maxlength="100"
                     >
+
                     <small class="field-help">
-                        Opsional. Jika dikosongkan, angkatan akan ditampilkan sebagai tanda strip (-) pada data peserta.
+                        Opsional. Jika dikosongkan, angkatan akan
+                        ditampilkan sebagai tanda strip (-) pada data peserta.
                     </small>
                 </div>
 
+                {{-- KABUPATEN / KOTA / MITRA --}}
                 <div class="form-group">
-                    <label for="kabupaten_kota_mitra">Kabupaten/Kota/Mitra/Mandiri <span class="required">*</span></label>
+                    <label for="kabupaten_kota_mitra">
+                        Kabupaten/Kota/Mitra/Mandiri
+                        <span class="required">*</span>
+                    </label>
+
                     <select
                         name="kabupaten_kota_mitra"
                         id="kabupaten_kota_mitra"
                         class="form-control form-select"
                         required
                     >
-                        <option value="">-- Pilih Kabupaten/Kota/Mitra/Mandiri --</option>
+                        <option value="">
+                            -- Pilih Kabupaten/Kota/Mitra/Mandiri --
+                        </option>
 
-                        @foreach ($districts ?? collect() as $district)
+                        @foreach ($districts as $district)
                             <option
                                 value="{{ $district->name }}"
-                                @selected(old('kabupaten_kota_mitra') === $district->name)
+                                @selected(
+                                    old('kabupaten_kota_mitra') === $district->name
+                                )
                             >
                                 {{ $district->name }}
                             </option>
                         @endforeach
                     </select>
+
                     <small class="field-help">
-                        Pilihan mengikuti master data SIRAPIK.
+                        Pilihan mengikuti Master Data SIRAPIK.
                     </small>
                 </div>
 
+                {{-- SUMBER DANA --}}
                 <div class="form-group full-width">
-                    <label for="sumber_dana">Sumber Dana <span class="required">*</span></label>
+                    <label for="sumber_dana">
+                        Sumber Dana <span class="required">*</span>
+                    </label>
+
                     <select
                         name="sumber_dana"
                         id="sumber_dana"
                         class="form-control form-select"
                         required
                     >
-                        <option value="">-- Pilih Sumber Dana --</option>
+                        <option value="">
+                            -- Pilih Sumber Dana --
+                        </option>
 
-                        @foreach ($fundingSources ?? collect() as $source)
+                        @foreach ($fundingSources as $source)
                             <option
                                 value="{{ $source->name }}"
-                                @selected(old('sumber_dana') === $source->name)
+                                @selected(
+                                    old('sumber_dana') === $source->name
+                                )
                             >
                                 {{ $source->name }}
                             </option>
                         @endforeach
                     </select>
+
                     <small class="field-help">
-                        Pilihan mengikuti master sumber dana SIRAPIK.
+                        Pilihan mengikuti Master Data Sumber Dana SIRAPIK.
                     </small>
                 </div>
+
+                {{-- KATEGORI PELATIHAN: OPSIONAL --}}
+                <div class="form-group">
+                    <label for="training_category_id">
+                        Kategori Pelatihan
+                    </label>
+
+                    <select
+                        name="training_category_id"
+                        id="training_category_id"
+                        class="form-control form-select"
+                    >
+                        <option value="">
+                            -- Pilih Kategori (Opsional) --
+                        </option>
+
+                        @foreach ($categories as $category)
+                            <option
+                                value="{{ $category->id }}"
+                                @selected(
+                                    (string) old('training_category_id', '') ===
+                                    (string) $category->id
+                                )
+                            >
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <small class="field-help">
+                        Opsional. Kategori mengikuti Master Data Kategori Pelatihan.
+                    </small>
+                </div>
+
+                {{-- JPL: OPSIONAL --}}
+                <div class="form-group">
+                    <label for="jpl">JPL</label>
+
+                    <input
+                        type="number"
+                        name="jpl"
+                        id="jpl"
+                        class="form-control"
+                        value="{{ old('jpl') }}"
+                        min="0"
+                        step="1"
+                        placeholder="Masukkan jumlah JPL"
+                    >
+
+                    <small class="field-help">
+                        Opsional. Isi jumlah Jam Pelajaran jika tersedia.
+                    </small>
+                </div>
+
             </div>
 
+            {{-- TOMBOL --}}
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary" id="submitButton">
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="submitButton"
+                >
                     <span aria-hidden="true">⇧</span>
                     <span>Import Excel</span>
                 </button>
 
-                <button type="reset" class="btn btn-secondary" id="resetButton">
+                <button
+                    type="reset"
+                    class="btn btn-secondary"
+                    id="resetButton"
+                >
                     Reset Form
                 </button>
             </div>
         </form>
     </div>
 
+    {{-- Informasi --}}
     <div class="info-card">
         <div class="info-icon" aria-hidden="true">i</div>
+
         <div>
             <strong>Perhatikan sebelum import</strong>
+
             <p>
-                Pastikan baris judul dan kolom peserta pada Excel sesuai format
-                yang digunakan SIRAPIK. Peserta yang sudah terdaftar dapat
-                diperbarui berdasarkan NIP atau NIK, dan riwayat pelatihan
-                yang sama tidak dibuat berulang.
+                Pastikan baris judul dan kolom peserta pada Excel
+                sesuai format yang digunakan SIRAPIK. Peserta yang
+                sudah terdaftar dapat diperbarui berdasarkan NIP atau NIK,
+                dan riwayat pelatihan yang sama tidak dibuat berulang.
+                Kategori Pelatihan dan JPL dapat dikosongkan jika
+                informasinya belum tersedia.
             </p>
         </div>
     </div>
