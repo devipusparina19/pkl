@@ -11,6 +11,7 @@
     </div>
 </div>
 
+{{-- Notifikasi --}}
 @if (session('success'))
     <div class="panel" role="status">
         {{ session('success') }}
@@ -24,24 +25,34 @@
 @endif
 
 <div class="panel">
-    <form method="GET"
-          action="{{ route('participants.index') }}"
-          class="search-form">
 
+    {{-- Pencarian --}}
+    <form
+        method="GET"
+        action="{{ route('participants.index') }}"
+        class="search-form"
+    >
         <input
             type="search"
             name="search"
             value="{{ $search }}"
             placeholder="Cari nama, NIK, NIP, instansi, atau kabupaten/kota..."
+            aria-label="Cari peserta"
         >
 
-        <button class="btn btn-primary" type="submit">Cari</button>
+        <button class="btn btn-primary" type="submit">
+            Cari
+        </button>
 
-        <a class="btn btn-light" href="{{ route('participants.index') }}">
+        <a
+            class="btn btn-light"
+            href="{{ route('participants.index') }}"
+        >
             Reset
         </a>
     </form>
 
+    {{-- Tabel Data Peserta --}}
     <div class="table-wrap">
         <table>
             <thead>
@@ -56,8 +67,6 @@
                     <th>NOMOR TELEPON</th>
                     <th>INSTANSI/UNIT KERJA</th>
                     <th>KABUPATEN/KOTA/MITRA/MANDIRI</th>
-                    <th>ANGKATAN</th>
-                    <th>SUMBER DANA</th>
                     <th>AKSI</th>
                 </tr>
             </thead>
@@ -65,9 +74,17 @@
             <tbody>
                 @forelse ($participants as $participant)
                     <tr>
-                        <td>{{ $participant->name ?: '-' }}</td>
-                        <td>{{ $participant->nik ?: '-' }}</td>
-                        <td>{{ $participant->nip ?: '-' }}</td>
+                        <td>
+                            {{ $participant->name ?: '-' }}
+                        </td>
+
+                        <td>
+                            {{ $participant->nik ?: '-' }}
+                        </td>
+
+                        <td>
+                            {{ $participant->nip ?: '-' }}
+                        </td>
 
                         <td>
                             @if ($participant->gender === 'L')
@@ -79,50 +96,42 @@
                             @endif
                         </td>
 
-                        <td>{{ $participant->rank ?: '-' }}</td>
-                        <td>{{ $participant->profession ?: '-' }}</td>
-                        <td>{{ $participant->email ?: '-' }}</td>
-                        <td>{{ $participant->phone ?: '-' }}</td>
-                        <td>{{ $participant->institution ?: '-' }}</td>
-                        <td>{{ $participant->district ?: '-' }}</td>
-
                         <td>
-                            @forelse ($participant->histories as $history)
-                                @if ($history->training)
-                                    <div>
-                                        {{ filled($history->training->batch_number)
-                                            ? $history->training->batch_number
-                                            : '-' }}
-                                    </div>
-                                @endif
-                            @empty
-                                -
-                            @endforelse
-
-                            @if ($participant->histories->isNotEmpty() &&
-                                $participant->histories->every(fn ($history) => !$history->training))
-                                -
-                            @endif
+                            {{ $participant->rank ?: '-' }}
                         </td>
 
                         <td>
-                            @forelse ($participant->histories as $history)
-                                @if ($history->training)
-                                    <div>
-                                        {{ $history->training->funding_source ?? '-' }}
-                                    </div>
-                                @endif
-                            @empty
-                                -
-                            @endforelse
+                            {{ $participant->profession ?: '-' }}
                         </td>
 
                         <td>
-                            <div style="display:flex; gap:8px; align-items:center; white-space:nowrap;">
+                            {{ $participant->email ?: '-' }}
+                        </td>
+
+                        <td>
+                            {{ $participant->phone ?: '-' }}
+                        </td>
+
+                        <td>
+                            {{ $participant->institution ?: '-' }}
+                        </td>
+
+                        <td>
+                            {{ $participant->district ?: '-' }}
+                        </td>
+
+                        {{-- Aksi --}}
+                        <td>
+                            <div style="
+                                display: flex;
+                                gap: 8px;
+                                align-items: center;
+                                white-space: nowrap;
+                            ">
                                 <a
                                     class="btn btn-light"
                                     href="{{ route('participants.show', $participant) }}"
-                                    style="text-decoration:none;"
+                                    style="text-decoration: none;"
                                 >
                                     Lihat
                                 </a>
@@ -130,7 +139,7 @@
                                 <a
                                     class="btn btn-light"
                                     href="{{ route('participants.edit', $participant) }}"
-                                    style="text-decoration:none;"
+                                    style="text-decoration: none;"
                                 >
                                     Edit
                                 </a>
@@ -138,7 +147,7 @@
                                 <form
                                     action="{{ route('participants.destroy', $participant) }}"
                                     method="POST"
-                                    style="margin:0;"
+                                    style="margin: 0;"
                                     onsubmit="return confirm('Yakin ingin menghapus peserta {{ addslashes($participant->name) }}? Data riwayat pelatihannya dan akun yang terhubung juga akan dihapus.');"
                                 >
                                     @csrf
@@ -147,7 +156,7 @@
                                     <button
                                         type="submit"
                                         class="btn btn-light"
-                                        style="color:#dc2626;"
+                                        style="color: #dc2626;"
                                     >
                                         Hapus
                                     </button>
@@ -157,7 +166,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="13" class="empty-state">
+                        <td colspan="11" class="empty-state">
                             @if ($search !== '')
                                 Data peserta tidak ditemukan.
                             @else
@@ -171,8 +180,10 @@
         </table>
     </div>
 
+    {{-- Pagination --}}
     <div class="pagination-wrap">
         {{ $participants->links() }}
     </div>
+
 </div>
 @endsection
