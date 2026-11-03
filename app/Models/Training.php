@@ -11,15 +11,9 @@ class Training extends Model
     protected $fillable = [
         'code',
         'name',
-
-        // Kategori pelatihan dari Master Data Super Admin
         'training_category_id',
-
-        // Kolom lama, dipertahankan untuk kompatibilitas
         'field',
         'location',
-
-        // Informasi pelatihan
         'batch_number',
         'funding_source',
         'organizer',
@@ -42,9 +36,6 @@ class Training extends Model
         ];
     }
 
-    /**
-     * Relasi kategori pelatihan.
-     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(
@@ -53,9 +44,6 @@ class Training extends Model
         );
     }
 
-    /**
-     * Relasi riwayat peserta pelatihan.
-     */
     public function histories(): HasMany
     {
         return $this->hasMany(

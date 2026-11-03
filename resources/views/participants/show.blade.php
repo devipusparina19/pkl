@@ -14,8 +14,10 @@
     </div>
 
     @if (auth()->user()->role === 'admin')
-        <a class="btn btn-light"
-           href="{{ route('participants.edit', $participant) }}">
+        <a
+            class="btn btn-light"
+            href="{{ route('participants.edit', $participant) }}"
+        >
             Edit Profil
         </a>
     @endif
@@ -136,9 +138,10 @@
                     <th>Nama Pelatihan</th>
                     <th>Angkatan</th>
                     <th>Sumber Dana</th>
-                    <th>Bidang</th>
+                    <th>Kategori</th>
                     <th>Penyelenggara</th>
                     <th>Tanggal Pelatihan</th>
+                    <th>JPL</th>
                     <th>Durasi</th>
                     <th>Status</th>
                 </tr>
@@ -146,38 +149,41 @@
 
             <tbody>
                 @forelse ($participant->histories as $history)
+                    @php
+                        $training = $history->training;
+                    @endphp
+
                     <tr>
                         <td>{{ $loop->iteration }}</td>
 
                         <td>
                             <strong>
-                                {{ $history->training?->name
-                                    ?? 'Pelatihan tidak tersedia' }}
+                                {{ $training?->name ?? 'Pelatihan tidak tersedia' }}
                             </strong>
                         </td>
 
                         <td>
-                            {{ $history->training?->batch_number ?? '-' }}
+                            {{ $training?->batch_number ?: '-' }}
                         </td>
 
                         <td>
-                            {{ $history->training?->funding_source ?? '-' }}
+                            {{ $training?->funding_source ?: '-' }}
                         </td>
 
                         <td>
-                            {{ $history->training?->field ?: '-' }}
+                            {{ $training?->category?->name ?: '-' }}
                         </td>
 
                         <td>
-                            {{ $history->training?->organizer ?: '-' }}
+                            {{ $training?->organizer ?: '-' }}
                         </td>
 
                         <td>
-                            @if ($history->training?->start_date)
-                                {{ $history->training->start_date->format('d/m/Y') }}
+                            @if ($training?->start_date)
+                                {{ $training->start_date->format('d/m/Y') }}
 
-                                @if ($history->training?->end_date)
-                                    – {{ $history->training->end_date->format('d/m/Y') }}
+                                @if ($training->end_date)
+                                    – {{ $training->end_date->format('d/m/Y') }}
                                 @endif
                             @else
                                 -
@@ -185,7 +191,11 @@
                         </td>
 
                         <td>
-                            {{ $history->training?->duration_days ?? 0 }} hari
+                            {{ $training?->jpl ?? '-' }}
+                        </td>
+
+                        <td>
+                            {{ $training?->duration_days ?? 0 }} hari
                         </td>
 
                         <td>
@@ -196,7 +206,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="empty-state">
+                        <td colspan="10" class="empty-state">
                             Belum ada riwayat pelatihan untuk peserta ini.
                         </td>
                     </tr>

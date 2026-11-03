@@ -74,7 +74,7 @@
 
         {{-- 3. Nomor Angkatan --}}
         <div class="form-group">
-            <label for="batch_number">Nomor Angkatan</label>
+            <label for="batch_number">Angkatan</label>
             <input
                 id="batch_number"
                 type="text"
