@@ -7,7 +7,6 @@ use App\Models\Training;
 use App\Models\TrainingHistory;
 use App\Models\District;
 use App\Models\FundingSource;
-use App\Models\TrainingYear;
 use App\Models\HealthWorkerType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -88,36 +87,14 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
-        $years = TrainingYear::query()
-            ->where('is_active', true)
-            ->orderByDesc('year')
-            ->pluck('year')
-            ->map(fn ($item) => (int) $item);
+        /*
+         * Pilihan tahun berdasarkan data pelatihan yang tersedia.
+         */
+        $years = $this->getAvailableTrainingYears();
 
-        if ($years->isEmpty()) {
-            $yearsQuery = Training::query()
-                ->whereNotNull('start_date');
-
-            if (DB::connection()->getDriverName() === 'sqlite') {
-                $yearsQuery->selectRaw(
-                    "CAST(strftime('%Y', start_date) AS INTEGER) as year"
-                );
-            } else {
-                $yearsQuery->selectRaw('YEAR(start_date) as year');
-            }
-
-            $years = $yearsQuery
-                ->distinct()
-                ->orderByDesc('year')
-                ->pluck('year')
-                ->map(fn ($item) => (int) $item);
+        if ($years->isNotEmpty() && !$years->contains($year)) {
+            $year = (int) $years->first();
         }
-
-        if (!$years->contains($year)) {
-            $years->push($year);
-        }
-
-        $years = $years->unique()->sortDesc()->values();
 
         $healthWorkerTypes = HealthWorkerType::query()
             ->where('is_active', true)
@@ -232,7 +209,8 @@ class DashboardController extends Controller
         /*
          * FILTER TAHUN DAN URUTAN
          */
-        $year = (int) $request->input('year', now()->year);
+        $requestedYear = (int) $request->input('year', now()->year);
+
         $sort = $request->input('sort', 'desc');
 
         if (!in_array($sort, ['asc', 'desc'], true)) {
@@ -245,45 +223,31 @@ class DashboardController extends Controller
 
         /*
          * PILIHAN TAHUN
+         *
+         * Hanya mengambil tahun yang benar-benar memiliki
+         * data pelatihan. Tidak mengambil tahun kosong dari
+         * tabel master TrainingYear.
          */
-        $years = TrainingYear::query()
-            ->where('is_active', true)
-            ->orderByDesc('year')
-            ->pluck('year')
-            ->map(fn ($item) => (int) $item);
+        $years = $this->getAvailableTrainingYears();
 
-        if ($years->isEmpty()) {
-            $yearsQuery = Training::query()
-                ->whereNotNull('start_date');
-
-            if (DB::connection()->getDriverName() === 'sqlite') {
-                $yearsQuery->selectRaw(
-                    "CAST(strftime('%Y', start_date) AS INTEGER) as year"
-                );
-            } else {
-                $yearsQuery->selectRaw('YEAR(start_date) as year');
-            }
-
-            $years = $yearsQuery
-                ->distinct()
-                ->orderByDesc('year')
-                ->pluck('year')
-                ->map(fn ($item) => (int) $item);
+        if ($years->isNotEmpty()) {
+            $year = $years->contains($requestedYear)
+                ? $requestedYear
+                : (int) $years->first();
+        } else {
+            $year = $requestedYear ?: now()->year;
         }
-
-        if (!$years->contains($year)) {
-            $years->push($year);
-        }
-
-        $years = $years->unique()->sortDesc()->values();
 
         /*
-         * STATISTIK BERDASARKAN TAHUN TERPILIH
+         * QUERY PELATIHAN BERDASARKAN TAHUN
          */
         $trainingIdsThisYear = Training::query()
             ->whereYear('start_date', $year)
             ->select('id');
 
+        /*
+         * STATISTIK UTAMA
+         */
         $totalTrainings = Training::query()
             ->whereYear('start_date', $year)
             ->count();
@@ -301,99 +265,109 @@ class DashboardController extends Controller
         $participationsThisYear = $totalParticipations;
 
         /*
- * STATISTIK JENIS KELAMIN PESERTA TERLATIH
- *
- * Sumber jenis kelamin: participants.gender.
- * Sumber keikutsertaan: training_histories.
- * Tahun pelatihan: trainings.start_date.
- *
- * Peserta dihitung satu kali per tahun,
- * meskipun mengikuti beberapa pelatihan.
- * Mendukung nilai gender L/P maupun Laki-laki/Perempuan.
- */
-$genderCounts = DB::table('training_histories')
-    ->join(
-        'trainings',
-        'trainings.id',
-        '=',
-        'training_histories.training_id'
-    )
-    ->join(
-        'participants',
-        'participants.id',
-        '=',
-        'training_histories.participant_id'
-    )
-    ->whereYear('trainings.start_date', $year)
-    ->whereRaw("
-        LOWER(TRIM(participants.gender)) IN (
-            'l',
-            'p',
-            'laki-laki',
-            'laki laki',
-            'laki',
-            'perempuan'
-        )
-    ")
-    ->selectRaw("
-        CASE
-            WHEN LOWER(TRIM(participants.gender))
-                IN ('l', 'laki-laki', 'laki laki', 'laki')
-                THEN 'L'
-            WHEN LOWER(TRIM(participants.gender))
-                IN ('p', 'perempuan')
-                THEN 'P'
-        END AS gender_code,
-        COUNT(DISTINCT training_histories.participant_id) AS total
-    ")
-    ->groupBy('gender_code')
-    ->get()
-    ->keyBy('gender_code');
+         * STATISTIK JENIS KELAMIN PESERTA TERLATIH
+         *
+         * Peserta dihitung satu kali per tahun,
+         * meskipun mengikuti beberapa pelatihan.
+         */
+        $genderCounts = DB::table('training_histories')
+            ->join(
+                'trainings',
+                'trainings.id',
+                '=',
+                'training_histories.training_id'
+            )
+            ->join(
+                'participants',
+                'participants.id',
+                '=',
+                'training_histories.participant_id'
+            )
+            ->whereYear('trainings.start_date', $year)
+            ->whereRaw("
+                LOWER(TRIM(participants.gender)) IN (
+                    'l',
+                    'p',
+                    'laki-laki',
+                    'laki laki',
+                    'laki',
+                    'perempuan'
+                )
+            ")
+            ->selectRaw("
+                CASE
+                    WHEN LOWER(TRIM(participants.gender))
+                        IN ('l', 'laki-laki', 'laki laki', 'laki')
+                        THEN 'L'
+                    WHEN LOWER(TRIM(participants.gender))
+                        IN ('p', 'perempuan')
+                        THEN 'P'
+                END AS gender_code,
+                COUNT(DISTINCT training_histories.participant_id) AS total
+            ")
+            ->groupBy('gender_code')
+            ->get()
+            ->keyBy('gender_code');
 
-$maleRow = $genderCounts->get('L');
-$femaleRow = $genderCounts->get('P');
+        $maleRow = $genderCounts->get('L');
+        $femaleRow = $genderCounts->get('P');
 
-$genderStats = [
-    'L' => (int) ($maleRow->total ?? 0),
-    'P' => (int) ($femaleRow->total ?? 0),
-];
+        $genderStats = [
+            'L' => (int) ($maleRow->total ?? 0),
+            'P' => (int) ($femaleRow->total ?? 0),
+        ];
 
         /*
-         * JUMLAH PELATIHAN SETIAP PESERTA
+         * JUMLAH KEIKUTSERTAAN SETIAP PESERTA
+         *
+         * PENTING:
+         * whereHas memastikan hanya peserta yang memiliki
+         * riwayat pelatihan pada tahun terpilih yang muncul.
+         *
+         * Peserta dengan jumlah 0 tidak akan ditampilkan.
          */
         $frequentParticipants = Participant::query()
+            ->whereHas('histories', function ($query) use ($year) {
+                $query->whereHas('training', function ($trainingQuery) use ($year) {
+                    $trainingQuery->whereYear('start_date', $year);
+                });
+            })
             ->withCount([
-                'histories as participations_count' => fn ($query) =>
-                    $query->whereHas('training', fn ($trainingQuery) =>
-                        $trainingQuery->whereYear('start_date', $year)
-                    ),
+                'histories as participations_count' => function ($query) use ($year) {
+                    $query->whereHas('training', function ($trainingQuery) use ($year) {
+                        $trainingQuery->whereYear('start_date', $year);
+                    });
+                },
             ])
             ->orderBy('participations_count', $sort)
             ->orderBy('name')
-            ->limit(8)
-            ->get();
+            ->paginate(8, ['*'], 'participant_page')
+            ->withQueryString();
 
         /*
-         * STATISTIK BIDANG PELATIHAN PADA TAHUN TERPILIH
+         * STATISTIK BIDANG PELATIHAN
          */
         $fieldStats = DB::table('trainings')
-    ->leftJoin(
-        'training_categories',
-        'training_categories.id',
-        '=',
-        'trainings.training_category_id'
-    )
-    ->whereYear('trainings.start_date', $year)
-    ->whereNotNull('training_categories.name')
-    ->where('training_categories.name', '!=', '')
-    ->selectRaw('
-        training_categories.name as name,
-        COUNT(trainings.id) as total
-    ')
-    ->groupBy('training_categories.id', 'training_categories.name')
-    ->orderByDesc('total')
-    ->limit(6)
-    ->get();
+            ->leftJoin(
+                'training_categories',
+                'training_categories.id',
+                '=',
+                'trainings.training_category_id'
+            )
+            ->whereYear('trainings.start_date', $year)
+            ->whereNotNull('training_categories.name')
+            ->where('training_categories.name', '!=', '')
+            ->selectRaw('
+                training_categories.name as name,
+                COUNT(trainings.id) as total
+            ')
+            ->groupBy(
+                'training_categories.id',
+                'training_categories.name'
+            )
+            ->orderByDesc('total')
+            ->limit(6)
+            ->get();
 
         /*
          * PILIHAN PROFESI DARI MASTER DATA
@@ -404,7 +378,7 @@ $genderStats = [
             ->pluck('name');
 
         /*
-         * DAFTAR PESERTA TERLATIH BERDASARKAN TAHUN DAN PROFESI
+         * DAFTAR PESERTA TERLATIH BERDASARKAN PROFESI
          */
         $trainedParticipants = collect();
 
@@ -415,24 +389,26 @@ $genderStats = [
                     === mb_strtolower($selectedProfession)
             );
 
-        if ($professionExists) {
+        if ($professionExists && $totalTrainings > 0) {
             $trainedParticipants = Participant::query()
                 ->whereRaw('LOWER(TRIM(profession)) = ?', [
                     mb_strtolower($selectedProfession),
                 ])
-                ->whereHas('histories', fn ($query) =>
-                    $query->whereHas('training', fn ($trainingQuery) =>
-                        $trainingQuery->whereYear('start_date', $year)
-                    )
-                )
+                ->whereHas('histories', function ($query) use ($year) {
+                    $query->whereHas('training', function ($trainingQuery) use ($year) {
+                        $trainingQuery->whereYear('start_date', $year);
+                    });
+                })
                 ->withCount([
-                    'histories as participations_count' => fn ($query) =>
-                        $query->whereHas('training', fn ($trainingQuery) =>
-                            $trainingQuery->whereYear('start_date', $year)
-                        ),
+                    'histories as participations_count' => function ($query) use ($year) {
+                        $query->whereHas('training', function ($trainingQuery) use ($year) {
+                            $trainingQuery->whereYear('start_date', $year);
+                        });
+                    },
                 ])
                 ->orderBy('name')
-                ->get();
+                ->paginate(10, ['*'], 'profession_page')
+                ->withQueryString();
         } else {
             $selectedProfession = '';
         }
@@ -443,7 +419,7 @@ $genderStats = [
         $recentHistories = collect();
 
         /*
-         * DATA YANG DIKIRIM KE VIEW DASHBOARD
+         * DATA YANG DIKIRIM KE VIEW
          */
         $data = compact(
             'totalParticipants',
@@ -468,5 +444,29 @@ $genderStats = [
         }
 
         return view('dashboards.pimpinan', $data);
+    }
+
+    /**
+     * Mengambil daftar tahun yang benar-benar memiliki pelatihan.
+     */
+    private function getAvailableTrainingYears()
+    {
+        $yearsQuery = Training::query()
+            ->whereNotNull('start_date');
+
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            $yearsQuery->selectRaw(
+                "CAST(strftime('%Y', start_date) AS INTEGER) as year"
+            );
+        } else {
+            $yearsQuery->selectRaw('YEAR(start_date) as year');
+        }
+
+        return $yearsQuery
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year')
+            ->map(fn ($item) => (int) $item)
+            ->values();
     }
 }
