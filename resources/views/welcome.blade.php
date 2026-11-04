@@ -3,63 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta name="theme-color" content="#12345a">
     <meta name="description" content="SIRAPIK - Sistem Informasi Pelatihan Bapelkes Provinsi Kalimantan Selatan.">
 
     <title>SIRAPIK | Bapelkes Provinsi Kalimantan Selatan</title>
 
-    <link rel="stylesheet" href="{{ asset('css/sirapik.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --navy: #12345a;
-            --navy-deep: #0b2340;
-            --navy-light: #1d4c7c;
-            --blue: #2463a6;
-            --blue-hover: #194c87;
-            --blue-soft: #edf4fc;
-            --ink: #26364a;
-            --muted: #64748b;
-            --border: #dce4ee;
-            --surface: #ffffff;
-            --page: #f3f6fa;
-            --green: #207653;
-            --green-soft: #e9f6ef;
-            --red: #b34545;
-            --red-soft: #fbefef;
-            --radius: 12px;
-            --shadow: 0 4px 18px rgba(19, 49, 83, .055);
-            --shadow-hover: 0 10px 26px rgba(19, 49, 83, .10);
+            --primary: #12345a;
+            --primary-dark: #092541;
+            --primary-light: #1c568a;
+            --blue: #2672b9;
+            --blue-light: #eaf3fc;
+            --gold: #d6a84f;
+            --ink: #26384c;
+            --muted: #718096;
+            --border: #e5eaf0;
+            --white: #ffffff;
+            --background: #f5f7fa;
+            --green: #21845b;
+            --shadow: 0 8px 30px rgba(15, 45, 75, .07);
+            --shadow-hover: 0 16px 38px rgba(15, 45, 75, .13);
         }
 
-        *,
-        *::before,
-        *::after {
+        * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 24px;
+            scroll-padding-top: 100px;
         }
 
         body {
-            margin: 0;
+            width: 100%;
+            min-width: 320px;
+            overflow-x: hidden;
+            font-family: 'DM Sans', sans-serif;
             color: var(--ink);
-            background: var(--page);
-            font-family: "Segoe UI", Arial, sans-serif;
-            font-size: 16px;
+            background: var(--white);
             line-height: 1.7;
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-        }
-
-        body,
-        button,
-        input,
-        select {
-            font-family: "Segoe UI", Arial, sans-serif;
         }
 
         a {
@@ -72,1747 +61,2203 @@
             font: inherit;
         }
 
-        button,
-        a,
-        select {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        a:focus-visible,
-        button:focus-visible,
-        select:focus-visible {
-            outline: 3px solid rgba(36, 99, 166, .32);
-            outline-offset: 3px;
-        }
-
         img {
+            display: block;
             max-width: 100%;
         }
 
+        /* CONTAINER */
+
         .public-container {
-            width: min(1480px, calc(100% - 64px));
-            margin-inline: auto;
+            width: calc(100% - 80px);
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
-        /* HEADER */
+        /* TOPBAR */
 
-        .public-nav {
-            position: relative;
-            z-index: 10;
-            background: #fff;
-            border-bottom: 1px solid var(--border);
+        .topbar {
+            background: var(--primary-dark);
+            color: rgba(255,255,255,.9);
+            font-size: 13px;
         }
 
-        .nav-inner {
-            min-height: 86px;
+        .topbar-inner {
+            min-height: 40px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 20px;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
             gap: 24px;
+        }
+
+        .topbar-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topbar-icon {
+            color: var(--gold);
+            font-size: 15px;
+        }
+
+        /* NAVBAR */
+
+        .public-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            background: rgba(255,255,255,.98);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 3px 16px rgba(15,45,75,.04);
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-inner {
+            width: calc(100% - 80px);
+            max-width: 1600px;
+            min-height: 86px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
         }
 
         .brand {
             display: flex;
             align-items: center;
+            flex: 0 0 auto;
             gap: 13px;
-            min-width: 0;
         }
 
-        .brand-mark {
-            width: 49px;
-            height: 49px;
-            flex: 0 0 49px;
-            display: grid;
-            place-items: center;
-            border-radius: 10px;
-            background: linear-gradient(145deg, var(--navy-light), var(--navy-deep));
-            color: #fff;
-            font-size: 26px;
-            font-weight: 800;
-            line-height: 1;
-            box-shadow: 0 4px 10px rgba(18, 52, 90, .16);
+        .brand-logo {
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 12px;
+            background: #f4f7fa;
+            border: 1px solid var(--border);
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .brand-title {
-            color: var(--navy);
-            font-size: 23px;
+            color: var(--primary);
+            font-family: 'Manrope', sans-serif;
+            font-size: 25px;
             font-weight: 800;
-            line-height: 1.25;
             letter-spacing: .4px;
+            line-height: 1.2;
         }
 
         .brand-subtitle {
             margin-top: 4px;
             color: var(--muted);
-            font-size: 13px;
-            line-height: 1.5;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.4;
         }
 
-        .nav-actions {
+        .nav-menu {
             display: flex;
             align-items: center;
-            gap: 18px;
+            justify-content: flex-end;
+            gap: 32px;
         }
 
-        .nav-label {
-            color: var(--muted);
+        .nav-link {
+            position: relative;
+            white-space: nowrap;
+            color: #42546a;
             font-size: 14px;
+            font-weight: 700;
+            transition: color .2s ease;
         }
 
-        /* BUTTONS */
+        .nav-link::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -9px;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: width .2s ease;
+        }
 
-        .btn {
+        .nav-link:hover {
+            color: var(--blue);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-button {
             min-height: 46px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 9px;
-            padding: 11px 19px;
-            border: 1px solid var(--blue);
-            border-radius: 8px;
+            gap: 10px;
+            padding: 0 20px;
+            border-radius: 6px;
+            color: white;
+            background: var(--primary);
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+            transition: .2s ease;
+        }
+
+        .nav-button:hover {
             background: var(--blue);
-            color: #fff;
-            font-size: 14px;
-            font-weight: 700;
-            line-height: 1.4;
-            text-align: center;
+            transform: translateY(-2px);
+        }
+
+        .mobile-menu-button {
+            display: none;
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: white;
+            color: var(--primary);
+            font-size: 23px;
             cursor: pointer;
-            transition: background .18s ease,
-                        border-color .18s ease,
-                        box-shadow .18s ease,
-                        transform .18s ease;
-        }
-
-        .btn:hover {
-            background: var(--blue-hover);
-            border-color: var(--blue-hover);
-            box-shadow: 0 4px 12px rgba(36, 99, 166, .15);
-        }
-
-        .btn-outline {
-            background: #fff;
-            color: var(--navy);
-            border-color: #cbd7e5;
-        }
-
-        .btn-outline:hover {
-            background: var(--blue-soft);
-            color: var(--navy);
-            border-color: #a9bfd9;
-        }
-
-        .btn-arrow {
-            font-size: 18px;
-            line-height: 1;
         }
 
         /* HERO */
 
         .hero {
             position: relative;
-            isolation: isolate;
+            min-height: 550px;
+            display: flex;
+            align-items: center;
             overflow: hidden;
-            padding: clamp(58px, 6vw, 92px) 0;
-            background-color: var(--navy-deep);
-            background-image:
+            color: white;
+            background:
                 linear-gradient(
-                    105deg,
-                    rgba(8, 29, 54, .93) 0%,
-                    rgba(14, 47, 81, .86) 52%,
-                    rgba(20, 64, 105, .72) 100%
+                    90deg,
+                    rgba(5,29,54,.94) 0%,
+                    rgba(9,44,76,.86) 48%,
+                    rgba(13,54,88,.57) 100%
                 ),
-                url("{{ asset('images/background-sirapik.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            color: #fff;
+                url("{{ asset('images/background-sirapik.jpg') }}") center/cover no-repeat;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            width: 580px;
+            height: 580px;
+            right: -170px;
+            top: -190px;
+            border: 1px solid rgba(255,255,255,.13);
+            border-radius: 50%;
+            pointer-events: none;
         }
 
         .hero::after {
             content: "";
             position: absolute;
-            z-index: -1;
-            width: 440px;
-            height: 440px;
-            right: -160px;
-            bottom: -280px;
-            border: 1px solid rgba(255, 255, 255, .13);
+            width: 390px;
+            height: 390px;
+            right: -75px;
+            top: -95px;
+            border: 1px solid rgba(255,255,255,.10);
             border-radius: 50%;
-            box-shadow:
-                0 0 0 45px rgba(255, 255, 255, .025),
-                0 0 0 90px rgba(255, 255, 255, .02);
             pointer-events: none;
         }
 
-        .hero-grid {
+        .hero-inner {
+            position: relative;
+            z-index: 2;
             display: grid;
-            grid-template-columns: minmax(0, 1.5fr) minmax(300px, .75fr);
+            grid-template-columns: 1.35fr .65fr;
             align-items: center;
-            gap: clamp(36px, 5vw, 76px);
+            gap: 65px;
+            padding-top: 75px;
+            padding-bottom: 75px;
         }
 
-        .hero-copy {
-            min-width: 0;
+        .hero-content {
+            max-width: 850px;
         }
 
-        .eyebrow {
+        .hero-label {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 12px;
-            color: #d0e4f9;
-            font-size: 13px;
+            margin-bottom: 23px;
+            padding: 8px 15px;
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 30px;
+            background: rgba(255,255,255,.09);
+            color: #f3d89e;
+            font-size: 12px;
             font-weight: 800;
             letter-spacing: 1.5px;
-            line-height: 1.6;
             text-transform: uppercase;
         }
 
-        .eyebrow::before {
+        .hero-label::before {
             content: "";
-            width: 28px;
-            height: 2px;
-            background: #91c6fa;
-            border-radius: 5px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--gold);
         }
 
         .hero h1 {
             max-width: 850px;
-            margin: 10px 0 20px;
-            color: #fff;
-            font-size: clamp(38px, 4.2vw, 58px);
-            font-weight: 760;
-            line-height: 1.19;
-            letter-spacing: -.8px;
-            text-wrap: balance;
+            margin-bottom: 22px;
+            font-family: 'Manrope', sans-serif;
+            font-size: clamp(40px, 4.5vw, 62px);
+            font-weight: 800;
+            line-height: 1.18;
+            letter-spacing: -1.8px;
+        }
+
+        .hero h1 span {
+            color: #f0c979;
         }
 
         .hero-description {
-            max-width: 760px;
-            margin: 0 0 30px;
-            color: #e0eaf5;
-            font-size: 17px;
+            max-width: 750px;
+            color: rgba(255,255,255,.85);
+            font-size: 16px;
             line-height: 1.9;
         }
 
-        .hero .btn {
-            min-height: 49px;
-            padding-inline: 22px;
-            background: #fff;
-            border-color: #fff;
-            color: var(--navy);
-        }
-
-        .hero .btn:hover {
-            background: #edf4fc;
-            border-color: #edf4fc;
-            transform: translateY(-1px);
-        }
-
-        .hero-note {
-            min-width: 0;
-            padding: clamp(22px, 2.5vw, 32px);
-            border: 1px solid rgba(255, 255, 255, .23);
-            border-radius: 14px;
-            background: rgba(7, 29, 54, .48);
-            box-shadow: 0 12px 35px rgba(0, 0, 0, .08);
-            backdrop-filter: blur(5px);
-        }
-
-        .hero-note-top {
+        .hero-actions {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 13px;
-            margin-bottom: 18px;
+            margin-top: 30px;
         }
 
-        .hero-note-icon {
-            width: 45px;
-            height: 45px;
-            flex: 0 0 45px;
+        .button-primary {
+            min-height: 50px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 24px;
+            border-radius: 6px;
+            color: var(--primary-dark);
+            background: #f0ca7a;
+            font-size: 14px;
+            font-weight: 800;
+            transition: .2s ease;
+        }
+
+        .button-primary:hover {
+            background: white;
+            transform: translateY(-3px);
+        }
+
+        .hero-side {
+            position: relative;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 12px;
+            background: rgba(255,255,255,.11);
+            backdrop-filter: blur(12px);
+        }
+
+        .hero-side-icon {
+            width: 54px;
+            height: 54px;
             display: grid;
             place-items: center;
-            border: 1px solid rgba(255, 255, 255, .19);
+            margin-bottom: 20px;
             border-radius: 10px;
-            background: rgba(255, 255, 255, .10);
-            color: #fff;
-            font-size: 22px;
+            color: var(--primary-dark);
+            background: #f0ca7a;
+            font-size: 25px;
         }
 
-        .hero-note-label {
-            color: #c5dcf4;
-            font-size: 12px;
-            font-weight: 750;
-            letter-spacing: 1px;
+        .hero-side-label {
+            margin-bottom: 7px;
+            color: #f0ca7a;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
         }
 
-        .hero-note strong {
-            display: block;
-            margin-top: 3px;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 750;
-            line-height: 1.5;
+        .hero-side h3 {
+            margin-bottom: 13px;
+            color: white;
+            font-family: 'Manrope', sans-serif;
+            font-size: 21px;
+            line-height: 1.45;
         }
 
-        .hero-note p {
-            margin: 0;
-            color: #e0eaf5;
-            font-size: 15px;
+        .hero-side p {
+            color: rgba(255,255,255,.82);
+            font-size: 14px;
             line-height: 1.9;
         }
 
-        .hero-note-divider {
+        .hero-side-line {
             height: 1px;
-            margin: 21px 0;
-            background: rgba(255, 255, 255, .16);
+            margin: 22px 0 16px;
+            background: rgba(255,255,255,.2);
         }
 
-        .hero-note-footer {
+        .hero-side-status {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 9px;
-            color: #d2e5f8;
-            font-size: 13px;
-            line-height: 1.7;
+            color: rgba(255,255,255,.88);
+            font-size: 12px;
         }
 
-        .status-dot {
+        .hero-side-status span {
             width: 8px;
             height: 8px;
-            flex: 0 0 8px;
-            margin-top: 7px;
+            flex-shrink: 0;
             border-radius: 50%;
-            background: #75d4a2;
-        }
- 
-
-        /* MAIN DASHBOARD */
-
-        .section {
-            padding: clamp(34px, 4vw, 54px) 0;
-            scroll-margin-top: 20px;
+            background: #75d8a5;
         }
 
-        .section-heading {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 22px;
-            margin-bottom: 24px;
-        }
+        /* SECTION UMUM */
 
-        .section-heading-main {
-            min-width: 0;
-        }
-
-        .section-kicker {
-            margin-bottom: 6px;
+        .section-label {
+            display: inline-block;
+            margin-bottom: 12px;
             color: var(--blue);
             font-size: 12px;
             font-weight: 800;
-            letter-spacing: 1.3px;
+            letter-spacing: 1.8px;
             text-transform: uppercase;
         }
 
-        .section-heading h2 {
-            margin: 0 0 7px;
-            color: var(--navy);
-            font-size: clamp(25px, 2.4vw, 32px);
-            font-weight: 780;
+        /* TENTANG SIRAPIK */
+
+        .about-section {
+            padding: 55px 0 40px;
+            background: #f5f8fb;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: .9fr 1.1fr;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .about-visual {
+            position: relative;
+            min-height: 370px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 12px;
+            background:
+                linear-gradient(145deg, rgba(8,38,68,.92), rgba(27,89,139,.83)),
+                url("{{ asset('images/background-sirapik.jpg') }}") center/cover;
+        }
+
+        .about-visual::before,
+        .about-visual::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 50%;
+        }
+
+        .about-visual::before {
+            width: 340px;
+            height: 340px;
+        }
+
+        .about-visual::after {
+            width: 250px;
+            height: 250px;
+        }
+
+        .about-visual-content {
+            position: relative;
+            z-index: 2;
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .about-logo {
+            width: 105px;
+            height: 105px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 19px;
+            padding: 10px;
+            border-radius: 18px;
+            background: white;
+        }
+
+        .about-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .about-visual-content strong {
+            display: block;
+            font-family: 'Manrope', sans-serif;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .about-visual-content span {
+            display: block;
+            margin-top: 5px;
+            color: rgba(255,255,255,.85);
+            font-size: 13px;
+        }
+
+        .about-content h2 {
+            margin-bottom: 18px;
+            color: var(--primary);
+            font-family: 'Manrope', sans-serif;
+            font-size: clamp(29px, 3vw, 39px);
+            font-weight: 800;
             line-height: 1.35;
-            letter-spacing: -.35px;
         }
 
-        .section-heading p {
-            max-width: 780px;
-            margin: 0;
-            color: var(--muted);
+        .about-content p {
+            margin-bottom: 15px;
+            color: #68798b;
             font-size: 15px;
-            line-height: 1.8;
+            line-height: 1.9;
         }
 
-        .data-badge {
+        .about-points {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 24px;
+        }
+
+        .about-point {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .about-point span {
+            width: 27px;
+            height: 27px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 50%;
+            color: var(--green);
+            background: #e8f6ef;
+            font-size: 13px;
+        }
+
+        /* DASHBOARD */
+
+        .dashboard-section {
+            padding: 55px 0 85px;
+            background: var(--background);
+        }
+
+        .dashboard-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-heading h2 {
+            color: var(--primary);
+            font-family: 'Manrope', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .dashboard-heading p {
+            max-width: 650px;
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .dashboard-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-            padding: 9px 13px;
-            border: 1px solid #dce8f5;
-            border-radius: 7px;
-            background: #fff;
-            color: #4d6682;
-            font-size: 13px;
-            font-weight: 650;
+            gap: 9px;
+            padding: 11px 17px;
+            border: 1px solid #dce9f5;
+            border-radius: 30px;
+            color: var(--blue);
+            background: #edf5fc;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
         }
 
-        .data-badge-dot {
-            width: 7px;
-            height: 7px;
+        .dashboard-badge span {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #39976b;
-        }
-
-        /* CARDS */
-
-        .filter-card,
-        .stat-card,
-        .content-card {
-            min-width: 0;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            background: #35a675;
         }
 
         /* FILTER */
 
         .filter-card {
-            padding: clamp(19px, 2.3vw, 29px);
+            margin-bottom: 22px;
+            padding: 23px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--shadow);
         }
 
-        .filter-title {
+        .filter-heading {
             display: flex;
             align-items: center;
             gap: 11px;
-            margin-bottom: 21px;
-            color: var(--navy);
-            font-size: 17px;
-            font-weight: 750;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-family: 'Manrope', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
         }
 
-        .filter-title-icon {
-            width: 34px;
-            height: 34px;
-            flex: 0 0 34px;
+        .filter-heading span {
+            width: 37px;
+            height: 37px;
             display: grid;
             place-items: center;
             border-radius: 8px;
-            background: var(--blue-soft);
             color: var(--blue);
-            font-size: 20px;
+            background: var(--blue-light);
+            font-size: 19px;
         }
 
         .filter-grid {
             display: grid;
-            grid-template-columns:
-                minmax(145px, .8fr)
-                minmax(220px, 1.35fr)
-                minmax(185px, 1fr)
-                auto;
+            grid-template-columns: 1fr 1.5fr 1fr auto;
             align-items: end;
             gap: 17px;
-        }
-
-        .form-field {
-            min-width: 0;
         }
 
         .form-field label {
             display: block;
             margin-bottom: 8px;
-            color: #34465d;
-            font-size: 14px;
-            font-weight: 750;
-            line-height: 1.5;
+            color: #43566d;
+            font-size: 13px;
+            font-weight: 800;
         }
 
         .form-field select {
-            display: block;
             width: 100%;
-            min-width: 0;
-            min-height: 49px;
-            padding: 10px 36px 10px 13px;
-            border: 1px solid #cbd7e5;
-            border-radius: 7px;
-            background-color: #fff;
-            color: var(--ink);
-            font-size: 14px;
-            line-height: 1.5;
-            cursor: pointer;
-            transition: border-color .18s ease, box-shadow .18s ease;
-        }
-
-        .form-field select:hover {
-            border-color: #a8bdd5;
+            height: 49px;
+            padding: 0 13px;
+            border: 1px solid #dce4ed;
+            border-radius: 6px;
+            outline: none;
+            color: #41546a;
+            background: #fff;
+            font-size: 13px;
+            transition: border .2s, box-shadow .2s;
         }
 
         .form-field select:focus {
-            outline: none;
             border-color: var(--blue);
-            box-shadow: 0 0 0 3px rgba(36, 99, 166, .10);
+            box-shadow: 0 0 0 3px rgba(38,114,185,.1);
         }
 
-        .filter-grid > .btn {
-            min-height: 49px;
+        .filter-submit {
+            height: 49px;
+            padding: 0 22px;
+            border: 0;
+            border-radius: 6px;
+            color: white;
+            background: var(--primary);
+            font-size: 13px;
+            font-weight: 800;
             white-space: nowrap;
+            cursor: pointer;
+            transition: .2s ease;
         }
 
-        /* STATISTICS */
+        .filter-submit:hover {
+            background: var(--blue);
+            transform: translateY(-2px);
+        }
+
+        /* KARTU STATISTIK */
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 20px;
-            margin-top: 22px;
+            gap: 18px;
+            margin-bottom: 22px;
         }
 
         .stat-card {
             position: relative;
+            min-height: 165px;
             overflow: hidden;
-            padding: clamp(20px, 2.3vw, 29px);
-            transition: box-shadow .2s ease, transform .2s ease;
+            padding: 24px 26px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: white;
+            box-shadow: var(--shadow);
+            transition: .25s ease;
         }
 
         .stat-card:hover {
+            transform: translateY(-5px);
             box-shadow: var(--shadow-hover);
-            transform: translateY(-2px);
+        }
+
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            right: -38px;
+            bottom: -52px;
+            border-radius: 50%;
+            background: #edf4fb;
         }
 
         .stat-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 14px;
+            gap: 10px;
         }
 
         .stat-label {
-            color: var(--muted);
-            font-size: 15px;
+            color: #718096;
+            font-size: 14px;
             font-weight: 700;
-            line-height: 1.65;
         }
 
         .stat-icon {
-            width: 45px;
-            height: 45px;
-            flex: 0 0 45px;
+            width: 44px;
+            height: 44px;
             display: grid;
             place-items: center;
-            border-radius: 10px;
-            background: var(--blue-soft);
+            border-radius: 9px;
             color: var(--blue);
-            font-size: 22px;
+            background: var(--blue-light);
+            font-size: 21px;
         }
 
         .stat-value {
-            margin-top: 16px;
-            color: var(--navy);
-            font-size: clamp(32px, 3vw, 43px);
+            position: relative;
+            z-index: 1;
+            margin-top: 10px;
+            color: var(--primary);
+            font-family: 'Manrope', sans-serif;
+            font-size: 36px;
             font-weight: 800;
-            line-height: 1.2;
-            letter-spacing: -.7px;
-            overflow-wrap: anywhere;
-            font-variant-numeric: tabular-nums;
+            line-height: 1.3;
         }
 
         .stat-caption {
-            margin-top: 10px;
-            color: #758499;
-            font-size: 13px;
-            line-height: 1.75;
+            position: relative;
+            z-index: 1;
+            margin-top: 5px;
+            color: #8a97a7;
+            font-size: 11px;
+            line-height: 1.6;
         }
 
-        .stat-caption strong {
-            color: #52647a;
-            font-weight: 700;
-        }
-
-        /* DATA TABLES */
+        /* REKAP DAN PERINGKAT */
 
         .data-grid {
-            display: grid;
-            grid-template-columns: minmax(0, .9fr) minmax(0, 1.25fr);
-            align-items: start;
-            gap: 21px;
-            margin-top: 22px;
-        }
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    align-items: start;
+    gap: 18px;
+}
 
         .content-card {
+            min-width: 0;
+            height: 100%;
             overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--shadow);
         }
 
         .content-card-header {
-            padding: 24px 25px 19px;
-            border-bottom: 1px solid #edf1f6;
+            padding: 23px 25px 19px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .content-card h3 {
-            margin: 0;
-            color: var(--navy);
-            font-size: 19px;
-            font-weight: 780;
+        .content-card-header h3 {
+            color: var(--primary);
+            font-family: 'Manrope', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
             line-height: 1.5;
         }
 
         .card-description {
-            margin: 7px 0 0;
+            margin-top: 6px;
             color: var(--muted);
-            font-size: 14px;
+            font-size: 12px;
             line-height: 1.8;
         }
 
         .card-body {
-            padding: 0 23px 21px;
+            padding: 20px 24px 25px;
         }
 
         .table-wrap {
             width: 100%;
             overflow-x: auto;
-            overscroll-behavior-x: contain;
-            -webkit-overflow-scrolling: touch;
         }
 
-        table {
+        .table-wrap table {
             width: 100%;
-            margin-top: 17px;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 14px;
+            border-collapse: collapse;
+            white-space: nowrap;
         }
 
-        th,
-        td {
-            padding: 14px 12px;
-            text-align: left;
-            vertical-align: middle;
-            border-bottom: 1px solid #edf1f5;
-        }
-
-        th {
-            background: #f2f6fb;
-            color: #52647a;
+        .table-wrap th {
+            padding: 15px 14px;
+            color: #64758a;
+            background: #f5f8fb;
             font-size: 12px;
             font-weight: 800;
-            line-height: 1.6;
-            letter-spacing: .35px;
-            text-transform: uppercase;
+            text-align: left;
         }
 
-        th:first-child {
-            border-radius: 6px 0 0 6px;
+        .table-wrap td {
+            padding: 17px 14px;
+            border-bottom: 1px solid #edf0f4;
+            color: #4c5d70;
+            font-size: 12px;
         }
 
-        th:last-child {
-            border-radius: 0 6px 6px 0;
+        .table-wrap tbody tr:last-child td {
+            border-bottom: 0;
         }
 
-        td {
-            color: #36475c;
-            line-height: 1.7;
-            overflow-wrap: anywhere;
-        }
-
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        tbody tr:hover td {
-            background: #f8fbff;
+        .table-wrap tbody tr:hover {
+            background: #f8fafc;
         }
 
         .table-count {
             display: inline-flex;
-            align-items: center;
+            min-width: 39px;
             justify-content: center;
-            min-width: 35px;
-            padding: 5px 9px;
-            border-radius: 6px;
-            background: var(--blue-soft);
-            color: var(--navy);
-            font-size: 13px;
+            padding: 5px 11px;
+            border-radius: 20px;
+            color: var(--blue);
+            background: var(--blue-light);
+            font-size: 11px;
             font-weight: 800;
-            font-variant-numeric: tabular-nums;
         }
 
         .empty {
-            padding: 28px 13px !important;
-            color: var(--muted);
-            font-size: 14px;
+            padding: 30px 12px !important;
+            color: #8a97a7 !important;
             text-align: center;
-            line-height: 1.8;
+            white-space: normal;
         }
 
-        /* RANKING TENAGA KESEHATAN */
+        /* PERINGKAT TENAGA KESEHATAN */
 
         .ranking-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            align-items: start;
-            gap: 17px;
-            padding: 22px;
+            gap: 15px;
+            padding: 20px;
         }
 
         .ranking-panel {
             min-width: 0;
-            padding: 19px;
-            border: 1px solid var(--border);
+            padding: 18px;
+            border: 1px solid #e9eef4;
             border-radius: 9px;
-            background: #fff;
+            background: #fbfcfe;
         }
 
         .ranking-heading {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 13px;
+            gap: 11px;
+            margin-bottom: 18px;
         }
 
         .ranking-icon {
-            width: 42px;
-            height: 42px;
-            flex: 0 0 42px;
+            width: 39px;
+            height: 39px;
             display: grid;
             place-items: center;
-            border-radius: 9px;
-            font-size: 22px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            font-size: 18px;
             font-weight: 800;
         }
 
         .ranking-high .ranking-icon {
-            background: var(--green-soft);
-            color: var(--green);
+            color: #21845b;
+            background: #e8f6ef;
         }
 
         .ranking-low .ranking-icon {
-            background: var(--red-soft);
-            color: var(--red);
+            color: #bd7950;
+            background: #fff2e9;
         }
 
         .ranking-heading h4 {
-            margin: 0;
-            color: var(--navy);
-            font-size: 15px;
+            color: var(--primary);
+            font-family: 'Manrope', sans-serif;
+            font-size: 14px;
             font-weight: 800;
-            line-height: 1.5;
         }
 
         .ranking-heading p {
-            margin: 3px 0 0;
-            color: var(--muted);
-            font-size: 12px;
-            line-height: 1.5;
+            color: #8995a4;
+            font-size: 11px;
         }
 
         .ranking-list {
-            margin: 0;
-            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
             list-style: none;
         }
 
         .ranking-item {
             display: grid;
-            grid-template-columns: 32px minmax(0, 1fr) auto;
+            grid-template-columns: 27px minmax(0, 1fr) auto;
             align-items: center;
-            gap: 11px;
-            padding: 13px 0;
-            border-bottom: 1px solid #edf1f5;
+            gap: 9px;
+            padding: 12px 0;
+            border-bottom: 1px solid #edf0f4;
         }
 
         .ranking-item:last-child {
-            border-bottom: none;
+            padding-bottom: 0;
+            border-bottom: 0;
         }
 
         .ranking-number {
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             display: grid;
             place-items: center;
-            border-radius: 7px;
-            background: #f0f4f9;
-            color: #49617d;
-            font-size: 13px;
+            border-radius: 6px;
+            color: var(--blue);
+            background: var(--blue-light);
+            font-size: 11px;
             font-weight: 800;
-        }
-
-        .ranking-item:first-child .ranking-number {
-            background: #e6eef9;
-            color: var(--navy);
         }
 
         .ranking-name {
-            min-width: 0;
-            color: #3d4d61;
-            font-size: 14px;
-            font-weight: 650;
-            line-height: 1.65;
             overflow-wrap: anywhere;
+            color: #506176;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.5;
         }
 
         .ranking-total {
-            color: var(--navy);
-            font-size: 14px;
+            color: var(--primary);
+            font-size: 12px;
             font-weight: 800;
             white-space: nowrap;
-            font-variant-numeric: tabular-nums;
         }
 
         .ranking-total small {
-            color: #8794a5;
-            font-size: 11px;
-            font-weight: 600;
+            color: #8b98a8;
+            font-size: 10px;
+            font-weight: 500;
         }
 
         .ranking-empty {
-            padding: 17px;
-            border: 1px dashed #d9e2ec;
-            border-radius: 7px;
-            background: #f8fafc;
-            color: var(--muted);
-            font-size: 13px;
+            padding: 20px 8px;
+            color: #8a97a7;
+            font-size: 12px;
             line-height: 1.8;
+            text-align: center;
         }
 
         /* FOOTER */
 
         .public-footer {
-            margin-top: 0;
-            padding: 32px 0;
-            background: var(--navy-deep);
-            color: #cfdaea;
-            font-size: 13px;
-            line-height: 1.8;
+            color: white;
+            background: #081f37;
         }
 
-        .footer-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 18px 28px;
+        .footer-main {
+            display: grid;
+            grid-template-columns: 1.3fr .7fr;
+            gap: 70px;
+            padding-top: 50px;
+            padding-bottom: 40px;
         }
 
         .footer-brand {
             display: flex;
-            align-items: center;
-            gap: 13px;
+            align-items: flex-start;
+            gap: 15px;
         }
 
-        .footer-mark {
-            width: 41px;
-            height: 41px;
+        .footer-logo {
+            width: 54px;
+            height: 54px;
             display: grid;
             place-items: center;
-            flex: 0 0 41px;
-            border: 1px solid rgba(255, 255, 255, .18);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 20px;
+            flex-shrink: 0;
+            padding: 5px;
+            border-radius: 9px;
+            background: white;
+        }
+
+        .footer-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .footer-brand h3 {
+            margin-bottom: 5px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: .5px;
+        }
+
+        .footer-brand p {
+            max-width: 450px;
+            color: rgba(255,255,255,.7);
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .footer-links h4 {
+            margin-bottom: 15px;
+            color: #f0ca7a;
+            font-size: 14px;
             font-weight: 800;
         }
 
-        .footer-inner strong {
-            color: #fff;
-            font-size: 15px;
-            font-weight: 800;
+        .footer-links a {
+            display: block;
+            width: fit-content;
+            margin-bottom: 9px;
+            color: rgba(255,255,255,.75);
+            font-size: 13px;
+            transition: color .2s;
         }
 
-        .footer-copy {
-            max-width: 460px;
-            color: #bdcadd;
-            text-align: right;
+        .footer-links a:hover {
+            color: white;
         }
 
-        /* LAPTOP / TABLET LANDSCAPE */
+        .footer-bottom {
+            padding: 18px 0;
+            border-top: 1px solid rgba(255,255,255,.12);
+        }
 
-        @media (max-width: 1100px) {
-            .public-container {
+        .footer-bottom-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            color: rgba(255,255,255,.6);
+            font-size: 12px;
+        }
+
+        /* TABLET */
+
+        @media (max-width: 1050px) {
+            .public-container,
+            .nav-inner {
                 width: calc(100% - 48px);
             }
 
-            .hero-grid {
-                grid-template-columns: minmax(0, 1.2fr) minmax(270px, .8fr);
-                gap: 32px;
+            .nav-menu {
+                gap: 19px;
+            }
+
+            .nav-link {
+                font-size: 13px;
+            }
+
+            .hero-inner {
+                gap: 35px;
+            }
+
+            .hero h1 {
+                font-size: 46px;
             }
 
             .filter-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: 1fr 1.3fr;
             }
 
-            .filter-grid > .btn {
+            .filter-submit {
                 width: 100%;
             }
 
             .data-grid {
-                grid-template-columns: minmax(0, 1fr);
+                grid-template-columns: 1fr;
+                gap: 22px;
+            }
+
+            .content-card {
+                height: auto;
+            }
+
+            .about-grid {
+                gap: 40px;
             }
         }
 
-        /* TABLET PORTRAIT */
+        /* MOBILE */
 
         @media (max-width: 760px) {
-            body {
-                font-size: 15px;
-            }
-
-            .public-container {
-                width: calc(100% - 38px);
-            }
-
+            .public-container,
             .nav-inner {
-                min-height: 76px;
+                width: calc(100% - 36px);
             }
 
-            .hero {
-                padding: 48px 0 50px;
+            .topbar-inner {
+                min-height: 36px;
+                justify-content: center;
             }
 
-            .hero-grid {
-                grid-template-columns: minmax(0, 1fr);
-                gap: 28px;
+            .topbar-left {
+                gap: 10px;
             }
 
-            .hero h1 {
-                max-width: 650px;
-                font-size: clamp(34px, 6vw, 44px);
+            .topbar-right {
+                display: none;
             }
 
-            .hero-description {
-                max-width: 680px;
-                font-size: 16px;
-            }
-
-            .hero-note {
-                max-width: 680px;
-            }
-
-            .section {
-                padding: 35px 0 40px;
-            }
-
-            .section-heading h2 {
-                font-size: 27px;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 14px;
-            }
-
-            .stat-card {
-                padding: 20px;
-            }
-
-            .stat-value {
-                font-size: 34px;
-            }
-
-            .data-grid {
-                gap: 16px;
-            }
-
-            .content-card-header {
-                padding: 21px 21px 16px;
-            }
-
-            .card-body {
-                padding-inline: 18px;
-            }
-
-            .ranking-grid {
-                padding: 17px;
-                gap: 12px;
-            }
-
-            .ranking-panel {
-                padding: 15px;
-            }
-        }
-
-        /* HP */
-
-        @media (max-width: 540px) {
-            body {
-                font-size: 15px;
-            }
-
-            .public-container {
-                width: calc(100% - 30px);
+            .topbar-item {
+                font-size: 11px;
             }
 
             .nav-inner {
                 min-height: 72px;
-                gap: 10px;
             }
 
-            .brand {
-                gap: 9px;
-            }
-
-            .brand-mark {
-                width: 40px;
-                height: 40px;
-                flex-basis: 40px;
-                border-radius: 8px;
-                font-size: 21px;
+            .brand-logo {
+                width: 46px;
+                height: 46px;
             }
 
             .brand-title {
-                font-size: 18px;
+                font-size: 21px;
             }
 
             .brand-subtitle {
-                max-width: 175px;
-                margin-top: 2px;
                 font-size: 10px;
-                line-height: 1.45;
             }
 
-            .nav-actions {
+            .mobile-menu-button {
+                display: block;
+                flex-shrink: 0;
+            }
+
+            .nav-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
                 gap: 0;
+                padding: 12px 22px 20px;
+                border-top: 1px solid var(--border);
+                background: white;
+                box-shadow: 0 12px 20px rgba(15,45,75,.09);
             }
 
-            .nav-label {
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .nav-link {
+                padding: 13px 4px;
+                border-bottom: 1px solid #eef1f5;
+                font-size: 14px;
+            }
+
+            .nav-link::after {
                 display: none;
             }
 
-            .nav-inner > .nav-actions .btn {
-                min-height: 39px;
-                gap: 5px;
-                padding: 8px 10px;
-                font-size: 11px;
-                white-space: nowrap;
+            .nav-button {
+                margin-top: 12px;
             }
 
             .hero {
-                padding: 39px 0 41px;
+                min-height: auto;
             }
 
-            .eyebrow {
-                font-size: 11px;
-                letter-spacing: 1px;
+            .hero-inner {
+                grid-template-columns: 1fr;
+                gap: 35px;
+                padding-top: 65px;
+                padding-bottom: 75px;
             }
 
             .hero h1 {
-                margin: 10px 0 15px;
-                font-size: clamp(31px, 8vw, 39px);
-                line-height: 1.23;
-                letter-spacing: -.45px;
+                font-size: clamp(35px, 8vw, 47px);
+                letter-spacing: -1px;
             }
 
             .hero-description {
-                margin-bottom: 22px;
-                font-size: 15px;
-                line-height: 1.85;
-            }
-
-            .hero .btn {
-                min-height: 45px;
-                padding-inline: 16px;
-                font-size: 13px;
-            }
-
-            .hero-note {
-                padding: 18px;
-                border-radius: 10px;
-            }
-
-            .hero-note-top {
-                gap: 10px;
-                margin-bottom: 14px;
-            }
-
-            .hero-note-icon {
-                width: 39px;
-                height: 39px;
-                flex-basis: 39px;
-            }
-
-            .hero-note-label {
-                font-size: 11px;
-            }
-
-            .hero-note strong {
-                font-size: 16px;
-            }
-
-            .hero-note p {
-                font-size: 14px;
-                line-height: 1.8;
-            }
-
-            .hero-note-divider {
-                margin: 15px 0;
-            }
-
-            .hero-note-footer {
-                font-size: 12px;
-            }
-
-            .section {
-                padding: 29px 0 33px;
-            }
-
-            .section-heading {
-                align-items: flex-start;
-                margin-bottom: 18px;
-            }
-
-            .section-kicker {
-                font-size: 11px;
-            }
-
-            .section-heading h2 {
-                font-size: 24px;
-            }
-
-            .section-heading p {
                 font-size: 14px;
             }
 
-            .data-badge {
-                display: none;
+            .hero-side {
+                max-width: 550px;
+                padding: 25px;
             }
 
-            .filter-card {
-                padding: 17px;
-                border-radius: 10px;
-            }
-
-            .filter-title {
-                margin-bottom: 16px;
-                font-size: 15px;
-            }
-
-            .filter-title-icon {
-                width: 31px;
-                height: 31px;
-                flex-basis: 31px;
-            }
-
-            .filter-grid {
-                grid-template-columns: minmax(0, 1fr);
-                gap: 14px;
-            }
-
-            .form-field label {
-                margin-bottom: 7px;
-                font-size: 14px;
-            }
-
-            .form-field select {
-                min-height: 48px;
-                padding-left: 12px;
-                font-size: 14px;
-            }
-
-            .filter-grid > .btn {
-                min-height: 47px;
-                font-size: 14px;
-            }
-
-            .stats-grid {
-                grid-template-columns: minmax(0, 1fr);
-                gap: 12px;
-                margin-top: 15px;
-            }
-
-            .stat-card {
-                padding: 18px;
-            }
-
-            .stat-icon {
-                width: 39px;
-                height: 39px;
-                flex-basis: 39px;
+            .hero-side h3 {
                 font-size: 19px;
             }
 
-            .stat-label {
+            .hero-side p {
+                font-size: 13px;
+            }
+
+            .about-section {
+                padding: 60px 0;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .about-visual {
+                min-height: 300px;
+            }
+
+            .about-content h2 {
+                font-size: 29px;
+            }
+
+            .about-content p {
                 font-size: 14px;
             }
 
-            .stat-value {
-                margin-top: 9px;
-                font-size: 32px;
+            .dashboard-section {
+                padding: 60px 0;
             }
 
-            .stat-caption {
-                margin-top: 6px;
-                font-size: 12px;
+            .dashboard-heading {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 24px;
             }
 
-            .data-grid {
-                gap: 14px;
-                margin-top: 15px;
+            .dashboard-heading h2 {
+                font-size: 29px;
             }
 
-            .content-card-header {
-                padding: 18px 17px 14px;
-            }
-
-            .content-card h3 {
-                font-size: 17px;
-            }
-
-            .card-description {
+            .dashboard-heading p {
                 font-size: 13px;
             }
 
-            .card-body {
-                padding: 0 13px 14px;
-            }
-
-            table {
-                min-width: 290px;
-                margin-top: 13px;
-                font-size: 13px;
-            }
-
-            th,
-            td {
-                padding: 11px 9px;
-            }
-
-            th {
+            .dashboard-badge {
                 font-size: 11px;
             }
 
-            .table-count {
+            .filter-card {
+                padding: 20px;
+            }
+
+            .filter-heading {
+                font-size: 16px;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .form-field label {
                 font-size: 12px;
             }
 
-            .empty {
+            .form-field select {
+                height: 47px;
+                font-size: 12px;
+            }
+
+            .filter-submit {
+                height: 47px;
+                font-size: 12px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 13px;
+                margin-bottom: 22px;
+            }
+
+            .stat-card {
+                min-height: 140px;
+                padding: 21px;
+            }
+
+            .stat-value {
+                font-size: 32px;
+            }
+
+            .stat-label {
                 font-size: 13px;
             }
 
-            .ranking-grid {
-                grid-template-columns: minmax(0, 1fr);
-                gap: 12px;
-                padding: 13px;
+            .stat-caption {
+                font-size: 11px;
             }
 
-            .ranking-panel {
+            .data-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .content-card-header {
+                padding: 20px;
+            }
+
+            .content-card-header h3 {
+                font-size: 16px;
+            }
+
+            .card-description {
+                font-size: 11px;
+            }
+
+            .card-body {
                 padding: 15px;
             }
 
+            .table-wrap th,
+            .table-wrap td {
+                font-size: 11px;
+            }
+
+            .ranking-grid {
+                grid-template-columns: 1fr;
+                gap: 13px;
+                padding: 15px;
+            }
+
+            .ranking-panel {
+                padding: 17px;
+            }
+
             .ranking-heading h4 {
-                font-size: 14px;
-            }
-
-            .ranking-heading p {
-                font-size: 12px;
-            }
-
-            .ranking-name,
-            .ranking-total {
                 font-size: 13px;
             }
 
-            .ranking-number {
-                width: 28px;
-                height: 28px;
-            }
-
-            .ranking-item {
-                grid-template-columns: 30px minmax(0, 1fr) auto;
-                gap: 8px;
-            }
-
-            .ranking-empty {
-                font-size: 13px;
-            }
-
-            .public-footer {
-                padding: 25px 0;
+            .ranking-name {
                 font-size: 12px;
             }
 
-            .footer-inner {
+            .footer-main {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding-top: 40px;
+                padding-bottom: 35px;
+            }
+
+            .footer-brand h3 {
+                font-size: 19px;
+            }
+
+            .footer-brand p {
+                font-size: 12px;
+            }
+
+            .footer-bottom-inner {
                 align-items: flex-start;
                 flex-direction: column;
-                gap: 14px;
-            }
-
-            .footer-copy {
-                text-align: left;
+                gap: 6px;
+                font-size: 11px;
             }
         }
 
         /* HP KECIL */
 
-        @media (max-width: 360px) {
-            .public-container {
-                width: calc(100% - 24px);
+        @media (max-width: 420px) {
+            .public-container,
+            .nav-inner {
+                width: calc(100% - 30px);
             }
 
-            .brand {
-                gap: 7px;
-            }
-
-            .brand-mark {
-                width: 35px;
-                height: 35px;
-                flex-basis: 35px;
-                font-size: 19px;
-            }
-
-            .brand-title {
-                font-size: 16px;
-            }
-
-            .brand-subtitle {
-                max-width: 130px;
-                font-size: 9px;
-            }
-
-            .nav-inner > .nav-actions .btn {
-                padding-inline: 8px;
-                font-size: 10px;
+            .hero-inner {
+                padding-top: 55px;
+                padding-bottom: 65px;
             }
 
             .hero h1 {
-                font-size: 29px;
+                font-size: 34px;
+            }
+
+            .hero-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .button-primary {
+                width: fit-content;
+            }
+
+            .hero-side {
+                padding: 21px;
+            }
+
+            .about-content h2 {
+                font-size: 26px;
+            }
+
+            .about-points {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-heading h2 {
+                font-size: 26px;
             }
 
             .filter-card {
-                padding: 13px;
+                padding: 17px;
+            }
+
+            .stat-value {
+                font-size: 30px;
+            }
+
+            .content-card-header {
+                padding: 17px;
+            }
+
+            .card-body {
+                padding: 12px;
             }
 
             .ranking-grid {
-                padding: 10px;
+                padding: 12px;
             }
 
-            .ranking-panel {
-                padding: 12px;
+            .footer-brand {
+                gap: 12px;
             }
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
-            }
+        /* AKSESIBILITAS */
 
+        @media (prefers-reduced-motion: reduce) {
             *,
             *::before,
             *::after {
+                scroll-behavior: auto !important;
                 transition-duration: .01ms !important;
                 animation-duration: .01ms !important;
-                animation-iteration-count: 1 !important;
             }
         }
     </style>
 </head>
 
 <body>
-    {{-- HEADER --}}
-    <header class="public-nav">
-        <div class="public-container nav-inner">
-            <a href="{{ route('public.dashboard') }}"
-               class="brand"
-               aria-label="Beranda SIRAPIK">
 
-                <div class="brand-mark">
-    <img
-        src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
-        alt="Logo Provinsi Kalimantan Selatan"
-        class="provinsi-logo"
-    >
-</div>
+    {{-- TOPBAR --}}
+    <div class="topbar">
+        <div class="public-container topbar-inner">
+
+            <div class="topbar-left">
+                <div class="topbar-item">
+                    <span class="topbar-icon">◷</span>
+                    <span>Portal Informasi Publik Bapelkes</span>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="topbar-item">
+                    <span class="topbar-icon">▣</span>
+                    <span>Sistem Informasi Pelatihan</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {{-- NAVBAR --}}
+    <header class="public-nav">
+        <div class="nav-inner">
+
+            <a href="{{ route('public.dashboard') }}" class="brand">
+
+                <div class="brand-logo">
+                    <img
+                        src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+                        alt="Logo Provinsi Kalimantan Selatan"
+                    >
+                </div>
 
                 <div>
                     <div class="brand-title">SIRAPIK</div>
+
                     <div class="brand-subtitle">
                         Bapelkes Provinsi Kalimantan Selatan
                     </div>
                 </div>
+
             </a>
 
-          <div class="nav-actions">
-    <span class="nav-label">Portal informasi publik</span>
+            <button
+                type="button"
+                class="mobile-menu-button"
+                id="mobile-menu-button"
+                aria-label="Buka menu navigasi"
+                aria-expanded="false"
+            >
+                ☰
+            </button>
 
-    <a href="{{ route('public.training-history') }}" class="btn">
-        Riwayat Pelatihan
-        <span aria-hidden="true">→</span>
-    </a>
-</div>
+            <nav class="nav-menu" id="nav-menu">
+
+                <a href="#beranda" class="nav-link">
+                    Beranda
+                </a>
+
+                <a href="#tentang" class="nav-link">
+                    Tentang SIRAPIK
+                </a>
+
+                <a href="#dashboard" class="nav-link">
+                    Data Pelatihan
+                </a>
+
+                <a href="{{ route('public.training-history') }}" class="nav-button">
+                    Riwayat Pelatihan
+                    <span>→</span>
+                </a>
+
+            </nav>
+
         </div>
     </header>
 
     <main>
+
         {{-- HERO --}}
-        <section class="hero">
-            <div class="public-container hero-grid">
-                <div class="hero-copy">
-                    <div class="eyebrow">Sistem Informasi Pelatihan</div>
+        <section class="hero" id="beranda">
+
+            <div class="public-container hero-inner">
+
+                <div class="hero-content">
+
+                    <div class="hero-label">
+                        Sistem Informasi Pelatihan
+                    </div>
 
                     <h1>
-                        Informasi pelatihan kesehatan dalam satu sistem.
+                        Informasi Pelatihan Kesehatan
+                        <span>Dalam Satu Sistem.</span>
                     </h1>
 
                     <p class="hero-description">
-                        SIRAPIK menyajikan ringkasan data pelatihan Bapelkes
-                        Provinsi Kalimantan Selatan berdasarkan tahun,
-                        kabupaten/kota atau mitra, serta sumber dana.
-                        Informasi ini mendukung pemantauan pelaksanaan
-                        pelatihan tenaga kesehatan secara lebih terarah.
+                        SIRAPIK menyajikan informasi dan ringkasan data pelatihan
+                        Bapelkes Provinsi Kalimantan Selatan. Melalui sistem ini,
+                        masyarakat dapat melihat informasi pelatihan berdasarkan
+                        tahun, kabupaten/kota atau mitra, serta sumber dana.
                     </p>
 
-                    <a class="btn" href="#dashboard">
-                        Lihat Dashboard
-                        <span class="btn-arrow" aria-hidden="true">↓</span>
-                    </a>
+                    <div class="hero-actions">
+
+                        <a href="#dashboard" class="button-primary">
+                            Lihat Data Pelatihan
+                            <span>→</span>
+                        </a>
+
+                    </div>
+
                 </div>
 
-                <aside class="hero-note">
-                    <div class="hero-note-top">
-                        <div class="hero-note-icon" aria-hidden="true">▤</div>
+                <aside class="hero-side">
 
-                        <div>
-                            <div class="hero-note-label">Akses informasi</div>
-                            <strong>Dashboard untuk publik</strong>
-                        </div>
+                    <div class="hero-side-icon">▤</div>
+
+                    <div class="hero-side-label">
+                        Portal Informasi
                     </div>
+
+                    <h3>
+                        Informasi pelatihan lebih mudah diakses.
+                    </h3>
 
                     <p>
-                        Ringkasan informasi pelatihan dapat diakses tanpa akun.
-                        Pengelolaan data dan administrasi tersedia bagi petugas
-                        internal sesuai hak akses masing-masing.
+                        Melalui SIRAPIK, masyarakat dapat melihat ringkasan
+                        pelatihan yang telah tercatat dalam sistem. Informasi
+                        tersedia secara terbuka tanpa harus masuk ke akun pengguna.
                     </p>
 
-                    <div class="hero-note-divider"></div>
+                    <div class="hero-side-line"></div>
 
-                    <div class="hero-note-footer">
-                        <span class="status-dot" aria-hidden="true"></span>
-                        <span>
-                            Informasi berdasarkan data yang tercatat di SIRAPIK
-                        </span>
+                    <div class="hero-side-status">
+                        <span></span>
+                        Informasi berdasarkan data SIRAPIK
                     </div>
+
                 </aside>
+
             </div>
+
         </section>
 
-        {{-- DASHBOARD --}}
-        <section class="section public-container" id="dashboard">
-            <div class="section-heading">
-                <div class="section-heading-main">
-                    <div class="section-kicker">Ringkasan data</div>
+        {{-- TENTANG SIRAPIK --}}
+        <section class="about-section" id="tentang">
 
-                    <h2>Dashboard Pelatihan</h2>
+            <div class="public-container about-grid">
+
+                <div class="about-visual">
+
+                    <div class="about-visual-content">
+
+                        <div class="about-logo">
+                            <img
+                                src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+                                alt="Logo Provinsi Kalimantan Selatan"
+                            >
+                        </div>
+
+                        <strong>SIRAPIK</strong>
+
+                        <span>
+                            Bapelkes Provinsi Kalimantan Selatan
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="about-content">
+
+                    <div class="section-label">
+                        Mengenal SIRAPIK
+                    </div>
+
+                    <h2>
+                        Mendukung Pengelolaan Informasi Pelatihan Kesehatan.
+                    </h2>
 
                     <p>
-                        Gunakan filter di bawah untuk melihat statistik
-                        pelatihan berdasarkan kriteria yang dipilih.
+                        SIRAPIK merupakan Sistem Informasi Pelatihan yang
+                        digunakan untuk menyajikan informasi pelatihan
+                        Bapelkes Provinsi Kalimantan Selatan.
                     </p>
-                </div>
 
-                <div class="data-badge">
-                    <span class="data-badge-dot" aria-hidden="true"></span>
-                    Data pelatihan
-                </div>
-            </div>
+                    <p>
+                        Informasi yang tersedia mencakup ringkasan pelatihan,
+                        jumlah peserta, rekap berdasarkan kabupaten/kota
+                        atau mitra, serta partisipasi tenaga kesehatan.
+                        Penyajian informasi ini diharapkan membantu pengguna
+                        memperoleh gambaran data pelatihan dengan lebih mudah.
+                    </p>
 
-            {{-- FILTER --}}
-            <form
-                method="GET"
-                action="{{ route('public.dashboard') }}"
-                class="filter-card"
-                id="dashboard-filter"
-            >
-                <div class="filter-title">
-                    <span class="filter-title-icon" aria-hidden="true">⌕</span>
-                    Filter data pelatihan
-                </div>
+                    <div class="about-points">
 
-                <div class="filter-grid">
-                    <div class="form-field">
-                        <label for="year">Tahun pelatihan</label>
-
-                        <select name="year" id="year">
-                            @forelse ($years as $availableYear)
-                                <option
-                                    value="{{ $availableYear }}"
-                                    @selected((int) $year === (int) $availableYear)
-                                >
-                                    {{ $availableYear }}
-                                </option>
-                            @empty
-                                <option value="{{ $year }}">
-                                    {{ $year }}
-                                </option>
-                            @endforelse
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="district">Kabupaten/Kota/Mitra/Mandiri</label>
-
-                        <select name="district" id="district">
-                            <option value="">Semua Kabupaten/Kota/Mitra/Mandiri</option>
-
-                            @foreach ($districts as $item)
-                                <option
-                                    value="{{ $item }}"
-                                    @selected($district === $item)
-                                >
-                                    {{ $item }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="funding_source">Sumber dana</label>
-
-                        <select name="funding_source" id="funding_source">
-                            <option value="">Semua sumber dana</option>
-
-                            @foreach ($fundingSources as $source)
-                                <option
-                                    value="{{ $source }}"
-                                    @selected($fundingSource === $source)
-                                >
-                                    {{ $source }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <button class="btn" type="submit">
-                        Terapkan Filter
-                        <span aria-hidden="true">→</span>
-                    </button>
-                </div>
-            </form>
-
-            {{-- STATISTIK --}}
-            <div class="stats-grid">
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <div class="stat-label">Jumlah pelatihan</div>
-                        <div class="stat-icon" aria-hidden="true">▤</div>
-                    </div>
-
-                    <div class="stat-value">
-                        {{ number_format($totalTrainings, 0, ',', '.') }}
-                    </div>
-
-                    <div class="stat-caption">
-                        Jumlah pelatihan sesuai filter yang dipilih
-                    </div>
-                </article>
-
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <div class="stat-label">Peserta yang sudah di latih</div>
-                        <div class="stat-icon" aria-hidden="true">♙</div>
-                    </div>
-
-                    <div class="stat-value">
-                        {{ number_format($totalParticipants, 0, ',', '.') }}
-                    </div>
-
-                    <div class="stat-caption">
-                        Jumlah peserta yang sudah dilatih per individu
-                    </div>
-                </article>
-
-                <article class="stat-card">
-                    <div class="stat-top">
-                        <div class="stat-label">Tahun laporan</div>
-                        <div class="stat-icon" aria-hidden="true">▦</div>
-                    </div>
-
-                    <div class="stat-value">{{ $year }}</div>
-
-                    <div class="stat-caption">
-                        Tahun pelaksanaan pelatihan yang sedang ditampilkan
-                    </div>
-                </article>
-            </div>
-
-            {{-- REKAP DAN PERINGKAT --}}
-            <div class="data-grid">
-                {{-- REKAP WILAYAH --}}
-                <section class="content-card">
-                    <div class="content-card-header">
-                        <h3>Rekap Kabupaten/Kota/Mitra/Mandiri</h3>
-
-                        <p class="card-description">
-                            Jumlah pelatihan berdasarkan wilayah atau mitra
-                            yang tercatat.
-                        </p>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Kabupaten/Kota/Mitra/Mandiri</th>
-                                        <th>Jumlah</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    @forelse ($trainingByDistrict as $row)
-                                        <tr>
-                                            <td>{{ $row->district }}</td>
-                                            <td>
-                                                <span class="table-count">
-                                                    {{ number_format($row->total, 0, ',', '.') }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="2" class="empty">
-                                                Belum ada data untuk filter ini.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                {{-- PERINGKAT TENAGA KESEHATAN --}}
-                <section class="content-card">
-                    <div class="content-card-header">
-                        <h3>Partisipasi Tenaga Kesehatan</h3>
-
-                        <p class="card-description">
-                            Peringkat jenis tenaga kesehatan berdasarkan jumlah
-                            peserta unik yang mengikuti pelatihan sesuai filter
-                            yang dipilih.
-                        </p>
-                    </div>
-
-                    <div class="ranking-grid">
-                        {{-- LIMA TERTINGGI --}}
-                        <div class="ranking-panel ranking-high">
-                            <div class="ranking-heading">
-                                <div class="ranking-icon" aria-hidden="true">↑</div>
-
-                                <div>
-                                    <h4>5 Tertinggi</h4>
-                                    <p>Peserta terbanyak</p>
-                                </div>
-                            </div>
-
-                            @if (isset($topNakes) && $topNakes->isNotEmpty())
-                                <ol class="ranking-list">
-                                    @foreach ($topNakes as $nakes)
-                                        <li class="ranking-item">
-                                            <span class="ranking-number">
-                                                {{ $loop->iteration }}
-                                            </span>
-
-                                            <span class="ranking-name">
-                                                {{ $nakes->name }}
-                                            </span>
-
-                                            <span class="ranking-total">
-                                                {{ number_format((int) $nakes->total, 0, ',', '.') }}
-                                                <small>org</small>
-                                            </span>
-                                        </li>
-                                    @endforeach
-                                </ol>
-                            @else
-                                <div class="ranking-empty">
-                                    Belum ada data peserta untuk ditampilkan
-                                    pada filter ini.
-                                </div>
-                            @endif
+                        <div class="about-point">
+                            <span>✓</span>
+                            Informasi pelatihan
                         </div>
 
-                        {{-- LIMA TERENDAH --}}
-                        <div class="ranking-panel ranking-low">
-                            <div class="ranking-heading">
-                                <div class="ranking-icon" aria-hidden="true">↓</div>
-
-                                <div>
-                                    <h4>5 Terendah</h4>
-                                    <p>Peserta paling sedikit</p>
-                                </div>
-                            </div>
-
-                            @if (isset($bottomNakes) && $bottomNakes->isNotEmpty())
-                                <ol class="ranking-list">
-                                    @foreach ($bottomNakes as $nakes)
-                                        <li class="ranking-item">
-                                            <span class="ranking-number">
-                                                {{ $loop->iteration }}
-                                            </span>
-
-                                            <span class="ranking-name">
-                                                {{ $nakes->name }}
-                                            </span>
-
-                                            <span class="ranking-total">
-                                                {{ number_format((int) $nakes->total, 0, ',', '.') }}
-                                                <small>org</small>
-                                            </span>
-                                        </li>
-                                    @endforeach
-                                </ol>
-                            @else
-                                <div class="ranking-empty">
-                                    Belum ada data peserta untuk ditampilkan
-                                    pada filter ini.
-                                </div>
-                            @endif
+                        <div class="about-point">
+                            <span>✓</span>
+                            Ringkasan statistik
                         </div>
+
+                        <div class="about-point">
+                            <span>✓</span>
+                            Filter data pelatihan
+                        </div>
+
+                        <div class="about-point">
+                            <span>✓</span>
+                            Rekap partisipasi
+                        </div>
+
                     </div>
-                </section>
+
+                </div>
+
             </div>
+
         </section>
+
+        {{-- DASHBOARD DATA PELATIHAN --}}
+        <section class="dashboard-section" id="dashboard">
+
+            <div class="public-container">
+
+                {{-- JUDUL DASHBOARD --}}
+                <div class="dashboard-heading">
+
+                    <div>
+
+                        <div class="section-label">
+                            Pusat Informasi Data
+                        </div>
+
+                        <h2>
+                            Data Pelatihan
+                        </h2>
+
+                        <p>
+                            Bagian ini menampilkan jumlah pelatihan, jumlah peserta,
+                            serta informasi pelatihan berdasarkan wilayah atau mitra
+                            dan jenis tenaga kesehatan. Gunakan filter untuk melihat
+                            data sesuai tahun dan sumber dana yang diinginkan.
+                        </p>
+
+                    </div>
+
+                    <div class="dashboard-badge">
+                        <span></span>
+                        Data Pelatihan
+                    </div>
+
+                </div>
+
+                {{-- FILTER DATA --}}
+                <form
+                    method="GET"
+                    action="{{ route('public.dashboard') }}"
+                    class="filter-card"
+                    id="dashboard-filter"
+                >
+
+                    <div class="filter-heading">
+                        <span>⌕</span>
+                        Filter Data Pelatihan
+                    </div>
+
+                    <div class="filter-grid">
+
+                        <div class="form-field">
+
+                            <label for="year">
+                                Tahun Pelatihan
+                            </label>
+
+                            <select name="year" id="year">
+
+                                @forelse ($years as $availableYear)
+
+                                    <option
+                                        value="{{ $availableYear }}"
+                                        @selected((int) $year === (int) $availableYear)
+                                    >
+                                        {{ $availableYear }}
+                                    </option>
+
+                                @empty
+
+                                    <option value="{{ $year }}">
+                                        {{ $year }}
+                                    </option>
+
+                                @endforelse
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-field">
+
+                            <label for="district">
+                                Kabupaten/Kota/Mitra/Mandiri
+                            </label>
+
+                            <select name="district" id="district">
+
+                                <option value="">
+                                    Semua Kabupaten/Kota/Mitra/Mandiri
+                                </option>
+
+                                @foreach ($districts as $item)
+
+                                    <option
+                                        value="{{ $item }}"
+                                        @selected($district === $item)
+                                    >
+                                        {{ $item }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-field">
+
+                            <label for="funding_source">
+                                Sumber Dana
+                            </label>
+
+                            <select name="funding_source" id="funding_source">
+
+                                <option value="">
+                                    Semua Sumber Dana
+                                </option>
+
+                                @foreach ($fundingSources as $source)
+
+                                    <option
+                                        value="{{ $source }}"
+                                        @selected($fundingSource === $source)
+                                    >
+                                        {{ $source }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        <button class="filter-submit" type="submit">
+                            Terapkan Filter →
+                        </button>
+
+                    </div>
+
+                </form>
+
+                {{-- RINGKASAN STATISTIK --}}
+                <div class="stats-grid">
+
+                    {{-- JUMLAH PELATIHAN --}}
+                    <article class="stat-card">
+
+                        <div class="stat-top">
+
+                            <div class="stat-label">
+                                Jumlah Pelatihan
+                            </div>
+
+                            <div class="stat-icon">
+                                ▤
+                            </div>
+
+                        </div>
+
+                        <div class="stat-value">
+                            {{ number_format($totalTrainings, 0, ',', '.') }}
+                        </div>
+
+                        <div class="stat-caption">
+                            Jumlah pelatihan sesuai filter yang dipilih
+                        </div>
+
+                    </article>
+
+                    {{-- JUMLAH PESERTA --}}
+                    <article class="stat-card">
+
+                        <div class="stat-top">
+
+                            <div class="stat-label">
+                                Peserta yang Sudah Dilatih
+                            </div>
+
+                            <div class="stat-icon">
+                                ♙
+                            </div>
+
+                        </div>
+
+                        <div class="stat-value">
+                            {{ number_format($totalParticipants, 0, ',', '.') }}
+                        </div>
+
+                        <div class="stat-caption">
+                            Jumlah peserta yang sudah dilatih per individu
+                        </div>
+
+                    </article>
+
+                    {{-- TAHUN LAPORAN --}}
+                    <article class="stat-card">
+
+                        <div class="stat-top">
+
+                            <div class="stat-label">
+                                Tahun Laporan
+                            </div>
+
+                            <div class="stat-icon">
+                                ▦
+                            </div>
+
+                        </div>
+
+                        <div class="stat-value">
+                            {{ $year }}
+                        </div>
+
+                        <div class="stat-caption">
+                            Tahun pelaksanaan pelatihan yang sedang ditampilkan
+                        </div>
+
+                    </article>
+
+                </div>
+
+                {{-- REKAP DATA DAN PERINGKAT --}}
+                <div class="data-grid">
+
+                    {{-- REKAP KABUPATEN/KOTA/MITRA --}}
+                    <section class="content-card">
+
+                        <div class="content-card-header">
+
+                            <h3>
+                                Rekap Kabupaten/Kota/Mitra/Mandiri
+                            </h3>
+
+                            <p class="card-description">
+                                Jumlah pelatihan berdasarkan wilayah atau mitra
+                                yang tercatat dalam sistem.
+                            </p>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="table-wrap">
+
+                                <table>
+
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Kabupaten/Kota/Mitra/Mandiri
+                                            </th>
+
+                                            <th>
+                                                Jumlah
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        @forelse ($trainingByDistrict as $row)
+
+                                            <tr>
+
+                                                <td>
+                                                    {{ $row->district }}
+                                                </td>
+
+                                                <td>
+                                                    <span class="table-count">
+                                                        {{ number_format($row->total, 0, ',', '.') }}
+                                                    </span>
+                                                </td>
+
+                                            </tr>
+
+                                        @empty
+
+                                            <tr>
+                                                <td colspan="2" class="empty">
+                                                    Belum ada data untuk filter ini.
+                                                </td>
+                                            </tr>
+
+                                        @endforelse
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    {{-- PARTISIPASI TENAGA KESEHATAN --}}
+                    <section class="content-card">
+
+                        <div class="content-card-header">
+
+                            <h3>
+                                Partisipasi Tenaga Kesehatan
+                            </h3>
+
+                            <p class="card-description">
+                                Peringkat jenis tenaga kesehatan berdasarkan
+                                jumlah peserta unik yang mengikuti pelatihan
+                                sesuai filter yang dipilih.
+                            </p>
+
+                        </div>
+
+                        <div class="ranking-grid">
+
+                            {{-- 5 TERTINGGI --}}
+                            <div class="ranking-panel ranking-high">
+
+                                <div class="ranking-heading">
+
+                                    <div class="ranking-icon">
+                                        ↑
+                                    </div>
+
+                                    <div>
+                                        <h4>5 Tertinggi</h4>
+                                        <p>Peserta terbanyak</p>
+                                    </div>
+
+                                </div>
+
+                                @if (isset($topNakes) && $topNakes->isNotEmpty())
+
+                                    <ol class="ranking-list">
+
+                                        @foreach ($topNakes as $nakes)
+
+                                            <li class="ranking-item">
+
+                                                <span class="ranking-number">
+                                                    {{ $loop->iteration }}
+                                                </span>
+
+                                                <span class="ranking-name">
+                                                    {{ $nakes->name }}
+                                                </span>
+
+                                                <span class="ranking-total">
+                                                    {{ number_format((int) $nakes->total, 0, ',', '.') }}
+                                                    <small>org</small>
+                                                </span>
+
+                                            </li>
+
+                                        @endforeach
+
+                                    </ol>
+
+                                @else
+
+                                    <div class="ranking-empty">
+                                        Belum ada data peserta untuk ditampilkan
+                                        pada filter ini.
+                                    </div>
+
+                                @endif
+
+                            </div>
+
+                            {{-- 5 TERENDAH --}}
+                            <div class="ranking-panel ranking-low">
+
+                                <div class="ranking-heading">
+
+                                    <div class="ranking-icon">
+                                        ↓
+                                    </div>
+
+                                    <div>
+                                        <h4>5 Terendah</h4>
+                                        <p>Peserta paling sedikit</p>
+                                    </div>
+
+                                </div>
+
+                                @if (isset($bottomNakes) && $bottomNakes->isNotEmpty())
+
+                                    <ol class="ranking-list">
+
+                                        @foreach ($bottomNakes as $nakes)
+
+                                            <li class="ranking-item">
+
+                                                <span class="ranking-number">
+                                                    {{ $loop->iteration }}
+                                                </span>
+
+                                                <span class="ranking-name">
+                                                    {{ $nakes->name }}
+                                                </span>
+
+                                                <span class="ranking-total">
+                                                    {{ number_format((int) $nakes->total, 0, ',', '.') }}
+                                                    <small>org</small>
+                                                </span>
+
+                                            </li>
+
+                                        @endforeach
+
+                                    </ol>
+
+                                @else
+
+                                    <div class="ranking-empty">
+                                        Belum ada data peserta untuk ditampilkan
+                                        pada filter ini.
+                                    </div>
+
+                                @endif
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </main>
 
     {{-- FOOTER --}}
     <footer class="public-footer">
-        <div class="public-container footer-inner">
+
+        <div class="public-container footer-main">
+
             <div class="footer-brand">
-                <div class="footer-mark">
-    <img
-        src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
-        alt="Logo Provinsi Kalimantan Selatan"
-        class="provinsi-logo"
-    >
-</div>
+
+                <div class="footer-logo">
+                    <img
+                        src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+                        alt="Logo Provinsi Kalimantan Selatan"
+                    >
+                </div>
 
                 <div>
-                    <strong>SIRAPIK</strong><br>
-                    Bapelkes Provinsi Kalimantan Selatan
+
+                    <h3>SIRAPIK</h3>
+
+                    <p>
+                        Sistem Informasi Pelatihan Bapelkes Provinsi
+                        Kalimantan Selatan. Menyediakan informasi dan
+                        ringkasan data pelatihan melalui satu sistem.
+                    </p>
+
                 </div>
+
             </div>
 
-            <div class="footer-copy">
-                © {{ date('Y') }} SIRAPIK.
-                Informasi ditampilkan berdasarkan data yang tersedia.
+            <div class="footer-links">
             </div>
+
         </div>
+
+        <div class="footer-bottom">
+
+            <div class="public-container footer-bottom-inner">
+
+                <span>
+                    © {{ date('Y') }} SIRAPIK. Hak Cipta Dilindungi.
+                </span>
+
+                <span>
+                    Bapelkes Provinsi Kalimantan Selatan
+                </span>
+
+            </div>
+
+        </div>
+
     </footer>
 
+    {{-- JAVASCRIPT NAVBAR MOBILE --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const dashboardLink = document.querySelector('a[href="#dashboard"]');
-            const dashboard = document.getElementById('dashboard');
 
-            if (dashboardLink && dashboard) {
-                dashboardLink.addEventListener('click', function (event) {
-                    event.preventDefault();
+            const menuButton = document.getElementById('mobile-menu-button');
+            const navMenu = document.getElementById('nav-menu');
 
-                    dashboard.scrollIntoView({
-                        behavior: window.matchMedia(
-                            '(prefers-reduced-motion: reduce)'
-                        ).matches ? 'auto' : 'smooth',
-                        block: 'start'
+            if (menuButton && navMenu) {
+
+                menuButton.addEventListener('click', function () {
+
+                    const isOpen = navMenu.classList.toggle('active');
+
+                    menuButton.setAttribute(
+                        'aria-expanded',
+                        isOpen ? 'true' : 'false'
+                    );
+
+                    menuButton.innerHTML = isOpen ? '×' : '☰';
+
+                });
+
+                navMenu.querySelectorAll('a').forEach(function (link) {
+
+                    link.addEventListener('click', function () {
+
+                        navMenu.classList.remove('active');
+
+                        menuButton.setAttribute(
+                            'aria-expanded',
+                            'false'
+                        );
+
+                        menuButton.innerHTML = '☰';
+
                     });
 
-                    if (window.history && window.history.replaceState) {
-                        window.history.replaceState(
-                            null,
-                            '',
-                            '#dashboard'
-                        );
-                    }
                 });
+
             }
+
         });
     </script>
+
 </body>
 </html>
