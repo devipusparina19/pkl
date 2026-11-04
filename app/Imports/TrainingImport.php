@@ -35,6 +35,7 @@ class TrainingImport implements ToCollection
 
     public function collection(Collection $rows): void
     {
+        // Header peserta berada pada baris Excel ke-7.
         $headerRow = $rows->get(6);
 
         if (!$headerRow instanceof Collection) {
@@ -46,15 +47,20 @@ class TrainingImport implements ToCollection
         $headers = $this->normalizeHeaders($headerRow);
 
         $nameColumn = $this->findColumn($headers, [
-            'nama lengkap', 'nama peserta', 'nama', 'name',
+            'nama lengkap',
+            'nama peserta',
+            'nama',
+            'name',
         ]);
 
         $nipColumn = $this->findColumn($headers, [
-            'nip', 'nomor induk pegawai',
+            'nip',
+            'nomor induk pegawai',
         ]);
 
         $nikColumn = $this->findColumn($headers, [
-            'nik', 'nomor induk kependudukan',
+            'nik',
+            'nomor induk kependudukan',
         ]);
 
         if ($nameColumn === null) {
@@ -77,6 +83,7 @@ class TrainingImport implements ToCollection
             return;
         }
 
+        // Data peserta dimulai dari baris Excel ke-8.
         foreach ($rows->slice(7)->values() as $index => $row) {
             $excelRow = $index + 8;
 
@@ -116,25 +123,25 @@ class TrainingImport implements ToCollection
                 ): void {
                     $participant = null;
 
+                    // Cari berdasarkan NIP terlebih dahulu.
                     if (
                         $nip !== '' &&
                         Schema::hasColumn('participants', 'nip')
                     ) {
-                        $participant = Participant::where(
-                            'nip',
-                            $nip
-                        )->first();
+                        $participant = Participant::query()
+                            ->where('nip', $nip)
+                            ->first();
                     }
 
+                    // Jika belum ditemukan, cari berdasarkan NIK.
                     if (
                         !$participant &&
                         $nik !== '' &&
                         Schema::hasColumn('participants', 'nik')
                     ) {
-                        $participant = Participant::where(
-                            'nik',
-                            $nik
-                        )->first();
+                        $participant = Participant::query()
+                            ->where('nik', $nik)
+                            ->first();
                     }
 
                     $isNew = !$participant;
@@ -145,12 +152,11 @@ class TrainingImport implements ToCollection
 
                     $participant->name = $name;
 
-                    if (
-                        $nip !== '' &&
-                        Schema::hasColumn('participants', 'nip')
-                    ) {
-                        $participant->nip = $nip;
-                    }
+                    $this->setIfColumnExists(
+                        $participant,
+                        'nip',
+                        $nip
+                    );
 
                     $this->setIfColumnExists(
                         $participant,
@@ -208,10 +214,22 @@ class TrainingImport implements ToCollection
                         $this->updatedParticipants++;
                     }
 
-                    $history = TrainingHistory::firstOrCreate([
-                        'participant_id' => $participant->id,
-                        'training_id' => $training->id,
-                    ]);
+                    /*
+                     * BAGIAN PENTING:
+                     * Hubungkan peserta dengan pelatihan.
+                     *
+                     * Kombinasi participant_id dan training_id
+                     * tidak dibuat berulang jika sudah ada.
+                     */
+                    $history = TrainingHistory::firstOrCreate(
+                        [
+                            'participant_id' => $participant->id,
+                            'training_id' => $training->id,
+                        ],
+                        [
+                            'status' => 'selesai',
+                        ]
+                    );
 
                     if ($history->wasRecentlyCreated) {
                         $this->createdHistories++;
@@ -267,33 +285,49 @@ class TrainingImport implements ToCollection
     ): array {
         $aliases = [
             'name' => [
-                'nama lengkap', 'nama peserta', 'nama', 'name',
+                'nama lengkap',
+                'nama peserta',
+                'nama',
+                'name',
             ],
             'nip' => [
-                'nip', 'nomor induk pegawai',
+                'nip',
+                'nomor induk pegawai',
             ],
             'nik' => [
-                'nik', 'nomor induk kependudukan',
+                'nik',
+                'nomor induk kependudukan',
             ],
             'gender' => [
-                'jenis kelamin', 'gender', 'jk',
+                'jenis kelamin',
+                'gender',
+                'jk',
             ],
             'rank' => [
-                'pangkat golongan', 'pangkat gol', 'golongan',
+                'pangkat golongan',
+                'pangkat gol',
+                'golongan',
             ],
             'profession' => [
-                'profesi nakes', 'profesi',
+                'profesi nakes',
+                'profesi',
                 'jenis tenaga kesehatan',
             ],
             'email' => [
-                'email', 'alamat email',
+                'email',
+                'alamat email',
             ],
             'phone' => [
-                'nomor telepon', 'no telepon', 'telepon',
-                'no hp', 'nomor hp',
+                'nomor telepon',
+                'no telepon',
+                'telepon',
+                'no hp',
+                'nomor hp',
             ],
             'institution' => [
-                'instansi unit kerja', 'instansi', 'unit kerja',
+                'instansi unit kerja',
+                'instansi',
+                'unit kerja',
             ],
         ];
 
@@ -301,7 +335,9 @@ class TrainingImport implements ToCollection
 
         foreach ($aliases as $field => $names) {
             $column = $this->findColumn($headers, $names);
-            $value = $column !== null ? $row->get($column) : null;
+            $value = $column !== null
+                ? $row->get($column)
+                : null;
 
             $result[$field] = $value === null
                 ? null
@@ -337,7 +373,7 @@ class TrainingImport implements ToCollection
 
         $isNew = !$training->exists;
 
-        $training->name = $this->trainingName;
+        $training->name = trim($this->trainingName);
 
         $this->setTrainingColumn(
             $training,
@@ -348,29 +384,29 @@ class TrainingImport implements ToCollection
         $this->setTrainingColumn(
             $training,
             'funding_source',
-            $this->fundingSource
+            trim($this->fundingSource)
         );
 
         $this->setTrainingColumn(
             $training,
             'district',
-            $this->district
+            trim($this->district)
         );
 
         $this->setTrainingColumn(
             $training,
             'organizer',
-            $this->organizer
+            trim($this->organizer)
         );
 
-        // KATEGORI DARI MASTER DATA
+        // Kategori dari Master Data Super Admin.
         $this->setTrainingColumn(
             $training,
             'training_category_id',
             $this->trainingCategoryId
         );
 
-        // JPL DARI FORM IMPORT
+        // JPL dari form import.
         $this->setTrainingColumn(
             $training,
             'jpl',

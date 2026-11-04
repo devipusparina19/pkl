@@ -23,7 +23,6 @@
     @endif
 </div>
 
-{{-- Statistik peserta --}}
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-label">Total Riwayat</div>
@@ -46,7 +45,6 @@
     </div>
 </div>
 
-{{-- Informasi peserta --}}
 <div class="panel">
     <div class="section-heading">
         <div>
@@ -116,16 +114,13 @@
     </div>
 </div>
 
-{{-- Riwayat pelatihan --}}
 <div class="panel">
     <div class="section-heading">
         <div>
             <h2>Riwayat Pelatihan</h2>
             <p>
                 Daftar pelatihan yang pernah diikuti
-                {{ auth()->user()->role === 'admin'
-                    ? 'peserta ini'
-                    : 'oleh Anda' }}.
+                {{ auth()->user()->role === 'admin' ? 'peserta ini' : 'oleh Anda' }}.
             </p>
         </div>
     </div>
@@ -139,9 +134,9 @@
                     <th>Angkatan</th>
                     <th>Sumber Dana</th>
                     <th>Kategori</th>
+                    <th>JPL</th>
                     <th>Penyelenggara</th>
                     <th>Tanggal Pelatihan</th>
-                    <th>JPL</th>
                     <th>Durasi</th>
                     <th>Status</th>
                 </tr>
@@ -175,6 +170,10 @@
                         </td>
 
                         <td>
+                            {{ $training?->jpl ?? '-' }}
+                        </td>
+
+                        <td>
                             {{ $training?->organizer ?: '-' }}
                         </td>
 
@@ -188,10 +187,6 @@
                             @else
                                 -
                             @endif
-                        </td>
-
-                        <td>
-                            {{ $training?->jpl ?? '-' }}
                         </td>
 
                         <td>

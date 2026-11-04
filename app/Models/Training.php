@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Training extends Model
 {
@@ -12,8 +12,11 @@ class Training extends Model
         'code',
         'name',
         'training_category_id',
+
+        // Kolom lama dipertahankan untuk kompatibilitas.
         'field',
         'location',
+
         'batch_number',
         'funding_source',
         'organizer',

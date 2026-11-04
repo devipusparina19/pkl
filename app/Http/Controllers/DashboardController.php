@@ -376,15 +376,24 @@ $genderStats = [
         /*
          * STATISTIK BIDANG PELATIHAN PADA TAHUN TERPILIH
          */
-        $fieldStats = Training::query()
-            ->select('field', DB::raw('COUNT(*) as total'))
-            ->whereYear('start_date', $year)
-            ->whereNotNull('field')
-            ->where('field', '!=', '')
-            ->groupBy('field')
-            ->orderByDesc('total')
-            ->limit(6)
-            ->get();
+        $fieldStats = DB::table('trainings')
+    ->leftJoin(
+        'training_categories',
+        'training_categories.id',
+        '=',
+        'trainings.training_category_id'
+    )
+    ->whereYear('trainings.start_date', $year)
+    ->whereNotNull('training_categories.name')
+    ->where('training_categories.name', '!=', '')
+    ->selectRaw('
+        training_categories.name as name,
+        COUNT(trainings.id) as total
+    ')
+    ->groupBy('training_categories.id', 'training_categories.name')
+    ->orderByDesc('total')
+    ->limit(6)
+    ->get();
 
         /*
          * PILIHAN PROFESI DARI MASTER DATA

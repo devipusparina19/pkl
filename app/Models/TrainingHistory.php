@@ -16,19 +16,19 @@ class TrainingHistory extends Model
         'notes',
     ];
 
-    /**
-     * Peserta pemilik riwayat pelatihan.
-     */
     public function participant(): BelongsTo
     {
-        return $this->belongsTo(Participant::class);
+        return $this->belongsTo(
+            Participant::class,
+            'participant_id'
+        );
     }
 
-    /**
-     * Data pelatihan yang diikuti peserta.
-     */
     public function training(): BelongsTo
     {
-        return $this->belongsTo(Training::class);
+        return $this->belongsTo(
+            Training::class,
+            'training_id'
+        );
     }
 }

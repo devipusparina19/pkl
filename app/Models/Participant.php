@@ -26,19 +26,19 @@ class Participant extends Model
         'notes',
     ];
 
-    /**
-     * Akun pengguna yang terhubung dengan peserta.
-     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class,
+            'user_id'
+        );
     }
 
-    /**
-     * Semua riwayat pelatihan milik peserta.
-     */
     public function histories(): HasMany
     {
-        return $this->hasMany(TrainingHistory::class);
+        return $this->hasMany(
+            TrainingHistory::class,
+            'participant_id'
+        );
     }
 }
