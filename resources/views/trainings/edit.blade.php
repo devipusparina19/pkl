@@ -205,21 +205,6 @@
             @enderror
         </div>
 
-        {{-- 10. Keterangan --}}
-        <div class="form-group">
-            <label for="description">Keterangan</label>
-            <textarea
-                id="description"
-                name="description"
-                rows="4"
-                class="form-control @error('description') input-error @enderror"
-                placeholder="Masukkan keterangan tambahan pelatihan"
-            >{{ old('description', $training->description) }}</textarea>
-            @error('description')
-                <p class="field-error">{{ $message }}</p>
-            @enderror
-        </div>
-
         <p style="font-size:12px;color:#64748b">
             <span>*</span> Wajib diisi.
         </p>

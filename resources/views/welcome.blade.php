@@ -721,7 +721,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 18px;
             margin-bottom: 22px;
         }
@@ -801,11 +801,11 @@
         /* REKAP DAN PERINGKAT */
 
         .data-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    align-items: start;
-    gap: 18px;
-}
+            display: grid;
+            grid-template-columns: 1fr 1.2f;
+            align-items: start;
+            gap: 18px;
+        }
 
         .content-card {
             min-width: 0;
@@ -1031,19 +1031,14 @@
 
         .footer-brand {
             display: flex;
-            align-items: flex-start;
-            gap: 15px;
+            align-items: center;
+            gap: 12px;
         }
 
         .footer-logo {
-            width: 54px;
-            height: 54px;
-            display: grid;
-            place-items: center;
-            flex-shrink: 0;
-            padding: 5px;
-            border-radius: 9px;
-            background: white;
+            width: 42px;
+            height: 42px;
+            padding: 4px;
         }
 
         .footer-logo img {
@@ -1053,18 +1048,14 @@
         }
 
         .footer-brand h3 {
-            margin-bottom: 5px;
-            font-family: 'Manrope', sans-serif;
-            font-size: 21px;
-            font-weight: 800;
-            letter-spacing: .5px;
+            margin-bottom: 3px;
+            font-size: 18px;
         }
 
         .footer-brand p {
-            max-width: 450px;
-            color: rgba(255,255,255,.7);
-            font-size: 13px;
-            line-height: 1.9;
+            max-width: 600px;
+            font-size: 12px;
+            line-height: 1.6;
         }
 
         .footer-links h4 {
@@ -1143,7 +1134,8 @@
             }
 
             .about-grid {
-                gap: 40px;
+                grid-template-columns: 1fr;
+                gap: 25px;
             }
         }
 
@@ -1262,7 +1254,7 @@
             }
 
             .about-section {
-                padding: 60px 0;
+                padding: 45px 0 30px;
             }
 
             .about-grid {
@@ -1283,7 +1275,7 @@
             }
 
             .dashboard-section {
-                padding: 60px 0;
+                padding: 45px 0 55px;
             }
 
             .dashboard-heading {
@@ -1400,10 +1392,9 @@
             }
 
             .footer-main {
-                grid-template-columns: 1fr;
-                gap: 30px;
-                padding-top: 40px;
-                padding-bottom: 35px;
+                display: block;
+                padding-top: 25px;
+                padding-bottom: 20px;
             }
 
             .footer-brand h3 {
