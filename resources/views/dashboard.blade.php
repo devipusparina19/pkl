@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Dashboard Admin')
@@ -136,7 +135,7 @@
         line-height: 1.8;
     }
 
-    /* KARTU RINGKASAN */
+    /* STATISTIK */
     .dashboard-admin .stats-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -504,60 +503,61 @@
         line-height: 1.8;
     }
 
-    /* PAGINATION TABEL */
-    .dashboard-admin .table-pagination {
+    /* PAGINATION LARAVEL */
+    .dashboard-admin .laravel-pagination {
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
         gap: 12px;
-        margin-top: 16px;
+        margin-top: 17px;
     }
 
-    .dashboard-admin .pagination-info {
+    .dashboard-admin .laravel-pagination nav {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .dashboard-admin .laravel-pagination p {
+        margin: 0;
         color: var(--muted);
         font-size: 11px;
     }
 
-    .dashboard-admin .pagination-controls {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 7px;
-    }
-
-    .dashboard-admin .page-button {
+    .dashboard-admin .laravel-pagination a,
+    .dashboard-admin .laravel-pagination span[aria-current="page"] span,
+    .dashboard-admin .laravel-pagination span[aria-disabled="true"] span {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         min-width: 34px;
-        height: 34px;
-        padding: 0 10px;
+        min-height: 34px;
+        padding: 6px 11px;
         color: #526984;
         background: #fff;
         border: 1px solid #dce5ef;
         border-radius: 7px;
         font-family: inherit;
         font-size: 11px;
-        font-weight: 600;
-        cursor: pointer;
+        text-decoration: none;
     }
 
-    .dashboard-admin .page-button:hover:not(:disabled) {
+    .dashboard-admin .laravel-pagination a:hover {
         color: var(--blue);
         background: #edf3fc;
         border-color: #cbdaf0;
     }
 
-    .dashboard-admin .page-button:disabled {
-        opacity: .4;
-        cursor: not-allowed;
-    }
-
-    .dashboard-admin .page-button.active {
+    .dashboard-admin .laravel-pagination span[aria-current="page"] span {
         color: #fff;
         background: var(--blue);
         border-color: var(--blue);
+    }
+
+    .dashboard-admin .laravel-pagination span[aria-disabled="true"] span {
+        opacity: .45;
     }
 
     /* CATATAN DAN PROFESI */
@@ -731,7 +731,7 @@
             flex: 1;
         }
 
-        .dashboard-admin .table-pagination {
+        .dashboard-admin .laravel-pagination {
             align-items: flex-start;
             flex-direction: column;
         }
@@ -784,6 +784,10 @@
         : 0;
 
     $hasYearData = $totalParticipants > 0 || $totalTrainings > 0;
+
+    $trainedParticipantTotal = $trainedParticipants instanceof \Illuminate\Contracts\Pagination\Paginator
+        ? $trainedParticipants->total()
+        : $trainedParticipants->count();
 @endphp
 
 <div class="dashboard-admin">
@@ -820,7 +824,6 @@
         </div>
 
         @if ($hasYearData)
-
             <div class="stats-grid">
 
                 {{-- TOTAL PESERTA --}}
@@ -925,7 +928,6 @@
             @endif
 
         @else
-
             <div class="no-year-data">
                 <div class="empty-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -940,7 +942,6 @@
                     Ringkasan dan diagram akan ditampilkan setelah data tersedia.
                 </p>
             </div>
-
         @endif
     </section>
 
@@ -995,7 +996,7 @@
         </form>
 
         <div class="table-responsive">
-            <table class="paginated-table" id="participantTable">
+            <table id="participantTable">
                 <thead>
                     <tr>
                         <th>Nama Peserta</th>
@@ -1025,10 +1026,17 @@
             </table>
         </div>
 
-        <div class="table-pagination" id="participantPagination">
-            <div class="pagination-info"></div>
-            <div class="pagination-controls"></div>
-        </div>
+        @if ($frequentParticipants instanceof \Illuminate\Contracts\Pagination\Paginator)
+            <div class="laravel-pagination">
+                <p>
+                    Menampilkan {{ $frequentParticipants->firstItem() ?? 0 }}
+                    sampai {{ $frequentParticipants->lastItem() ?? 0 }}
+                    dari {{ $frequentParticipants->total() }} peserta
+                </p>
+
+                {{ $frequentParticipants->onEachSide(1)->links() }}
+            </div>
+        @endif
 
         <div class="info-note">
             <span aria-hidden="true">ⓘ</span>
@@ -1095,21 +1103,22 @@
         </form>
 
         @if ($selectedProfession !== '')
-
             <div class="profession-summary">
                 <span class="profession-chip">
                     Profesi: {{ $selectedProfession }}
                 </span>
+
                 <span class="profession-chip">
                     Tahun: {{ $year }}
                 </span>
+
                 <span class="profession-chip">
-                    Jumlah peserta: {{ $trainedParticipants->count() }}
+                    Jumlah peserta: {{ number_format($trainedParticipantTotal, 0, ',', '.') }}
                 </span>
             </div>
 
             <div class="table-responsive">
-                <table class="paginated-table" id="professionTable">
+                <table id="professionTable">
                     <thead>
                         <tr>
                             <th>No.</th>
@@ -1122,7 +1131,10 @@
                     <tbody>
                         @forelse ($trainedParticipants as $index => $participant)
                             <tr>
-                                <td>{{ $index + 1 }}</td>
+                                <td>
+                                    {{ ($trainedParticipants->firstItem() ?? 1) + $index }}
+                                </td>
+
                                 <td>
                                     <div class="participant-name">
                                         <span class="participant-icon" aria-hidden="true">
@@ -1136,8 +1148,10 @@
                                         {{ $participant->name ?? '-' }}
                                     </div>
                                 </td>
+
                                 <td>{{ $participant->nip ?? '-' }}</td>
                                 <td>{{ $participant->profession ?? '-' }}</td>
+
                                 <td>
                                     <span class="number-pill">
                                         {{ number_format((int) ($participant->participations_count ?? 0), 0, ',', '.') }}
@@ -1156,18 +1170,23 @@
                 </table>
             </div>
 
-            <div class="table-pagination" id="professionPagination">
-                <div class="pagination-info"></div>
-                <div class="pagination-controls"></div>
-            </div>
+            @if ($trainedParticipants instanceof \Illuminate\Contracts\Pagination\Paginator)
+                <div class="laravel-pagination">
+                    <p>
+                        Menampilkan {{ $trainedParticipants->firstItem() ?? 0 }}
+                        sampai {{ $trainedParticipants->lastItem() ?? 0 }}
+                        dari {{ $trainedParticipants->total() }} peserta
+                    </p>
+
+                    {{ $trainedParticipants->onEachSide(1)->links() }}
+                </div>
+            @endif
 
         @else
-
             <div class="empty-state">
                 Pilih tahun dan jenis profesi, kemudian klik
                 <strong>Tampilkan Peserta</strong> untuk melihat daftar peserta.
             </div>
-
         @endif
     </section>
 
@@ -1178,167 +1197,65 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
-    /* DIAGRAM PIE JENIS KELAMIN */
     const canvas = document.getElementById('genderPieChart');
 
-    if (canvas && typeof Chart !== 'undefined') {
-        const maleCount = Number(@json($maleCount));
-        const femaleCount = Number(@json($femaleCount));
-        const total = maleCount + femaleCount;
+    if (!canvas || typeof Chart === 'undefined') {
+        return;
+    }
 
-        new Chart(canvas, {
-            // Menggunakan pie agar bagian tengah diagram tidak kosong.
-            type: 'pie',
+    const maleCount = Number(@json($maleCount));
+    const femaleCount = Number(@json($femaleCount));
+    const total = maleCount + femaleCount;
 
-            data: {
-                labels: ['Laki-laki', 'Perempuan'],
-                datasets: [{
-                    data: [maleCount, femaleCount],
+    new Chart(canvas, {
+        type: 'pie',
 
-                    // Biru untuk laki-laki dan pink untuk perempuan.
-                    backgroundColor: [
-                        '#2457a7',
-                        '#e85d9e'
-                    ],
+        data: {
+            labels: ['Laki-laki', 'Perempuan'],
+            datasets: [{
+                data: [maleCount, femaleCount],
+                backgroundColor: [
+                    '#2457a7',
+                    '#e85d9e'
+                ],
+                borderColor: '#ffffff',
+                borderWidth: 3,
+                hoverOffset: 8
+            }]
+        },
 
-                    borderColor: '#ffffff',
-                    borderWidth: 3,
-                    hoverOffset: 8
-                }]
-            },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
 
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
 
-                plugins: {
-                    // Legenda bawaan dimatikan karena sudah ada
-                    // keterangan khusus di bawah diagram.
-                    legend: {
-                        display: false
-                    },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const value = Number(context.raw) || 0;
 
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                const value = Number(context.raw) || 0;
+                            const percentage = total > 0
+                                ? (value / total * 100).toLocaleString(
+                                    'id-ID',
+                                    { maximumFractionDigits: 1 }
+                                )
+                                : '0';
 
-                                const percentage = total > 0
-                                    ? (value / total * 100).toLocaleString(
-                                        'id-ID',
-                                        { maximumFractionDigits: 1 }
-                                    )
-                                    : '0';
-
-                                return context.label + ': '
-                                    + value.toLocaleString('id-ID')
-                                    + ' peserta ('
-                                    + percentage
-                                    + '%)';
-                            }
+                            return context.label + ': '
+                                + value.toLocaleString('id-ID')
+                                + ' peserta ('
+                                + percentage
+                                + '%)';
                         }
                     }
                 }
             }
-        });
-    }
-
-    /* PAGINATION TABEL */
-    function setupPagination(tableId, paginationId, pageSize = 8) {
-        const table = document.getElementById(tableId);
-        const pagination = document.getElementById(paginationId);
-
-        if (!table || !pagination) return;
-
-        const tbody = table.querySelector('tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        const info = pagination.querySelector('.pagination-info');
-        const controls = pagination.querySelector('.pagination-controls');
-
-        // Baris pesan kosong tidak perlu pagination.
-        if (
-            rows.length === 0 ||
-            (rows.length === 1 && rows[0].querySelector('.empty-state'))
-        ) {
-            pagination.style.display = 'none';
-            return;
         }
-
-        let currentPage = 1;
-        const totalPages = Math.ceil(rows.length / pageSize);
-
-        function renderPage() {
-            const start = (currentPage - 1) * pageSize;
-            const end = Math.min(start + pageSize, rows.length);
-
-            rows.forEach((row, index) => {
-                row.style.display = index >= start && index < end ? '' : 'none';
-            });
-
-            info.textContent =
-                'Menampilkan ' + (start + 1) + '–' + end +
-                ' dari ' + rows.length + ' peserta';
-
-            controls.innerHTML = '';
-
-            const previous = document.createElement('button');
-            previous.type = 'button';
-            previous.className = 'page-button';
-            previous.textContent = 'Sebelumnya';
-            previous.disabled = currentPage === 1;
-
-            previous.addEventListener('click', function () {
-                if (currentPage > 1) {
-                    currentPage--;
-                    renderPage();
-                }
-            });
-
-            controls.appendChild(previous);
-
-            for (let page = 1; page <= totalPages; page++) {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'page-button' +
-                    (page === currentPage ? ' active' : '');
-                button.textContent = page;
-
-                button.addEventListener('click', function () {
-                    currentPage = page;
-                    renderPage();
-                });
-
-                controls.appendChild(button);
-            }
-
-            const next = document.createElement('button');
-            next.type = 'button';
-            next.className = 'page-button';
-            next.textContent = 'Berikutnya';
-            next.disabled = currentPage === totalPages;
-
-            next.addEventListener('click', function () {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    renderPage();
-                }
-            });
-
-            controls.appendChild(next);
-        }
-
-        if (rows.length <= pageSize) {
-            pagination.style.display = 'none';
-            return;
-        }
-
-        renderPage();
-    }
-
-    setupPagination('participantTable', 'participantPagination', 8);
-    setupPagination('professionTable', 'professionPagination', 8);
-
+    });
 });
 </script>
 @endsection
