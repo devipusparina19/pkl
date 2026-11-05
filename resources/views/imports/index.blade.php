@@ -3,668 +3,1471 @@
 @section('title', 'Import Data Peserta Pelatihan')
 
 @section('content')
-<div class="import-page">
-    <div class="page-heading">
-        <div>
-            <h1>Import Data Peserta Pelatihan</h1>
+<div class="sirapik-import">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+        .sirapik-import {
+            --si-navy: #102b50;
+            --si-blue: #1761b5;
+            --si-blue-dark: #124b91;
+            --si-cyan: #28a6c7;
+            --si-ink: #1d2d42;
+            --si-muted: #697b91;
+            --si-line: #dce5ef;
+            --si-soft: #f3f7fc;
+            --si-white: #ffffff;
+            --si-amber: #c58a2a;
+
+            width: 100%;
+            max-width: none;
+            padding: 26px clamp(18px, 2.2vw, 38px) 42px;
+            color: var(--si-ink);
+            font-family: 'DM Sans', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .sirapik-import *,
+        .sirapik-import *::before,
+        .sirapik-import *::after {
+            box-sizing: border-box;
+        }
+
+        .sirapik-import button,
+        .sirapik-import input,
+        .sirapik-import select {
+            font: inherit;
+        }
+
+        /* HEADER */
+
+        .si-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 27px;
+        }
+
+        .si-heading-copy {
+            min-width: 0;
+        }
+
+        .si-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 12px;
+            color: var(--si-blue);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .si-eyebrow::before {
+            content: '';
+            width: 26px;
+            height: 3px;
+            border-radius: 10px;
+            background: var(--si-cyan);
+        }
+
+        .si-header h1 {
+            margin: 0;
+            color: var(--si-navy);
+            font-family: 'Manrope', sans-serif;
+            font-size: clamp(29px, 3vw, 40px);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            line-height: 1.2;
+        }
+
+        .si-header p {
+            max-width: 720px;
+            margin: 11px 0 0;
+            color: var(--si-muted);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .si-header-mark {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 0 0 auto;
+            padding: 13px 17px;
+            border: 1px solid #d8e6f5;
+            border-radius: 12px;
+            background: #f5f9fe;
+        }
+
+        .si-header-mark-icon {
+            display: grid;
+            width: 39px;
+            height: 39px;
+            place-items: center;
+            border-radius: 10px;
+            background: #e2efff;
+            color: var(--si-blue);
+        }
+
+        .si-header-mark strong {
+            display: block;
+            color: var(--si-navy);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .si-header-mark span {
+            display: block;
+            margin-top: 3px;
+            color: var(--si-muted);
+            font-size: 11px;
+        }
+
+        /* ALERT */
+
+        .si-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 19px;
+            padding: 17px 19px;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            animation: si-enter .35s ease both;
+        }
+
+        .si-alert-icon {
+            display: grid;
+            width: 30px;
+            height: 30px;
+            flex: 0 0 30px;
+            place-items: center;
+            border-radius: 9px;
+        }
+
+        .si-alert-content {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .si-alert strong {
+            display: block;
+            margin: 2px 0 5px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .si-alert ul {
+            margin: 7px 0 0;
+            padding-left: 19px;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .si-alert li {
+            overflow-wrap: anywhere;
+        }
+
+        .si-alert-danger {
+            color: #902f37;
+            background: #fff4f3;
+            border-color: #f1d1d0;
+        }
+
+        .si-alert-danger .si-alert-icon {
+            color: #a3343d;
+            background: #fce2e1;
+        }
+
+        .si-alert-success {
+            color: #24623f;
+            background: #f0faf3;
+            border-color: #cce9d5;
+        }
+
+        .si-alert-success .si-alert-icon {
+            color: #267346;
+            background: #dcefe2;
+        }
+
+        .si-import-notes {
+            margin-top: 14px;
+            padding-top: 13px;
+            border-top: 1px solid #cce9d5;
+        }
+
+        /* MAIN LAYOUT */
+
+        .si-workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 280px;
+            align-items: start;
+            gap: 21px;
+        }
+
+        .si-main-panel {
+            min-width: 0;
+            overflow: hidden;
+            border: 1px solid var(--si-line);
+            border-radius: 16px;
+            background: var(--si-white);
+            box-shadow: 0 5px 22px rgba(20, 48, 82, .045);
+        }
+
+        .si-panel-heading {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 23px 26px;
+            border-bottom: 1px solid #e8eef5;
+        }
+
+        .si-panel-icon {
+            display: grid;
+            width: 49px;
+            height: 49px;
+            flex: 0 0 49px;
+            place-items: center;
+            border-radius: 13px;
+            background: #eaf2fc;
+            color: var(--si-blue);
+        }
+
+        .si-panel-heading h2 {
+            margin: 0;
+            color: var(--si-navy);
+            font-family: 'Manrope', sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: -.35px;
+        }
+
+        .si-panel-heading p {
+            margin: 5px 0 0;
+            color: var(--si-muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .si-form-body {
+            padding: 25px 27px 27px;
+        }
+
+        /* SECTION LABEL */
+
+        .si-section-label {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            margin: 0 0 19px;
+        }
+
+        .si-section-number {
+            display: grid;
+            width: 27px;
+            height: 27px;
+            flex: 0 0 27px;
+            place-items: center;
+            border-radius: 8px;
+            background: var(--si-navy);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .si-section-label strong {
+            color: var(--si-navy);
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .si-section-label span:last-child {
+            height: 1px;
+            flex: 1;
+            background: #e7edf4;
+        }
+
+        /* FORM */
+
+        .si-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 21px 23px;
+        }
+
+        .si-field {
+            min-width: 0;
+        }
+
+        .si-field-full {
+            grid-column: 1 / -1;
+        }
+
+        .si-field label {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 9px;
+            color: #293c53;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .si-required {
+            color: #d34c51;
+            font-size: 15px;
+        }
+
+        .si-optional {
+            margin-left: 3px;
+            color: #8492a4;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .si-control-wrap {
+            position: relative;
+        }
+
+        .sirapik-import .si-control {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            min-height: 49px;
+            padding: 12px 15px;
+            border: 1px solid #cdd9e7;
+            border-radius: 9px;
+            outline: none;
+            background: #fff;
+            color: #25384e;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 1px 2px rgba(16, 43, 80, .025);
+            transition:
+                border-color .2s ease,
+                box-shadow .2s ease,
+                background .2s ease;
+        }
+
+        .sirapik-import .si-control::placeholder {
+            color: #9aa8b8;
+        }
+
+        .sirapik-import .si-control:hover {
+            border-color: #9cb6d5;
+        }
+
+        .sirapik-import .si-control:focus {
+            border-color: var(--si-blue);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(23, 97, 181, .11);
+        }
+
+        .sirapik-import select.si-control {
+            padding-right: 39px;
+            cursor: pointer;
+        }
+
+        .sirapik-import input[type="file"].si-control {
+            padding: 8px 10px;
+            background: #f8fbff;
+        }
+
+        .sirapik-import input[type="file"]::file-selector-button {
+            min-height: 31px;
+            margin-right: 12px;
+            padding: 5px 12px;
+            border: 0;
+            border-radius: 6px;
+            background: #e5effc;
+            color: var(--si-blue-dark);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background .2s ease;
+        }
+
+        .sirapik-import input[type="file"]::file-selector-button:hover {
+            background: #d5e6fb;
+        }
+
+        .si-field-help {
+            display: block;
+            margin-top: 8px;
+            color: #748399;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        .si-selected-file {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 11px;
+            padding: 11px 13px;
+            border: 1px solid #d6e6f8;
+            border-radius: 9px;
+            background: #f2f7fd;
+            color: var(--si-blue-dark);
+            font-size: 13px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .si-selected-file[hidden] {
+            display: none;
+        }
+
+        .si-file-symbol {
+            display: grid;
+            width: 31px;
+            height: 31px;
+            flex: 0 0 31px;
+            place-items: center;
+            border-radius: 7px;
+            background: #dfebfb;
+        }
+
+        /* FORM FOOTER */
+
+        .si-form-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 29px;
+            padding-top: 21px;
+            border-top: 1px solid #e7edf4;
+        }
+
+        .si-footer-note {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #7a899b;
+            font-size: 12px;
+        }
+
+        .si-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sirapik-import .si-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 45px;
+            padding: 11px 19px;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition:
+                transform .2s ease,
+                background .2s ease,
+                border-color .2s ease,
+                box-shadow .2s ease;
+        }
+
+        .sirapik-import .si-btn:focus-visible {
+            outline: 3px solid rgba(40, 166, 199, .35);
+            outline-offset: 3px;
+        }
+
+        .sirapik-import .si-btn-primary {
+            background: var(--si-blue);
+            color: white;
+            box-shadow: 0 4px 10px rgba(23, 97, 181, .16);
+        }
+
+        .sirapik-import .si-btn-primary:hover {
+            transform: translateY(-2px);
+            background: var(--si-blue-dark);
+            box-shadow: 0 7px 15px rgba(23, 97, 181, .2);
+        }
+
+        .sirapik-import .si-btn-primary:disabled {
+            transform: none;
+            opacity: .7;
+            cursor: wait;
+            box-shadow: none;
+        }
+
+        .sirapik-import .si-btn-secondary {
+            border-color: #d4deea;
+            background: white;
+            color: #52647a;
+        }
+
+        .sirapik-import .si-btn-secondary:hover {
+            border-color: #aabdd4;
+            background: #f5f8fc;
+        }
+
+        /* SIDE PANEL */
+
+        .si-side-column {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .si-side-card {
+            overflow: hidden;
+            border: 1px solid var(--si-line);
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 4px 17px rgba(20, 48, 82, .035);
+        }
+
+        .si-side-blue {
+            position: relative;
+            padding: 22px 20px;
+            border-color: #183c68;
+            background: var(--si-navy);
+            color: white;
+        }
+
+        .si-side-blue::after {
+            position: absolute;
+            top: -39px;
+            right: -35px;
+            width: 130px;
+            height: 130px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 50%;
+            content: '';
+        }
+
+        .si-side-blue::before {
+            position: absolute;
+            top: -17px;
+            right: -13px;
+            width: 85px;
+            height: 85px;
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 50%;
+            content: '';
+        }
+
+        .si-side-blue .si-side-icon {
+            display: grid;
+            width: 41px;
+            height: 41px;
+            margin-bottom: 17px;
+            place-items: center;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 11px;
+            background: rgba(255,255,255,.1);
+            color: #a9ddff;
+        }
+
+        .si-side-blue h3 {
+            position: relative;
+            z-index: 1;
+            margin: 0 0 9px;
+            color: white;
+            font-family: 'Manrope', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .si-side-blue p {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            color: #c3d5e9;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .si-side-content {
+            padding: 19px 19px 20px;
+        }
+
+        .si-side-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 15px;
+            color: var(--si-navy);
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .si-check-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .si-check-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            color: #5e7086;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .si-check {
+            display: grid;
+            width: 20px;
+            height: 20px;
+            flex: 0 0 20px;
+            margin-top: 1px;
+            place-items: center;
+            border-radius: 6px;
+            background: #e9f3ff;
+            color: var(--si-blue);
+        }
+
+        .si-side-warning {
+            padding: 17px 18px;
+            border: 1px solid #f0e1c3;
+            border-radius: 12px;
+            background: #fffaf0;
+        }
+
+        .si-warning-heading {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 8px;
+            color: #94631b;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .si-side-warning p {
+            margin: 0;
+            color: #826e4e;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        /* ANIMATION */
+
+        @keyframes si-enter {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .si-header,
+        .si-main-panel,
+        .si-side-column {
+            animation: si-enter .45s ease both;
+        }
+
+        .si-side-column {
+            animation-delay: .08s;
+        }
+
+        /* RESPONSIVE */
+
+        @media (min-width: 1500px) {
+            .si-workspace {
+                grid-template-columns: minmax(0, 1fr) 310px;
+                gap: 24px;
+            }
+
+            .si-form-body {
+                padding: 29px 32px 31px;
+            }
+
+            .si-panel-heading {
+                padding: 25px 32px;
+            }
+
+            .si-form-grid {
+                column-gap: 30px;
+                row-gap: 24px;
+            }
+        }
+
+        @media (max-width: 1050px) {
+            .si-workspace {
+                grid-template-columns: minmax(0, 1fr) 245px;
+                gap: 15px;
+            }
+
+            .si-form-body {
+                padding: 22px;
+            }
+
+            .si-panel-heading {
+                padding: 21px 22px;
+            }
+
+            .si-form-grid {
+                gap: 19px 16px;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .sirapik-import {
+                padding: 23px 18px 34px;
+            }
+
+            .si-workspace {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .si-side-column {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-items: stretch;
+            }
+
+            .si-side-blue {
+                grid-row: span 2;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sirapik-import {
+                padding: 20px 13px 30px;
+            }
+
+            .si-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 17px;
+                margin-bottom: 21px;
+            }
+
+            .si-header h1 {
+                font-size: 28px;
+                letter-spacing: -.8px;
+            }
+
+            .si-header p {
+                font-size: 13px;
+            }
+
+            .si-header-mark {
+                padding: 10px 13px;
+            }
+
+            .si-form-grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 18px;
+            }
+
+            .si-field-full {
+                grid-column: auto;
+            }
+
+            .si-panel-heading {
+                padding: 18px 16px;
+            }
+
+            .si-panel-heading h2 {
+                font-size: 17px;
+            }
+
+            .si-panel-heading p {
+                font-size: 12px;
+            }
+
+            .si-panel-icon {
+                width: 43px;
+                height: 43px;
+                flex-basis: 43px;
+            }
+
+            .si-form-body {
+                padding: 19px 16px 20px;
+            }
+
+            .si-form-footer {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .si-footer-note {
+                order: 2;
+            }
+
+            .si-actions {
+                display: grid;
+                grid-template-columns: 1fr;
+                width: 100%;
+            }
+
+            .sirapik-import .si-btn {
+                width: 100%;
+            }
+
+            .si-side-column {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .si-side-blue {
+                grid-row: auto;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sirapik-import *,
+            .sirapik-import *::before,
+            .sirapik-import *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+
+    {{-- HEADER --}}
+    <header class="si-header">
+        <div class="si-heading-copy">
+            <div class="si-eyebrow">Manajemen Data SIRAPIK</div>
+
+            <h1>Import Data Peserta</h1>
+
             <p>
-                Unggah Excel dan tentukan angkatan, wilayah/mitra,
-                sumber dana, kategori, serta JPL pelatihan.
+                Kelola data peserta dan riwayat pelatihan melalui satu proses
+                import yang terstruktur. Unggah file Excel, lengkapi informasi
+                pelatihan, lalu mulai proses import.
             </p>
         </div>
-    </div>
 
-    {{-- Pesan validasi --}}
+        <div class="si-header-mark">
+            <div class="si-header-mark-icon" aria-hidden="true">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 16V4"/>
+                    <path d="m7 9 5-5 5 5"/>
+                    <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
+                </svg>
+            </div>
+            <div>
+                <strong>Import Excel</strong>
+                <span>Pengelolaan data peserta</span>
+            </div>
+        </div>
+    </header>
+
+    {{-- VALIDATION ERROR --}}
     @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            <strong>Import belum dapat diproses.</strong>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        <div class="si-alert si-alert-danger" role="alert">
+            <div class="si-alert-icon" aria-hidden="true">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4"/>
+                    <path d="M12 16h.01"/>
+                </svg>
+            </div>
+
+            <div class="si-alert-content">
+                <strong>Import belum dapat diproses.</strong>
+                <span>Periksa kembali informasi berikut:</span>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
     @endif
 
-    {{-- Hasil import --}}
+    {{-- IMPORT RESULT --}}
     @if (session('import_result'))
         @php($result = session('import_result'))
 
-        <div class="alert alert-success" role="status">
-            <strong>Import selesai diproses.</strong>
+        <div class="si-alert si-alert-success" role="status">
+            <div class="si-alert-icon" aria-hidden="true">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m5 12 4 4L19 6"/>
+                </svg>
+            </div>
 
-            <ul>
-                <li>
-                    Peserta baru:
-                    {{ $result['created_participants'] ?? 0 }}
-                </li>
-                <li>
-                    Peserta diperbarui:
-                    {{ $result['updated_participants'] ?? 0 }}
-                </li>
-                <li>
-                    Pelatihan baru:
-                    {{ $result['created_trainings'] ?? 0 }}
-                </li>
-                <li>
-                    Riwayat pelatihan baru:
-                    {{ $result['created_histories'] ?? 0 }}
-                </li>
-            </ul>
+            <div class="si-alert-content">
+                <strong>Import selesai diproses.</strong>
 
-            @if (!empty($result['errors']))
-                <div class="import-notes">
-                    <strong>Catatan baris yang perlu diperiksa:</strong>
-                    <ul>
-                        @foreach ($result['errors'] as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+                <ul>
+                    <li>
+                        Peserta baru:
+                        <strong>{{ $result['created_participants'] ?? 0 }}</strong>
+                    </li>
+                    <li>
+                        Peserta diperbarui:
+                        <strong>{{ $result['updated_participants'] ?? 0 }}</strong>
+                    </li>
+                    <li>
+                        Pelatihan baru:
+                        <strong>{{ $result['created_trainings'] ?? 0 }}</strong>
+                    </li>
+                    <li>
+                        Riwayat pelatihan baru:
+                        <strong>{{ $result['created_histories'] ?? 0 }}</strong>
+                    </li>
+                </ul>
+
+                @if (!empty($result['errors']))
+                    <div class="si-import-notes">
+                        <strong>Catatan baris yang perlu diperiksa:</strong>
+                        <ul>
+                            @foreach ($result['errors'] as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            </div>
         </div>
     @endif
 
-    <div class="import-card">
-        <div class="card-heading">
-            <div class="card-icon" aria-hidden="true">⇧</div>
+    {{-- MAIN WORKSPACE --}}
+    <div class="si-workspace">
 
-            <div>
-                <h2>Unggah file Excel</h2>
-                <p>Periksa pilihan data sebelum memulai import.</p>
-            </div>
-        </div>
+        {{-- FORM PANEL --}}
+        <section class="si-main-panel">
 
-        <form
-            id="importForm"
-            action="{{ route('imports.store') }}"
-            method="POST"
-            enctype="multipart/form-data"
-        >
-            @csrf
-
-            <div class="form-grid">
-
-                {{-- FILE EXCEL --}}
-                <div class="form-group full-width">
-                    <label for="file">
-                        File Excel <span class="required">*</span>
-                    </label>
-
-                    <input
-                        type="file"
-                        name="file"
-                        id="file"
-                        class="form-control"
-                        accept=".xlsx,.xls,.csv"
-                        required
-                    >
-
-                    <small class="field-help">
-                        Format yang didukung: XLSX, XLS, atau CSV.
-                        Maksimal 10 MB.
-                    </small>
-
-                    <div
-                        id="selectedFile"
-                        class="selected-file"
-                        hidden
-                    ></div>
+            <div class="si-panel-heading">
+                <div class="si-panel-icon" aria-hidden="true">
+                    <svg width="25" height="25" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 16V4"/>
+                        <path d="m7 9 5-5 5 5"/>
+                        <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
+                    </svg>
                 </div>
 
-                {{-- ANGKATAN --}}
-                <div class="form-group">
-                    <label for="angkatan">Angkatan</label>
-
-                    <input
-                        type="text"
-                        name="angkatan"
-                        id="angkatan"
-                        class="form-control"
-                        value="{{ old('angkatan') }}"
-                        placeholder="Kosongkan jika tidak ada angkatan"
-                        maxlength="100"
-                    >
-
-                    <small class="field-help">
-                        Opsional. Jika dikosongkan, angkatan akan
-                        ditampilkan sebagai tanda strip (-) pada data peserta.
-                    </small>
+                <div>
+                    <h2>Unggah file Excel</h2>
+                    <p>Lengkapi informasi pelatihan sebelum memulai import data.</p>
                 </div>
-
-                {{-- KABUPATEN / KOTA / MITRA --}}
-                <div class="form-group">
-                    <label for="kabupaten_kota_mitra">
-                        Kabupaten/Kota/Mitra/Mandiri
-                        <span class="required">*</span>
-                    </label>
-
-                    <select
-                        name="kabupaten_kota_mitra"
-                        id="kabupaten_kota_mitra"
-                        class="form-control form-select"
-                        required
-                    >
-                        <option value="">
-                            -- Pilih Kabupaten/Kota/Mitra/Mandiri --
-                        </option>
-
-                        @foreach ($districts as $district)
-                            <option
-                                value="{{ $district->name }}"
-                                @selected(
-                                    old('kabupaten_kota_mitra') === $district->name
-                                )
-                            >
-                                {{ $district->name }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <small class="field-help">
-                        Pilihan mengikuti Master Data SIRAPIK.
-                    </small>
-                </div>
-
-                {{-- SUMBER DANA --}}
-                <div class="form-group full-width">
-                    <label for="sumber_dana">
-                        Sumber Dana <span class="required">*</span>
-                    </label>
-
-                    <select
-                        name="sumber_dana"
-                        id="sumber_dana"
-                        class="form-control form-select"
-                        required
-                    >
-                        <option value="">
-                            -- Pilih Sumber Dana --
-                        </option>
-
-                        @foreach ($fundingSources as $source)
-                            <option
-                                value="{{ $source->name }}"
-                                @selected(
-                                    old('sumber_dana') === $source->name
-                                )
-                            >
-                                {{ $source->name }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <small class="field-help">
-                        Pilihan mengikuti Master Data Sumber Dana SIRAPIK.
-                    </small>
-                </div>
-
-                {{-- KATEGORI PELATIHAN: OPSIONAL --}}
-                <div class="form-group">
-                    <label for="training_category_id">
-                        Kategori Pelatihan
-                    </label>
-
-                    <select
-                        name="training_category_id"
-                        id="training_category_id"
-                        class="form-control form-select"
-                    >
-                        <option value="">
-                            -- Pilih Kategori (Opsional) --
-                        </option>
-
-                        @foreach ($categories as $category)
-                            <option
-                                value="{{ $category->id }}"
-                                @selected(
-                                    (string) old('training_category_id', '') ===
-                                    (string) $category->id
-                                )
-                            >
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <small class="field-help">
-                        Opsional. Kategori mengikuti Master Data Kategori Pelatihan.
-                    </small>
-                </div>
-
-                {{-- JPL: OPSIONAL --}}
-                <div class="form-group">
-                    <label for="jpl">JPL</label>
-
-                    <input
-                        type="number"
-                        name="jpl"
-                        id="jpl"
-                        class="form-control"
-                        value="{{ old('jpl') }}"
-                        min="0"
-                        step="1"
-                        placeholder="Masukkan jumlah JPL"
-                    >
-
-                    <small class="field-help">
-                        Opsional. Isi jumlah Jam Pelajaran jika tersedia.
-                    </small>
-                </div>
-
             </div>
 
-            {{-- TOMBOL --}}
-            <div class="form-actions">
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                    id="submitButton"
+            <div class="si-form-body">
+
+                <form
+                    id="importForm"
+                    action="{{ route('imports.store') }}"
+                    method="POST"
+                    enctype="multipart/form-data"
                 >
-                    <span aria-hidden="true">⇧</span>
-                    <span>Import Excel</span>
-                </button>
+                    @csrf
 
-                <button
-                    type="reset"
-                    class="btn btn-secondary"
-                    id="resetButton"
-                >
-                    Reset Form
-                </button>
+                    {{-- SECTION 1 --}}
+                    <div class="si-section-label">
+                        <span class="si-section-number">01</span>
+                        <strong>File sumber data</strong>
+                        <span></span>
+                    </div>
+
+                    <div class="si-form-grid">
+
+                        <div class="si-field si-field-full">
+                            <label for="file">
+                                File Excel
+                                <span class="si-required">*</span>
+                            </label>
+
+                            <input
+                                type="file"
+                                name="file"
+                                id="file"
+                                class="si-control"
+                                accept=".xlsx,.xls,.csv"
+                                required
+                            >
+
+                            <small class="si-field-help">
+                                Format yang didukung: XLSX, XLS, atau CSV.
+                                Ukuran file maksimal 10 MB.
+                            </small>
+
+                            <div
+                                id="selectedFile"
+                                class="si-selected-file"
+                                hidden
+                            >
+                                <span class="si-file-symbol" aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor"
+                                         stroke-width="1.8" stroke-linecap="round"
+                                         stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <path d="M14 2v6h6"/>
+                                        <path d="M8 13h8M8 17h8"/>
+                                    </svg>
+                                </span>
+                                <span id="selectedFileName"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {{-- SECTION 2 --}}
+                    <div class="si-section-label" style="margin-top:30px">
+                        <span class="si-section-number">02</span>
+                        <strong>Informasi penyelenggaraan pelatihan</strong>
+                        <span></span>
+                    </div>
+
+                    <div class="si-form-grid">
+
+                        {{-- ANGKATAN --}}
+                        <div class="si-field">
+                            <label for="angkatan">
+                                Angkatan
+                                <span class="si-optional">Opsional</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                name="angkatan"
+                                id="angkatan"
+                                class="si-control"
+                                value="{{ old('angkatan') }}"
+                                placeholder="Contoh: Angkatan I Tahun 2026"
+                                maxlength="100"
+                            >
+
+                            <small class="si-field-help">
+                                Kosongkan jika pelatihan tidak memiliki informasi angkatan.
+                            </small>
+                        </div>
+
+                        {{-- WILAYAH --}}
+                        <div class="si-field">
+                            <label for="kabupaten_kota_mitra">
+                                Kabupaten/Kota/Mitra/Mandiri
+                                <span class="si-required">*</span>
+                            </label>
+
+                            <select
+                                name="kabupaten_kota_mitra"
+                                id="kabupaten_kota_mitra"
+                                class="si-control"
+                                required
+                            >
+                                <option value="">
+                                    -- Pilih wilayah atau mitra --
+                                </option>
+
+                                @foreach ($districts as $district)
+                                    <option
+                                        value="{{ $district->name }}"
+                                        @selected(
+                                            old('kabupaten_kota_mitra') === $district->name
+                                        )
+                                    >
+                                        {{ $district->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <small class="si-field-help">
+                                Pilihan mengikuti Master Data SIRAPIK.
+                            </small>
+                        </div>
+
+                        {{-- SUMBER DANA --}}
+                        <div class="si-field si-field-full">
+                            <label for="sumber_dana">
+                                Sumber Dana
+                                <span class="si-required">*</span>
+                            </label>
+
+                            <select
+                                name="sumber_dana"
+                                id="sumber_dana"
+                                class="si-control"
+                                required
+                            >
+                                <option value="">
+                                    -- Pilih sumber dana --
+                                </option>
+
+                                @foreach ($fundingSources as $source)
+                                    <option
+                                        value="{{ $source->name }}"
+                                        @selected(
+                                            old('sumber_dana') === $source->name
+                                        )
+                                    >
+                                        {{ $source->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <small class="si-field-help">
+                                Pilihan mengikuti Master Data Sumber Dana SIRAPIK.
+                            </small>
+                        </div>
+
+                    </div>
+
+                    {{-- SECTION 3 --}}
+                    <div class="si-section-label" style="margin-top:30px">
+                        <span class="si-section-number">03</span>
+                        <strong>Klasifikasi dan durasi pelatihan</strong>
+                        <span></span>
+                    </div>
+
+                    <div class="si-form-grid">
+
+                        {{-- CATEGORY --}}
+                        <div class="si-field">
+                            <label for="training_category_id">
+                                Kategori Pelatihan
+                                <span class="si-optional">Opsional</span>
+                            </label>
+
+                            <select
+                                name="training_category_id"
+                                id="training_category_id"
+                                class="si-control"
+                            >
+                                <option value="">
+                                    -- Pilih kategori --
+                                </option>
+
+                                @foreach ($categories as $category)
+                                    <option
+                                        value="{{ $category->id }}"
+                                        @selected(
+                                            (string) old('training_category_id', '') ===
+                                            (string) $category->id
+                                        )
+                                    >
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <small class="si-field-help">
+                                Mengikuti Master Data Kategori Pelatihan.
+                            </small>
+                        </div>
+
+                        {{-- JPL --}}
+                        <div class="si-field">
+                            <label for="jpl">
+                                Jumlah JPL
+                                <span class="si-optional">Opsional</span>
+                            </label>
+
+                            <input
+                                type="number"
+                                name="jpl"
+                                id="jpl"
+                                class="si-control"
+                                value="{{ old('jpl') }}"
+                                min="0"
+                                step="1"
+                                placeholder="Contoh: 32"
+                            >
+
+                            <small class="si-field-help">
+                                Isi jumlah Jam Pelajaran jika tersedia.
+                            </small>
+                        </div>
+
+                    </div>
+
+                    {{-- ACTIONS --}}
+                    <div class="si-form-footer">
+
+                        <div class="si-footer-note">
+                            <svg width="16" height="16" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor"
+                                 stroke-width="1.8" stroke-linecap="round"
+                                 stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4M12 8h.01"/>
+                            </svg>
+                            Pastikan data sudah benar sebelum diimport.
+                        </div>
+
+                        <div class="si-actions">
+                            <button
+                                type="reset"
+                                class="si-btn si-btn-secondary"
+                                id="resetButton"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor"
+                                     stroke-width="1.8" stroke-linecap="round"
+                                     stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
+                                    <path d="M3 3v5h5"/>
+                                </svg>
+                                Reset Form
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="si-btn si-btn-primary"
+                                id="submitButton"
+                            >
+                                <svg width="17" height="17" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M12 16V4"/>
+                                    <path d="m7 9 5-5 5 5"/>
+                                    <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
+                                </svg>
+                                <span>Import Excel</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
+        </section>
 
-    {{-- Informasi --}}
-    <div class="info-card">
-        <div class="info-icon" aria-hidden="true">i</div>
+        {{-- SIDE INFORMATION --}}
+        <aside class="si-side-column">
 
-        <div>
-            <strong>Perhatikan sebelum import</strong>
+            <section class="si-side-card si-side-blue">
+                <div class="si-side-icon" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </div>
 
-            <p>
-                Pastikan baris judul dan kolom peserta pada Excel
-                sesuai format yang digunakan SIRAPIK. Peserta yang
-                sudah terdaftar dapat diperbarui berdasarkan NIP atau NIK,
-                dan riwayat pelatihan yang sama tidak dibuat berulang.
-                Kategori Pelatihan dan JPL dapat dikosongkan jika
-                informasinya belum tersedia.
-            </p>
-        </div>
+                <h3>Import data lebih terstruktur</h3>
+
+                <p>
+                    SIRAPIK membantu mengelola data peserta dan riwayat
+                    pelatihan dalam satu sistem yang terintegrasi.
+                    Pastikan file sumber dan informasi pelatihan sesuai
+                    sebelum memulai proses.
+                </p>
+            </section>
+
+            <section class="si-side-card">
+                <div class="si-side-content">
+                    <div class="si-side-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24"
+                             fill="none" stroke="#1761b5" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round"
+                             aria-hidden="true">
+                            <path d="m5 12 4 4L19 6"/>
+                        </svg>
+                        Checklist sebelum import
+                    </div>
+
+                    <ul class="si-check-list">
+                        <li>
+                            <span class="si-check" aria-hidden="true">
+                                <svg width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor"
+                                     stroke-width="2.5" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path d="m5 12 4 4L19 6"/>
+                                </svg>
+                            </span>
+                            File Excel memiliki susunan kolom yang sesuai.
+                        </li>
+
+                        <li>
+                            <span class="si-check" aria-hidden="true">
+                                <svg width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor"
+                                     stroke-width="2.5" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path d="m5 12 4 4L19 6"/>
+                                </svg>
+                            </span>
+                            Data identitas peserta sudah diperiksa.
+                        </li>
+
+                        <li>
+                            <span class="si-check" aria-hidden="true">
+                                <svg width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor"
+                                     stroke-width="2.5" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path d="m5 12 4 4L19 6"/>
+                                </svg>
+                            </span>
+                            Wilayah dan sumber dana sudah dipilih.
+                        </li>
+
+                        <li>
+                            <span class="si-check" aria-hidden="true">
+                                <svg width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor"
+                                     stroke-width="2.5" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path d="m5 12 4 4L19 6"/>
+                                </svg>
+                            </span>
+                            Kategori dan JPL diisi jika informasinya tersedia.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="si-side-warning">
+                <div class="si-warning-heading">
+                    <svg width="17" height="17" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <path d="M10.3 3.9 2.5 17.4A2 2 0 0 0 4.2 20h15.6a2 2 0 0 0 1.7-2.6L13.7 3.9a2 2 0 0 0-3.4 0z"/>
+                        <path d="M12 9v4M12 17h.01"/>
+                    </svg>
+                    Informasi penting
+                </div>
+
+                <p>
+                    Peserta yang sudah terdaftar dapat diperbarui berdasarkan
+                    NIP atau NIK. Riwayat pelatihan yang sama tidak dibuat
+                    berulang. Kategori Pelatihan dan JPL boleh dikosongkan
+                    jika informasinya belum tersedia.
+                </p>
+            </section>
+
+        </aside>
     </div>
 </div>
 
-<style>
-    .import-page {
-        width: 100%;
-        max-width: 1120px;
-        margin: 0 auto;
-        padding: 30px 28px 42px;
-        color: #243247;
-    }
-
-    .page-heading {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .page-heading h1 {
-        margin: 0 0 7px;
-        color: #17365d;
-        font-size: clamp(24px, 3vw, 30px);
-        font-weight: 750;
-        line-height: 1.3;
-    }
-
-    .page-heading p,
-    .card-heading p {
-        margin: 0;
-        color: #637187;
-        font-size: 14px;
-        line-height: 1.7;
-    }
-
-    .import-card {
-        padding: 26px;
-        background: #fff;
-        border: 1px solid #dce4ed;
-        border-radius: 12px;
-        box-shadow: 0 3px 14px rgba(24, 45, 75, .05);
-    }
-
-    .card-heading {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-        padding-bottom: 22px;
-        margin-bottom: 23px;
-        border-bottom: 1px solid #e7edf4;
-    }
-
-    .card-icon {
-        display: grid;
-        place-items: center;
-        width: 44px;
-        height: 44px;
-        flex: 0 0 44px;
-        border-radius: 10px;
-        background: #eaf1fb;
-        color: #245ba7;
-        font-size: 25px;
-        font-weight: 800;
-    }
-
-    .card-heading h2 {
-        margin: 0 0 4px;
-        color: #17365d;
-        font-size: 19px;
-        font-weight: 750;
-    }
-
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 22px 20px;
-    }
-
-    .form-group {
-        min-width: 0;
-    }
-
-    .full-width {
-        grid-column: 1 / -1;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: #243247;
-        font-size: 14px;
-        font-weight: 700;
-    }
-
-    .required {
-        color: #c03939;
-    }
-
-    .import-page .form-control {
-        display: block;
-        width: 100%;
-        min-width: 0;
-        min-height: 46px;
-        padding: 11px 13px;
-        border: 1px solid #cbd5e1;
-        border-radius: 7px;
-        background-color: #fff;
-        color: #243247;
-        font-family: inherit;
-        font-size: 14px;
-        line-height: 1.5;
-        box-shadow: none;
-    }
-
-    .import-page input[type="file"].form-control {
-        padding: 8px 10px;
-    }
-
-    .import-page .form-control:focus {
-        border-color: #245ba7;
-        outline: 3px solid rgba(36, 91, 167, .12);
-        outline-offset: 0;
-    }
-
-    .import-page select.form-select {
-        cursor: pointer;
-        padding-right: 38px;
-    }
-
-    .field-help {
-        display: block;
-        margin-top: 7px;
-        color: #718096;
-        font-size: 12px;
-        line-height: 1.6;
-    }
-
-    .selected-file {
-        margin-top: 9px;
-        padding: 9px 12px;
-        border-radius: 6px;
-        background: #f1f6fc;
-        color: #245ba7;
-        font-size: 13px;
-        overflow-wrap: anywhere;
-    }
-
-    .form-actions {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 28px;
-        padding-top: 21px;
-        border-top: 1px solid #e7edf4;
-    }
-
-    .import-page .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        min-height: 43px;
-        padding: 10px 18px;
-        border: 1px solid transparent;
-        border-radius: 7px;
-        font-family: inherit;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background-color .15s ease;
-    }
-
-    .import-page .btn-primary {
-        background: #245ba7;
-        border-color: #245ba7;
-        color: #fff;
-    }
-
-    .import-page .btn-primary:hover {
-        background: #1b477f;
-    }
-
-    .import-page .btn-primary:disabled {
-        opacity: .7;
-        cursor: wait;
-    }
-
-    .import-page .btn-secondary {
-        background: #fff;
-        border-color: #cbd5e1;
-        color: #334155;
-    }
-
-    .import-page .btn-secondary:hover {
-        background: #f3f6fa;
-    }
-
-    .import-page .alert {
-        padding: 16px 19px;
-        margin-bottom: 20px;
-        border: 1px solid transparent;
-        border-radius: 9px;
-        font-size: 14px;
-    }
-
-    .import-page .alert ul {
-        margin: 9px 0 0;
-        padding-left: 22px;
-    }
-
-    .import-page .alert li {
-        margin: 3px 0;
-        overflow-wrap: anywhere;
-    }
-
-    .import-page .alert-danger {
-        background: #fff1f1;
-        border-color: #f0caca;
-        color: #8f2929;
-    }
-
-    .import-page .alert-success {
-        background: #edf8f0;
-        border-color: #c9e8d0;
-        color: #23623a;
-    }
-
-    .import-notes {
-        margin-top: 15px;
-        padding-top: 13px;
-        border-top: 1px solid #c9e8d0;
-    }
-
-    .info-card {
-        display: flex;
-        align-items: flex-start;
-        gap: 13px;
-        margin-top: 19px;
-        padding: 18px 20px;
-        border: 1px solid #d7e5f7;
-        border-radius: 9px;
-        background: #f2f7fd;
-    }
-
-    .info-icon {
-        display: grid;
-        place-items: center;
-        width: 27px;
-        height: 27px;
-        flex: 0 0 27px;
-        border-radius: 50%;
-        background: #dceafb;
-        color: #245ba7;
-        font-weight: 800;
-    }
-
-    .info-card strong {
-        display: block;
-        margin-bottom: 4px;
-        color: #17365d;
-        font-size: 14px;
-    }
-
-    .info-card p {
-        margin: 0;
-        color: #53657d;
-        font-size: 13px;
-        line-height: 1.8;
-    }
-
-    @media (max-width: 700px) {
-        .import-page {
-            padding: 23px 15px 32px;
-        }
-
-        .import-card {
-            padding: 19px 16px;
-        }
-
-        .form-grid {
-            grid-template-columns: minmax(0, 1fr);
-            gap: 18px;
-        }
-
-        .full-width {
-            grid-column: auto;
-        }
-
-        .page-heading h1 {
-            font-size: 24px;
-        }
-
-        .card-heading h2 {
-            font-size: 17px;
-        }
-
-        .form-actions {
-            align-items: stretch;
-            flex-direction: column;
-        }
-
-        .form-actions .btn {
-            width: 100%;
-        }
-    }
-</style>
-
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const fileInput = document.getElementById('file');
-    const selectedFile = document.getElementById('selectedFile');
-    const importForm = document.getElementById('importForm');
-    const submitButton = document.getElementById('submitButton');
-    const resetButton = document.getElementById('resetButton');
+(function () {
+    function initializeImportPage() {
+        const page = document.querySelector('.sirapik-import');
 
-    if (fileInput && selectedFile) {
-        fileInput.addEventListener('change', function () {
-            const file = this.files && this.files.length
-                ? this.files[0]
-                : null;
+        if (!page || page.dataset.initialized === 'true') {
+            return;
+        }
 
-            if (!file) {
-                selectedFile.textContent = '';
-                selectedFile.hidden = true;
-                return;
-            }
+        page.dataset.initialized = 'true';
 
-            selectedFile.textContent =
-                'File dipilih: ' + file.name +
-                ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+        const fileInput = page.querySelector('#file');
+        const selectedFile = page.querySelector('#selectedFile');
+        const selectedFileName = page.querySelector('#selectedFileName');
+        const importForm = page.querySelector('#importForm');
+        const submitButton = page.querySelector('#submitButton');
+        const resetButton = page.querySelector('#resetButton');
 
-            selectedFile.hidden = false;
-        });
-    }
+        const defaultButtonContent = submitButton
+            ? submitButton.innerHTML
+            : '';
 
-    if (importForm && submitButton) {
-        importForm.addEventListener('submit', function () {
-            if (!importForm.checkValidity()) {
-                return;
-            }
+        // Menampilkan nama file yang dipilih.
+        if (fileInput && selectedFile && selectedFileName) {
+            fileInput.addEventListener('change', function () {
+                const file = this.files && this.files.length
+                    ? this.files[0]
+                    : null;
 
-            submitButton.disabled = true;
-
-            const buttonText =
-                submitButton.querySelector('span:last-child');
-
-            if (buttonText) {
-                buttonText.textContent = 'Memproses import...';
-            }
-        });
-    }
-
-    if (resetButton && fileInput && selectedFile) {
-        resetButton.addEventListener('click', function () {
-            window.setTimeout(function () {
-                selectedFile.textContent = '';
-                selectedFile.hidden = true;
-
-                if (submitButton) {
-                    submitButton.disabled = false;
-
-                    const buttonText =
-                        submitButton.querySelector('span:last-child');
-
-                    if (buttonText) {
-                        buttonText.textContent = 'Import Excel';
-                    }
+                if (!file) {
+                    selectedFileName.textContent = '';
+                    selectedFile.hidden = true;
+                    return;
                 }
-            }, 0);
-        });
+
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+
+                selectedFileName.textContent =
+                    file.name + ' · ' + fileSize + ' MB';
+
+                selectedFile.hidden = false;
+            });
+        }
+
+        // Mencegah pengiriman berulang saat proses import dimulai.
+        if (importForm && submitButton) {
+            importForm.addEventListener('submit', function (event) {
+                if (!importForm.checkValidity()) {
+                    return;
+                }
+
+                if (submitButton.disabled) {
+                    event.preventDefault();
+                    return;
+                }
+
+                submitButton.disabled = true;
+
+                submitButton.innerHTML = `
+                    <svg width="17" height="17" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 2v4"/>
+                        <path d="M12 18v4"/>
+                        <path d="m4.93 4.93 2.83 2.83"/>
+                        <path d="m16.24 16.24 2.83 2.83"/>
+                        <path d="M2 12h4"/>
+                        <path d="M18 12h4"/>
+                        <path d="m4.93 19.07 2.83-2.83"/>
+                        <path d="m16.24 7.76 2.83-2.83"/>
+                    </svg>
+                    <span>Memproses import...</span>
+                `;
+            });
+        }
+
+        // Reset tampilan setelah form direset.
+        if (resetButton) {
+            resetButton.addEventListener('click', function () {
+                window.setTimeout(function () {
+                    if (selectedFileName) {
+                        selectedFileName.textContent = '';
+                    }
+
+                    if (selectedFile) {
+                        selectedFile.hidden = true;
+                    }
+
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = defaultButtonContent;
+                    }
+                }, 0);
+            });
+        }
     }
-});
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeImportPage);
+    } else {
+        initializeImportPage();
+    }
+})();
 </script>
 @endsection

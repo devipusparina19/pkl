@@ -5,9 +5,28 @@
 @section('content')
 
 <style>
+    /* =====================================================
+       EXECUTIVE BLUE — TRAINING MANAGEMENT
+       ===================================================== */
+
     .training-page {
-        color: #172b4d;
-        font-size: 14px;
+        --tp-navy: #102b50;
+        --tp-blue: #2463a6;
+        --tp-blue-dark: #194d86;
+        --tp-blue-soft: #eaf2fc;
+        --tp-ink: #1b304b;
+        --tp-muted: #718198;
+        --tp-line: #e3eaf2;
+        --tp-surface: #ffffff;
+        --tp-bg: #f5f8fc;
+        --tp-green: #16845b;
+        --tp-red: #d94b55;
+
+        width: 100%;
+        color: var(--tp-ink);
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        font-size: 15px;
+        animation: tpPageEnter .55s ease both;
     }
 
     .training-page *,
@@ -16,210 +35,523 @@
         box-sizing: border-box;
     }
 
-    /* JUDUL HALAMAN */
+    .training-page button,
+    .training-page input,
+    .training-page select {
+        font: inherit;
+    }
+
+    .training-page a,
+    .training-page button {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    @keyframes tpPageEnter {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* =====================================================
+       PAGE HEADER
+       ===================================================== */
+
     .training-page .page-heading {
-        margin-bottom: 24px;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 24px;
+        margin-bottom: 30px;
+        padding: 5px 0 25px;
+        border-bottom: 1px solid var(--tp-line);
+    }
+
+    .training-page .heading-content {
+        min-width: 0;
     }
 
     .training-page .eyebrow {
-        margin-bottom: 8px;
-        color: #2457a7;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 13px;
+        color: var(--tp-blue);
         font-size: 12px;
         font-weight: 800;
-        letter-spacing: 1.4px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .training-page .eyebrow::before {
+        content: '';
+        width: 27px;
+        height: 3px;
+        border-radius: 10px;
+        background: var(--tp-blue);
     }
 
     .training-page .page-heading h1 {
         margin: 0;
-        color: #17365f;
-        font-size: 28px;
-        font-weight: 800;
-        line-height: 1.3;
+        color: var(--tp-navy);
+        font-size: clamp(30px, 3.2vw, 42px);
+        font-weight: 850;
+        line-height: 1.2;
+        letter-spacing: -1.7px;
     }
 
     .training-page .page-heading p {
-        margin: 9px 0 0;
-        color: #718096;
-        font-size: 14px;
-        line-height: 1.7;
+        max-width: 550px;
+        margin: 12px 0 0;
+        color: var(--tp-muted);
+        font-size: 15px;
+        line-height: 1.8;
     }
 
-    /* NOTIFIKASI */
+    .training-page .heading-decoration {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 17px;
+        color: var(--tp-blue);
+        background: var(--tp-blue-soft);
+        border: 1px solid #d8e7f8;
+        border-radius: 12px;
+    }
+
+    .training-page .heading-decoration svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .training-page .heading-decoration span {
+        color: var(--tp-navy);
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    /* =====================================================
+       NOTIFICATIONS
+       ===================================================== */
+
     .training-page .notice {
-        margin-bottom: 18px;
-        padding: 15px 18px;
-        border-radius: 10px;
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 17px 19px;
+        border-radius: 12px;
         font-size: 14px;
-        line-height: 1.7;
+        line-height: 1.8;
+        animation: tpPageEnter .3s ease both;
+    }
+
+    .training-page .notice svg {
+        flex-shrink: 0;
+        width: 21px;
+        height: 21px;
+        margin-top: 1px;
     }
 
     .training-page .notice-success {
-        color: #166534;
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
+        color: #176747;
+        background: #edfaf4;
+        border: 1px solid #c8efdc;
     }
 
     .training-page .notice-error {
-        color: #991b1b;
-        background: #fef2f2;
-        border: 1px solid #fecaca;
+        color: #a12f3b;
+        background: #fff1f2;
+        border: 1px solid #f7d1d5;
     }
 
     .training-page .notice ul {
         margin: 8px 0 0;
-        padding-left: 22px;
+        padding-left: 20px;
     }
 
-    /* PANEL */
-    .training-page .panel {
-        min-width: 0;
-        padding: 21px;
-        background: #fff;
-        border: 1px solid #dce5ef;
-        border-radius: 13px;
-        box-shadow: 0 4px 15px rgba(23, 43, 77, .035);
+    /* =====================================================
+       YEAR FILTER
+       ===================================================== */
+
+    .training-page .year-filter {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 25px;
+        margin-bottom: 22px;
+        padding: 23px 25px;
+        overflow: hidden;
+        background: var(--tp-surface);
+        border: 1px solid var(--tp-line);
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(21, 47, 81, .035);
     }
 
-    /* FILTER */
-    .training-page .filter-section {
-        margin-bottom: 18px;
-        padding: 20px;
-        background: #fff;
-        border: 1px solid #dce5ef;
-        border-radius: 12px;
-        box-shadow: 0 3px 12px rgba(23, 43, 77, .025);
+    .training-page .year-filter::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--tp-blue);
+        content: '';
+    }
+
+    .training-page .filter-intro {
+        min-width: 170px;
     }
 
     .training-page .filter-title {
         display: block;
-        margin-bottom: 12px;
-        color: #233d60;
-        font-size: 15px;
-        font-weight: 700;
+        margin-bottom: 5px;
+        color: var(--tp-navy);
+        font-size: 16px;
+        font-weight: 800;
     }
 
-    .training-page .filter-form {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+    .training-page .filter-description {
+        color: var(--tp-muted);
+        font-size: 13px;
+        line-height: 1.6;
     }
 
-    .training-page .filter-row {
+    .training-page .year-filter-form {
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         flex-wrap: wrap;
         gap: 10px;
     }
 
-    .training-page .search-wrap {
-        flex: 1 1 300px;
-        min-width: 220px;
-    }
-
     .training-page .year-select-wrap {
-        flex: 0 1 230px;
-        min-width: 180px;
+        width: 220px;
     }
 
-    .training-page .search-input,
-    .training-page .year-select {
+    .training-page .year-select,
+    .training-page .search-input {
         display: block;
         width: 100%;
-        height: 46px;
-        padding: 0 14px;
-        color: #17365f;
-        background: #fff;
-        border: 1px solid #cbd8e8;
-        border-radius: 8px;
-        font-family: inherit;
+        height: 49px;
+        padding: 0 15px;
+        color: var(--tp-navy);
+        background: #f9fbfe;
+        border: 1px solid #dce5ef;
+        border-radius: 10px;
         font-size: 14px;
         outline: none;
+        transition: border .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .training-page .year-select {
+        cursor: pointer;
+    }
+
+    .training-page .year-select:focus,
+    .training-page .search-input:focus {
+        background: #fff;
+        border-color: var(--tp-blue);
+        box-shadow: 0 0 0 4px rgba(36, 99, 166, .10);
     }
 
     .training-page .search-input::placeholder {
-        color: #8494aa;
+        color: #98a6b8;
     }
 
-    .training-page .search-input:focus,
-    .training-page .year-select:focus {
-        border-color: #3978bd;
-        box-shadow: 0 0 0 3px rgba(36, 87, 167, .1);
-    }
+    /* =====================================================
+       BUTTONS
+       ===================================================== */
 
-    /* TOMBOL */
     .training-page .action-button {
         display: inline-flex;
-        align-items: center;
         justify-content: center;
-        gap: 8px;
-        min-height: 44px;
-        padding: 10px 19px;
+        align-items: center;
+        gap: 9px;
+        min-height: 46px;
+        padding: 11px 17px;
         border: 1px solid transparent;
-        border-radius: 8px;
-        font-family: inherit;
+        border-radius: 9px;
         font-size: 13px;
-        font-weight: 700;
+        font-weight: 750;
         text-decoration: none;
-        cursor: pointer;
-        transition: .2s ease;
         white-space: nowrap;
+        cursor: pointer;
+        transition:
+            transform .2s ease,
+            background .2s ease,
+            color .2s ease,
+            border-color .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .training-page .action-button svg {
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+    }
+
+    .training-page .action-button:active {
+        transform: scale(.97);
     }
 
     .training-page .btn-primary {
         color: #fff;
-        background: #2865a8;
-        border-color: #2865a8;
+        background: var(--tp-blue);
+        border-color: var(--tp-blue);
+        box-shadow: 0 4px 10px rgba(36, 99, 166, .14);
     }
 
     .training-page .btn-primary:hover {
         color: #fff;
-        background: #1d4f89;
-        border-color: #1d4f89;
+        background: var(--tp-blue-dark);
+        border-color: var(--tp-blue-dark);
+        box-shadow: 0 6px 16px rgba(36, 99, 166, .2);
+        transform: translateY(-2px);
     }
 
     .training-page .btn-light {
-        color: #36516f;
-        background: #edf2f8;
-        border-color: #e1e8f1;
+        color: var(--tp-blue-dark);
+        background: #f0f5fb;
+        border-color: #e1eaf5;
     }
 
     .training-page .btn-light:hover {
-        background: #e1eaf5;
+        color: var(--tp-navy);
+        background: #e3edf9;
+        border-color: #cfdef0;
+        transform: translateY(-2px);
     }
 
-    /* INFORMASI FILTER */
+    .training-page .delete-button {
+        color: #c13d49;
+        background: #fff2f3;
+        border-color: #f8dfe2;
+    }
+
+    .training-page .delete-button:hover {
+        color: #fff;
+        background: var(--tp-red);
+        border-color: var(--tp-red);
+        transform: translateY(-2px);
+    }
+
+    /* =====================================================
+       MAIN DATA PANEL
+       ===================================================== */
+
+    .training-page .panel {
+        width: 100%;
+        min-width: 0;
+        padding: 25px;
+        background: var(--tp-surface);
+        border: 1px solid var(--tp-line);
+        border-radius: 16px;
+        box-shadow: 0 5px 24px rgba(21, 47, 81, .045);
+    }
+
+    .training-page .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .training-page .panel-heading {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        min-width: 0;
+    }
+
+    .training-page .panel-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 47px;
+        height: 47px;
+        flex-shrink: 0;
+        color: var(--tp-blue);
+        background: var(--tp-blue-soft);
+        border-radius: 12px;
+    }
+
+    .training-page .panel-icon svg {
+        width: 23px;
+        height: 23px;
+    }
+
+    .training-page .panel-heading h2 {
+        margin: 0;
+        color: var(--tp-navy);
+        font-size: 20px;
+        font-weight: 850;
+        letter-spacing: -.5px;
+    }
+
+    .training-page .panel-heading p {
+        margin: 5px 0 0;
+        color: var(--tp-muted);
+        font-size: 13px;
+    }
+
+    .training-page .panel-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 13px;
+        color: #24704f;
+        background: #eef9f3;
+        border: 1px solid #d8efe2;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .training-page .indicator-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #2da878;
+        box-shadow: 0 0 0 3px rgba(45, 168, 120, .12);
+    }
+
+    /* =====================================================
+       FILTER STATUS
+       ===================================================== */
+
     .training-page .filter-information {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        gap: 9px;
-        margin-bottom: 17px;
+        gap: 10px;
+        margin-bottom: 19px;
+        padding: 13px 15px;
+        background: #f7f9fc;
+        border: 1px solid #eaf0f6;
+        border-radius: 10px;
+    }
+
+    .training-page .filter-label {
+        color: var(--tp-muted);
+        font-size: 13px;
+        font-weight: 600;
     }
 
     .training-page .filter-chip {
         display: inline-flex;
         align-items: center;
         gap: 7px;
-        padding: 9px 12px;
-        color: #2457a7;
-        background: #edf4fd;
-        border: 1px solid #dce9fa;
+        padding: 7px 12px;
+        color: var(--tp-blue-dark);
+        background: #e9f2fd;
+        border: 1px solid #d7e6f8;
         border-radius: 7px;
-        font-size: 12px;
-        font-weight: 700;
+        font-size: 13px;
+        font-weight: 750;
     }
 
-    /* TABEL */
+    .training-page .filter-chip svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* =====================================================
+       SEARCH
+       ===================================================== */
+
+    .training-page .search-section {
+        margin-bottom: 22px;
+    }
+
+    .training-page .search-title {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--tp-navy);
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .training-page .search-form {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .training-page .search-input-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .training-page .search-input-wrap svg {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        width: 19px;
+        height: 19px;
+        color: #8294aa;
+        pointer-events: none;
+        transform: translateY(-50%);
+    }
+
+    .training-page .search-input {
+        height: 49px;
+        padding-left: 44px;
+    }
+
+    .training-page .search-actions {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    /* =====================================================
+       TABLE
+       ===================================================== */
+
+    .training-page .table-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .training-page .table-heading h3 {
+        margin: 0;
+        color: var(--tp-navy);
+        font-size: 15px;
+        font-weight: 850;
+    }
+
+    .training-page .table-heading span {
+        color: var(--tp-muted);
+        font-size: 12px;
+    }
+
     .training-page .table-wrap {
         width: 100%;
         overflow-x: auto;
-        border: 1px solid #e2eaf2;
-        border-radius: 9px;
+        border: 1px solid #e2eaf3;
+        border-radius: 12px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #bdcde0 #f2f5f9;
     }
 
     .training-page table {
         width: 100%;
-        min-width: 1250px;
+        min-width: 1280px;
         margin: 0;
         border-collapse: separate;
         border-spacing: 0;
@@ -227,40 +559,70 @@
     }
 
     .training-page thead th {
-        padding: 15px 13px;
-        color: #425b79;
-        background: #f3f7fc;
-        border-bottom: 1px solid #dce5ef;
-        font-size: 12px;
+        padding: 17px 15px;
+        color: #fff;
+        background: var(--tp-navy);
+        border-bottom: 3px solid #397bb9;
+        font-size: 11px;
         font-weight: 800;
         text-align: left;
+        vertical-align: middle;
         white-space: nowrap;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+    }
+
+    .training-page thead th:first-child {
+        padding-left: 19px;
     }
 
     .training-page tbody td {
-        padding: 16px 13px;
-        color: #334b68;
-        border-bottom: 1px solid #e6edf5;
+        padding: 19px 15px;
+        color: #52647a;
+        border-bottom: 1px solid #edf1f6;
         font-size: 13px;
-        line-height: 1.7;
+        line-height: 1.75;
         vertical-align: middle;
+        transition: background .2s ease;
+    }
+
+    .training-page tbody tr {
+        transition: background .2s ease;
+    }
+
+    .training-page tbody tr:nth-child(even) {
+        background: #f8fafd;
+    }
+
+    .training-page tbody tr:hover {
+        background: #edf5ff;
     }
 
     .training-page tbody tr:last-child td {
         border-bottom: none;
     }
 
-    .training-page tbody tr:hover {
-        background: #f8fbff;
+    .training-page tbody td:first-child {
+        padding-left: 19px;
+        color: var(--tp-blue);
+        font-weight: 800;
     }
 
     .training-page tbody td:nth-child(2) {
-        color: #1c3659;
-        font-weight: 600;
-        min-width: 210px;
+        min-width: 235px;
+        color: var(--tp-navy);
+        font-weight: 750;
     }
 
-    /* AKSI */
+    .training-page tbody td:nth-child(3),
+    .training-page tbody td:nth-child(4) {
+        min-width: 130px;
+    }
+
+    /* =====================================================
+       ACTION GROUP
+       ===================================================== */
+
     .training-page .action-group {
         display: flex;
         align-items: center;
@@ -270,112 +632,310 @@
 
     .training-page .action-group .action-button {
         min-height: 35px;
-        padding: 7px 12px;
+        padding: 8px 12px;
         font-size: 12px;
     }
 
-    .training-page .delete-button {
-        color: #dc2626;
-        background: #fff1f2;
-        border-color: #ffe0e4;
-    }
+    /* =====================================================
+       EMPTY STATE
+       ===================================================== */
 
-    .training-page .delete-button:hover {
-        color: #b91c1c;
-        background: #ffe4e6;
-    }
-
-    /* DATA KOSONG */
     .training-page .empty-state {
-        padding: 40px 18px;
-        color: #8291a5;
-        font-size: 14px;
-        line-height: 1.8;
+        padding: 65px 20px !important;
+        color: var(--tp-muted) !important;
+        font-size: 14px !important;
+        line-height: 1.9 !important;
         text-align: center;
     }
 
-    /* PAGINATION */
+    .training-page .empty-state-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 17px;
+        color: var(--tp-blue);
+        background: var(--tp-blue-soft);
+        border-radius: 18px;
+    }
+
+    .training-page .empty-state-icon svg {
+        width: 30px;
+        height: 30px;
+    }
+
+    .training-page .empty-state strong {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--tp-navy);
+        font-size: 17px;
+    }
+
+    /* =====================================================
+       PAGINATION
+       ===================================================== */
+
     .training-page .pagination-wrap {
         display: flex;
-        justify-content: flex-end;
-        margin-top: 20px;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 22px;
+        padding-top: 19px;
+        border-top: 1px solid var(--tp-line);
         overflow-x: auto;
-    }
-
-    .training-page .pagination-wrap nav {
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .training-page .pagination-wrap svg {
-        width: 18px;
-        height: 18px;
     }
 
     .training-page .pagination-wrap p {
         margin: 0;
-        color: #718096;
+        color: var(--tp-muted);
         font-size: 13px;
+    }
+
+    .training-page .pagination-wrap nav {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .training-page .pagination-wrap nav > div:first-child {
+        display: none;
+    }
+
+    .training-page .pagination-wrap nav > div:last-child {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
     }
 
     .training-page .pagination-wrap a,
     .training-page .pagination-wrap span {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 36px;
+        min-height: 36px;
+        padding: 6px 10px;
+        color: var(--tp-blue);
+        background: #f3f7fc;
+        border: 1px solid #e5edf6;
+        border-radius: 8px;
         font-size: 13px;
+        text-decoration: none;
+        transition: .2s ease;
     }
+
+    .training-page .pagination-wrap a:hover {
+        color: #fff;
+        background: var(--tp-blue);
+        border-color: var(--tp-blue);
+    }
+
+    .training-page .pagination-wrap span[aria-current="page"] span {
+        color: #fff;
+        background: var(--tp-blue);
+        border-color: var(--tp-blue);
+    }
+
+    .training-page .pagination-wrap svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    /* =====================================================
+       ACCESSIBILITY
+       ===================================================== */
 
     .training-page :focus-visible {
-        outline: 3px solid rgba(36, 87, 167, .3);
-        outline-offset: 2px;
+        outline: 3px solid rgba(36, 99, 166, .35);
+        outline-offset: 3px;
     }
 
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
+    @media (prefers-reduced-motion: reduce) {
+        .training-page *,
+        .training-page *::before,
+        .training-page *::after {
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+
+    /* =====================================================
+       TABLET
+       ===================================================== */
+
+    @media (max-width: 992px) {
+        .training-page .year-filter {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .training-page .year-filter-form {
+            justify-content: flex-start;
+            width: 100%;
+        }
+
         .training-page .panel {
-            padding: 15px;
+            padding: 21px;
+        }
+    }
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 768px) {
+        .training-page {
+            font-size: 14px;
+        }
+
+        .training-page .page-heading {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 22px;
+            padding-bottom: 20px;
         }
 
         .training-page .page-heading h1 {
-            font-size: 25px;
+            font-size: 32px;
+            letter-spacing: -1.2px;
         }
 
         .training-page .page-heading p {
-            font-size: 13px;
+            margin-top: 9px;
+            font-size: 14px;
         }
 
-        .training-page .filter-section {
-            padding: 16px;
+        .training-page .heading-decoration {
+            padding: 10px 13px;
         }
 
-        .training-page .filter-row {
+        .training-page .year-filter {
+            gap: 17px;
+            padding: 19px;
+            margin-bottom: 17px;
+        }
+
+        .training-page .filter-intro {
+            width: 100%;
+        }
+
+        .training-page .year-filter-form {
             align-items: stretch;
+            flex-direction: column;
         }
 
-        .training-page .search-wrap,
         .training-page .year-select-wrap {
-            flex-basis: 100%;
+            width: 100%;
         }
 
-        .training-page .filter-row .action-button {
-            flex: 1;
+        .training-page .year-filter-form .action-button {
+            width: 100%;
         }
 
-        .training-page .pagination-wrap {
-            justify-content: flex-start;
+        .training-page .panel {
+            padding: 17px;
+            border-radius: 13px;
+        }
+
+        .training-page .panel-header {
+            align-items: flex-start;
+            flex-direction: column;
+            margin-bottom: 17px;
+        }
+
+        .training-page .panel-heading h2 {
+            font-size: 18px;
+        }
+
+        .training-page .panel-indicator {
+            margin-left: 60px;
+        }
+
+        .training-page .filter-information {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .training-page .search-form {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .training-page .search-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .training-page .search-actions .action-button {
+            width: 100%;
+        }
+
+        .training-page .table-heading {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .training-page .table-wrap {
+            border-radius: 9px;
         }
 
         .training-page table {
-            min-width: 1250px;
+            min-width: 1280px;
+        }
+
+        .training-page thead th {
+            padding: 15px 12px;
+        }
+
+        .training-page tbody td {
+            padding: 16px 12px;
+        }
+
+        .training-page .pagination-wrap {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .training-page .pagination-wrap nav {
+            max-width: 100%;
         }
     }
 
-    @media (max-width: 380px) {
-        .training-page .filter-row .action-button {
-            padding: 9px 10px;
-            font-size: 12px;
+    @media (max-width: 420px) {
+        .training-page .page-heading h1 {
+            font-size: 29px;
         }
 
-        .training-page .page-heading h1 {
-            font-size: 23px;
+        .training-page .eyebrow {
+            font-size: 11px;
+        }
+
+        .training-page .panel {
+            padding: 14px;
+        }
+
+        .training-page .panel-icon {
+            width: 42px;
+            height: 42px;
+        }
+
+        .training-page .panel-indicator {
+            margin-left: 55px;
+        }
+
+        .training-page .filter-title {
+            font-size: 15px;
+        }
+
+        .training-page .notice {
+            padding: 14px;
         }
     }
 </style>
@@ -388,150 +948,372 @@
 
 <div class="training-page">
 
-    {{-- JUDUL HALAMAN --}}
+    {{-- ==================================================
+         PAGE HEADER
+    ================================================== --}}
+
     <div class="page-heading">
-        <div>
-            <div class="eyebrow">DATA MASTER</div>
+
+        <div class="heading-content">
+
+            <div class="eyebrow">
+                DATA MASTER
+            </div>
+
             <h1>Data Pelatihan</h1>
+
             <p>
-                Data pelatihan yang berasal dari hasil Impor Excel.
+                Kelola dan pantau seluruh informasi program pelatihan
+                yang telah terdaftar dalam sistem.
             </p>
+
         </div>
+
+        <div class="heading-decoration">
+
+            <svg viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                <path d="M8 7h8M8 11h8"/>
+            </svg>
+
+            <span>Manajemen Pelatihan</span>
+
+        </div>
+
     </div>
 
-    {{-- NOTIFIKASI BERHASIL --}}
+
+    {{-- ==================================================
+         NOTIFICATIONS
+    ================================================== --}}
+
     @if (session('success'))
+
         <div class="notice notice-success" role="status">
-            {{ session('success') }}
+
+            <svg viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <path d="m9 11 3 3L22 4"/>
+            </svg>
+
+            <div>
+                {{ session('success') }}
+            </div>
+
         </div>
+
     @endif
 
-    {{-- NOTIFIKASI GAGAL --}}
+
     @if (session('error'))
+
         <div class="notice notice-error" role="alert">
-            {{ session('error') }}
+
+            <svg viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4m0 4h.01"/>
+            </svg>
+
+            <div>
+                {{ session('error') }}
+            </div>
+
         </div>
+
     @endif
 
-    {{-- PESAN VALIDASI --}}
+
     @if ($errors->any())
-        <div class="notice notice-error" role="alert">
-            <strong>Terjadi kesalahan.</strong>
 
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        <div class="notice notice-error" role="alert">
+
+            <svg viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4m0 4h.01"/>
+            </svg>
+
+            <div>
+
+                <strong>Terjadi kesalahan.</strong>
+
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+
+            </div>
+
         </div>
+
     @endif
 
-    {{-- PANEL DATA PELATIHAN --}}
-    <div class="panel">
 
-        {{-- INFORMASI FILTER AKTIF --}}
-        <div class="filter-information">
+    {{-- ==================================================
+         YEAR FILTER
+    ================================================== --}}
 
-            @if ($year)
-                <span class="filter-chip">
-                    Tahun Pelatihan: {{ $year }}
-                </span>
-            @else
-                <span class="filter-chip">
-                    Menampilkan Semua Tahun
-                </span>
-            @endif
+    <section class="year-filter">
 
-            @if ($search !== '')
-                <span class="filter-chip">
-                    Pencarian: {{ $search }}
-                </span>
-            @endif
-
-        </div>
-
-        {{-- PENCARIAN DAN FILTER TAHUN --}}
-        <div class="filter-section">
+        <div class="filter-intro">
 
             <label for="year" class="filter-title">
-                Pencarian dan Filter Data Pelatihan
+                Filter Tahun Pelatihan
             </label>
+
+            <div class="filter-description">
+                Pilih tahun untuk melihat data pelatihan tertentu.
+            </div>
+
+        </div>
+
+
+        <form
+            method="GET"
+            action="{{ route('trainings.index') }}"
+            class="year-filter-form"
+        >
+
+            @if ($search !== '')
+                <input type="hidden" name="search" value="{{ $search }}">
+            @endif
+
+
+            <div class="year-select-wrap">
+
+                <select
+                    name="year"
+                    id="year"
+                    class="year-select"
+                    aria-label="Pilih tahun pelatihan"
+                >
+
+                    <option value="" @selected($year === '')>
+                        Semua Tahun
+                    </option>
+
+                    @foreach ($years as $availableYear)
+
+                        <option
+                            value="{{ $availableYear }}"
+                            @selected((string) $year === (string) $availableYear)
+                        >
+                            {{ $availableYear }}
+                        </option>
+
+                    @endforeach
+
+                </select>
+
+            </div>
+
+
+            <button type="submit" class="action-button btn-primary">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16l-6.5 8v6l-3 2v-8L4 4Z"/>
+                </svg>
+
+                Terapkan Filter
+
+            </button>
+
+
+            <a
+                href="{{ route('trainings.index', ['search' => $search ?: null]) }}"
+                class="action-button btn-light"
+            >
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
+                    <path d="M3 3v5h5"/>
+                </svg>
+
+                Reset
+
+            </a>
+
+        </form>
+
+    </section>
+
+
+    {{-- ==================================================
+         MAIN DATA PANEL
+    ================================================== --}}
+
+    <section class="panel">
+
+
+        {{-- PANEL HEADER --}}
+
+        <div class="panel-header">
+
+            <div class="panel-heading">
+
+                <div class="panel-icon">
+
+                    <svg viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="17" rx="2"/>
+                        <path d="M8 2v4m8-4v4M3 10h18"/>
+                        <path d="M8 14h3m2 0h3M8 18h3"/>
+                    </svg>
+
+                </div>
+
+                <div>
+
+                    <h2>Daftar Pelatihan</h2>
+
+                    <p>
+                        Informasi lengkap program pelatihan terdaftar.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel-indicator">
+
+                <span class="indicator-dot"></span>
+
+                Data Pelatihan
+
+            </div>
+
+        </div>
+
+
+        {{-- ACTIVE FILTER --}}
+
+        <div class="filter-information">
+
+            <span class="filter-label">
+                Filter aktif:
+            </span>
+
+            @if ($year)
+
+                <span class="filter-chip">
+
+                    <svg viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="17" rx="2"/>
+                        <path d="M8 2v4m8-4v4M3 10h18"/>
+                    </svg>
+
+                    Tahun {{ $year }}
+
+                </span>
+
+            @else
+
+                <span class="filter-chip">
+
+                    <svg viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 5h16M4 12h16M4 19h16"/>
+                    </svg>
+
+                    Semua Tahun
+
+                </span>
+
+            @endif
+
+        </div>
+
+
+        {{-- ==================================================
+             SEARCH SECTION
+        ================================================== --}}
+
+        <div class="search-section">
+
+            <label for="training-search" class="search-title">
+                Cari Data Pelatihan
+            </label>
+
 
             <form
                 method="GET"
                 action="{{ route('trainings.index') }}"
-                class="filter-form"
+                class="search-form"
             >
 
-                <div class="filter-row">
+                <input type="hidden" name="year" value="{{ $year }}">
 
-                    {{-- PENCARIAN --}}
-                    <div class="search-wrap">
-                        <input
-                            type="search"
-                            name="search"
-                            value="{{ $search }}"
-                            class="search-input"
-                            placeholder="Cari nama, kategori, kerja sama, angkatan, atau sumber dana..."
-                            aria-label="Cari data pelatihan"
-                        >
-                    </div>
 
-                    {{-- FILTER TAHUN --}}
-                    <div class="year-select-wrap">
-                        <select
-                            name="year"
-                            id="year"
-                            class="year-select"
-                            aria-label="Filter tahun pelatihan"
-                        >
-                            <option value="">
-                                Semua Tahun
-                            </option>
+                <div class="search-input-wrap">
 
-                            @foreach ($years as $availableYear)
-                                <option
-                                    value="{{ $availableYear }}"
-                                    @selected(
-                                        (string) $year === (string) $availableYear
-                                    )
-                                >
-                                    {{ $availableYear }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <svg viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="7"/>
+                        <path d="m20 20-4-4"/>
+                    </svg>
+
+                    <input
+                        type="search"
+                        id="training-search"
+                        name="search"
+                        value="{{ $search }}"
+                        class="search-input"
+                        placeholder="Cari nama, kategori, kerja sama, angkatan, atau sumber dana..."
+                        aria-label="Cari data pelatihan"
+                    >
 
                 </div>
 
-                {{-- TOMBOL FILTER --}}
-                <div class="filter-row">
 
-                    <button
-                        type="submit"
-                        class="action-button btn-primary"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor"
-                             stroke-width="2" stroke-linecap="round"
-                             stroke-linejoin="round">
-                            <path d="M4 4h16l-6.5 8v6l-3 2v-8L4 4Z"/>
+                <div class="search-actions">
+
+                    <button type="submit" class="action-button btn-primary">
+
+                        <svg viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="7"/>
+                            <path d="m20 20-4-4"/>
                         </svg>
-                        Terapkan
+
+                        Cari Data
+
                     </button>
 
+
                     <a
-                        href="{{ route('trainings.index') }}"
+                        href="{{ route('trainings.index', ['year' => $year ?: null]) }}"
                         class="action-button btn-light"
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor"
-                             stroke-width="2" stroke-linecap="round"
-                             stroke-linejoin="round">
+
+                        <svg viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
                             <path d="M3 3v5h5"/>
                         </svg>
+
                         Reset
+
                     </a>
 
                 </div>
@@ -540,11 +1322,32 @@
 
         </div>
 
-        {{-- TABEL DATA PELATIHAN --}}
+
+        {{-- ==================================================
+             TABLE HEADING
+        ================================================== --}}
+
+        <div class="table-heading">
+
+            <h3>Informasi Program Pelatihan</h3>
+
+            <span>
+                Geser tabel ke samping untuk melihat seluruh kolom.
+            </span>
+
+        </div>
+
+
+        {{-- ==================================================
+             TRAINING TABLE
+        ================================================== --}}
+
         <div class="table-wrap">
 
             <table>
+
                 <thead>
+
                     <tr>
                         <th>NO.</th>
                         <th>NAMA PELATIHAN</th>
@@ -557,7 +1360,9 @@
                         <th>TANGGAL SELESAI</th>
                         <th>AKSI</th>
                     </tr>
+
                 </thead>
+
 
                 <tbody>
 
@@ -565,69 +1370,82 @@
 
                         <tr>
 
-                            {{-- NOMOR URUT --}}
                             <td>
                                 {{ $trainings->firstItem() + $loop->index }}
                             </td>
 
-                            {{-- NAMA PELATIHAN --}}
+
                             <td>
                                 {{ $training->name ?: '-' }}
                             </td>
 
-                            {{-- KATEGORI --}}
+
                             <td>
                                 {{ $training->category?->name ?? '-' }}
                             </td>
 
-                            {{-- KERJA SAMA --}}
+
                             <td>
                                 {{ $training->organizer ?: '-' }}
                             </td>
 
-                            {{-- ANGKATAN --}}
+
                             <td>
                                 {{ filled($training->batch_number)
                                     ? $training->batch_number
                                     : '-' }}
                             </td>
 
-                            {{-- SUMBER DANA --}}
+
                             <td>
                                 {{ $training->funding_source ?: '-' }}
                             </td>
 
-                            {{-- JPL --}}
+
                             <td>
                                 {{ $training->jpl !== null
                                     ? $training->jpl
                                     : '-' }}
                             </td>
 
-                            {{-- TANGGAL MULAI --}}
+
                             <td>
                                 {{ $training->start_date
                                     ? $training->start_date->format('d-m-Y')
                                     : '-' }}
                             </td>
 
-                            {{-- TANGGAL SELESAI --}}
+
                             <td>
                                 {{ $training->end_date
                                     ? $training->end_date->format('d-m-Y')
                                     : '-' }}
                             </td>
 
-                            {{-- AKSI --}}
+
+                            {{-- ACTIONS --}}
+
                             <td>
+
                                 <div class="action-group">
 
                                     <a
                                         class="action-button btn-light"
                                         href="{{ route('trainings.edit', $training) }}"
+                                        aria-label="Edit {{ $training->name }}"
                                     >
+
+                                        <svg viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="2"
+                                             stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="m16 4 4 4L9 19H5v-4L16 4Z"/>
+                                            <path d="m14 6 4 4"/>
+                                        </svg>
+
                                         Edit
+
                                     </a>
+
 
                                     <form
                                         method="POST"
@@ -635,55 +1453,114 @@
                                         style="margin: 0;"
                                         onsubmit="return confirm('Yakin ingin menghapus pelatihan ini?')"
                                     >
+
                                         @csrf
                                         @method('DELETE')
+
 
                                         <button
                                             class="action-button delete-button"
                                             type="submit"
+                                            aria-label="Hapus {{ $training->name }}"
                                         >
+
+                                            <svg viewBox="0 0 24 24" fill="none"
+                                                 stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M3 6h18"/>
+                                                <path d="M8 6V4h8v2"/>
+                                                <path d="m19 6-1 14H6L5 6"/>
+                                                <path d="M10 11v5m4-5v5"/>
+                                            </svg>
+
                                             Hapus
+
                                         </button>
+
                                     </form>
 
                                 </div>
+
                             </td>
 
                         </tr>
 
+
                     @empty
 
                         <tr>
+
                             <td colspan="10" class="empty-state">
 
+                                <div class="empty-state-icon">
+
+                                    <svg viewBox="0 0 24 24" fill="none"
+                                         stroke="currentColor" stroke-width="1.6"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="17" rx="2"/>
+                                        <path d="M8 2v4m8-4v4M3 10h18"/>
+                                        <path d="M12 14v4m-2-2h4"/>
+                                    </svg>
+
+                                </div>
+
+
                                 @if ($search !== '' || $year !== '')
-                                    Data pelatihan tidak ditemukan.
+
+                                    <strong>Data Tidak Ditemukan</strong>
+
+                                    Tidak ada data pelatihan yang sesuai dengan
+                                    pencarian atau filter yang dipilih.
+
                                     <br>
-                                    Coba ubah pencarian atau pilih tahun lainnya.
+
+                                    Coba ubah kata kunci pencarian atau pilih tahun lainnya.
+
                                 @else
-                                    Belum ada data pelatihan.
+
+                                    <strong>Belum Ada Data Pelatihan</strong>
+
+                                    Data pelatihan belum tersedia dalam sistem.
+
                                     <br>
+
                                     Silakan lakukan Impor Excel terlebih dahulu.
+
                                 @endif
 
                             </td>
+
                         </tr>
 
                     @endforelse
 
                 </tbody>
+
             </table>
 
         </div>
 
-        {{-- PAGINATION --}}
+
+        {{-- ==================================================
+             PAGINATION
+        ================================================== --}}
+
         @if ($trainings->hasPages())
+
             <div class="pagination-wrap">
+
+                <p>
+                    Menampilkan navigasi data pelatihan
+                </p>
+
                 {{ $trainings->links() }}
+
             </div>
+
         @endif
 
-    </div>
+
+    </section>
 
 </div>
 
