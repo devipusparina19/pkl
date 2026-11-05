@@ -1,191 +1,266 @@
+
 @extends('layouts.app')
 
 @section('content')
 
 <style>
-    /* ==========================================
-       SIRAPIK — DASHBOARD PIMPINAN
-       Selaras dengan Dashboard Admin
-       ========================================== */
+    /* =========================================================
+       SIRAPIK — EXECUTIVE DASHBOARD
+       Concept: Executive Data / Editorial Blue
+       ========================================================= */
 
     .leader-dashboard {
-        --ld-navy: #172b4d;
-        --ld-blue: #2457a7;
-        --ld-teal: #087f8c;
-        --ld-text: #263b59;
-        --ld-muted: #718097;
-        --ld-border: #e3eaf2;
-        --ld-bg: #f5f8fc;
-        --ld-white: #ffffff;
+        --ld-navy: #102b4e;
+        --ld-navy-2: #173d68;
+        --ld-blue: #2864ad;
+        --ld-blue-light: #eaf2fc;
+        --ld-teal: #168b91;
+        --ld-teal-light: #e8f5f4;
+        --ld-gold: #c18a3b;
+        --ld-gold-light: #fbf3e7;
+        --ld-purple: #8267b5;
+        --ld-purple-light: #f1edfa;
 
+        --ld-text: #253b56;
+        --ld-muted: #718198;
+        --ld-border: #e3eaf2;
+        --ld-surface: #ffffff;
+        --ld-background: #f4f7fb;
+
+        width: 100%;
+        padding-bottom: 34px;
         color: var(--ld-text);
-        font-family: inherit;
-        padding-bottom: 28px;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+        font-size: 15px;
     }
 
-    .leader-dashboard * {
+    .leader-dashboard *,
+    .leader-dashboard *::before,
+    .leader-dashboard *::after {
         box-sizing: border-box;
     }
 
-    /* Header */
+    .leader-dashboard h1,
+    .leader-dashboard h2,
+    .leader-dashboard h3,
+    .leader-dashboard p {
+        margin-top: 0;
+    }
+
+    /* =========================================================
+       PAGE HEADER
+       ========================================================= */
 
     .leader-dashboard .page-heading {
         position: relative;
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 220px;
         align-items: center;
-        justify-content: space-between;
-        gap: 24px;
+        gap: 30px;
+        min-height: 245px;
+        margin-bottom: 36px;
+        padding: 42px 45px;
         overflow: hidden;
-        padding: 31px 32px;
-        margin-bottom: 25px;
+        isolation: isolate;
         color: #fff;
-        background:
-            radial-gradient(
-                circle at 92% 12%,
-                rgba(100, 218, 208, .20),
-                transparent 27%
-            ),
-            linear-gradient(
-                118deg,
-                #172b4d 0%,
-                #204a7e 66%,
-                #176b79 100%
-            );
-        border-radius: 18px;
-        box-shadow: 0 12px 30px rgba(23, 43, 77, .12);
+        background: var(--ld-navy);
+        border-radius: 22px;
+        box-shadow: 0 18px 42px rgba(16, 43, 78, .13);
+    }
+
+    .leader-dashboard .page-heading::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        top: -180px;
+        right: 120px;
+        width: 450px;
+        height: 450px;
+        border: 1px solid rgba(255,255,255,.10);
+        border-radius: 50%;
+        box-shadow:
+            0 0 0 45px rgba(255,255,255,.025),
+            0 0 0 95px rgba(255,255,255,.02);
     }
 
     .leader-dashboard .page-heading::after {
         content: "";
         position: absolute;
-        right: -36px;
-        bottom: -115px;
-        width: 250px;
-        height: 250px;
-        border: 1px solid rgba(255, 255, 255, .14);
-        border-radius: 50%;
-        box-shadow:
-            0 0 0 26px rgba(255, 255, 255, .035),
-            0 0 0 54px rgba(255, 255, 255, .025);
-        pointer-events: none;
+        z-index: -1;
+        right: -65px;
+        bottom: -130px;
+        width: 340px;
+        height: 340px;
+        background: var(--ld-blue);
+        border-radius: 48% 52% 43% 57%;
+        opacity: .28;
+        transform: rotate(-25deg);
     }
 
     .leader-dashboard .heading-copy {
         position: relative;
-        z-index: 1;
-        max-width: 720px;
+        z-index: 2;
+        max-width: 760px;
     }
 
     .leader-dashboard .eyebrow {
         display: inline-flex;
         align-items: center;
-        gap: 9px;
-        margin-bottom: 12px;
-        color: #bce9e8;
-        font-size: 10px;
+        gap: 11px;
+        margin-bottom: 19px;
+        color: #9ddbd9;
+        font-size: 12px;
         font-weight: 800;
-        letter-spacing: 2px;
+        letter-spacing: 2.5px;
         text-transform: uppercase;
     }
 
     .leader-dashboard .eyebrow::before {
         content: "";
-        width: 23px;
-        height: 2px;
-        background: #67d5cd;
+        width: 30px;
+        height: 3px;
+        background: #69c9c5;
         border-radius: 10px;
     }
 
     .leader-dashboard .page-heading h1 {
         margin: 0;
         color: #fff;
-        font-size: clamp(26px, 3vw, 35px);
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(34px, 4vw, 48px);
         font-weight: 800;
-        line-height: 1.2;
-        letter-spacing: -.7px;
+        line-height: 1.13;
+        letter-spacing: -1.8px;
     }
 
     .leader-dashboard .page-heading p {
-        max-width: 590px;
-        margin: 12px 0 0;
-        color: rgba(255, 255, 255, .80);
-        font-size: 13px;
-        line-height: 1.9;
+        max-width: 650px;
+        margin: 17px 0 0;
+        color: rgba(255,255,255,.77);
+        font-size: 16px;
+        line-height: 1.85;
     }
 
-    .leader-dashboard .heading-icon {
+    .leader-dashboard .heading-visual {
         position: relative;
-        z-index: 1;
+        z-index: 2;
         display: flex;
-        flex: 0 0 76px;
         align-items: center;
         justify-content: center;
+        width: 174px;
+        height: 174px;
+        margin: auto;
+        color: #c6f1ee;
+        background: rgba(255,255,255,.075);
+        border: 1px solid rgba(255,255,255,.17);
+        border-radius: 42px;
+        transform: rotate(5deg);
+        transition: transform .35s ease, background .35s ease;
+    }
+
+    .leader-dashboard .page-heading:hover .heading-visual {
+        background: rgba(255,255,255,.12);
+        transform: rotate(0deg) translateY(-4px);
+    }
+
+    .leader-dashboard .heading-visual svg {
         width: 76px;
         height: 76px;
-        color: #d4fbf5;
-        background: rgba(255, 255, 255, .10);
-        border: 1px solid rgba(255, 255, 255, .19);
-        border-radius: 22px;
+        transform: rotate(-5deg);
     }
 
-    .leader-dashboard .heading-icon svg {
-        width: 38px;
-        height: 38px;
+    .leader-dashboard .heading-visual::after {
+        content: "";
+        position: absolute;
+        right: -14px;
+        bottom: -14px;
+        width: 48px;
+        height: 48px;
+        background: var(--ld-gold);
+        border: 7px solid var(--ld-navy);
+        border-radius: 17px;
     }
 
-    /* Intro section */
+    /* =========================================================
+       SECTION INTRO
+       ========================================================= */
 
     .leader-dashboard .section-intro {
-        margin-bottom: 15px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 20px;
     }
 
     .leader-dashboard .section-kicker {
         display: block;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
         color: var(--ld-teal);
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 800;
-        letter-spacing: 1.7px;
+        letter-spacing: 2px;
         text-transform: uppercase;
     }
 
     .leader-dashboard .section-intro h2 {
         margin: 0;
         color: var(--ld-navy);
-        font-size: 19px;
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(23px, 2.5vw, 29px);
         font-weight: 800;
-        letter-spacing: -.3px;
+        line-height: 1.3;
+        letter-spacing: -.8px;
     }
 
     .leader-dashboard .section-intro p {
-        margin: 6px 0 0;
+        max-width: 540px;
+        margin: 8px 0 0;
         color: var(--ld-muted);
-        font-size: 12px;
+        font-size: 15px;
         line-height: 1.8;
     }
 
-    /* Kartu statistik */
+    .leader-dashboard .section-number {
+        flex-shrink: 0;
+        color: #aab7c7;
+        font-family: 'Manrope', sans-serif;
+        font-size: 38px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -2px;
+    }
+
+    /* =========================================================
+       STATISTIC CARDS
+       ========================================================= */
 
     .leader-dashboard .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 16px;
-        margin-bottom: 28px;
+        gap: 17px;
+        margin-bottom: 42px;
     }
 
     .leader-dashboard .stat-card {
+        --stat-accent: var(--ld-blue);
+        --stat-soft: var(--ld-blue-light);
+
         position: relative;
+        display: flex;
+        flex-direction: column;
         min-width: 0;
+        min-height: 220px;
+        padding: 23px 22px 20px;
         overflow: hidden;
-        padding: 21px 20px 18px;
-        background: var(--ld-white);
+        background: var(--ld-surface);
         border: 1px solid var(--ld-border);
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(23, 43, 77, .035);
+        border-radius: 17px;
+        box-shadow: 0 5px 18px rgba(16,43,78,.035);
         transition:
-            transform .22s ease,
-            box-shadow .22s ease,
-            border-color .22s ease;
+            transform .25s ease,
+            box-shadow .25s ease,
+            border-color .25s ease;
     }
 
     .leader-dashboard .stat-card::before {
@@ -194,283 +269,373 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 3px;
-        background: var(--stat-accent, var(--ld-blue));
+        height: 4px;
+        background: var(--stat-accent);
+    }
+
+    .leader-dashboard .stat-card::after {
+        content: "";
+        position: absolute;
+        right: -40px;
+        bottom: -65px;
+        width: 135px;
+        height: 135px;
+        background: var(--stat-soft);
+        border-radius: 50%;
+        opacity: .55;
+        transition: transform .35s ease;
+        pointer-events: none;
     }
 
     .leader-dashboard .stat-card:hover {
-        transform: translateY(-4px);
-        border-color: #c8d8e8;
-        box-shadow: 0 12px 24px rgba(23, 43, 77, .08);
+        z-index: 1;
+        border-color: color-mix(in srgb, var(--stat-accent), white 65%);
+        box-shadow: 0 15px 30px rgba(16,43,78,.09);
+        transform: translateY(-5px);
+    }
+
+    .leader-dashboard .stat-card:hover::after {
+        transform: scale(1.35);
     }
 
     .leader-dashboard .stat-topline {
+        position: relative;
+        z-index: 1;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 18px;
+        gap: 12px;
+        margin-bottom: 22px;
     }
 
     .leader-dashboard .stat-icon {
         display: flex;
-        flex: 0 0 43px;
         align-items: center;
         justify-content: center;
-        width: 43px;
-        height: 43px;
-        color: var(--stat-accent, var(--ld-blue));
-        background: var(--stat-soft, #eaf1fc);
-        border-radius: 13px;
+        flex: 0 0 49px;
+        width: 49px;
+        height: 49px;
+        color: var(--stat-accent);
+        background: var(--stat-soft);
+        border-radius: 15px;
+        transition: transform .25s ease;
+    }
+
+    .leader-dashboard .stat-card:hover .stat-icon {
+        transform: rotate(-7deg) scale(1.06);
     }
 
     .leader-dashboard .stat-icon svg {
-        width: 22px;
-        height: 22px;
+        width: 25px;
+        height: 25px;
     }
 
     .leader-dashboard .stat-index {
-        color: #a0adbe;
-        font-size: 10px;
+        color: #9aa9bb;
+        font-family: 'Manrope', sans-serif;
+        font-size: 11px;
         font-weight: 800;
-        letter-spacing: .8px;
+        letter-spacing: 1px;
     }
 
     .leader-dashboard .stat-label {
-        min-height: 38px;
-        color: var(--ld-muted);
-        font-size: 12px;
+        position: relative;
+        z-index: 1;
+        min-height: 28px;
+        color: #65768c;
+        font-size: 14px;
         font-weight: 700;
-        line-height: 1.7;
+        line-height: 1.6;
     }
 
     .leader-dashboard .stat-number {
-        margin-top: 5px;
+        position: relative;
+        z-index: 1;
+        margin-top: 4px;
         color: var(--ld-navy);
-        font-size: clamp(27px, 2.5vw, 35px);
-        font-weight: 850;
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(30px, 3vw, 39px);
+        font-weight: 800;
         line-height: 1.25;
-        letter-spacing: -1px;
-        overflow-wrap: anywhere;
+        letter-spacing: -1.7px;
         font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
     }
 
     .leader-dashboard .stat-note {
+        position: relative;
+        z-index: 1;
         display: flex;
-        align-items: flex-start;
-        gap: 7px;
-        margin-top: 13px;
-        padding-top: 12px;
-        color: #8290a4;
+        align-items: center;
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 15px;
+        color: #8290a2;
         border-top: 1px solid #edf1f6;
-        font-size: 10px;
-        line-height: 1.7;
+        font-size: 12px;
+        line-height: 1.6;
     }
 
     .leader-dashboard .stat-note::before {
         content: "";
-        flex: 0 0 6px;
-        width: 6px;
-        height: 6px;
-        margin-top: 5px;
-        background: var(--stat-accent, var(--ld-blue));
+        flex: 0 0 7px;
+        width: 7px;
+        height: 7px;
+        background: var(--stat-accent);
         border-radius: 50%;
     }
 
-    /* Panel */
+    /* =========================================================
+       PANELS
+       ========================================================= */
 
     .leader-dashboard .panel {
-        margin-bottom: 22px;
-        padding: 25px;
-        background: var(--ld-white);
+        margin-bottom: 25px;
+        padding: 30px;
+        background: var(--ld-surface);
         border: 1px solid var(--ld-border);
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(23, 43, 77, .035);
+        border-radius: 19px;
+        box-shadow: 0 5px 20px rgba(16,43,78,.035);
     }
 
     .leader-dashboard .panel-header {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 18px;
-        margin-bottom: 22px;
+        gap: 24px;
+        margin-bottom: 28px;
+    }
+
+    .leader-dashboard .panel-heading {
+        min-width: 0;
     }
 
     .leader-dashboard .panel-header h2 {
         margin: 0;
         color: var(--ld-navy);
-        font-size: 17px;
+        font-family: 'Manrope', sans-serif;
+        font-size: 23px;
         font-weight: 800;
-        line-height: 1.5;
-        letter-spacing: -.25px;
+        line-height: 1.4;
+        letter-spacing: -.6px;
     }
 
     .leader-dashboard .panel-header p {
-        max-width: 680px;
-        margin: 7px 0 0;
+        max-width: 690px;
+        margin: 9px 0 0;
         color: var(--ld-muted);
-        font-size: 12px;
-        line-height: 1.8;
+        font-size: 14px;
+        line-height: 1.85;
     }
 
     .leader-dashboard .panel-tag {
         display: inline-flex;
-        flex: 0 0 auto;
+        flex-shrink: 0;
         align-items: center;
-        gap: 7px;
-        padding: 8px 11px;
-        color: #526984;
-        background: #f2f6fb;
-        border: 1px solid #e5edf5;
-        border-radius: 9px;
-        font-size: 10px;
+        gap: 9px;
+        padding: 11px 15px;
+        color: var(--ld-blue);
+        background: var(--ld-blue-light);
+        border: 1px solid #dce8f8;
+        border-radius: 11px;
+        font-size: 12px;
         font-weight: 800;
-        letter-spacing: .6px;
+        letter-spacing: .5px;
         text-transform: uppercase;
     }
 
     .leader-dashboard .panel-tag svg {
-        width: 15px;
-        height: 15px;
+        width: 18px;
+        height: 18px;
     }
 
-    /* Distribusi bidang */
+    /* =========================================================
+       DISTRIBUTION
+       ========================================================= */
+
+    .leader-dashboard .distribution-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 42px;
+    }
 
     .leader-dashboard .field-stat {
-        padding: 17px 0;
+        min-width: 0;
+        padding: 19px 0;
         border-bottom: 1px solid #edf1f6;
     }
 
-    .leader-dashboard .field-stat:first-child {
-        padding-top: 0;
+    .leader-dashboard .field-stat:nth-last-child(-n+2) {
+        border-bottom-color: transparent;
     }
 
-    .leader-dashboard .field-stat:last-child {
-        padding-bottom: 0;
-        border-bottom: 0;
+    .leader-dashboard .field-stat:first-child,
+    .leader-dashboard .field-stat:nth-child(2) {
+        padding-top: 0;
     }
 
     .leader-dashboard .field-stat-line {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 15px;
-        margin-bottom: 10px;
+        gap: 14px;
+        margin-bottom: 12px;
     }
 
     .leader-dashboard .field-stat-line span {
-        display: inline-flex;
+        display: flex;
         align-items: center;
-        gap: 10px;
-        color: #40536d;
-        font-size: 13px;
-        font-weight: 650;
-        line-height: 1.7;
+        gap: 11px;
+        min-width: 0;
+        color: #3d526d;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.6;
         overflow-wrap: anywhere;
     }
 
     .leader-dashboard .field-stat-line span::before {
         content: "";
-        flex: 0 0 8px;
-        width: 8px;
-        height: 8px;
-        background: #168d98;
+        flex: 0 0 9px;
+        width: 9px;
+        height: 9px;
+        background: var(--ld-teal);
         border-radius: 3px;
         transform: rotate(45deg);
     }
 
     .leader-dashboard .field-stat-line strong {
-        flex: 0 0 auto;
-        min-width: 38px;
-        padding: 5px 10px;
+        flex-shrink: 0;
+        min-width: 47px;
+        padding: 6px 10px;
         color: var(--ld-blue);
-        background: #eaf1fc;
-        border: 1px solid #dce8fa;
+        background: var(--ld-blue-light);
+        border: 1px solid #dce8f8;
         border-radius: 8px;
-        font-size: 12px;
+        font-family: 'Manrope', sans-serif;
+        font-size: 13px;
         font-weight: 800;
         text-align: center;
         font-variant-numeric: tabular-nums;
     }
 
     .leader-dashboard .progress-track {
+        position: relative;
         width: 100%;
-        height: 9px;
+        height: 11px;
         overflow: hidden;
         background: #edf2f7;
         border-radius: 20px;
     }
 
     .leader-dashboard .progress-fill {
+        position: relative;
         height: 100%;
         min-width: 0;
-        background: linear-gradient(90deg, #2457a7 0%, #168d98 100%);
+        background: linear-gradient(90deg, #2864ad 0%, #168b91 100%);
         border-radius: 20px;
-        transition: width .45s ease;
+        transition: width .7s cubic-bezier(.2,.7,.2,1);
     }
 
-    /* Tampilan data kosong */
+    .leader-dashboard .progress-fill::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 30px;
+        height: 100%;
+        background: rgba(255,255,255,.24);
+        border-radius: inherit;
+    }
+
+    /* =========================================================
+       EMPTY STATE
+       ========================================================= */
 
     .leader-dashboard .empty-state {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 19px 17px;
-        color: #74849a;
+        gap: 15px;
+        padding: 23px;
+        color: #708198;
         background: #f7f9fc;
-        border: 1px dashed #d7e1ec;
-        border-radius: 10px;
-        font-size: 12px;
+        border: 1px dashed #d5e0ec;
+        border-radius: 13px;
+        font-size: 14px;
         line-height: 1.8;
     }
 
-    .leader-dashboard .empty-state::before {
-        content: "i";
+    .leader-dashboard .empty-icon {
         display: flex;
-        flex: 0 0 27px;
+        flex: 0 0 42px;
         align-items: center;
         justify-content: center;
-        width: 27px;
-        height: 27px;
-        color: #357bb8;
-        background: #e7f1fb;
-        border-radius: 50%;
-        font-size: 14px;
-        font-weight: 800;
-        font-style: normal;
+        width: 42px;
+        height: 42px;
+        color: var(--ld-blue);
+        background: var(--ld-blue-light);
+        border-radius: 12px;
     }
 
-    /* Panel informasi */
+    .leader-dashboard .empty-icon svg {
+        width: 21px;
+        height: 21px;
+    }
+
+    /* =========================================================
+       MONITORING / INFORMATION PANEL
+       ========================================================= */
 
     .leader-dashboard .monitoring-panel {
         position: relative;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 25px;
         overflow: hidden;
-        background:
-            linear-gradient(120deg, #fff 0%, #f6fbfd 100%);
+        background: #edf4fb;
+        border: 1px solid #dce8f5;
+    }
+
+    .leader-dashboard .monitoring-panel::after {
+        content: "";
+        position: absolute;
+        top: -100px;
+        right: 100px;
+        width: 240px;
+        height: 240px;
+        border: 1px solid rgba(40,100,173,.12);
+        border-radius: 50%;
+        box-shadow: 0 0 0 28px rgba(40,100,173,.035);
+        pointer-events: none;
     }
 
     .leader-dashboard .monitoring-content {
+        position: relative;
+        z-index: 1;
         display: flex;
         align-items: flex-start;
-        gap: 16px;
+        gap: 19px;
+        min-width: 0;
     }
 
     .leader-dashboard .monitoring-icon {
         display: flex;
-        flex: 0 0 47px;
+        flex: 0 0 55px;
         align-items: center;
         justify-content: center;
-        width: 47px;
-        height: 47px;
+        width: 55px;
+        height: 55px;
         color: var(--ld-teal);
-        background: #e4f5f3;
-        border: 1px solid #d2eeeb;
-        border-radius: 14px;
+        background: #fff;
+        border: 1px solid #dcebe9;
+        border-radius: 16px;
+        box-shadow: 0 5px 14px rgba(16,43,78,.05);
     }
 
     .leader-dashboard .monitoring-icon svg {
-        width: 23px;
-        height: 23px;
+        width: 27px;
+        height: 27px;
     }
 
     .leader-dashboard .monitoring-copy {
@@ -480,163 +645,281 @@
     .leader-dashboard .monitoring-copy h2 {
         margin: 0;
         color: var(--ld-navy);
-        font-size: 17px;
+        font-family: 'Manrope', sans-serif;
+        font-size: 22px;
         font-weight: 800;
-        line-height: 1.5;
+        line-height: 1.4;
     }
 
     .leader-dashboard .monitoring-copy p {
-        margin: 8px 0 0;
-        color: var(--ld-muted);
-        font-size: 12px;
+        max-width: 760px;
+        margin: 9px 0 0;
+        color: #64778e;
+        font-size: 14px;
         line-height: 1.9;
     }
 
     .leader-dashboard .monitoring-copy strong {
-        color: #2457a7;
+        color: var(--ld-blue);
         font-weight: 800;
     }
 
-    .leader-dashboard :focus-visible {
-        outline: 3px solid rgba(8, 127, 140, .55);
-        outline-offset: 3px;
+    .leader-dashboard .monitoring-decoration {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 76px;
+        width: 76px;
+        height: 76px;
+        color: #fff;
+        background: var(--ld-navy);
+        border-radius: 23px;
+        transform: rotate(-7deg);
     }
 
-    /* Tablet */
+    .leader-dashboard .monitoring-decoration svg {
+        width: 34px;
+        height: 34px;
+        transform: rotate(7deg);
+    }
+
+    /* =========================================================
+       ACCESSIBILITY
+       ========================================================= */
+
+    .leader-dashboard :focus-visible {
+        outline: 3px solid rgba(22,139,145,.65);
+        outline-offset: 4px;
+    }
+
+    /* =========================================================
+       RESPONSIVE — TABLET
+       ========================================================= */
 
     @media (max-width: 1100px) {
         .leader-dashboard .stats-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+
+        .leader-dashboard .page-heading {
+            grid-template-columns: minmax(0, 1fr) 160px;
+        }
+
+        .leader-dashboard .heading-visual {
+            width: 140px;
+            height: 140px;
+        }
+
+        .leader-dashboard .distribution-list {
+            column-gap: 25px;
+        }
     }
 
-    /* Ponsel */
+    /* =========================================================
+       RESPONSIVE — MOBILE
+       ========================================================= */
 
     @media (max-width: 640px) {
         .leader-dashboard {
-            padding-bottom: 16px;
+            padding-bottom: 20px;
         }
 
         .leader-dashboard .page-heading {
-            align-items: flex-start;
-            gap: 15px;
-            padding: 23px 20px;
-            margin-bottom: 22px;
-            border-radius: 14px;
+            grid-template-columns: minmax(0, 1fr);
+            min-height: auto;
+            padding: 29px 24px;
+            margin-bottom: 29px;
+            border-radius: 17px;
+        }
+
+        .leader-dashboard .page-heading::before {
+            right: -160px;
         }
 
         .leader-dashboard .page-heading h1 {
-            font-size: 25px;
+            font-size: clamp(31px, 8vw, 38px);
+            letter-spacing: -1.2px;
         }
 
         .leader-dashboard .page-heading p {
-            font-size: 12px;
+            margin-top: 13px;
+            font-size: 14px;
+            line-height: 1.8;
         }
 
         .leader-dashboard .eyebrow {
-            font-size: 9px;
-            letter-spacing: 1.3px;
+            margin-bottom: 14px;
+            font-size: 10px;
+            letter-spacing: 1.8px;
         }
 
-        .leader-dashboard .heading-icon {
-            flex-basis: 46px;
-            width: 46px;
-            height: 46px;
-            border-radius: 13px;
+        .leader-dashboard .heading-visual {
+            position: absolute;
+            right: 17px;
+            bottom: 15px;
+            width: 66px;
+            height: 66px;
+            border-radius: 19px;
+            opacity: .5;
         }
 
-        .leader-dashboard .heading-icon svg {
-            width: 25px;
-            height: 25px;
+        .leader-dashboard .heading-visual svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .leader-dashboard .heading-visual::after {
+            width: 22px;
+            height: 22px;
+            right: -6px;
+            bottom: -6px;
+            border-width: 4px;
+            border-radius: 8px;
+        }
+
+        .leader-dashboard .section-intro {
+            align-items: flex-start;
+            margin-bottom: 17px;
+        }
+
+        .leader-dashboard .section-intro h2 {
+            font-size: 23px;
+        }
+
+        .leader-dashboard .section-intro p {
+            font-size: 13px;
+        }
+
+        .leader-dashboard .section-number {
+            font-size: 29px;
         }
 
         .leader-dashboard .stats-grid {
-            gap: 11px;
-            margin-bottom: 23px;
+            gap: 12px;
+            margin-bottom: 30px;
         }
 
         .leader-dashboard .stat-card {
-            padding: 16px 14px;
-            border-radius: 12px;
+            min-height: 195px;
+            padding: 18px 16px;
+            border-radius: 14px;
         }
 
         .leader-dashboard .stat-topline {
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
 
         .leader-dashboard .stat-icon {
-            flex-basis: 37px;
-            width: 37px;
-            height: 37px;
-            border-radius: 11px;
+            flex-basis: 42px;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
         }
 
         .leader-dashboard .stat-icon svg {
-            width: 19px;
-            height: 19px;
+            width: 22px;
+            height: 22px;
         }
 
         .leader-dashboard .stat-index {
             font-size: 9px;
+            letter-spacing: .5px;
         }
 
         .leader-dashboard .stat-label {
             min-height: 39px;
-            font-size: 11px;
+            font-size: 13px;
         }
 
         .leader-dashboard .stat-number {
-            font-size: 27px;
+            font-size: clamp(27px, 7vw, 34px);
         }
 
         .leader-dashboard .stat-note {
-            font-size: 10px;
-        }
-
-        .leader-dashboard .panel {
-            padding: 18px 15px;
-            margin-bottom: 16px;
-            border-radius: 13px;
-        }
-
-        .leader-dashboard .panel-header {
-            gap: 10px;
-            margin-bottom: 19px;
-        }
-
-        .leader-dashboard .panel-header h2,
-        .leader-dashboard .monitoring-copy h2 {
-            font-size: 15px;
-        }
-
-        .leader-dashboard .panel-header p,
-        .leader-dashboard .monitoring-copy p {
+            padding-top: 11px;
             font-size: 11px;
         }
 
+        .leader-dashboard .panel {
+            padding: 22px 18px;
+            margin-bottom: 17px;
+            border-radius: 15px;
+        }
+
+        .leader-dashboard .panel-header {
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 23px;
+        }
+
+        .leader-dashboard .panel-header h2 {
+            font-size: 20px;
+        }
+
+        .leader-dashboard .panel-header p {
+            font-size: 13px;
+        }
+
         .leader-dashboard .panel-tag {
-            padding: 7px;
-            font-size: 9px;
+            padding: 9px 12px;
+            font-size: 11px;
+        }
+
+        .leader-dashboard .distribution-list {
+            grid-template-columns: 1fr;
+        }
+
+        .leader-dashboard .field-stat {
+            padding: 16px 0;
+            border-bottom: 1px solid #edf1f6 !important;
+        }
+
+        .leader-dashboard .field-stat:first-child {
+            padding-top: 0;
+        }
+
+        .leader-dashboard .field-stat:last-child {
+            padding-bottom: 0;
+            border-bottom: 0 !important;
         }
 
         .leader-dashboard .field-stat-line span {
-            font-size: 12px;
+            font-size: 14px;
+        }
+
+        .leader-dashboard .monitoring-panel {
+            grid-template-columns: 1fr;
+            padding: 22px 18px;
         }
 
         .leader-dashboard .monitoring-content {
-            gap: 12px;
+            gap: 13px;
         }
 
         .leader-dashboard .monitoring-icon {
-            flex-basis: 39px;
-            width: 39px;
-            height: 39px;
-            border-radius: 11px;
+            flex-basis: 43px;
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
         }
 
         .leader-dashboard .monitoring-icon svg {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
+        }
+
+        .leader-dashboard .monitoring-copy h2 {
+            font-size: 19px;
+        }
+
+        .leader-dashboard .monitoring-copy p {
+            font-size: 13px;
+        }
+
+        .leader-dashboard .monitoring-decoration {
+            display: none;
         }
     }
 
@@ -645,83 +928,147 @@
             grid-template-columns: 1fr;
         }
 
+        .leader-dashboard .stat-card {
+            min-height: 180px;
+        }
+
         .leader-dashboard .stat-label {
             min-height: 0;
         }
 
-        .leader-dashboard .heading-icon {
-            display: none;
+        .leader-dashboard .stat-number {
+            font-size: 34px;
         }
     }
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
 
     @media (prefers-reduced-motion: reduce) {
         .leader-dashboard *,
         .leader-dashboard *::before,
         .leader-dashboard *::after {
-            transition-duration: .01ms !important;
+            scroll-behavior: auto !important;
             animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: .01ms !important;
         }
     }
 </style>
 
+{{-- FONT --}}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <div class="leader-dashboard">
 
-    {{-- HEADER DASHBOARD PIMPINAN --}}
-    <header class="page-heading">
-        <div class="heading-copy">
-            <span class="eyebrow">DASHBOARD PIMPINAN</span>
+    {{-- =====================================================
+         HEADER
+         ===================================================== --}}
 
-            <h1>Ringkasan Pelatihan</h1>
+    <header class="page-heading">
+
+        <div class="heading-copy">
+
+            <span class="eyebrow">
+                Dashboard Pimpinan
+            </span>
+
+            <h1>
+                Ringkasan<br>
+                Pelatihan
+            </h1>
 
             <p>
-                Informasi agregat untuk memantau pelaksanaan pelatihan,
-                melihat distribusi program, dan mendukung evaluasi
-                berdasarkan data yang tercatat di SIRAPIK.
+                Pusat informasi untuk memantau pelaksanaan pelatihan,
+                memahami distribusi program, dan melihat perkembangan
+                keikutsertaan peserta melalui data SIRAPIK.
             </p>
+
         </div>
 
-        <div class="heading-icon" aria-hidden="true">
+        <div class="heading-visual" aria-hidden="true">
+
             <svg viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.6"
+                 stroke="currentColor" stroke-width="1.35"
                  stroke-linecap="round" stroke-linejoin="round">
+
                 <rect x="3" y="3" width="7" height="7" rx="1.5"/>
                 <rect x="14" y="3" width="7" height="5" rx="1.5"/>
                 <rect x="14" y="12" width="7" height="9" rx="1.5"/>
                 <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+
             </svg>
+
         </div>
+
     </header>
 
-    {{-- RINGKASAN STATISTIK --}}
+
+    {{-- =====================================================
+         STATISTIK UTAMA
+         ===================================================== --}}
+
     <section aria-labelledby="leader-summary-title">
+
         <div class="section-intro">
-            <span class="section-kicker">Ikhtisar sistem</span>
-            <h2 id="leader-summary-title">Gambaran Umum Pelatihan</h2>
-            <p>
-                Ringkasan angka utama sebagai gambaran kondisi data pelatihan.
-            </p>
+
+            <div>
+
+                <span class="section-kicker">
+                    Ikhtisar sistem
+                </span>
+
+                <h2 id="leader-summary-title">
+                    Gambaran Umum Pelatihan
+                </h2>
+
+                <p>
+                    Indikator utama untuk memberikan gambaran kondisi
+                    pelatihan dan keikutsertaan peserta.
+                </p>
+
+            </div>
+
+            <span class="section-number" aria-hidden="true">
+                01
+            </span>
+
         </div>
+
 
         <div class="stats-grid">
 
             {{-- TOTAL PESERTA --}}
-            <div class="stat-card"
-                 style="--stat-accent:#2457a7;--stat-soft:#eaf1fc;">
+            <article class="stat-card"
+                     style="--stat-accent:#2864ad;--stat-soft:#eaf2fc;">
+
                 <div class="stat-topline">
+
                     <div class="stat-icon" aria-hidden="true">
+
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
+
                             <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                             <circle cx="10" cy="7" r="4"/>
                             <path d="M20 21v-2a4 4 0 0 0-3-3.87"/>
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+
                         </svg>
+
                     </div>
+
                     <span class="stat-index">01 / SDM</span>
+
                 </div>
 
-                <div class="stat-label">Total Peserta</div>
+                <div class="stat-label">
+                    Total Peserta
+                </div>
 
                 <div class="stat-number">
                     {{ number_format($totalParticipants) }}
@@ -730,25 +1077,37 @@
                 <div class="stat-note">
                     Peserta terdaftar di sistem
                 </div>
-            </div>
+
+            </article>
+
 
             {{-- TOTAL PELATIHAN --}}
-            <div class="stat-card"
-                 style="--stat-accent:#087f8c;--stat-soft:#e5f6f4;">
+            <article class="stat-card"
+                     style="--stat-accent:#168b91;--stat-soft:#e8f5f4;">
+
                 <div class="stat-topline">
+
                     <div class="stat-icon" aria-hidden="true">
+
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
+
                             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
                             <path d="M8 7h8M8 11h7"/>
+
                         </svg>
+
                     </div>
+
                     <span class="stat-index">02 / PROGRAM</span>
+
                 </div>
 
-                <div class="stat-label">Total Pelatihan</div>
+                <div class="stat-label">
+                    Total Pelatihan
+                </div>
 
                 <div class="stat-number">
                     {{ number_format($totalTrainings) }}
@@ -757,25 +1116,37 @@
                 <div class="stat-note">
                     Pelatihan tercatat di sistem
                 </div>
-            </div>
+
+            </article>
+
 
             {{-- TOTAL KEIKUTSERTAAN --}}
-            <div class="stat-card"
-                 style="--stat-accent:#8b65bd;--stat-soft:#f1eafb;">
+            <article class="stat-card"
+                     style="--stat-accent:#8267b5;--stat-soft:#f1edfa;">
+
                 <div class="stat-topline">
+
                     <div class="stat-icon" aria-hidden="true">
+
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
+
                             <path d="M8 2h8l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/>
                             <path d="M16 2v5h5"/>
                             <path d="M8 12h8M8 16h8M8 8h3"/>
+
                         </svg>
+
                     </div>
+
                     <span class="stat-index">03 / RIWAYAT</span>
+
                 </div>
 
-                <div class="stat-label">Total Keikutsertaan</div>
+                <div class="stat-label">
+                    Total Keikutsertaan
+                </div>
 
                 <div class="stat-number">
                     {{ number_format($totalParticipations) }}
@@ -784,22 +1155,32 @@
                 <div class="stat-note">
                     Riwayat keikutsertaan peserta
                 </div>
-            </div>
+
+            </article>
+
 
             {{-- KEIKUTSERTAAN TAHUN INI --}}
-            <div class="stat-card"
-                 style="--stat-accent:#bd8530;--stat-soft:#fbf2e2;">
+            <article class="stat-card"
+                     style="--stat-accent:#bd8530;--stat-soft:#fbf3e7;">
+
                 <div class="stat-topline">
+
                     <div class="stat-icon" aria-hidden="true">
+
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
+
                             <rect x="3" y="5" width="18" height="16" rx="2"/>
                             <path d="M16 3v4M8 3v4M3 10h18"/>
                             <path d="m9 15 2 2 4-4"/>
+
                         </svg>
+
                     </div>
+
                     <span class="stat-index">04 / TAHUN</span>
+
                 </div>
 
                 <div class="stat-label">
@@ -813,85 +1194,171 @@
                 <div class="stat-note">
                     Berdasarkan tanggal mulai pelatihan
                 </div>
-            </div>
+
+            </article>
 
         </div>
+
     </section>
 
-    {{-- DISTRIBUSI BIDANG PELATIHAN --}}
-    <section class="panel" aria-labelledby="field-distribution-title">
+
+    {{-- =====================================================
+         DISTRIBUSI BIDANG PELATIHAN
+         ===================================================== --}}
+
+    <section class="panel"
+             aria-labelledby="field-distribution-title">
+
         <div class="panel-header">
-            <div>
-                <span class="section-kicker">Komposisi program</span>
+
+            <div class="panel-heading">
+
+                <span class="section-kicker">
+                    Komposisi program
+                </span>
 
                 <h2 id="field-distribution-title">
                     Distribusi Bidang Pelatihan
                 </h2>
 
                 <p>
-                    Perbandingan jumlah pelatihan per bidang untuk membantu
-                    pimpinan melihat persebaran program yang tercatat.
-                    Batang yang lebih panjang menunjukkan jumlah yang lebih besar.
+                    Perbandingan jumlah pelatihan berdasarkan bidang.
+                    Gunakan visualisasi ini untuk melihat persebaran
+                    program yang telah tercatat di dalam sistem.
                 </p>
+
             </div>
 
             <div class="panel-tag">
+
                 <svg viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="1.8"
                      stroke-linecap="round" stroke-linejoin="round">
+
                     <path d="M3 3v18h18"/>
                     <path d="M7 14h3v4H7zM12 9h3v9h-3zM17 5h3v13h-3z"/>
+
                 </svg>
+
                 Distribusi
+
             </div>
+
         </div>
 
         @php
+            // Alias dari query controller adalah name dan total.
             $maxFieldTotal = max(
                 1,
                 (int) $fieldStats->max('total')
             );
         @endphp
 
-        @forelse ($fieldStats as $stat)
-            <div class="field-stat">
-                <div class="field-stat-line">
-                    <span>{{ $stat->field }}</span>
+        <div class="distribution-list">
 
-                    <strong>{{ number_format($stat->total) }}</strong>
-                </div>
+            @forelse ($fieldStats as $stat)
 
-                <div class="progress-track">
+                @php
+                    $fieldName = $stat->name ?? 'Bidang tidak diketahui';
+                    $total = (int) ($stat->total ?? 0);
+
+                    $percentage = min(
+                        100,
+                        max(0, ($total / $maxFieldTotal) * 100)
+                    );
+                @endphp
+
+                <div class="field-stat">
+
+                    <div class="field-stat-line">
+
+                        <span>
+                            {{ $fieldName }}
+                        </span>
+
+                        <strong>
+                            {{ number_format($total) }}
+                        </strong>
+
+                    </div>
+
                     <div
-                        class="progress-fill"
-                        style="width: {{ ($stat->total / $maxFieldTotal) * 100 }}%"
-                    ></div>
+                        class="progress-track"
+                        role="progressbar"
+                        aria-label="Jumlah pelatihan {{ $fieldName }}"
+                        aria-valuenow="{{ $total }}"
+                        aria-valuemin="0"
+                        aria-valuemax="{{ $maxFieldTotal }}"
+                    >
+
+                        <div
+                            class="progress-fill"
+                            style="width: {{ $percentage }}%;"
+                        ></div>
+
+                    </div>
+
                 </div>
-            </div>
-        @empty
-            <div class="empty-state">
-                Belum ada data bidang pelatihan yang dapat ditampilkan.
-            </div>
-        @endforelse
+
+            @empty
+
+                <div class="empty-state">
+
+                    <div class="empty-icon" aria-hidden="true">
+
+                        <svg viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M12 11v5"/>
+                            <path d="M12 8h.01"/>
+
+                        </svg>
+
+                    </div>
+
+                    <div>
+                        Belum ada data bidang pelatihan yang dapat ditampilkan.
+                    </div>
+
+                </div>
+
+            @endforelse
+
+        </div>
+
     </section>
 
-    {{-- CATATAN PEMANTAUAN --}}
+
+    {{-- =====================================================
+         CATATAN PEMANTAUAN
+         ===================================================== --}}
+
     <section class="panel monitoring-panel"
              aria-labelledby="monitoring-title">
 
         <div class="monitoring-content">
+
             <div class="monitoring-icon" aria-hidden="true">
+
                 <svg viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="1.8"
                      stroke-linecap="round" stroke-linejoin="round">
+
                     <path d="M3 3v18h18"/>
                     <path d="m7 14 4-4 3 3 5-7"/>
                     <path d="M15 6h4v4"/>
+
                 </svg>
+
             </div>
 
             <div class="monitoring-copy">
-                <span class="section-kicker">Informasi lanjutan</span>
+
+                <span class="section-kicker">
+                    Informasi lanjutan
+                </span>
 
                 <h2 id="monitoring-title">
                     Pemantauan Pelaksanaan Pelatihan
@@ -902,9 +1369,28 @@
                     untuk melihat rincian laporan dan memantau pelaksanaan
                     pelatihan berdasarkan data yang tercatat di SIRAPIK.
                 </p>
+
             </div>
+
         </div>
+
+        <div class="monitoring-decoration" aria-hidden="true">
+
+            <svg viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.6"
+                 stroke-linecap="round" stroke-linejoin="round">
+
+                <path d="M4 19V5"/>
+                <path d="M4 19h16"/>
+                <path d="m7 15 4-4 3 3 5-7"/>
+                <path d="M15 7h4v4"/>
+
+            </svg>
+
+        </div>
+
     </section>
 
 </div>
+
 @endsection

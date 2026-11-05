@@ -5,653 +5,786 @@
 @section('content')
 
 <style>
-    /* ==========================================
-       SIRAPIK — SUPER ADMIN CONTROL PANEL
-       Selaras dengan Dashboard Admin & Pimpinan
-       ========================================== */
+    /* =====================================================
+       SIRAPIK — SUPER ADMIN DASHBOARD
+       Premium Blue Interface
+       ===================================================== */
 
-    .super-dashboard {
-        --sd-navy: #172b4d;
-        --sd-blue: #2457a7;
-        --sd-teal: #087f8c;
-        --sd-purple: #8061ad;
-        --sd-green: #23856d;
-        --sd-red: #c65c62;
-        --sd-text: #263b59;
-        --sd-muted: #718097;
-        --sd-border: #e3eaf2;
-        --sd-white: #ffffff;
+    .sa-dashboard {
+        --sa-navy: #142d4e;
+        --sa-blue: #2463a8;
+        --sa-blue-dark: #194d86;
+        --sa-sky: #eaf3fc;
+        --sa-teal: #168b91;
+        --sa-green: #21836b;
+        --sa-purple: #7861a8;
+        --sa-red: #c45d68;
+        --sa-text: #233b58;
+        --sa-muted: #718198;
+        --sa-border: #e3eaf2;
+        --sa-surface: #ffffff;
+        --sa-background: #f5f8fc;
 
-        color: var(--sd-text);
+        width: 100%;
+        color: var(--sa-text);
         font-family: inherit;
-        padding-bottom: 28px;
+        padding-bottom: 35px;
     }
 
-    .super-dashboard * {
+    .sa-dashboard *,
+    .sa-dashboard *::before,
+    .sa-dashboard *::after {
         box-sizing: border-box;
     }
 
-    /* Header utama */
+    .sa-dashboard a {
+        -webkit-tap-highlight-color: transparent;
+    }
 
-    .super-dashboard .page-heading {
+    /* =========================
+       HEADER
+       ========================= */
+
+    .sa-header {
         position: relative;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 24px;
+        gap: 28px;
+        min-height: 235px;
+        padding: 38px 42px;
+        margin-bottom: 36px;
         overflow: hidden;
-        padding: 31px 32px;
-        margin-bottom: 25px;
-        color: #fff;
-        background:
-            radial-gradient(
-                circle at 92% 10%,
-                rgba(105, 220, 208, .19),
-                transparent 28%
-            ),
-            linear-gradient(
-                118deg,
-                #172b4d 0%,
-                #204a7e 66%,
-                #176b79 100%
-            );
-        border-radius: 18px;
-        box-shadow: 0 12px 30px rgba(23, 43, 77, .12);
+        isolation: isolate;
+        color: white;
+        background: var(--sa-navy);
+        border-radius: 22px;
+        box-shadow: 0 16px 38px rgba(20, 45, 78, .13);
     }
 
-    .super-dashboard .page-heading::after {
+    .sa-header::before {
         content: "";
         position: absolute;
-        right: -38px;
-        bottom: -115px;
-        width: 250px;
-        height: 250px;
-        border: 1px solid rgba(255, 255, 255, .14);
+        z-index: -1;
+        top: -170px;
+        right: 8%;
+        width: 420px;
+        height: 420px;
+        border: 1px solid rgba(255,255,255,.13);
         border-radius: 50%;
         box-shadow:
-            0 0 0 26px rgba(255, 255, 255, .035),
-            0 0 0 54px rgba(255, 255, 255, .025);
+            0 0 0 35px rgba(255,255,255,.035),
+            0 0 0 75px rgba(255,255,255,.025);
+    }
+
+    .sa-header::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        right: 0;
+        bottom: 0;
+        width: 44%;
+        height: 100%;
+        background: linear-gradient(
+            135deg,
+            transparent,
+            rgba(36, 99, 168, .30)
+        );
         pointer-events: none;
     }
 
-    .super-dashboard .heading-copy {
-        position: relative;
-        z-index: 1;
-        max-width: 650px;
+    .sa-header-content {
+        max-width: 680px;
     }
 
-    .super-dashboard .eyebrow {
+    .sa-eyebrow {
         display: inline-flex;
         align-items: center;
-        gap: 9px;
-        margin-bottom: 12px;
-        color: #bce9e8;
-        font-size: 10px;
+        gap: 10px;
+        margin-bottom: 18px;
+        color: #91d9d9;
+        font-size: 12px;
         font-weight: 800;
         letter-spacing: 2px;
         text-transform: uppercase;
     }
 
-    .super-dashboard .eyebrow::before {
+    .sa-eyebrow::before {
         content: "";
-        width: 23px;
-        height: 2px;
-        background: #67d5cd;
+        width: 28px;
+        height: 3px;
+        background: #57c5c2;
         border-radius: 10px;
     }
 
-    .super-dashboard .page-heading h1 {
+    .sa-header h1 {
         margin: 0;
         color: #fff;
-        font-size: clamp(26px, 3vw, 35px);
-        font-weight: 800;
-        line-height: 1.2;
-        letter-spacing: -.7px;
+        font-size: clamp(32px, 4vw, 43px);
+        font-weight: 850;
+        line-height: 1.15;
+        letter-spacing: -1.4px;
     }
 
-    .super-dashboard .page-heading p {
-        max-width: 540px;
-        margin: 12px 0 0;
-        color: rgba(255, 255, 255, .80);
-        font-size: 13px;
-        line-height: 1.9;
+    .sa-header p {
+        max-width: 570px;
+        margin: 17px 0 0;
+        color: rgba(255,255,255,.78);
+        font-size: 16px;
+        line-height: 1.85;
     }
 
-    .super-dashboard .heading-actions {
+    .sa-header-actions {
         position: relative;
         z-index: 2;
         display: flex;
-        flex: 0 0 auto;
         align-items: center;
-        gap: 12px;
+        gap: 15px;
+        flex-shrink: 0;
     }
 
-    .super-dashboard .heading-icon {
+    .sa-header-symbol {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 53px;
-        height: 53px;
-        color: #d4fbf5;
-        background: rgba(255, 255, 255, .10);
-        border: 1px solid rgba(255, 255, 255, .19);
-        border-radius: 15px;
+        width: 64px;
+        height: 64px;
+        color: #a9eeee;
+        background: rgba(255,255,255,.09);
+        border: 1px solid rgba(255,255,255,.19);
+        border-radius: 19px;
     }
 
-    .super-dashboard .heading-icon svg {
-        width: 27px;
-        height: 27px;
+    .sa-header-symbol svg {
+        width: 32px;
+        height: 32px;
     }
 
-    /* Tombol tambah akun */
+    /* =========================
+       BUTTONS
+       ========================= */
 
-    .super-dashboard .btn {
+    .sa-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 9px;
-        min-height: 43px;
-        padding: 11px 17px;
+        gap: 10px;
+        min-height: 49px;
+        padding: 12px 19px;
         border: 1px solid transparent;
-        border-radius: 10px;
+        border-radius: 12px;
         font-family: inherit;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 800;
         line-height: 1.4;
         text-align: center;
         text-decoration: none;
         cursor: pointer;
         transition:
-            background .2s ease,
-            border-color .2s ease,
-            box-shadow .2s ease,
-            transform .2s ease;
-    }
-
-    .super-dashboard .btn svg {
-        flex: 0 0 17px;
-        width: 17px;
-        height: 17px;
-    }
-
-    .super-dashboard .btn-primary {
-        color: #173653;
-        background: #d7f5ef;
-        border-color: rgba(255, 255, 255, .4);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
-    }
-
-    .super-dashboard .btn-primary:hover {
-        color: #123c45;
-        background: #fff;
-        border-color: #fff;
-        box-shadow: 0 7px 17px rgba(0, 0, 0, .12);
-        transform: translateY(-2px);
-    }
-
-    .super-dashboard .btn-light {
-        color: #2457a7;
-        background: #fff;
-        border-color: #d8e4f1;
-    }
-
-    .super-dashboard .btn-light:hover {
-        color: #173f80;
-        background: #f0f6fd;
-        border-color: #b8cde5;
-        box-shadow: 0 5px 13px rgba(36, 87, 167, .08);
-        transform: translateY(-2px);
-    }
-
-    .super-dashboard .btn:focus-visible {
-        outline: 3px solid rgba(8, 127, 140, .5);
-        outline-offset: 3px;
-    }
-
-    /* Judul bagian */
-
-    .super-dashboard .section-intro {
-        margin-bottom: 15px;
-    }
-
-    .super-dashboard .section-kicker {
-        display: block;
-        margin-bottom: 5px;
-        color: var(--sd-teal);
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 1.7px;
-        text-transform: uppercase;
-    }
-
-    .super-dashboard .section-intro h2 {
-        margin: 0;
-        color: var(--sd-navy);
-        font-size: 19px;
-        font-weight: 800;
-        letter-spacing: -.3px;
-    }
-
-    .super-dashboard .section-intro p {
-        margin: 6px 0 0;
-        color: var(--sd-muted);
-        font-size: 12px;
-        line-height: 1.8;
-    }
-
-    /* Kartu statistik */
-
-    .super-dashboard .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 16px;
-        margin-bottom: 29px;
-    }
-
-    .super-dashboard .stat-card {
-        position: relative;
-        min-width: 0;
-        overflow: hidden;
-        padding: 21px 20px 18px;
-        background: var(--sd-white);
-        border: 1px solid var(--sd-border);
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(23, 43, 77, .035);
-        transition:
             transform .22s ease,
+            background .22s ease,
+            color .22s ease,
             box-shadow .22s ease,
             border-color .22s ease;
     }
 
-    .super-dashboard .stat-card::before {
+    .sa-btn svg {
+        width: 19px;
+        height: 19px;
+        flex-shrink: 0;
+    }
+
+    .sa-btn:hover {
+        transform: translateY(-3px);
+    }
+
+    .sa-btn:focus-visible {
+        outline: 3px solid rgba(22,139,145,.45);
+        outline-offset: 4px;
+    }
+
+    .sa-btn-primary {
+        color: #173b5c;
+        background: #d9f5f0;
+        border-color: rgba(255,255,255,.35);
+        box-shadow: 0 6px 18px rgba(0,0,0,.10);
+    }
+
+    .sa-btn-primary:hover {
+        color: #123b47;
+        background: #fff;
+        box-shadow: 0 10px 22px rgba(0,0,0,.15);
+    }
+
+    .sa-btn-outline {
+        color: var(--sa-blue);
+        background: white;
+        border-color: #d9e5f1;
+    }
+
+    .sa-btn-outline:hover {
+        color: var(--sa-blue-dark);
+        background: #f0f6fd;
+        border-color: #b8cee4;
+        box-shadow: 0 7px 18px rgba(36,99,168,.10);
+    }
+
+    /* =========================
+       SECTION HEADING
+       ========================= */
+
+    .sa-section {
+        margin-bottom: 36px;
+    }
+
+    .sa-section-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 19px;
+    }
+
+    .sa-section-kicker {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--sa-teal);
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 1.7px;
+        text-transform: uppercase;
+    }
+
+    .sa-section-heading h2 {
+        margin: 0;
+        color: var(--sa-navy);
+        font-size: 25px;
+        font-weight: 850;
+        line-height: 1.3;
+        letter-spacing: -.65px;
+    }
+
+    .sa-section-heading p {
+        margin: 8px 0 0;
+        color: var(--sa-muted);
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .sa-section-number {
+        color: #a8b8c9;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        white-space: nowrap;
+    }
+
+    /* =========================
+       STATISTICS
+       ========================= */
+
+    .sa-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 17px;
+    }
+
+    .sa-stat-card {
+        --stat-color: var(--sa-blue);
+        --stat-soft: #eaf2fc;
+
+        position: relative;
+        min-width: 0;
+        min-height: 200px;
+        padding: 23px;
+        overflow: hidden;
+        background: var(--sa-surface);
+        border: 1px solid var(--sa-border);
+        border-radius: 17px;
+        box-shadow: 0 5px 18px rgba(20,45,78,.035);
+        transition:
+            transform .24s ease,
+            border-color .24s ease,
+            box-shadow .24s ease;
+    }
+
+    .sa-stat-card::before {
         content: "";
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        height: 3px;
-        background: var(--stat-accent, var(--sd-blue));
+        height: 4px;
+        background: var(--stat-color);
     }
 
-    .super-dashboard .stat-card:hover {
-        transform: translateY(-4px);
-        border-color: #c8d8e8;
-        box-shadow: 0 12px 24px rgba(23, 43, 77, .08);
+    .sa-stat-card::after {
+        content: "";
+        position: absolute;
+        right: -38px;
+        bottom: -65px;
+        width: 130px;
+        height: 130px;
+        background: var(--stat-soft);
+        border-radius: 50%;
+        opacity: .65;
+        pointer-events: none;
     }
 
-    .super-dashboard .stat-topline {
+    .sa-stat-card:hover {
+        transform: translateY(-5px);
+        border-color: #c7d9eb;
+        box-shadow: 0 14px 28px rgba(20,45,78,.085);
+    }
+
+    .sa-stat-top {
+        position: relative;
+        z-index: 1;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 18px;
+        gap: 12px;
+        margin-bottom: 22px;
     }
 
-    .super-dashboard .stat-icon {
+    .sa-stat-icon {
         display: flex;
-        flex: 0 0 43px;
         align-items: center;
         justify-content: center;
-        width: 43px;
-        height: 43px;
-        color: var(--stat-accent, var(--sd-blue));
-        background: var(--stat-soft, #eaf1fc);
-        border-radius: 13px;
+        width: 49px;
+        height: 49px;
+        color: var(--stat-color);
+        background: var(--stat-soft);
+        border-radius: 15px;
     }
 
-    .super-dashboard .stat-icon svg {
-        width: 22px;
-        height: 22px;
+    .sa-stat-icon svg {
+        width: 24px;
+        height: 24px;
     }
 
-    .super-dashboard .stat-index {
-        color: #a0adbe;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: .8px;
-    }
-
-    .super-dashboard .stat-label {
-        min-height: 38px;
-        color: var(--sd-muted);
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 1.7;
-    }
-
-    .super-dashboard .stat-number {
-        margin-top: 5px;
-        color: var(--sd-navy);
-        font-size: clamp(27px, 2.5vw, 35px);
+    .sa-stat-index {
+        color: #a1afc0;
+        font-size: 11px;
         font-weight: 850;
-        line-height: 1.25;
-        letter-spacing: -1px;
+        letter-spacing: 1px;
+    }
+
+    .sa-stat-label {
+        position: relative;
+        z-index: 1;
+        color: #667991;
+        font-size: 14px;
+        font-weight: 750;
+        line-height: 1.6;
+    }
+
+    .sa-stat-number {
+        position: relative;
+        z-index: 1;
+        margin-top: 7px;
+        color: var(--sa-navy);
+        font-size: clamp(34px, 3vw, 43px);
+        font-weight: 900;
+        line-height: 1.2;
+        letter-spacing: -1.5px;
         overflow-wrap: anywhere;
         font-variant-numeric: tabular-nums;
     }
 
-    .super-dashboard .stat-note {
+    .sa-stat-note {
+        position: relative;
+        z-index: 1;
         display: flex;
-        align-items: flex-start;
-        gap: 7px;
-        margin-top: 13px;
-        padding-top: 12px;
-        color: #8290a4;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+        padding-top: 13px;
+        color: #8795a7;
         border-top: 1px solid #edf1f6;
-        font-size: 10px;
-        line-height: 1.7;
+        font-size: 12px;
+        line-height: 1.6;
     }
 
-    .super-dashboard .stat-note::before {
+    .sa-stat-note::before {
         content: "";
-        flex: 0 0 6px;
-        width: 6px;
-        height: 6px;
-        margin-top: 5px;
-        background: var(--stat-accent, var(--sd-blue));
+        width: 7px;
+        height: 7px;
+        flex-shrink: 0;
+        background: var(--stat-color);
         border-radius: 50%;
     }
 
-    /* Panel informasi */
+    /* =========================
+       MANAGEMENT CARDS
+       ========================= */
 
-    .super-dashboard .dashboard-grid {
+    .sa-management-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px;
-        align-items: stretch;
+        grid-template-columns: 1fr 1.15fr;
+        gap: 19px;
     }
 
-    .super-dashboard .content-card {
+    .sa-management-card {
         position: relative;
         display: flex;
         flex-direction: column;
         min-width: 0;
-        padding: 25px;
-        background: #fff;
-        border: 1px solid var(--sd-border);
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(23, 43, 77, .035);
+        min-height: 310px;
+        padding: 27px;
+        overflow: hidden;
+        background: white;
+        border: 1px solid var(--sa-border);
+        border-radius: 18px;
+        box-shadow: 0 5px 18px rgba(20,45,78,.035);
         transition:
-            border-color .2s ease,
-            box-shadow .2s ease;
+            transform .24s ease,
+            box-shadow .24s ease,
+            border-color .24s ease;
     }
 
-    .super-dashboard .content-card:hover {
-        border-color: #d2dfec;
-        box-shadow: 0 9px 22px rgba(23, 43, 77, .055);
+    .sa-management-card:hover {
+        border-color: #cbdbea;
+        box-shadow: 0 13px 27px rgba(20,45,78,.07);
+        transform: translateY(-3px);
     }
 
-    .super-dashboard .card-topline {
+    .sa-management-card.master {
+        background: linear-gradient(145deg,#fff 0%,#f1f8fd 100%);
+    }
+
+    .sa-card-top {
         display: flex;
-        align-items: flex-start;
-        gap: 13px;
-        margin-bottom: 18px;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 21px;
     }
 
-    .super-dashboard .card-icon {
+    .sa-card-icon {
         display: flex;
-        flex: 0 0 45px;
         align-items: center;
         justify-content: center;
-        width: 45px;
-        height: 45px;
-        color: var(--card-accent, var(--sd-blue));
-        background: var(--card-soft, #eaf1fc);
-        border-radius: 13px;
+        width: 53px;
+        height: 53px;
+        flex-shrink: 0;
+        color: var(--sa-blue);
+        background: var(--sa-sky);
+        border-radius: 16px;
     }
 
-    .super-dashboard .card-icon svg {
-        width: 22px;
-        height: 22px;
+    .sa-card-icon.teal {
+        color: var(--sa-teal);
+        background: #e4f5f3;
     }
 
-    .super-dashboard .card-title-wrap {
-        min-width: 0;
+    .sa-card-icon svg {
+        width: 26px;
+        height: 26px;
     }
 
-    .super-dashboard .card-title-wrap .section-kicker {
+    .sa-card-kicker {
+        display: block;
         margin-bottom: 4px;
+        color: var(--sa-teal);
+        font-size: 11px;
+        font-weight: 850;
+        letter-spacing: 1.3px;
+        text-transform: uppercase;
     }
 
-    .super-dashboard .content-card h2 {
+    .sa-management-card h3 {
         margin: 0;
-        color: var(--sd-navy);
-        font-size: 17px;
-        font-weight: 800;
-        line-height: 1.5;
-        letter-spacing: -.25px;
+        color: var(--sa-navy);
+        font-size: 21px;
+        font-weight: 850;
+        line-height: 1.4;
+        letter-spacing: -.4px;
     }
 
-    .super-dashboard .content-card p {
-        margin: 0 0 12px;
-        color: var(--sd-muted);
-        font-size: 12px;
+    .sa-card-description {
+        margin: 0;
+        color: #687b91;
+        font-size: 15px;
         line-height: 1.9;
     }
 
-    .super-dashboard .content-card p:last-of-type {
-        margin-bottom: 0;
-    }
-
-    .super-dashboard .content-card strong {
-        color: #405675;
-        font-weight: 800;
-    }
-
-    .super-dashboard .card-divider {
+    .sa-card-divider {
         height: 1px;
-        margin: 17px 0;
-        background: #edf1f6;
+        margin: 21px 0;
+        background: #eaf0f5;
         border: 0;
     }
 
-    /* Keterangan akses */
+    .sa-card-detail {
+        margin: 0;
+        color: #78899d;
+        font-size: 14px;
+        line-height: 1.9;
+    }
 
-    .super-dashboard .access-note {
+    .sa-access-note {
         display: flex;
         align-items: flex-start;
-        gap: 10px;
+        gap: 11px;
         margin-top: auto;
-        padding: 12px;
-        color: #526984;
-        background: #f3f7fc;
-        border: 1px solid #e4edf6;
-        border-radius: 10px;
-        font-size: 11px;
+        padding: 15px;
+        color: #4f6884;
+        background: #f1f6fb;
+        border: 1px solid #e2ebf4;
+        border-radius: 12px;
+        font-size: 13px;
         line-height: 1.8;
     }
 
-    .super-dashboard .access-note svg {
-        flex: 0 0 16px;
-        width: 16px;
-        height: 16px;
-        margin-top: 2px;
-        color: #357bb8;
+    .sa-access-note svg {
+        width: 19px;
+        height: 19px;
+        flex-shrink: 0;
+        margin-top: 1px;
+        color: var(--sa-blue);
     }
 
-    .super-dashboard .inline-actions {
+    .sa-card-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 11px;
         margin-top: auto;
-        padding-top: 22px;
+        padding-top: 24px;
     }
 
-    .super-dashboard .master-card {
-        background:
-            linear-gradient(135deg, #fff 0%, #f6fbfd 100%);
+    .sa-master-link {
+        min-height: 50px;
+        padding: 13px 18px;
     }
 
-    .super-dashboard .master-card .btn-light {
-        min-height: 45px;
-    }
-
-    .super-dashboard .master-card .btn-light svg {
-        margin-left: 2px;
+    .sa-master-link .sa-arrow {
         transition: transform .2s ease;
     }
 
-    .super-dashboard .master-card .btn-light:hover svg {
-        transform: translateX(3px);
+    .sa-master-link:hover .sa-arrow {
+        transform: translateX(4px);
     }
 
-    /* Tablet */
+    /* =========================
+       RESPONSIVE TABLET
+       ========================= */
 
     @media (max-width: 1100px) {
-        .super-dashboard .stats-grid {
+        .sa-stats-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
-        .super-dashboard .dashboard-grid {
-            gap: 16px;
+        .sa-management-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .sa-header {
+            padding: 32px;
         }
     }
 
-    /* Ponsel */
+    /* =========================
+       RESPONSIVE MOBILE
+       ========================= */
 
-    @media (max-width: 640px) {
-        .super-dashboard {
-            padding-bottom: 16px;
+    @media (max-width: 680px) {
+        .sa-dashboard {
+            padding-bottom: 20px;
         }
 
-        .super-dashboard .page-heading {
+        .sa-header {
             align-items: flex-start;
             flex-direction: column;
-            gap: 20px;
-            padding: 23px 20px;
-            margin-bottom: 22px;
-            border-radius: 14px;
+            gap: 23px;
+            min-height: auto;
+            padding: 27px 22px;
+            margin-bottom: 29px;
+            border-radius: 17px;
         }
 
-        .super-dashboard .page-heading h1 {
-            font-size: 25px;
+        .sa-header::before {
+            right: -190px;
+            top: -150px;
         }
 
-        .super-dashboard .page-heading p {
-            font-size: 12px;
+        .sa-header h1 {
+            font-size: 30px;
+            letter-spacing: -.8px;
         }
 
-        .super-dashboard .eyebrow {
-            font-size: 9px;
+        .sa-header p {
+            margin-top: 13px;
+            font-size: 14px;
+        }
+
+        .sa-eyebrow {
+            margin-bottom: 13px;
+            font-size: 10px;
             letter-spacing: 1.3px;
         }
 
-        .super-dashboard .heading-actions {
+        .sa-header-actions {
             width: 100%;
         }
 
-        .super-dashboard .heading-actions .btn {
+        .sa-header-actions .sa-btn {
             width: 100%;
         }
 
-        .super-dashboard .heading-icon {
+        .sa-header-symbol {
             display: none;
         }
 
-        .super-dashboard .stats-grid {
-            gap: 11px;
-            margin-bottom: 23px;
+        .sa-section {
+            margin-bottom: 30px;
         }
 
-        .super-dashboard .stat-card {
-            padding: 16px 14px;
-            border-radius: 12px;
+        .sa-section-heading {
+            align-items: flex-start;
+            margin-bottom: 16px;
         }
 
-        .super-dashboard .stat-topline {
-            margin-bottom: 14px;
+        .sa-section-heading h2 {
+            font-size: 22px;
         }
 
-        .super-dashboard .stat-icon {
-            flex-basis: 37px;
-            width: 37px;
-            height: 37px;
-            border-radius: 11px;
+        .sa-section-heading p {
+            font-size: 13px;
         }
 
-        .super-dashboard .stat-icon svg {
-            width: 19px;
-            height: 19px;
+        .sa-section-number {
+            display: none;
         }
 
-        .super-dashboard .stat-index {
-            font-size: 9px;
+        .sa-stats-grid {
+            gap: 12px;
         }
 
-        .super-dashboard .stat-label {
-            min-height: 39px;
-            font-size: 11px;
+        .sa-stat-card {
+            min-height: 180px;
+            padding: 17px 15px;
+            border-radius: 14px;
         }
 
-        .super-dashboard .stat-number {
-            font-size: 27px;
+        .sa-stat-top {
+            margin-bottom: 17px;
         }
 
-        .super-dashboard .stat-note {
-            font-size: 10px;
-        }
-
-        .super-dashboard .dashboard-grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .super-dashboard .content-card {
-            padding: 19px 16px;
+        .sa-stat-icon {
+            width: 42px;
+            height: 42px;
             border-radius: 13px;
         }
 
-        .super-dashboard .content-card h2 {
-            font-size: 16px;
+        .sa-stat-icon svg {
+            width: 21px;
+            height: 21px;
         }
 
-        .super-dashboard .content-card p {
+        .sa-stat-index {
+            font-size: 9px;
+        }
+
+        .sa-stat-label {
+            font-size: 12px;
+        }
+
+        .sa-stat-number {
+            font-size: 32px;
+        }
+
+        .sa-stat-note {
+            align-items: flex-start;
             font-size: 11px;
         }
 
-        .super-dashboard .inline-actions .btn {
+        .sa-management-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .sa-management-card {
+            min-height: 275px;
+            padding: 21px 18px;
+            border-radius: 15px;
+        }
+
+        .sa-card-icon {
+            width: 47px;
+            height: 47px;
+        }
+
+        .sa-management-card h3 {
+            font-size: 19px;
+        }
+
+        .sa-card-description,
+        .sa-card-detail {
+            font-size: 13px;
+        }
+
+        .sa-card-actions .sa-btn {
             width: 100%;
         }
     }
 
-    @media (max-width: 380px) {
-        .super-dashboard .stats-grid {
+    @media (max-width: 390px) {
+        .sa-stats-grid {
             grid-template-columns: 1fr;
         }
 
-        .super-dashboard .stat-label {
-            min-height: 0;
+        .sa-stat-card {
+            min-height: 160px;
+        }
+
+        .sa-stat-label {
+            font-size: 14px;
+        }
+
+        .sa-stat-number {
+            font-size: 36px;
         }
     }
 
+    /* =========================
+       ACCESSIBILITY
+       ========================= */
+
     @media (prefers-reduced-motion: reduce) {
-        .super-dashboard *,
-        .super-dashboard *::before,
-        .super-dashboard *::after {
-            transition-duration: .01ms !important;
+        .sa-dashboard *,
+        .sa-dashboard *::before,
+        .sa-dashboard *::after {
+            scroll-behavior: auto !important;
             animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: .01ms !important;
         }
     }
 </style>
 
-<div class="super-dashboard">
+<div class="sa-dashboard">
 
-    {{-- HEADER SUPER ADMIN --}}
-    <header class="page-heading">
-        <div class="heading-copy">
-            <span class="eyebrow">PANEL PENGELOLAAN SISTEM</span>
+    {{-- =========================
+         HEADER
+         ========================= --}}
+
+    <header class="sa-header">
+        <div class="sa-header-content">
+            <span class="sa-eyebrow">
+                PANEL PENGELOLAAN SISTEM
+            </span>
 
             <h1>Dashboard Super Admin</h1>
 
             <p>
-                Pusat kontrol akun pengguna dan data master.
-                Pantau status akun serta akses pengelolaan konfigurasi
-                sistem SIRAPIK dari satu halaman.
+                Pusat kendali akun pengguna dan konfigurasi data master.
+                Kelola akses serta referensi sistem SIRAPIK dalam satu
+                ruang pengelolaan yang terintegrasi.
             </p>
         </div>
 
-        <div class="heading-actions">
-            <div class="heading-icon" aria-hidden="true">
+        <div class="sa-header-actions">
+            <div class="sa-header-symbol" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="1.6"
                      stroke-linecap="round" stroke-linejoin="round">
@@ -661,11 +794,10 @@
             </div>
 
             <a href="{{ route('super-admin.users.create') }}"
-               class="btn btn-primary">
+               class="sa-btn sa-btn-primary">
                 <svg viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round"
-                     aria-hidden="true">
+                     stroke-linecap="round">
                     <path d="M12 5v14M5 12h14"/>
                 </svg>
                 Tambah Akun
@@ -673,24 +805,44 @@
         </div>
     </header>
 
-    {{-- RINGKASAN AKUN --}}
-    <section aria-labelledby="account-summary-title">
-        <div class="section-intro">
-            <span class="section-kicker">Ikhtisar pengguna</span>
-            <h2 id="account-summary-title">Ringkasan Akun Sistem</h2>
-            <p>
-                Pantau jumlah akun berdasarkan peran dan status
-                untuk mendapatkan gambaran pengelolaan pengguna.
-            </p>
+
+    {{-- =========================
+         ACCOUNT STATISTICS
+         ========================= --}}
+
+    <section class="sa-section"
+             aria-labelledby="sa-account-title">
+
+        <div class="sa-section-heading">
+            <div>
+                <span class="sa-section-kicker">
+                    IKHTISAR PENGGUNA
+                </span>
+
+                <h2 id="sa-account-title">
+                    Ringkasan Akun Sistem
+                </h2>
+
+                <p>
+                    Gambaran jumlah akun berdasarkan peran
+                    dan status pengguna.
+                </p>
+            </div>
+
+            <span class="sa-section-number">
+                OVERVIEW / 01
+            </span>
         </div>
 
-        <div class="stats-grid">
+        <div class="sa-stats-grid">
 
             {{-- TOTAL ADMIN --}}
-            <div class="stat-card"
-                 style="--stat-accent:#2457a7;--stat-soft:#eaf1fc;">
-                <div class="stat-topline">
-                    <div class="stat-icon" aria-hidden="true">
+
+            <article class="sa-stat-card"
+                     style="--stat-color:#2463a8;--stat-soft:#eaf2fc;">
+
+                <div class="sa-stat-top">
+                    <div class="sa-stat-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
@@ -700,25 +852,31 @@
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                     </div>
-                    <span class="stat-index">01 / ADMIN</span>
+
+                    <span class="sa-stat-index">01 / ADMIN</span>
                 </div>
 
-                <div class="stat-label">Total Akun Admin</div>
+                <div class="sa-stat-label">
+                    Total Akun Admin
+                </div>
 
-                <div class="stat-number">
+                <div class="sa-stat-number">
                     {{ number_format($totalAdmin, 0, ',', '.') }}
                 </div>
 
-                <div class="stat-note">
+                <div class="sa-stat-note">
                     Pengelola data operasional.
                 </div>
-            </div>
+            </article>
+
 
             {{-- TOTAL PIMPINAN --}}
-            <div class="stat-card"
-                 style="--stat-accent:#8061ad;--stat-soft:#f1eafb;">
-                <div class="stat-topline">
-                    <div class="stat-icon" aria-hidden="true">
+
+            <article class="sa-stat-card"
+                     style="--stat-color:#7861a8;--stat-soft:#f0ebf8;">
+
+                <div class="sa-stat-top">
+                    <div class="sa-stat-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
@@ -727,25 +885,31 @@
                             <path d="M8 13.5 12 16l4-2.5"/>
                         </svg>
                     </div>
-                    <span class="stat-index">02 / PIMPINAN</span>
+
+                    <span class="sa-stat-index">02 / PIMPINAN</span>
                 </div>
 
-                <div class="stat-label">Total Akun Pimpinan</div>
+                <div class="sa-stat-label">
+                    Total Akun Pimpinan
+                </div>
 
-                <div class="stat-number">
+                <div class="sa-stat-number">
                     {{ number_format($totalPimpinan, 0, ',', '.') }}
                 </div>
 
-                <div class="stat-note">
-                    Akun untuk pemantauan.
+                <div class="sa-stat-note">
+                    Akun untuk pemantauan sistem.
                 </div>
-            </div>
+            </article>
+
 
             {{-- AKUN AKTIF --}}
-            <div class="stat-card"
-                 style="--stat-accent:#23856d;--stat-soft:#e4f5ef;">
-                <div class="stat-topline">
-                    <div class="stat-icon" aria-hidden="true">
+
+            <article class="sa-stat-card"
+                     style="--stat-color:#21836b;--stat-soft:#e6f5ef;">
+
+                <div class="sa-stat-top">
+                    <div class="sa-stat-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
@@ -753,25 +917,31 @@
                             <path d="m8 12 2.5 2.5L16 9"/>
                         </svg>
                     </div>
-                    <span class="stat-index">03 / STATUS</span>
+
+                    <span class="sa-stat-index">03 / STATUS</span>
                 </div>
 
-                <div class="stat-label">Akun Aktif</div>
+                <div class="sa-stat-label">
+                    Akun Aktif
+                </div>
 
-                <div class="stat-number">
+                <div class="sa-stat-number">
                     {{ number_format($totalAktif, 0, ',', '.') }}
                 </div>
 
-                <div class="stat-note">
-                    Akun Admin dan Pimpinan yang aktif.
+                <div class="sa-stat-note">
+                    Akun Admin dan Pimpinan aktif.
                 </div>
-            </div>
+            </article>
+
 
             {{-- AKUN NONAKTIF --}}
-            <div class="stat-card"
-                 style="--stat-accent:#c65c62;--stat-soft:#fbecee;">
-                <div class="stat-topline">
-                    <div class="stat-icon" aria-hidden="true">
+
+            <article class="sa-stat-card"
+                     style="--stat-color:#c45d68;--stat-soft:#fbecef;">
+
+                <div class="sa-stat-top">
+                    <div class="sa-stat-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
@@ -779,42 +949,64 @@
                             <path d="m9 9 6 6M15 9l-6 6"/>
                         </svg>
                     </div>
-                    <span class="stat-index">04 / STATUS</span>
+
+                    <span class="sa-stat-index">04 / STATUS</span>
                 </div>
 
-                <div class="stat-label">Akun Nonaktif</div>
+                <div class="sa-stat-label">
+                    Akun Nonaktif
+                </div>
 
-                <div class="stat-number">
+                <div class="sa-stat-number">
                     {{ number_format($totalNonaktif, 0, ',', '.') }}
                 </div>
 
-                <div class="stat-note">
-                    Akun Admin dan Pimpinan yang nonaktif.
+                <div class="sa-stat-note">
+                    Akun Admin dan Pimpinan nonaktif.
                 </div>
-            </div>
+            </article>
 
         </div>
     </section>
 
-    {{-- PANEL PENGELOLAAN --}}
-    <section aria-labelledby="management-title">
-        <div class="section-intro">
-            <span class="section-kicker">Pengaturan sistem</span>
-            <h2 id="management-title">Pusat Pengelolaan</h2>
-            <p>
-                Pilih bagian yang ingin dikelola sesuai kewenangan
-                Super Admin.
-            </p>
+
+    {{-- =========================
+         MANAGEMENT CENTER
+         ========================= --}}
+
+    <section class="sa-section"
+             aria-labelledby="sa-management-title">
+
+        <div class="sa-section-heading">
+            <div>
+                <span class="sa-section-kicker">
+                    PENGELOLAAN SISTEM
+                </span>
+
+                <h2 id="sa-management-title">
+                    Pusat Pengelolaan
+                </h2>
+
+                <p>
+                    Akses pengaturan utama berdasarkan kewenangan
+                    Super Admin.
+                </p>
+            </div>
+
+            <span class="sa-section-number">
+                MANAGEMENT / 02
+            </span>
         </div>
 
-        <div class="dashboard-grid">
+
+        <div class="sa-management-grid">
 
             {{-- MANAJEMEN PENGGUNA --}}
-            <section class="content-card">
-                <div class="card-topline">
-                    <div class="card-icon"
-                         style="--card-accent:#2457a7;--card-soft:#eaf1fc;"
-                         aria-hidden="true">
+
+            <article class="sa-management-card">
+
+                <div class="sa-card-top">
+                    <div class="sa-card-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
@@ -824,25 +1016,29 @@
                         </svg>
                     </div>
 
-                    <div class="card-title-wrap">
-                        <span class="section-kicker">Akses pengguna</span>
-                        <h2>Manajemen Pengguna</h2>
+                    <div>
+                        <span class="sa-card-kicker">
+                            AKSES PENGGUNA
+                        </span>
+
+                        <h3>Manajemen Pengguna</h3>
                     </div>
                 </div>
 
-                <p>
-                    Kelola akun Admin dan Pimpinan. Super Admin tidak
-                    mengelola data peserta maupun data pelatihan.
+                <p class="sa-card-description">
+                    Kelola akun Admin dan Pimpinan, mulai dari
+                    penambahan akun hingga pengaturan akses pengguna.
                 </p>
 
-                <hr class="card-divider">
+                <hr class="sa-card-divider">
 
-                <p>
-                    Gunakan menu Kelola Akun di sidebar untuk melihat
-                    dan mengelola akun yang terdaftar.
+                <p class="sa-card-detail">
+                    Gunakan menu Kelola Akun pada sidebar untuk
+                    melihat dan mengelola akun yang terdaftar
+                    di dalam sistem.
                 </p>
 
-                <div class="access-note">
+                <div class="sa-access-note">
                     <svg viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="1.8"
                          stroke-linecap="round" stroke-linejoin="round"
@@ -850,62 +1046,75 @@
                         <circle cx="12" cy="12" r="9"/>
                         <path d="M12 11v5M12 8h.01"/>
                     </svg>
+
                     <span>
-                        Gunakan pengelolaan akun untuk memastikan
-                        akses pengguna sesuai perannya.
+                        Pastikan setiap pengguna memiliki akses
+                        yang sesuai dengan perannya.
                     </span>
                 </div>
-            </section>
+            </article>
+
 
             {{-- DATA MASTER --}}
-            <section class="content-card master-card">
-                <div class="card-topline">
-                    <div class="card-icon"
-                         style="--card-accent:#087f8c;--card-soft:#e5f6f4;"
-                         aria-hidden="true">
+
+            <article class="sa-management-card master">
+
+                <div class="sa-card-top">
+                    <div class="sa-card-icon teal" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 3 3 8l9 5 9-5-9-5Z"/>
-                            <path d="m3 12 9 5 9-5M3 16l9 5 9-5"/>
+                            <path d="m3 12 9 5 9-5"/>
+                            <path d="m3 16 9 5 9-5"/>
                         </svg>
                     </div>
 
-                    <div class="card-title-wrap">
-                        <span class="section-kicker">Konfigurasi referensi</span>
-                        <h2>Data Master</h2>
+                    <div>
+                        <span class="sa-card-kicker">
+                            KONFIGURASI REFERENSI
+                        </span>
+
+                        <h3>Data Master</h3>
                     </div>
                 </div>
 
-                <p>
-                    Kelola provinsi, kabupaten/kota/mitra, sumber dana,
+                <p class="sa-card-description">
+                    Kelola data referensi yang digunakan sebagai
+                    pilihan dan acuan pada berbagai fitur SIRAPIK.
+                </p>
+
+                <hr class="sa-card-divider">
+
+                <p class="sa-card-detail">
+                    Pengelolaan mencakup provinsi, kabupaten/kota,
+                    mitra, sumber dana, kategori pelatihan,
                     tahun pelatihan, dan jenis tenaga kesehatan.
                 </p>
 
-                <hr class="card-divider">
-
-                <p>
-                    Data master membantu menjaga konsistensi pilihan
-                    dan referensi yang digunakan di dalam sistem.
-                </p>
-
-                <div class="inline-actions">
+                <div class="sa-card-actions">
                     <a href="{{ route('super-admin.master-data.index', [
                         'category' => 'provinces'
-                    ]) }}" class="btn btn-light">
+                    ]) }}"
+                       class="sa-btn sa-btn-outline sa-master-link">
+
                         <svg viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
                              stroke-linecap="round" stroke-linejoin="round"
                              aria-hidden="true">
                             <path d="M4 5h16M4 12h16M4 19h16"/>
-                            <circle cx="8" cy="5" r="1.5" fill="currentColor" stroke="none"/>
-                            <circle cx="15" cy="12" r="1.5" fill="currentColor" stroke="none"/>
-                            <circle cx="10" cy="19" r="1.5" fill="currentColor" stroke="none"/>
+                            <circle cx="8" cy="5" r="1.5"
+                                    fill="currentColor" stroke="none"/>
+                            <circle cx="15" cy="12" r="1.5"
+                                    fill="currentColor" stroke="none"/>
+                            <circle cx="10" cy="19" r="1.5"
+                                    fill="currentColor" stroke="none"/>
                         </svg>
 
                         Buka Data Master
 
-                        <svg viewBox="0 0 24 24" fill="none"
+                        <svg class="sa-arrow"
+                             viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="2"
                              stroke-linecap="round" stroke-linejoin="round"
                              aria-hidden="true">
@@ -913,10 +1122,11 @@
                         </svg>
                     </a>
                 </div>
-            </section>
+            </article>
 
         </div>
     </section>
 
 </div>
+
 @endsection
