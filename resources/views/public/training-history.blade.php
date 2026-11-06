@@ -3,1209 +3,505 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#102b4e">
+    <meta name="theme-color" content="#081B33">
     <meta name="description" content="Informasi riwayat pelatihan peserta SIRAPIK.">
 
     <title>Riwayat Pelatihan — SIRAPIK</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --navy: #102b4e;
-            --navy-deep: #0a1e36;
-            --blue: #1e4f82;
-            --blue-light: #eaf2fb;
-            --blue-soft: #f3f7fc;
-            --ink: #192b40;
-            --muted: #65758a;
-            --border: #dce5ef;
-            --green: #16734d;
-            --green-bg: #eaf7f0;
-            --white: #ffffff;
-            --page: #f4f7fb;
-            --shadow: 0 12px 35px rgba(16, 43, 78, .07);
+            --navy: #081B33;
+            --midnight: #0B2545;
+            --royal: #2457D6;
+            --electric: #3478F6;
+            --soft: #EAF2FF;
+            --ice: #F3F7FC;
+            --slate: #64748B;
+            --text: #14243A;
+            --border: #E1E9F2;
+            --cyan: #38C6E8;
+            --ok: #0F6B4A;
+            --ok-bg: #E8F6EF;
+            --ok-line: #B7E2CC;
+            --font-display: "Sora", "Segoe UI", Arial, sans-serif;
+            --font-body: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+            --ease: cubic-bezier(.2, .7, .2, 1);
+            --pad: clamp(20px, 5vw, 80px);
         }
 
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
 
         body {
-            min-height: 100vh;
-            width: 100%;
-            margin: 0;
-            color: var(--ink);
-            background: var(--page);
-            font-family: Inter, "Segoe UI", Arial, sans-serif;
-            font-size: 16px;
-            line-height: 1.7;
+            margin: 0; min-height: 100vh;
+            font-family: var(--font-body); font-size: 16px; line-height: 1.65;
+            color: var(--text); background: var(--ice);
             -webkit-font-smoothing: antialiased;
         }
+        a { color: inherit; }
+        svg.i {
+            width: 1em; height: 1em; flex: none;
+            fill: none; stroke: currentColor;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+        }
+        :focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
 
-        a {
-            color: inherit;
+        .skip {
+            position: absolute; left: 12px; top: -60px; z-index: 100;
+            padding: 10px 16px; border-radius: 8px; background: #fff;
+            color: var(--navy); font-weight: 700; text-decoration: none; transition: top .2s;
+        }
+        .skip:focus { top: 12px; }
+
+        /* ---------- Navbar ---------- */
+        .nav { position: sticky; top: 0; z-index: 50; transition: background .3s, box-shadow .3s; }
+        .nav.is-scrolled {
+            background: rgba(8, 27, 51, .92); backdrop-filter: blur(12px);
+            box-shadow: 0 8px 30px rgba(8, 27, 51, .25);
+        }
+        .nav-inner {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            padding: 14px var(--pad);
+        }
+        .nav-brand { display: flex; align-items: center; gap: 12px; min-width: 0; color: #fff; text-decoration: none; }
+        .nav-logo {
+            display: grid; place-items: center; flex: none;
+            width: 46px; height: 46px; border-radius: 12px; background: #fff; overflow: hidden;
+        }
+        .nav-logo img { width: 100%; height: 100%; padding: 4px; object-fit: contain; }
+        .nav-name { font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: .02em; line-height: 1.1; }
+        .nav-sub { display: block; font-family: var(--font-body); font-weight: 500; font-size: 12px; color: rgba(255,255,255,.75); letter-spacing: 0; }
+        .nav-links { display: flex; align-items: center; gap: 6px; }
+        .nav-link {
+            position: relative; display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 14px; border-radius: 999px;
+            color: rgba(255,255,255,.82); font-size: 14px; font-weight: 600; text-decoration: none;
+            transition: color .2s, background .2s;
+        }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,.1); }
+        .nav-link[aria-current="page"] { color: #fff; background: rgba(52,120,246,.35); }
+        .nav-link[aria-current="page"]::after {
+            content: ""; position: absolute; left: 50%; bottom: 2px;
+            width: 18px; height: 3px; border-radius: 3px; background: var(--cyan);
+            transform: translateX(-50%);
+        }
+        .progress {
+            position: fixed; left: 0; top: 0; z-index: 60; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--electric));
+            transform: scaleX(0); transform-origin: left;
         }
 
-        /* HEADER FULL WIDTH */
-
-        .site-header {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            color: var(--white);
-            background: var(--navy-deep);
+        /* ---------- Hero ---------- */
+        .hero {
+            position: relative; isolation: isolate; overflow: hidden;
+            margin-top: -78px; padding: calc(78px + clamp(40px, 7vw, 88px)) var(--pad) clamp(48px, 7vw, 88px);
+            color: #fff; background: var(--navy);
         }
-
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 24px;
-            width: 100%;
-            padding: 25px clamp(22px, 5vw, 80px);
-            border-bottom: 1px solid rgba(255,255,255,.12);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 17px;
-            min-width: 0;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 58px;
-            width: 58px;
-            height: 58px;
-            overflow: hidden;
-            border-radius: 13px;
-            background: white;
-            box-shadow: 0 5px 18px rgba(0,0,0,.15);
-        }
-
-        .brand-logo img {
-            width: 100%;
-            height: 100%;
-            padding: 5px;
-            object-fit: contain;
-        }
-
-        .brand-name {
-            margin: 0;
-            color: white;
-            font-size: 25px;
-            font-weight: 850;
-            line-height: 1.25;
-            letter-spacing: -.6px;
-        }
-
-        .brand-description {
-            margin: 4px 0 0;
-            color: rgba(255,255,255,.76);
-            font-size: 14px;
-        }
-
-        .header-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            padding: 10px 16px;
-            border: 1px solid rgba(255,255,255,.2);
-            border-radius: 30px;
-            color: #e6effa;
-            background: rgba(255,255,255,.07);
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .header-label::before {
-            content: "";
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #69d6a2;
-            box-shadow: 0 0 0 4px rgba(105,214,162,.13);
-        }
-
-        /* INTRODUCTION */
-
-        .intro-section {
-            position: relative;
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 30px;
-            width: 100%;
-            padding: 48px clamp(22px, 5vw, 80px) 43px;
-            overflow: hidden;
-            color: white;
+        .hero::before {
+            content: ""; position: absolute; inset: 0; z-index: -2;
             background:
-                radial-gradient(
-                    circle at 88% 15%,
-                    rgba(87,145,201,.22),
-                    transparent 27%
-                ),
-                linear-gradient(115deg, #102b4e, #173e68);
+                linear-gradient(120deg, rgba(8,27,51,.96) 0%, rgba(11,37,69,.9) 55%, rgba(36,87,214,.55) 100%),
+                url("{{ asset('images/login-bapelkes.jpg') }}") center / cover no-repeat;
         }
-
-        .intro-section::after {
-            content: "S";
-            position: absolute;
-            right: 8%;
-            bottom: -115px;
-            color: rgba(255,255,255,.035);
-            font-size: 310px;
-            font-weight: 900;
-            line-height: 1;
-            pointer-events: none;
+        .orb {
+            position: absolute; z-index: -1; border-radius: 50%; pointer-events: none;
+            filter: blur(60px); animation: drift 24s ease-in-out infinite alternate;
         }
+        .orb.a { width: 380px; height: 380px; left: -100px; top: 40px; background: var(--royal); opacity: .5; }
+        .orb.b { width: 300px; height: 300px; right: 6%; bottom: -60px; background: var(--cyan); opacity: .2; animation-duration: 30s; }
+        @keyframes drift { to { transform: translate3d(50px, -36px, 0); } }
 
-        .intro-content {
-            position: relative;
-            z-index: 1;
+        .hero-grid {
+            display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+            align-items: end; gap: clamp(28px, 5vw, 72px);
         }
-
-        .eyebrow {
-            display: inline-block;
-            margin-bottom: 10px;
-            color: #a9d0f8;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        .badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 14px 8px 10px; margin-bottom: 22px;
+            border: 1px solid rgba(105,214,162,.4); border-radius: 999px;
+            background: rgba(105,214,162,.12); color: #C9F2DD;
+            font-size: 13px; font-weight: 600;
         }
-
-        .intro-title {
-            margin: 0;
-            color: white;
-            font-size: clamp(30px, 4vw, 48px);
-            font-weight: 850;
-            line-height: 1.2;
-            letter-spacing: -1.3px;
+        .badge .i { font-size: 16px; color: #69D6A2; }
+        .hero h1 {
+            margin: 0 0 20px; font-family: var(--font-display); font-weight: 800;
+            font-size: clamp(2.4rem, 6.4vw, 4.8rem); line-height: 1.04; letter-spacing: -.035em;
         }
+        .hero h1 span { display: block; color: var(--cyan); }
+        .hero p { max-width: 560px; margin: 0; font-size: clamp(1rem, 1.5vw, 1.125rem); line-height: 1.8; color: rgba(255,255,255,.84); }
 
-        .intro-description {
-            max-width: 720px;
-            margin: 13px 0 0;
-            color: rgba(255,255,255,.78);
-            font-size: 17px;
+        .stat {
+            position: relative; padding: 26px 28px; border-radius: 22px;
+            border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08);
+            backdrop-filter: blur(8px);
         }
-
-        .intro-side {
-            position: relative;
-            z-index: 1;
-            flex: 0 0 auto;
-            padding: 13px 18px;
-            border: 1px solid rgba(255,255,255,.18);
-            border-radius: 12px;
-            color: white;
-            background: rgba(255,255,255,.08);
-            font-size: 14px;
-            font-weight: 700;
+        .stat-label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,.8); }
+        .stat-label .i { font-size: 20px; color: var(--cyan); }
+        .stat-number {
+            display: block; margin: 10px 0 4px;
+            font-family: var(--font-display); font-weight: 800; font-variant-numeric: tabular-nums;
+            font-size: clamp(3.4rem, 8vw, 5.6rem); line-height: 1; letter-spacing: -.04em;
         }
+        .stat-note { font-size: 13px; color: rgba(255,255,255,.72); }
 
-        /* MAIN CONTENT */
-
-        .main-content {
-            width: 100%;
-            padding: 38px clamp(20px, 5vw, 80px) 65px;
+        /* ---------- Main ---------- */
+        main { padding: 0 var(--pad) clamp(48px, 6vw, 72px); }
+        .section { padding-top: clamp(36px, 5vw, 60px); }
+        .section-head { margin-bottom: 22px; }
+        .section-head h2 {
+            margin: 0 0 6px; font-family: var(--font-display); font-weight: 700;
+            font-size: clamp(1.5rem, 3.2vw, 2.1rem); letter-spacing: -.025em; color: var(--navy);
         }
+        .section-head p { margin: 0; font-size: 15px; color: var(--slate); }
 
-        .success-alert {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            width: 100%;
-            margin-bottom: 36px;
-            padding: 19px 22px;
-            border: 1px solid #b9e4ce;
-            border-left: 5px solid #269566;
-            border-radius: 12px;
-            color: var(--green);
-            background: var(--green-bg);
+        .success {
+            display: flex; align-items: flex-start; gap: 14px;
+            margin-top: 28px; padding: 16px 20px;
+            border: 1px solid var(--ok-line); border-left: 5px solid #1E9C6B; border-radius: 14px;
+            background: var(--ok-bg); color: var(--ok);
         }
+        .success .i { margin-top: 3px; font-size: 22px; color: #1E9C6B; }
+        .success strong { display: block; font-size: 15px; }
+        .success p { margin: 2px 0 0; font-size: 14px; color: #36765A; }
 
-        .success-icon {
-            display: flex;
-            flex: 0 0 34px;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            color: white;
-            background: #269566;
-            font-size: 19px;
-            font-weight: 800;
+        /* Profile: editorial definition list, no card grid */
+        .profile {
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+            column-gap: clamp(24px, 4vw, 56px); margin: 0;
+            border-top: 2px solid var(--navy);
         }
+        .profile > div { min-width: 0; padding: 18px 0; border-bottom: 1px solid var(--border); }
+        .profile dt { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--slate); }
+        .profile dd { margin: 0; font-size: 17px; font-weight: 700; color: var(--navy); overflow-wrap: anywhere; }
+        .profile .wide { grid-column: span 1; }
 
-        .success-alert strong {
-            display: block;
-            margin-bottom: 2px;
-            font-size: 16px;
+        /* Table */
+        .panel {
+            overflow: hidden; border: 1px solid var(--border); border-radius: 20px;
+            background: #fff; box-shadow: 0 18px 44px rgba(8, 27, 51, .07);
         }
-
-        .success-alert p {
-            margin: 0;
-            color: #36765a;
-            font-size: 14px;
+        .panel-top {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            padding: 18px 24px; border-bottom: 1px solid var(--border);
         }
-
-        /* SECTION HEADINGS */
-
-        .section-block {
-            margin-bottom: 39px;
-        }
-
-        .section-heading {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 18px;
-        }
-
-        .section-title {
-            margin: 0;
-            color: var(--navy);
-            font-size: 25px;
-            font-weight: 850;
-            letter-spacing: -.5px;
-        }
-
-        .section-subtitle {
-            margin: 5px 0 0;
-            color: var(--muted);
-            font-size: 15px;
-        }
-
-        .section-index {
-            color: #9aabc0;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        /* PARTICIPANT INFORMATION */
-
-        .participant-panel {
-            width: 100%;
-            padding: 25px 28px;
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            background: white;
-            box-shadow: var(--shadow);
-        }
-
-        .participant-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            column-gap: 35px;
-            row-gap: 0;
-        }
-
-        .info-item {
-            min-width: 0;
-            padding: 17px 0;
-            border-bottom: 1px solid #e9eef4;
-        }
-
-        .info-item:nth-last-child(-n+3) {
-            border-bottom: none;
-        }
-
-        .info-label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--muted);
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .info-value {
-            display: block;
-            color: var(--ink);
-            font-size: 17px;
-            font-weight: 750;
-            overflow-wrap: anywhere;
-        }
-
-        /* SUMMARY */
-
-        .summary-layout {
-            display: grid;
-            grid-template-columns: 1.35fr 1fr;
-            gap: 17px;
-            margin-bottom: 21px;
-        }
-
-        .summary-card {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            min-height: 145px;
-            padding: 25px 29px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            background: white;
-            box-shadow: var(--shadow);
-        }
-
-        .summary-card.primary {
-            color: white;
-            border-color: var(--navy);
-            background: var(--navy);
-        }
-
-        .summary-card.primary::after {
-            content: "";
-            position: absolute;
-            right: -35px;
-            bottom: -90px;
-            width: 210px;
-            height: 210px;
-            border: 30px solid rgba(255,255,255,.07);
-            border-radius: 50%;
-        }
-
-        .summary-info {
-            position: relative;
-            z-index: 1;
-        }
-
-        .summary-label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--muted);
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .primary .summary-label {
-            color: rgba(255,255,255,.72);
-        }
-
-        .summary-number {
-            display: block;
-            color: var(--navy);
-            font-size: 42px;
-            font-weight: 900;
-            line-height: 1.2;
-            letter-spacing: -1px;
-        }
-
-        .primary .summary-number {
-            color: white;
-        }
-
-        .summary-note {
-            display: block;
-            margin-top: 5px;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .primary .summary-note {
-            color: rgba(255,255,255,.7);
-        }
-
-        .summary-symbol {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex: 0 0 55px;
-            align-items: center;
-            justify-content: center;
-            width: 55px;
-            height: 55px;
-            border-radius: 15px;
-            color: var(--blue);
-            background: var(--blue-light);
-        }
-
-        .primary .summary-symbol {
-            color: white;
-            background: rgba(255,255,255,.13);
-        }
-
-        .summary-symbol svg {
-            width: 27px;
-            height: 27px;
-        }
-
-        /* TABLE */
-
-        .table-panel {
-            width: 100%;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            background: white;
-            box-shadow: var(--shadow);
-        }
-
-        .table-topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            padding: 19px 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .table-topbar strong {
-            color: var(--navy);
-            font-size: 17px;
-            font-weight: 800;
-        }
-
-        .table-count {
-            padding: 6px 12px;
-            border-radius: 30px;
-            color: var(--blue);
-            background: var(--blue-light);
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        table {
-            width: 100%;
-            min-width: 700px;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 18px 22px;
-            text-align: left;
-            vertical-align: middle;
-            border-bottom: 1px solid #e9eef4;
-        }
-
-        th {
-            color: #60728a;
-            background: #f5f8fc;
-            font-size: 13px;
-            font-weight: 800;
-            white-space: nowrap;
-        }
-
-        td {
-            color: #35475d;
-            font-size: 15px;
-        }
-
-        tbody tr {
-            transition: background .2s ease;
-        }
-
-        tbody tr:hover {
-            background: #f7faff;
-        }
-
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .number-cell {
-            width: 70px;
-            color: #8b9bb0;
-            font-weight: 700;
-        }
-
-        .training-name {
-            display: block;
-            color: var(--navy);
-            font-size: 15px;
-            font-weight: 800;
-        }
-
+        .panel-top strong { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--navy); }
+        .count { padding: 6px 12px; border-radius: 999px; background: var(--soft); color: var(--royal); font-size: 13px; font-weight: 700; }
+        .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; min-width: 720px; border-collapse: collapse; }
+        th, td { padding: 17px 22px; text-align: left; vertical-align: middle; border-bottom: 1px solid #EBF0F6; }
+        th { background: var(--ice); color: #55677F; font-size: 13px; font-weight: 700; white-space: nowrap; }
+        td { font-size: 15px; color: #33465C; }
+        tbody tr { transition: background .2s; }
+        tbody tr:hover { background: #F7FAFF; }
+        tbody tr:last-child td { border-bottom: 0; }
+        .num { width: 64px; font-weight: 700; color: #7C8DA3; font-variant-numeric: tabular-nums; }
+        .t-name { font-weight: 700; color: var(--navy); }
         .status {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 7px 12px;
-            border-radius: 7px;
-            color: #176b4a;
-            background: #eaf7f0;
-            font-size: 13px;
-            font-weight: 800;
-            text-transform: capitalize;
-            white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px;
+            border-radius: 8px; background: var(--ok-bg); color: var(--ok);
+            font-size: 13px; font-weight: 700; text-transform: capitalize; white-space: nowrap;
         }
+        .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #1E9C6B; }
 
-        .status::before {
-            content: "";
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #269566;
+        .empty { padding: 48px 24px; text-align: center; color: var(--slate); }
+        .empty .i { display: block; margin: 0 auto 12px; font-size: 34px; color: var(--royal); }
+        .empty strong { display: block; margin-bottom: 4px; font-family: var(--font-display); font-size: 17px; color: var(--navy); }
+
+        /* Actions */
+        .actions {
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+            margin-top: 40px; padding-top: 26px; border-top: 1px solid var(--border);
         }
-
-        .empty-state {
-            padding: 42px 25px;
-            color: var(--muted);
-            text-align: center;
+        .actions p { margin: 0; max-width: 520px; font-size: 14px; color: var(--slate); }
+        .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            min-height: 52px; padding: 12px 22px; border-radius: 14px; border: 1.5px solid transparent;
+            font-family: var(--font-display); font-size: 15px; font-weight: 600; text-decoration: none;
+            transition: transform .2s var(--ease), box-shadow .2s, background .2s;
         }
+        .btn .i { font-size: 18px; transition: transform .2s var(--ease); }
+        .btn-primary { color: #fff; background: linear-gradient(110deg, var(--royal), var(--electric)); box-shadow: 0 12px 26px rgba(36,87,214,.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(36,87,214,.4); }
+        .btn-primary:hover .i { transform: translateX(-4px); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-secondary { color: var(--royal); background: #fff; border-color: #C5D6F5; }
+        .btn-secondary:hover { background: var(--soft); transform: translateY(-2px); }
 
-        .empty-state strong {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--navy);
-            font-size: 17px;
+        /* Footer */
+        .footer {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            padding: 24px var(--pad); background: var(--navy); color: rgba(255,255,255,.8);
         }
+        .footer b { display: block; font-family: var(--font-display); color: #fff; font-size: 16px; }
+        .footer span { font-size: 13px; }
 
-        /* ACTIONS */
+        /* Entrance: satu rangkaian di hero saja */
+        .rise { opacity: 0; transform: translate3d(0, 22px, 0); animation: rise .8s var(--ease) forwards; }
+        .rise.d1 { animation-delay: .1s; }
+        .rise.d2 { animation-delay: .2s; }
+        .rise.d3 { animation-delay: .32s; }
+        @keyframes rise { to { opacity: 1; transform: none; } }
 
-        .bottom-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 18px;
-            margin-top: 34px;
-            padding-top: 26px;
-            border-top: 1px solid var(--border);
-        }
-
-        .bottom-note {
-            margin: 0;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 11px;
-            min-height: 50px;
-            padding: 12px 21px;
-            border: 1px solid var(--navy);
-            border-radius: 9px;
-            color: white;
-            background: var(--navy);
-            font-size: 15px;
-            font-weight: 750;
-            text-decoration: none;
-            transition:
-                background .2s ease,
-                transform .2s ease,
-                box-shadow .2s ease;
-        }
-
-        .back-button:hover {
-            transform: translateY(-2px);
-            background: var(--blue);
-            box-shadow: 0 8px 20px rgba(16,43,78,.18);
-        }
-
-        .back-button svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        /* FOOTER */
-
-        .site-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            width: 100%;
-            padding: 23px clamp(22px, 5vw, 80px);
-            border-top: 1px solid var(--border);
-            background: white;
-        }
-
-        .footer-brand {
-            color: var(--navy);
-            font-size: 15px;
-            font-weight: 850;
-        }
-
-        .footer-text {
-            margin: 3px 0 0;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .footer-year {
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        /* ANIMATION */
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .intro-content,
-        .section-block,
-        .success-alert {
-            animation: fadeUp .55s ease both;
-        }
-
-        .section-block:nth-of-type(2) {
-            animation-delay: .08s;
-        }
-
-        .section-block:nth-of-type(3) {
-            animation-delay: .14s;
-        }
-
-        /* RESPONSIVE */
-
+        /* ---------- Responsive ---------- */
         @media (max-width: 900px) {
-            .participant-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                column-gap: 25px;
-            }
-
-            .info-item:nth-last-child(-n+3) {
-                border-bottom: 1px solid #e9eef4;
-            }
-
-            .info-item:nth-last-child(-n+2) {
-                border-bottom: none;
-            }
-
-            .intro-section {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 20px;
-            }
+            .hero-grid { grid-template-columns: 1fr; align-items: start; }
+            .profile { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
-
         @media (max-width: 600px) {
-            .header-inner {
-                padding: 18px 17px;
-            }
-
-            .brand {
-                gap: 12px;
-            }
-
-            .brand-logo {
-                flex-basis: 47px;
-                width: 47px;
-                height: 47px;
-            }
-
-            .brand-name {
-                font-size: 21px;
-            }
-
-            .brand-description {
-                font-size: 11px;
-            }
-
-            .header-label {
-                display: none;
-            }
-
-            .intro-section {
-                padding: 34px 20px;
-            }
-
-            .intro-title {
-                font-size: 32px;
-            }
-
-            .intro-description {
-                font-size: 15px;
-            }
-
-            .main-content {
-                padding: 25px 15px 42px;
-            }
-
-            .success-alert {
-                padding: 15px;
-                gap: 11px;
-            }
-
-            .section-title {
-                font-size: 22px;
-            }
-
-            .section-subtitle {
-                font-size: 14px;
-            }
-
-            .participant-panel {
-                padding: 12px 18px;
-            }
-
-            .participant-grid {
-                grid-template-columns: minmax(0, 1fr);
-            }
-
-            .info-item,
-            .info-item:nth-last-child(-n+2),
-            .info-item:nth-last-child(-n+3) {
-                border-bottom: 1px solid #e9eef4;
-            }
-
-            .info-item:last-child {
-                border-bottom: none;
-            }
-
-            .info-value {
-                font-size: 16px;
-            }
-
-            .summary-layout {
-                grid-template-columns: minmax(0, 1fr);
-                gap: 12px;
-            }
-
-            .summary-card {
-                min-height: 120px;
-                padding: 20px;
-            }
-
-            .summary-number {
-                font-size: 36px;
-            }
-
-            .table-topbar {
-                padding: 16px;
-            }
-
-            .table-wrapper {
-                overflow: visible;
-            }
-
-            table {
-                display: block;
-                min-width: 0;
-                width: 100%;
-            }
-
-            thead {
-                display: none;
-            }
-
-            tbody {
-                display: grid;
-                gap: 12px;
-                padding: 12px;
-            }
-
-            tbody tr {
-                display: block;
-                overflow: hidden;
-                border: 1px solid var(--border);
-                border-radius: 10px;
-                background: white;
-            }
-
+            .nav-sub { display: none; }
+            .nav-link .t { display: none; }
+            .profile { grid-template-columns: 1fr; }
+            .panel-top { padding: 16px; }
+            .table-wrap { overflow: visible; }
+            table { display: block; min-width: 0; }
+            thead { display: none; }
+            tbody { display: grid; gap: 12px; padding: 12px; }
+            tbody tr { display: block; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; }
             tbody td {
-                display: grid;
-                grid-template-columns: 115px minmax(0, 1fr);
-                gap: 10px;
-                padding: 12px;
-                border-bottom: 1px solid #edf1f5;
-                font-size: 14px;
+                display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px;
+                padding: 12px 14px; font-size: 14px; border-bottom: 1px solid #EDF1F5;
             }
-
-            tbody td::before {
-                content: attr(data-label);
-                color: var(--muted);
-                font-size: 13px;
-                font-weight: 700;
-            }
-
-            tbody tr:last-child td {
-                border-bottom: 1px solid #edf1f5;
-            }
-
-            tbody tr td:last-child {
-                border-bottom: none;
-            }
-
-            .bottom-actions {
-                align-items: stretch;
-                flex-direction: column;
-            }
-
-            .back-button {
-                width: 100%;
-            }
-
-            .site-footer {
-                align-items: flex-start;
-                flex-direction: column;
-                padding: 20px;
-            }
+            tbody td::before { content: attr(data-label); font-size: 13px; font-weight: 600; color: var(--slate); }
+            tbody tr:last-child td { border-bottom: 1px solid #EDF1F5; }
+            tbody tr td:last-child { border-bottom: 0; }
+            .num { width: auto; }
+            .actions { align-items: stretch; flex-direction: column; }
+            .btn-row, .btn { width: 100%; }
+            .footer { flex-direction: column; align-items: flex-start; }
         }
-
-        @media (max-width: 360px) {
-            .intro-title {
-                font-size: 28px;
-            }
-
-            tbody td {
-                grid-template-columns: 90px minmax(0, 1fr);
-                gap: 7px;
-                padding: 10px;
-            }
-        }
-
         @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                scroll-behavior: auto !important;
-                animation-duration: .01ms !important;
-                transition-duration: .01ms !important;
-            }
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+            .rise { opacity: 1; transform: none; }
         }
     </style>
 </head>
 
 <body>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<a class="skip" href="#riwayat">Lewati ke riwayat pelatihan</a>
 
-    <!-- HEADER -->
-    <header class="site-header">
-        <div class="header-inner">
+<header class="nav" id="nav">
+    <div class="nav-inner">
+        <a class="nav-brand" href="{{ route('public.dashboard') }}" aria-label="SIRAPIK, kembali ke dashboard publik">
+            <span class="nav-logo">
+                <img src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+                     alt="Logo Provinsi Kalimantan Selatan" width="46" height="46">
+            </span>
+            <span class="nav-name">SIRAPIK
+                <span class="nav-sub">Bapelkes Provinsi Kalimantan Selatan</span>
+            </span>
+        </a>
 
-            <div class="brand">
-                <div class="brand-logo">
-                    <img
-                        src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
-                        alt="Logo Provinsi Kalimantan Selatan"
-                    >
-                </div>
+        <nav class="nav-links" aria-label="Navigasi utama">
+            <a class="nav-link" href="{{ route('public.dashboard') }}">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+                <span class="t">Dashboard</span>
+            </a>
+            <a class="nav-link" href="{{ url()->previous() }}" aria-current="page">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <span class="t">Riwayat pelatihan</span>
+            </a>
+        </nav>
+    </div>
+</header>
 
-                <div>
-                    <h1 class="brand-name">SIRAPIK</h1>
-                    <p class="brand-description">
-                        Bapelkes Provinsi Kalimantan Selatan
-                    </p>
-                </div>
-            </div>
+<section class="hero" aria-labelledby="hero-title">
+    <span class="orb a" aria-hidden="true"></span>
+    <span class="orb b" aria-hidden="true"></span>
 
-            <div class="header-label">
-                Sistem Informasi Riwayat Pelatihan
-            </div>
-
-        </div>
-    </header>
-
-    <!-- INTRO FULL WIDTH -->
-    <section class="intro-section">
-        <div class="intro-content">
-            <span class="eyebrow">Hasil Pencarian</span>
-
-            <h2 class="intro-title">
-                Riwayat Pelatihan Anda
-            </h2>
-
-            <p class="intro-description">
-                Informasi identitas peserta dan seluruh riwayat
-                pelatihan yang telah tercatat di sistem SIRAPIK.
+    <div class="hero-grid">
+        <div>
+            <span class="badge rise">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                Data peserta ditemukan
+            </span>
+            <h1 id="hero-title" class="rise d1">
+                Riwayat pelatihan Anda
+                <span>tercatat di SIRAPIK.</span>
+            </h1>
+            <p class="rise d2">
+                Identitas peserta dan seluruh pelatihan yang pernah diikuti
+                ditampilkan berdasarkan data yang tersimpan di sistem.
             </p>
         </div>
 
-        <div class="intro-side">
-            Data Peserta SIRAPIK
+        <div class="stat rise d3">
+            <span class="stat-label">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5v15"/><path d="M8 7h8M8 11h8"/></svg>
+                Total riwayat pelatihan
+            </span>
+            <strong class="stat-number" id="counter" data-target="{{ $participant->histories->count() }}">{{ $participant->histories->count() }}</strong>
+            <span class="stat-note">Jumlah keikutsertaan yang tercatat</span>
+        </div>
+    </div>
+</section>
+
+<main>
+    <div class="success" role="status">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        <div>
+            <strong>Data peserta berhasil ditemukan.</strong>
+            <p>NIK dan nama lengkap sesuai dengan data peserta yang terdaftar di SIRAPIK.</p>
+        </div>
+    </div>
+
+    <section class="section" aria-labelledby="profil-title">
+        <div class="section-head">
+            <h2 id="profil-title">Informasi peserta</h2>
+            <p>Identitas peserta yang terdaftar dalam sistem.</p>
+        </div>
+
+        <dl class="profile">
+            <div>
+                <dt>Nama lengkap</dt>
+                <dd>{{ $participant->name ?: '-' }}</dd>
+            </div>
+            <div>
+                <dt>NIK</dt>
+                <dd>{{ $participant->nik ?: '-' }}</dd>
+            </div>
+            <div>
+                <dt>NIP</dt>
+                <dd>{{ $participant->nip ?: '-' }}</dd>
+            </div>
+            <div>
+                <dt>Instansi</dt>
+                <dd>{{ $participant->institution ?: '-' }}</dd>
+            </div>
+            <div>
+                <dt>Kabupaten/Kota/Mitra</dt>
+                <dd>{{ $participant->district ?: '-' }}</dd>
+            </div>
+            <div>
+                <dt>Profesi</dt>
+                <dd>{{ $participant->profession ?: '-' }}</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="section" id="riwayat" aria-labelledby="riwayat-title">
+        <div class="section-head">
+            <h2 id="riwayat-title">Daftar riwayat pelatihan</h2>
+            <p>Seluruh pelatihan yang pernah diikuti peserta.</p>
+        </div>
+
+        <div class="panel">
+            <div class="panel-top">
+                <strong>Riwayat keikutsertaan</strong>
+                <span class="count">{{ $participant->histories->count() }} data</span>
+            </div>
+
+            @if ($participant->histories->isEmpty())
+                <div class="empty">
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                    <strong>Belum ada riwayat pelatihan</strong>
+                    Data keikutsertaan pelatihan peserta ini belum tercatat di sistem.
+                </div>
+            @else
+                <div class="table-wrap">
+                    <table>
+                        <caption class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">
+                            Daftar riwayat pelatihan peserta
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Nama Pelatihan</th>
+                                <th scope="col">Angkatan</th>
+                                <th scope="col">Sumber Dana</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($participant->histories as $history)
+                                <tr>
+                                    <td class="num" data-label="No.">{{ $loop->iteration }}</td>
+                                    <td data-label="Nama Pelatihan">
+                                        <span class="t-name">
+                                            {{ $history->training?->name ?? 'Nama pelatihan tidak tersedia' }}
+                                        </span>
+                                    </td>
+                                    <td data-label="Angkatan">{{ $history->training?->batch_number ?: '-' }}</td>
+                                    <td data-label="Sumber Dana">{{ $history->training?->funding_source ?: '-' }}</td>
+                                    <td data-label="Status">
+                                        @if ($history->status)
+                                            <span class="status">{{ $history->status }}</span>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </div>
     </section>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
+    <div class="actions">
+        <p>Informasi ini ditampilkan berdasarkan data yang tersimpan di sistem SIRAPIK.</p>
 
-        <!-- NOTIFIKASI -->
-        <div class="success-alert" role="status">
-            <div class="success-icon" aria-hidden="true">✓</div>
-
-            <div>
-                <strong>Data peserta berhasil ditemukan.</strong>
-                <p>
-                    NIK dan nama lengkap sesuai dengan data peserta
-                    yang terdaftar di SIRAPIK.
-                </p>
-            </div>
-        </div>
-
-        <!-- INFORMASI PESERTA -->
-        <section class="section-block">
-
-            <div class="section-heading">
-                <div>
-                    <h3 class="section-title">Informasi Peserta</h3>
-                    <p class="section-subtitle">
-                        Identitas peserta yang terdaftar dalam sistem.
-                    </p>
-                </div>
-
-                <span class="section-index">01 / PROFIL</span>
-            </div>
-
-            <div class="participant-panel">
-                <div class="participant-grid">
-
-                    <div class="info-item">
-                        <span class="info-label">Nama Lengkap</span>
-                        <strong class="info-value">
-                            {{ $participant->name ?: '-' }}
-                        </strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">NIK</span>
-                        <strong class="info-value">
-                            {{ $participant->nik ?: '-' }}
-                        </strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">NIP</span>
-                        <strong class="info-value">
-                            {{ $participant->nip ?: '-' }}
-                        </strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Instansi</span>
-                        <strong class="info-value">
-                            {{ $participant->institution ?: '-' }}
-                        </strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Kabupaten/Kota/Mitra</span>
-                        <strong class="info-value">
-                            {{ $participant->district ?: '-' }}
-                        </strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Profesi</span>
-                        <strong class="info-value">
-                            {{ $participant->profession ?: '-' }}
-                        </strong>
-                    </div>
-
-                </div>
-            </div>
-
-        </section>
-
-        <!-- RIWAYAT PELATIHAN -->
-        <section class="section-block">
-
-            <div class="section-heading">
-                <div>
-                    <h3 class="section-title">Daftar Riwayat Pelatihan</h3>
-                    <p class="section-subtitle">
-                        Seluruh pelatihan yang pernah diikuti peserta.
-                    </p>
-                </div>
-
-                <span class="section-index">02 / RIWAYAT</span>
-            </div>
-
-            <!-- RINGKASAN -->
-            <div class="summary-layout">
-
-                <div class="summary-card primary">
-                    <div class="summary-info">
-                        <span class="summary-label">
-                            Total Riwayat Pelatihan
-                        </span>
-
-                        <strong class="summary-number">
-                            {{ $participant->histories->count() }}
-                        </strong>
-
-                        <span class="summary-note">
-                            Jumlah keikutsertaan yang tercatat
-                        </span>
-                    </div>
-
-                    <div class="summary-symbol" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="1.8"
-                             stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/>
-                            <path d="M4 5.5v15"/>
-                            <path d="M8 7h8M8 11h8"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="summary-card">
-                    <div class="summary-info">
-                        <span class="summary-label">
-                            Status Data Peserta
-                        </span>
-
-                        <strong class="summary-number"
-                                style="font-size:30px">
-                            Terdaftar
-                        </strong>
-
-                        <span class="summary-note">
-                            Identitas ditemukan dalam database
-                        </span>
-                    </div>
-
-                    <div class="summary-symbol" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="1.8"
-                             stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="9"/>
-                            <path d="m8 12 2.5 2.5L16 9"/>
-                        </svg>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- TABEL RIWAYAT -->
-            <div class="table-panel">
-
-                <div class="table-topbar">
-                    <strong>Riwayat Keikutsertaan</strong>
-
-                    <span class="table-count">
-                        {{ $participant->histories->count() }} Data
-                    </span>
-                </div>
-
-                @if ($participant->histories->isEmpty())
-
-                    <div class="empty-state">
-                        <strong>Belum Ada Riwayat Pelatihan</strong>
-                        Data keikutsertaan pelatihan peserta ini
-                        belum tercatat di sistem.
-                    </div>
-
-                @else
-
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Nama Pelatihan</th>
-                                    <th>Angkatan</th>
-                                    <th>Sumber Dana</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @foreach ($participant->histories as $history)
-                                    <tr>
-                                        <td class="number-cell"
-                                            data-label="No.">
-                                            {{ $loop->iteration }}
-                                        </td>
-
-                                        <td data-label="Nama Pelatihan">
-                                            <span class="training-name">
-                                                {{ $history->training?->name
-                                                    ?? 'Nama pelatihan tidak tersedia' }}
-                                            </span>
-                                        </td>
-
-                                        <td data-label="Angkatan">
-                                            {{ $history->training?->batch_number ?: '-' }}
-                                        </td>
-
-                                        <td data-label="Sumber Dana">
-                                            {{ $history->training?->funding_source ?: '-' }}
-                                        </td>
-
-                                        <td data-label="Status">
-                                            @if ($history->status)
-                                                <span class="status">
-                                                    {{ $history->status }}
-                                                </span>
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                @endif
-
-            </div>
-
-        </section>
-
-        <!-- NAVIGASI -->
-        <div class="bottom-actions">
-
-            <p class="bottom-note">
-                Informasi ini ditampilkan berdasarkan data
-                yang tersimpan di sistem SIRAPIK.
-            </p>
-
-            <a href="{{ route('public.dashboard') }}"
-               class="back-button">
-
-                <svg viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round"
-                     aria-hidden="true">
-                    <path d="m15 18-6-6 6-6"/>
-                    <path d="M9 12h12"/>
-                </svg>
-
+        <div class="btn-row">
+            <a class="btn btn-secondary" href="{{ url()->previous() }}">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                Cari data lain
+            </a>
+            <a class="btn btn-primary" href="{{ route('public.dashboard') }}">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
                 Kembali ke Dashboard Publik
             </a>
-
         </div>
+    </div>
+</main>
 
-    </main>
+<footer class="footer">
+    <div>
+        <b>SIRAPIK</b>
+        <span>Bapelkes Provinsi Kalimantan Selatan</span>
+    </div>
+    <span>&copy; {{ date('Y') }} SIRAPIK. Seluruh hak cipta dilindungi.</span>
+</footer>
 
-    <!-- FOOTER -->
-    <footer class="site-footer">
-        <div>
-            <div class="footer-brand">SIRAPIK</div>
-            <p class="footer-text">
-                Bapelkes Provinsi Kalimantan Selatan
-            </p>
-        </div>
+<script>
+    (function () {
+        var nav = document.getElementById('nav');
+        var bar = document.getElementById('progress');
+        var ticking = false;
 
-        <div class="footer-year">
-            &copy; {{ date('Y') }} SIRAPIK. Seluruh hak cipta dilindungi.
-        </div>
-    </footer>
+        function update() {
+            var y = window.scrollY || document.documentElement.scrollTop;
+            var max = document.documentElement.scrollHeight - window.innerHeight;
+            nav.classList.toggle('is-scrolled', y > 12);
+            bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(y / max, 1) : 0) + ')';
+            ticking = false;
+        }
+        window.addEventListener('scroll', function () {
+            if (!ticking) { ticking = true; requestAnimationFrame(update); }
+        }, { passive: true });
+        update();
 
+        // Counter angka total (nilai asli dari server; teks awal sudah benar tanpa JS)
+        var el = document.getElementById('counter');
+        var target = parseInt(el.getAttribute('data-target'), 10) || 0;
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!reduce && target > 0) {
+            var start = null, dur = 900;
+            el.textContent = '0';
+            (function step(t) {
+                if (start === null) { start = t; }
+                var p = Math.min((t - start) / dur, 1);
+                el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+                if (p < 1) { requestAnimationFrame(step); }
+            })(performance.now());
+        }
+    })();
+</script>
 </body>
 </html>

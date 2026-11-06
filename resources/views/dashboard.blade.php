@@ -5,1299 +5,202 @@
 @section('content')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* =========================================================
-       SIRAPIK ADMIN DASHBOARD
-       Editorial Data Dashboard
-    ========================================================= */
-
-    .dashboard-admin {
-        --da-navy: #102d50;
-        --da-navy-2: #173e69;
-        --da-blue: #2463a8;
-        --da-blue-light: #eaf2fb;
-        --da-teal: #087f83;
-        --da-teal-light: #e8f5f3;
-        --da-coral: #d96b79;
-        --da-coral-light: #fff0f1;
-        --da-gold: #d6ad62;
-
-        --da-ink: #1b3049;
-        --da-text: #40536b;
-        --da-muted: #728197;
-        --da-subtle: #93a0b1;
-
-        --da-line: #e3eaf1;
-        --da-line-soft: #edf1f5;
-        --da-surface: #ffffff;
-        --da-canvas: #f4f7fa;
-
-        width: 100%;
-        padding: 10px 0 42px;
-        color: var(--da-ink);
-        font-family: 'DM Sans', sans-serif;
-        font-size: 15px;
-        line-height: 1.65;
-    }
-
-    .dashboard-admin *,
-    .dashboard-admin *::before,
-    .dashboard-admin *::after {
-        box-sizing: border-box;
-    }
-
-    .dashboard-admin button,
-    .dashboard-admin input,
-    .dashboard-admin select {
-        font: inherit;
-    }
-
-    .dashboard-admin svg {
-        display: block;
-        width: 21px;
-        height: 21px;
-        flex-shrink: 0;
-    }
-
-    .dashboard-admin a {
-        text-decoration: none;
-    }
-
-    .dashboard-admin button,
-    .dashboard-admin a,
-    .dashboard-admin select {
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    /* =========================================================
-       HEADER / INTRO
-    ========================================================= */
-
-    .dashboard-admin .dashboard-heading {
-        position: relative;
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: center;
-        gap: 30px;
-        min-height: 245px;
-        margin-bottom: 38px;
-        padding: 42px 46px;
-        overflow: hidden;
-        color: #fff;
-        background: var(--da-navy);
-        border-radius: 22px;
-        box-shadow: 0 16px 40px rgba(16, 45, 80, .13);
-        isolation: isolate;
-    }
-
-    .dashboard-admin .dashboard-heading::before {
-        position: absolute;
-        z-index: -1;
-        top: -120px;
-        right: 100px;
-        width: 390px;
-        height: 390px;
-        content: "";
-        border: 1px solid rgba(255,255,255,.11);
-        border-radius: 50%;
-        box-shadow:
-            0 0 0 35px rgba(255,255,255,.025),
-            0 0 0 75px rgba(255,255,255,.018);
-    }
-
-    .dashboard-admin .dashboard-heading::after {
-        position: absolute;
-        z-index: -1;
-        right: 0;
-        bottom: 0;
-        width: 42%;
-        height: 5px;
-        content: "";
-        background: linear-gradient(
-            90deg,
-            transparent,
-            var(--da-teal),
-            #65b9b2
-        );
-    }
-
-    .dashboard-admin .heading-copy {
-        max-width: 760px;
-    }
-
-    .dashboard-admin .heading-eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 11px;
-        margin-bottom: 17px;
-        color: #9ed7d2;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-    }
-
-    .dashboard-admin .heading-eyebrow::before {
-        width: 29px;
-        height: 2px;
-        content: "";
-        background: var(--da-gold);
-    }
-
-    .dashboard-admin .dashboard-heading h1 {
-        max-width: 700px;
-        margin: 0;
-        color: #fff;
-        font-family: 'Manrope', sans-serif;
-        font-size: clamp(30px, 4vw, 43px);
-        font-weight: 800;
-        letter-spacing: -1.8px;
-        line-height: 1.2;
-    }
-
-    .dashboard-admin .dashboard-heading p {
-        max-width: 650px;
-        margin: 17px 0 0;
-        color: rgba(255,255,255,.77);
-        font-size: 16px;
-        line-height: 1.85;
-    }
-
-    .dashboard-admin .heading-mark {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 112px;
-        height: 112px;
-        margin-right: 18px;
-        color: #c6eeea;
-        background: rgba(255,255,255,.07);
-        border: 1px solid rgba(255,255,255,.18);
-        border-radius: 29px;
-        transform: rotate(-5deg);
-    }
-
-    .dashboard-admin .heading-mark::before,
-    .dashboard-admin .heading-mark::after {
-        position: absolute;
-        content: "";
-        border: 1px solid rgba(255,255,255,.15);
-        border-radius: 22px;
-    }
-
-    .dashboard-admin .heading-mark::before {
-        inset: -11px;
-    }
-
-    .dashboard-admin .heading-mark::after {
-        inset: 11px;
-        border-color: rgba(255,255,255,.1);
-    }
-
-    .dashboard-admin .heading-mark svg {
-        width: 47px;
-        height: 47px;
-        transform: rotate(5deg);
-    }
-
-    /* =========================================================
-       SECTION HEADING
-    ========================================================= */
-
-    .dashboard-admin .section-intro {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 19px;
-    }
-
-    .dashboard-admin .section-kicker {
-        display: block;
-        margin-bottom: 7px;
-        color: var(--da-teal);
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1.7px;
-        text-transform: uppercase;
-    }
-
-    .dashboard-admin .section-intro h2,
-    .dashboard-admin .panel-heading h2 {
-        margin: 0;
-        color: var(--da-ink);
-        font-family: 'Manrope', sans-serif;
-        font-size: clamp(21px, 2.3vw, 26px);
-        font-weight: 800;
-        letter-spacing: -.7px;
-        line-height: 1.35;
-    }
-
-    .dashboard-admin .section-intro p,
-    .dashboard-admin .panel-heading p {
-        margin: 8px 0 0;
-        color: var(--da-muted);
-        font-size: 15px;
-        line-height: 1.75;
-    }
-
-    .dashboard-admin .section-year {
-        flex-shrink: 0;
-        padding: 9px 14px;
-        color: var(--da-blue);
-        background: var(--da-blue-light);
-        border: 1px solid #d9e7f7;
-        border-radius: 9px;
-        font-size: 13px;
-        font-weight: 800;
-    }
-
-    /* =========================================================
-       STATISTICS
-    ========================================================= */
-
-    .dashboard-admin .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-        margin-bottom: 23px;
-    }
-
-    .dashboard-admin .stat-card {
-        position: relative;
-        min-width: 0;
-        min-height: 215px;
-        padding: 26px 28px 23px;
-        overflow: hidden;
-        background: var(--da-surface);
-        border: 1px solid var(--da-line);
-        border-radius: 16px;
-        box-shadow: 0 5px 20px rgba(23, 48, 73, .035);
-        transition:
-            transform .25s ease,
-            box-shadow .25s ease,
-            border-color .25s ease;
-    }
-
-    .dashboard-admin .stat-card:hover {
-        border-color: #cbdbea;
-        box-shadow: 0 14px 32px rgba(23, 48, 73, .08);
-        transform: translateY(-4px);
-    }
-
-    .dashboard-admin .stat-card::after {
-        position: absolute;
-        right: -42px;
-        bottom: -67px;
-        width: 175px;
-        height: 175px;
-        content: "";
-        background: var(--stat-soft, var(--da-blue-light));
-        border-radius: 50%;
-        opacity: .75;
-        transition: transform .35s ease;
-    }
-
-    .dashboard-admin .stat-card:hover::after {
-        transform: scale(1.15);
-    }
-
-    .dashboard-admin .stat-topline {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 22px;
-    }
-
-    .dashboard-admin .stat-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 49px;
-        height: 49px;
-        color: var(--stat-accent, var(--da-blue));
-        background: var(--stat-soft, var(--da-blue-light));
-        border: 1px solid rgba(36,99,168,.08);
-        border-radius: 14px;
-    }
-
-    .dashboard-admin .stat-icon svg {
-        width: 25px;
-        height: 25px;
-    }
-
-    .dashboard-admin .stat-index {
-        color: #9aa8b8;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1.1px;
-    }
-
-    .dashboard-admin .stat-label {
-        position: relative;
-        z-index: 1;
-        color: var(--da-muted);
-        font-size: 15px;
-        font-weight: 600;
-    }
-
-    .dashboard-admin .stat-value {
-        position: relative;
-        z-index: 1;
-        margin-top: 3px;
-        color: var(--da-ink);
-        font-family: 'Manrope', sans-serif;
-        font-size: clamp(36px, 4vw, 47px);
-        font-weight: 800;
-        letter-spacing: -1.8px;
-        line-height: 1.35;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .dashboard-admin .stat-caption {
-        position: relative;
-        z-index: 1;
-        max-width: 440px;
-        margin-top: 13px;
-        padding-top: 12px;
-        color: #8290a2;
-        border-top: 1px solid var(--da-line-soft);
-        font-size: 13px;
-        line-height: 1.7;
-    }
-
-    /* =========================================================
-       GENDER CHART
-    ========================================================= */
-
-    .dashboard-admin .gender-card {
-        display: grid;
-        grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr);
-        align-items: center;
-        gap: 35px;
-        margin-bottom: 36px;
-        padding: 30px;
-        background: #fff;
-        border: 1px solid var(--da-line);
-        border-radius: 17px;
-        box-shadow: 0 5px 20px rgba(23, 48, 73, .035);
-    }
-
-    .dashboard-admin .gender-heading {
-        align-self: start;
-    }
-
-    .dashboard-admin .gender-heading h3 {
-        max-width: 350px;
-        margin: 0;
-        color: var(--da-ink);
-        font-family: 'Manrope', sans-serif;
-        font-size: 23px;
-        font-weight: 800;
-        letter-spacing: -.6px;
-        line-height: 1.4;
-    }
-
-    .dashboard-admin .gender-heading p {
-        max-width: 370px;
-        margin: 10px 0 0;
-        color: var(--da-muted);
-        font-size: 15px;
-        line-height: 1.8;
-    }
-
-    .dashboard-admin .gender-total {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 22px;
-        padding: 10px 13px;
-        color: var(--da-navy-2);
-        background: #f0f5fa;
-        border: 1px solid #e2eaf2;
-        border-radius: 9px;
-        font-size: 13px;
-    }
-
-    .dashboard-admin .gender-total strong {
-        font-weight: 800;
-    }
-
-    .dashboard-admin .gender-chart-area {
-        min-width: 0;
-    }
-
-    .dashboard-admin .gender-chart-wrapper {
-        position: relative;
-        width: 100%;
-        max-width: 440px;
-        height: 260px;
-        margin: 0 auto 18px;
-    }
-
-    .dashboard-admin .gender-chart-wrapper canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-    }
-
-    .dashboard-admin .gender-legend {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-    }
-
-    .dashboard-admin .gender-legend-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-width: 0;
-        padding: 15px;
-        background: #f8fafc;
-        border: 1px solid var(--da-line);
-        border-radius: 11px;
-    }
-
-    .dashboard-admin .gender-dot {
-        flex: 0 0 12px;
-        width: 12px;
-        height: 12px;
-        border-radius: 4px;
-    }
-
-    .dashboard-admin .gender-legend-label {
-        color: var(--da-muted);
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .dashboard-admin .gender-legend-value {
-        display: block;
-        margin-top: 3px;
-        color: var(--da-ink);
-        font-family: 'Manrope', sans-serif;
-        font-size: 17px;
-        font-weight: 800;
-        line-height: 1.45;
-    }
-
-    /* =========================================================
-       CONTENT PANELS
-    ========================================================= */
-
-    .dashboard-admin .content-card {
-        min-width: 0;
-        margin-bottom: 25px;
-        padding: 30px;
-        background: #fff;
-        border: 1px solid var(--da-line);
-        border-radius: 17px;
-        box-shadow: 0 5px 20px rgba(23, 48, 73, .035);
-    }
-
-    .dashboard-admin .panel-heading {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 23px;
-    }
-
-    .dashboard-admin .panel-heading-copy {
-        max-width: 760px;
-    }
-
-    .dashboard-admin .panel-number {
-        display: inline-flex;
-        flex-shrink: 0;
-        align-items: center;
-        gap: 8px;
-        padding: 9px 13px;
-        color: #536a83;
-        background: #f2f6fa;
-        border: 1px solid #e4ebf2;
-        border-radius: 9px;
-        font-size: 12px;
-        font-weight: 800;
-        white-space: nowrap;
-    }
-
-    .dashboard-admin .panel-number::before {
-        width: 7px;
-        height: 7px;
-        content: "";
-        background: var(--da-teal);
-        border-radius: 50%;
-    }
-
-    /* =========================================================
-       FILTER FORM
-    ========================================================= */
-
-    .dashboard-admin .filter-form {
-        display: flex;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        gap: 14px;
-        margin-bottom: 22px;
-        padding: 20px;
-        background: #f6f9fc;
-        border: 1px solid #e5edf4;
-        border-radius: 13px;
-    }
-
-    .dashboard-admin .filter-field {
-        display: flex;
-        flex: 1 1 210px;
-        flex-direction: column;
-        gap: 8px;
-        min-width: 160px;
-    }
-
-    .dashboard-admin .filter-field label {
-        color: #405771;
-        font-size: 13px;
-        font-weight: 800;
-    }
-
-    .dashboard-admin .filter-field select {
-        width: 100%;
-        min-height: 48px;
-        padding: 10px 40px 10px 14px;
-        color: var(--da-ink);
-        background-color: #fff;
-        border: 1px solid #d6e1ec;
-        border-radius: 9px;
-        font-family: inherit;
-        font-size: 14px;
-        outline: none;
-        cursor: pointer;
-        transition:
-            border-color .2s ease,
-            box-shadow .2s ease;
-    }
-
-    .dashboard-admin .filter-field select:hover {
-        border-color: #9fb7d0;
-    }
-
-    .dashboard-admin .filter-field select:focus {
-        border-color: var(--da-blue);
-        box-shadow: 0 0 0 4px rgba(36, 99, 168, .11);
-    }
-
-    .dashboard-admin .filter-button,
-    .dashboard-admin .reset-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 9px;
-        min-height: 48px;
-        padding: 11px 19px;
-        border: 1px solid transparent;
-        border-radius: 9px;
-        font-family: inherit;
-        font-size: 14px;
-        font-weight: 800;
-        text-decoration: none;
-        cursor: pointer;
-        transition:
-            background .2s ease,
-            color .2s ease,
-            border-color .2s ease,
-            transform .2s ease,
-            box-shadow .2s ease;
-    }
-
-    .dashboard-admin .filter-button {
-        color: #fff;
-        background: var(--da-blue);
-        border-color: var(--da-blue);
-        box-shadow: 0 4px 10px rgba(36, 99, 168, .14);
-    }
-
-    .dashboard-admin .filter-button svg {
-        width: 18px;
-        height: 18px;
-    }
-
-    .dashboard-admin .filter-button:hover {
-        color: #fff;
-        background: #194d86;
-        border-color: #194d86;
-        box-shadow: 0 7px 16px rgba(36, 99, 168, .2);
-        transform: translateY(-2px);
-    }
-
-    .dashboard-admin .filter-button:active,
-    .dashboard-admin .reset-button:active {
-        transform: translateY(0);
-    }
-
-    .dashboard-admin .reset-button {
-        color: #536a83;
-        background: #fff;
-        border-color: #d7e1eb;
-    }
-
-    .dashboard-admin .reset-button:hover {
-        color: var(--da-blue);
-        background: #edf4fb;
-        border-color: #c6d8eb;
-    }
-
-    /* =========================================================
-       TABLE
-    ========================================================= */
-
-    .dashboard-admin .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-        border: 1px solid #e3eaf1;
-        border-radius: 12px;
-        scrollbar-width: thin;
-        scrollbar-color: #b8c8d9 #f1f5f8;
-    }
-
-    .dashboard-admin .table-responsive::-webkit-scrollbar {
-        height: 8px;
-    }
-
-    .dashboard-admin .table-responsive::-webkit-scrollbar-track {
-        background: #f1f5f8;
-    }
-
-    .dashboard-admin .table-responsive::-webkit-scrollbar-thumb {
-        background: #b8c8d9;
-        border-radius: 20px;
-    }
-
-    .dashboard-admin table {
-        width: 100%;
-        min-width: 540px;
-        margin: 0;
-        border-collapse: separate;
-        border-spacing: 0;
-        background: #fff;
-        text-align: left;
-    }
-
-    .dashboard-admin thead th {
-        padding: 16px 18px;
-        color: #62758c;
-        background: #f3f7fb;
-        border-bottom: 1px solid #e2eaf2;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: .6px;
-        text-transform: uppercase;
-        white-space: nowrap;
-    }
-
-    .dashboard-admin tbody td {
-        padding: 16px 18px;
-        color: var(--da-text);
-        border-bottom: 1px solid #edf1f5;
-        font-size: 14px;
-        line-height: 1.7;
-        vertical-align: middle;
-    }
-
-    .dashboard-admin tbody tr {
-        transition: background .18s ease;
-    }
-
-    .dashboard-admin tbody tr:hover {
-        background: #f7faff;
-    }
-
-    .dashboard-admin tbody tr:last-child td {
-        border-bottom: 0;
-    }
-
-    .dashboard-admin tbody td:first-child {
-        color: #263e5b;
-        font-weight: 700;
-    }
-
-    .dashboard-admin .number-pill {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 43px;
-        min-height: 32px;
-        padding: 5px 11px;
-        color: #245d9b;
-        background: #eaf2fb;
-        border: 1px solid #dce9f7;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 800;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .dashboard-admin .participant-name {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-width: 200px;
-        color: var(--da-ink);
-        font-weight: 700;
-    }
-
-    .dashboard-admin .participant-icon {
-        display: inline-flex;
-        flex: 0 0 38px;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
-        color: var(--da-teal);
-        background: var(--da-teal-light);
-        border: 1px solid #d6eeea;
-        border-radius: 11px;
-    }
-
-    .dashboard-admin .participant-icon svg {
-        width: 20px;
-        height: 20px;
-    }
-
-    .dashboard-admin .empty-state {
-        padding: 32px 18px;
-        color: #78889c;
-        text-align: center;
-        font-size: 14px;
-        line-height: 1.8;
-    }
-
-    /* =========================================================
-       PAGINATION
-    ========================================================= */
-
-    .dashboard-admin .laravel-pagination {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 14px;
-        margin-top: 20px;
-    }
-
-    .dashboard-admin .laravel-pagination nav {
-        display: flex;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .dashboard-admin .laravel-pagination p {
-        margin: 0;
-        color: var(--da-muted);
-        font-size: 13px;
-    }
-
-    .dashboard-admin .laravel-pagination a,
-    .dashboard-admin .laravel-pagination span[aria-current="page"] span,
-    .dashboard-admin .laravel-pagination span[aria-disabled="true"] span {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 37px;
-        min-height: 37px;
-        padding: 6px 12px;
-        color: #536a83;
-        background: #fff;
-        border: 1px solid #dce5ee;
-        border-radius: 8px;
-        font-family: inherit;
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none;
-        transition: .2s ease;
-    }
-
-    .dashboard-admin .laravel-pagination a:hover {
-        color: var(--da-blue);
-        background: #edf4fb;
-        border-color: #cbdced;
-    }
-
-    .dashboard-admin .laravel-pagination span[aria-current="page"] span {
-        color: #fff;
-        background: var(--da-blue);
-        border-color: var(--da-blue);
-    }
-
-    .dashboard-admin .laravel-pagination span[aria-disabled="true"] span {
-        opacity: .45;
-    }
-
-    /* =========================================================
-       NOTE / PROFESSION SUMMARY
-    ========================================================= */
-
-    .dashboard-admin .info-note {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        margin-top: 20px;
-        padding: 16px 18px;
-        color: #526b84;
-        background: #f0f6fb;
-        border: 1px solid #dfebf5;
-        border-left: 4px solid #4d91bd;
-        border-radius: 9px;
-        font-size: 13px;
-        line-height: 1.8;
-    }
-
-    .dashboard-admin .info-note-icon {
-        display: flex;
-        flex: 0 0 23px;
-        align-items: center;
-        justify-content: center;
-        width: 23px;
-        height: 23px;
-        color: #397da9;
-    }
-
-    .dashboard-admin .info-note-icon svg {
-        width: 19px;
-        height: 19px;
-    }
-
-    .dashboard-admin .info-note strong {
-        color: #294967;
-    }
-
-    .dashboard-admin .profession-summary {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 19px;
-    }
-
-    .dashboard-admin .profession-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 9px 13px;
-        color: #087a7e;
-        background: #e8f5f3;
-        border: 1px solid #d2ebe7;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .dashboard-admin .profession-chip strong {
-        color: #075f63;
-        font-weight: 800;
-    }
-
-    /* =========================================================
-       EMPTY YEAR STATE
-    ========================================================= */
-
-    .dashboard-admin .no-year-data {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 235px;
-        margin-bottom: 30px;
-        padding: 35px 25px;
-        background: #fff;
-        border: 1px dashed #c8d6e4;
-        border-radius: 16px;
-        text-align: center;
-    }
-
-    .dashboard-admin .no-year-data .empty-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 57px;
-        height: 57px;
-        margin-bottom: 15px;
-        color: #6585a7;
-        background: #edf3f9;
-        border: 1px solid #e0eaf3;
-        border-radius: 16px;
-    }
-
-    .dashboard-admin .no-year-data .empty-icon svg {
-        width: 26px;
-        height: 26px;
-    }
-
-    .dashboard-admin .no-year-data h3 {
-        margin: 0;
-        color: var(--da-ink);
-        font-family: 'Manrope', sans-serif;
-        font-size: 20px;
-        font-weight: 800;
-    }
-
-    .dashboard-admin .no-year-data p {
-        max-width: 520px;
-        margin: 9px 0 0;
-        color: var(--da-muted);
-        font-size: 14px;
-        line-height: 1.8;
-    }
-
-    /* =========================================================
-       ACCESSIBILITY
-    ========================================================= */
-
-    .dashboard-admin :focus-visible {
-        outline: 3px solid rgba(8, 127, 131, .42);
-        outline-offset: 3px;
-    }
-
-    .dashboard-admin .filter-button:focus-visible,
-    .dashboard-admin .reset-button:focus-visible {
-        outline-offset: 4px;
-    }
-
-    /* =========================================================
-       RESPONSIVE TABLET
-    ========================================================= */
-
-    @media (max-width: 900px) {
-        .dashboard-admin .dashboard-heading {
-            padding: 35px;
-        }
-
-        .dashboard-admin .gender-card {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .dashboard-admin .gender-heading h3,
-        .dashboard-admin .gender-heading p {
-            max-width: 650px;
-        }
-
-        .dashboard-admin .gender-total {
-            margin-top: 15px;
-        }
-
-        .dashboard-admin .gender-chart-wrapper {
-            max-width: 500px;
-        }
-    }
-
-    /* =========================================================
-       RESPONSIVE MOBILE
-    ========================================================= */
-
-    @media (max-width: 640px) {
-        .dashboard-admin {
-            padding-top: 3px;
-            padding-bottom: 25px;
-        }
-
-        .dashboard-admin .dashboard-heading {
-            grid-template-columns: minmax(0, 1fr);
-            gap: 18px;
-            min-height: auto;
-            margin-bottom: 29px;
-            padding: 29px 23px 32px;
-            border-radius: 17px;
-        }
-
-        .dashboard-admin .dashboard-heading::before {
-            top: auto;
-            right: -130px;
-            bottom: -200px;
-            width: 330px;
-            height: 330px;
-        }
-
-        .dashboard-admin .dashboard-heading::after {
-            width: 65%;
-        }
-
-        .dashboard-admin .heading-eyebrow {
-            margin-bottom: 13px;
-            font-size: 10px;
-            letter-spacing: 1.5px;
-        }
-
-        .dashboard-admin .dashboard-heading h1 {
-            font-size: clamp(27px, 7vw, 34px);
-            letter-spacing: -1.2px;
-        }
-
-        .dashboard-admin .dashboard-heading p {
-            margin-top: 12px;
-            font-size: 14px;
-            line-height: 1.8;
-        }
-
-        .dashboard-admin .heading-mark {
-            position: absolute;
-            right: 24px;
-            bottom: 24px;
-            width: 60px;
-            height: 60px;
-            margin: 0;
-            border-radius: 16px;
-            opacity: .7;
-        }
-
-        .dashboard-admin .heading-mark::before {
-            inset: -6px;
-            border-radius: 13px;
-        }
-
-        .dashboard-admin .heading-mark::after {
-            inset: 7px;
-            border-radius: 10px;
-        }
-
-        .dashboard-admin .heading-mark svg {
-            width: 28px;
-            height: 28px;
-        }
-
-        .dashboard-admin .section-intro {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .dashboard-admin .section-intro h2,
-        .dashboard-admin .panel-heading h2 {
-            font-size: 21px;
-        }
-
-        .dashboard-admin .section-intro p,
-        .dashboard-admin .panel-heading p {
-            font-size: 14px;
-        }
-
-        .dashboard-admin .section-year {
-            font-size: 12px;
-        }
-
-        .dashboard-admin .stats-grid {
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .dashboard-admin .stat-card {
-            min-height: 190px;
-            padding: 22px;
-            border-radius: 14px;
-        }
-
-        .dashboard-admin .stat-topline {
-            margin-bottom: 17px;
-        }
-
-        .dashboard-admin .stat-value {
-            font-size: 39px;
-        }
-
-        .dashboard-admin .stat-caption {
-            max-width: 90%;
-            font-size: 13px;
-        }
-
-        .dashboard-admin .gender-card {
-            gap: 19px;
-            margin-bottom: 27px;
-            padding: 22px 17px;
-            border-radius: 14px;
-        }
-
-        .dashboard-admin .gender-heading h3 {
-            font-size: 21px;
-        }
-
-        .dashboard-admin .gender-heading p {
-            font-size: 14px;
-        }
-
-        .dashboard-admin .gender-chart-wrapper {
-            height: 235px;
-            margin-bottom: 15px;
-        }
-
-        .dashboard-admin .gender-legend {
-            grid-template-columns: 1fr;
-            gap: 9px;
-        }
-
-        .dashboard-admin .gender-legend-item {
-            padding: 13px;
-        }
-
-        .dashboard-admin .gender-total {
-            align-items: flex-start;
-            flex-wrap: wrap;
-            font-size: 12px;
-        }
-
-        .dashboard-admin .content-card {
-            margin-bottom: 19px;
-            padding: 22px 16px;
-            border-radius: 14px;
-        }
-
-        .dashboard-admin .panel-heading {
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 19px;
-        }
-
-        .dashboard-admin .panel-number {
-            font-size: 11px;
-        }
-
-        .dashboard-admin .filter-form {
-            align-items: stretch;
-            flex-direction: column;
-            gap: 13px;
-            padding: 15px;
-        }
-
-        .dashboard-admin .filter-field {
-            flex: 1 1 auto;
-            min-width: 100%;
-        }
-
-        .dashboard-admin .filter-field label {
-            font-size: 13px;
-        }
-
-        .dashboard-admin .filter-field select {
-            min-height: 47px;
-            font-size: 14px;
-        }
-
-        .dashboard-admin .filter-button,
-        .dashboard-admin .reset-button {
-            width: 100%;
-            min-height: 47px;
-            font-size: 14px;
-        }
-
-        .dashboard-admin .table-responsive {
-            border-radius: 10px;
-        }
-
-        .dashboard-admin thead th {
-            padding: 14px;
-            font-size: 11px;
-        }
-
-        .dashboard-admin tbody td {
-            padding: 14px;
-            font-size: 13px;
-        }
-
-        .dashboard-admin .profession-summary {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .dashboard-admin .profession-chip {
-            max-width: 100%;
-            font-size: 12px;
-        }
-
-        .dashboard-admin .info-note {
-            padding: 14px;
-            font-size: 12px;
-        }
-
-        .dashboard-admin .no-year-data {
-            min-height: 210px;
-            padding: 27px 18px;
-        }
-
-        .dashboard-admin .no-year-data h3 {
-            font-size: 18px;
-        }
-
-        .dashboard-admin .no-year-data p {
-            font-size: 13px;
-        }
-
-        .dashboard-admin .laravel-pagination {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-
-        .dashboard-admin .laravel-pagination nav {
-            justify-content: flex-start;
-        }
-    }
-
-    @media (max-width: 380px) {
-        .dashboard-admin .dashboard-heading {
-            padding: 25px 18px 29px;
-        }
-
-        .dashboard-admin .dashboard-heading h1 {
-            font-size: 26px;
-        }
-
-        .dashboard-admin .heading-mark {
-            display: none;
-        }
-
-        .dashboard-admin .stat-value {
-            font-size: 35px;
-        }
-
-        .dashboard-admin .content-card {
-            padding: 19px 13px;
-        }
-
-        .dashboard-admin .gender-card {
-            padding: 19px 13px;
-        }
-    }
-
-    /* =========================================================
-       MOTION PREFERENCES
-    ========================================================= */
-
-    @media (prefers-reduced-motion: reduce) {
-        .dashboard-admin *,
-        .dashboard-admin *::before,
-        .dashboard-admin *::after {
-            scroll-behavior: auto !important;
-            animation-duration: .01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: .01ms !important;
-        }
-    }
+/* =========================================================
+   SIRAPIK ADMIN DASHBOARD — Premium Blue Editorial
+   Semua style di-scope ke .da agar tidak bentrok dengan layout.
+========================================================= */
+.da{
+  --navy:#081b33; --midnight:#0b2545; --royal:#2457d6; --electric:#3478f6;
+  --soft:#eaf2ff; --ice:#f3f7fc; --slate:#64748b; --ink:#14243a; --text:#3c4f66;
+  --border:#e1e9f2; --line:#edf1f5; --cyan:#38c6e8;
+  --f-display:'Sora',system-ui,sans-serif; --f-body:'Plus Jakarta Sans',system-ui,sans-serif;
+  --r-sm:10px; --r:14px; --r-lg:26px;
+  --shadow:0 18px 46px rgba(8,27,51,.08);
+  --ease:cubic-bezier(.2,.7,.3,1);
+
+  width:100%; padding:8px 0 56px; color:var(--ink);
+  font:400 16px/1.7 var(--f-body); -webkit-font-smoothing:antialiased;
+}
+.da *,.da *::before,.da *::after{box-sizing:border-box}
+.da button,.da input,.da select{font:inherit}
+.da a{text-decoration:none}
+.da svg{display:block;width:20px;height:20px;flex-shrink:0}
+.da :focus-visible{outline:3px solid rgba(52,120,246,.5);outline-offset:3px;border-radius:6px}
+
+/* ---------- Page header ---------- */
+.da-head{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:32px;
+  min-height:300px;margin-bottom:56px;padding:56px 56px 52px;overflow:hidden;border-radius:var(--r-lg);
+  color:#fff;background:var(--navy);isolation:isolate;box-shadow:0 24px 60px rgba(8,27,51,.22)}
+.da-head::before{content:"";position:absolute;inset:0;z-index:-2;opacity:.12;
+  background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:64px 64px;mask-image:linear-gradient(100deg,#000 5%,transparent 75%);-webkit-mask-image:linear-gradient(100deg,#000 5%,transparent 75%)}
+.da-head::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:4px;z-index:-1;
+  background:linear-gradient(90deg,var(--royal) 0 30%,var(--electric) 30% 75%,var(--cyan) 75%)}
+.da-year{position:absolute;z-index:-1;right:-14px;bottom:-.2em;font:800 clamp(150px,24vw,330px)/1 var(--f-display);letter-spacing:-.06em;
+  color:transparent;-webkit-text-stroke:1.5px rgba(130,183,255,.2);user-select:none;pointer-events:none}
+.da-head h1{max-width:14ch;font:800 clamp(38px,5.6vw,76px)/1.04 var(--f-display);letter-spacing:-.045em}
+.da-head p{max-width:56ch;margin-top:22px;font-size:clamp(16px,1.3vw,18px);line-height:1.8;color:rgba(255,255,255,.74)}
+.da-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;padding:9px 16px;border:1px solid rgba(255,255,255,.2);border-radius:999px;
+  background:rgba(255,255,255,.07);font-size:14px;font-weight:600;color:#bcd8ff}
+.da-dot{width:9px;height:9px;border-radius:50%;background:#54d69b;box-shadow:0 0 0 4px rgba(84,214,155,.18);animation:da-pulse 2.6s ease-in-out infinite}
+@keyframes da-pulse{50%{box-shadow:0 0 0 8px rgba(84,214,155,0)}}
+
+/* ---------- Section heading ---------- */
+.da-kicker{display:inline-flex;align-items:center;gap:12px;margin-bottom:12px;font-size:15px;font-weight:700;color:var(--royal)}
+.da-kicker::before{content:"";width:32px;height:2px;background:var(--cyan)}
+.da-title{font:800 clamp(28px,3.4vw,44px)/1.12 var(--f-display);letter-spacing:-.04em;color:var(--navy)}
+.da-sub{margin-top:12px;max-width:62ch;font-size:17px;line-height:1.8;color:var(--slate)}
+.da-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:28px}
+.da-period{flex-shrink:0;padding:10px 18px;border:1px solid #d4e3f5;border-radius:999px;background:var(--soft);font-size:14px;font-weight:700;color:var(--royal)}
+
+/* ---------- Bento stats ---------- */
+.da-bento{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px}
+.da-stat{position:relative;min-width:0;overflow:hidden;padding:32px;border:1px solid var(--border);border-radius:var(--r-lg);background:#fff;
+  transition:transform .35s var(--ease),box-shadow .35s}
+.da-stat:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.da-stat-top{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;font-weight:700;color:var(--slate)}
+.da-ico{width:50px;height:50px;display:grid;place-items:center;border-radius:15px;background:var(--soft);color:var(--royal)}
+.da-ico svg{width:24px;height:24px}
+.da-val{margin-top:28px;font:800 clamp(52px,6vw,88px)/1 var(--f-display);letter-spacing:-.05em;color:var(--navy);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.da-cap{max-width:38ch;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;line-height:1.7;color:var(--slate)}
+.da-stat.feature{background:var(--navy);border-color:var(--navy);color:#fff}
+.da-stat.feature .da-stat-top{color:rgba(255,255,255,.75)}
+.da-stat.feature .da-ico{background:rgba(255,255,255,.1);color:var(--cyan)}
+.da-stat.feature .da-val{color:#fff;font-size:clamp(64px,8vw,116px)}
+.da-stat.feature .da-cap{color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.15)}
+.da-stat.feature::after{content:"";position:absolute;right:-100px;bottom:-140px;width:340px;height:340px;border-radius:50%;
+  border:1px solid rgba(130,183,255,.25);box-shadow:0 0 0 46px rgba(130,183,255,.05)}
+
+/* ---------- Gender ---------- */
+.da-gender{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center;gap:48px;margin-bottom:72px;padding:40px;
+  border:1px solid var(--border);border-radius:var(--r-lg);background:var(--ice)}
+.da-gender h3{font:700 clamp(24px,2.4vw,32px)/1.2 var(--f-display);letter-spacing:-.035em;color:var(--navy)}
+.da-gender p{margin-top:14px;max-width:44ch;font-size:16px;line-height:1.8;color:var(--slate)}
+.da-gtotal{display:inline-flex;align-items:baseline;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);font-size:15px;color:var(--slate)}
+.da-gtotal strong{font:800 30px/1 var(--f-display);letter-spacing:-.04em;color:var(--navy)}
+.da-chart{width:100%;max-width:320px;height:300px;margin:0 auto 20px}
+.da-chart canvas{display:block;width:100%!important;height:100%!important}
+.da-legend{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.da-leg{display:flex;align-items:center;gap:14px;min-width:0;padding:16px 18px;border:1px solid var(--border);border-radius:var(--r);background:#fff}
+.da-leg i{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.da-leg small{display:block;font-size:13px;font-weight:600;color:var(--slate)}
+.da-leg b{display:block;margin-top:2px;font:700 18px/1.3 var(--f-display);letter-spacing:-.02em;color:var(--navy)}
+
+/* ---------- Empty year ---------- */
+.da-empty-year{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:260px;margin-bottom:72px;padding:40px 24px;
+  border:1.5px dashed #c8d6e4;border-radius:var(--r-lg);background:#fff;text-align:center}
+.da-empty-year .da-ico{width:60px;height:60px;margin-bottom:18px}
+.da-empty-year h3{font:700 24px/1.3 var(--f-display);letter-spacing:-.03em;color:var(--navy)}
+.da-empty-year p{max-width:52ch;margin-top:10px;font-size:16px;line-height:1.8;color:var(--slate)}
+
+/* ---------- Panels ---------- */
+.da-panel{min-width:0;margin-bottom:56px;padding:40px;border:1px solid var(--border);border-radius:var(--r-lg);background:#fff;box-shadow:0 8px 30px rgba(8,27,51,.04)}
+.da-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:28px}
+.da-tag{display:inline-flex;align-items:center;gap:9px;flex-shrink:0;padding:9px 16px;border:1px solid #d4e3f5;border-radius:999px;background:var(--soft);
+  font-size:13px;font-weight:700;color:var(--royal);white-space:nowrap}
+.da-tag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--royal)}
+
+/* ---------- Filter ---------- */
+.da-filter{display:flex;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:28px;padding:22px;border:1px solid var(--border);border-radius:var(--r);background:var(--ice)}
+.da-field{display:flex;flex:1 1 210px;flex-direction:column;gap:8px;min-width:160px}
+.da-field label{font-size:14px;font-weight:700;color:#40536a}
+.da-field select{width:100%;min-height:54px;padding:10px 42px 10px 16px;border:1.5px solid var(--border);border-radius:var(--r);color:var(--ink);font-size:16px;outline:none;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+  appearance:none;-webkit-appearance:none;cursor:pointer;transition:border-color .25s,box-shadow .25s}
+.da-field select:hover{border-color:#a6bddb}
+.da-field select:focus{border-color:var(--royal);box-shadow:0 0 0 4px rgba(36,87,214,.12)}
+.da-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 26px;border:1.5px solid transparent;border-radius:var(--r);
+  font-size:16px;font-weight:700;cursor:pointer;transition:background .25s,color .25s,border-color .25s,transform .25s var(--ease),box-shadow .25s}
+.da-btn:active{transform:scale(.97)}
+.da-btn svg{width:18px;height:18px}
+.da-btn-primary{background:var(--royal);color:#fff}
+.da-btn-primary:hover{background:var(--navy);transform:translateY(-2px);box-shadow:0 12px 26px rgba(36,87,214,.25)}
+.da-btn-ghost{background:#fff;color:#506176;border-color:var(--border)}
+.da-btn-ghost:hover{color:var(--royal);border-color:#b9cfec;background:var(--soft)}
+
+/* ---------- Table ---------- */
+.da-table-wrap{width:100%;overflow-x:auto;border:1px solid var(--border);border-radius:var(--r);scrollbar-width:thin;scrollbar-color:#b8c8d9 #f1f5f8}
+.da table{width:100%;min-width:560px;margin:0;border-collapse:separate;border-spacing:0;background:#fff;text-align:left}
+.da thead th{padding:18px 20px;border-bottom:1px solid var(--border);background:var(--ice);font:700 13px/1.3 var(--f-body);letter-spacing:.02em;color:#506176;white-space:nowrap}
+.da tbody td{padding:18px 20px;border-bottom:1px solid var(--line);font-size:15px;color:var(--text);vertical-align:middle}
+.da tbody tr{transition:background .2s}
+.da tbody tr:hover{background:#f7faff}
+.da tbody tr:last-child td{border-bottom:0}
+.da tbody td:first-child{font-weight:700;color:var(--ink)}
+.da-count{display:flex;align-items:center;gap:14px;min-width:150px}
+.da-pill{display:inline-grid;place-items:center;min-width:46px;min-height:34px;padding:0 12px;border:1px solid #dce8fa;border-radius:999px;background:var(--soft);
+  font:700 14px var(--f-display);color:var(--royal);font-variant-numeric:tabular-nums}
+.da-bar{flex:1;height:6px;min-width:60px;border-radius:99px;background:var(--soft);overflow:hidden}
+.da-bar i{display:block;width:var(--w);height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--royal),var(--cyan));
+  transform:scaleX(0);transform-origin:left;transition:transform 1.1s var(--ease)}
+.da-in .da-bar i,.da-nojs .da-bar i{transform:scaleX(1)}
+.da-person{display:flex;align-items:center;gap:14px;min-width:200px;font-weight:700;color:var(--ink)}
+.da-avatar{width:40px;height:40px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:var(--soft);color:var(--royal)}
+.da-avatar svg{width:20px;height:20px}
+.da-empty{padding:40px 20px!important;text-align:center;font-size:15px;line-height:1.8;color:var(--slate)!important;font-weight:500!important}
+.da-hint{padding:36px 20px;border:1.5px dashed #c8d6e4;border-radius:var(--r);text-align:center;font-size:16px;line-height:1.8;color:var(--slate)}
+.da-hint strong{color:var(--navy)}
+
+/* ---------- Chips + note ---------- */
+.da-chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.da-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid #d4e3f5;border-radius:999px;background:var(--soft);font-size:14px;font-weight:600;color:#40536a}
+.da-chip strong{font-weight:800;color:var(--royal)}
+.da-note{display:flex;align-items:flex-start;gap:14px;margin-top:24px;padding:18px 22px;border-left:4px solid var(--royal);border-radius:0 var(--r) var(--r) 0;background:var(--ice);font-size:14px;line-height:1.8;color:var(--text)}
+.da-note svg{margin-top:3px;color:var(--royal)}
+.da-note strong{color:var(--navy)}
+
+/* ---------- Pagination (Laravel) ---------- */
+.da-pager{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:24px}
+.da-pager>p{font-size:14px;color:var(--slate)}
+.da-pager nav{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px}
+.da-pager nav svg{width:16px;height:16px}
+.da-pager a,.da-pager span[aria-current="page"] span,.da-pager span[aria-disabled="true"] span{display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:40px;padding:6px 13px;
+  border:1px solid var(--border);border-radius:var(--r-sm);background:#fff;font-size:14px;font-weight:700;color:#506176;transition:.25s var(--ease)}
+.da-pager a:hover{color:var(--royal);border-color:#b9cfec;background:var(--soft);transform:translateY(-2px)}
+.da-pager span[aria-current="page"] span{color:#fff;background:var(--royal);border-color:var(--royal)}
+.da-pager span[aria-disabled="true"] span{opacity:.45}
+
+/* ---------- Reveal ---------- */
+.da-rv{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s var(--ease)}
+.da-in.da-rv,.da-nojs .da-rv{opacity:1;transform:none}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1000px){
+  .da-head{padding:44px 36px;min-height:260px}
+  .da-bento{grid-template-columns:1fr}
+  .da-gender{grid-template-columns:1fr;gap:28px;padding:32px}
+  .da-panel{padding:32px}
+}
+@media (max-width:640px){
+  .da{font-size:15px;padding-bottom:32px}
+  .da-head{grid-template-columns:1fr;min-height:auto;margin-bottom:40px;padding:36px 24px 40px;border-radius:20px}
+  .da-intro,.da-panel-head{flex-direction:column;align-items:flex-start;gap:14px}
+  .da-sub{font-size:15px}
+  .da-stat{padding:24px}
+  .da-gender{margin-bottom:48px;padding:24px 18px;border-radius:20px}
+  .da-chart{max-width:270px;height:260px}
+  .da-legend{grid-template-columns:1fr}
+  .da-panel{margin-bottom:36px;padding:24px 16px;border-radius:20px}
+  .da-filter{flex-direction:column;align-items:stretch;padding:16px}
+  .da-field{flex:1 1 auto;min-width:100%}
+  .da-btn{width:100%}
+  .da thead th,.da tbody td{padding:15px 14px}
+  .da-pager{flex-direction:column;align-items:flex-start}
+  .da-pager nav{justify-content:flex-start}
+  .da-note{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .da *,.da *::before,.da *::after{animation:none!important;transition-duration:.01ms!important}
+  .da-rv{opacity:1;transform:none}
+  .da-bar i{transform:scaleX(1)}
+}
 </style>
 
 @php
-    /*
-    |--------------------------------------------------------------------------
-    | DATA DEFAULTS
-    |--------------------------------------------------------------------------
-    | Menjaga halaman tetap aman jika sebagian data belum dikirim controller.
-    */
-
+    /* ---------- DATA DEFAULTS (logika asli dipertahankan) ---------- */
     $totalParticipants = (int) ($totalParticipants ?? 0);
     $totalTrainings = (int) ($totalTrainings ?? 0);
 
@@ -1311,247 +214,132 @@
     $professionOptions = $professionOptions ?? collect();
     $trainedParticipants = $trainedParticipants ?? collect();
 
-    $genderStats = $genderStats ?? [
-        'L' => 0,
-        'P' => 0,
-    ];
+    $genderStats = $genderStats ?? ['L' => 0, 'P' => 0];
 
     $maleCount = (int) ($genderStats['L'] ?? 0);
     $femaleCount = (int) ($genderStats['P'] ?? 0);
-
     $genderTotal = $maleCount + $femaleCount;
 
-    $malePercent = $genderTotal > 0
-        ? round(($maleCount / $genderTotal) * 100, 1)
-        : 0;
-
-    $femalePercent = $genderTotal > 0
-        ? round(($femaleCount / $genderTotal) * 100, 1)
-        : 0;
+    $malePercent = $genderTotal > 0 ? round(($maleCount / $genderTotal) * 100, 1) : 0;
+    $femalePercent = $genderTotal > 0 ? round(($femaleCount / $genderTotal) * 100, 1) : 0;
 
     $hasYearData = $totalParticipants > 0 || $totalTrainings > 0;
 
-    /*
-     * Gunakan LengthAwarePaginator untuk data yang memiliki total().
-     * Collection biasa tetap bisa ditampilkan tanpa pagination.
-     */
-    $isFrequentPaginated = $frequentParticipants instanceof
-        \Illuminate\Contracts\Pagination\LengthAwarePaginator;
+    $isFrequentPaginated = $frequentParticipants instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator;
+    $isTrainedPaginated = $trainedParticipants instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-    $isTrainedPaginated = $trainedParticipants instanceof
-        \Illuminate\Contracts\Pagination\LengthAwarePaginator;
+    $trainedParticipantTotal = $isTrainedPaginated ? $trainedParticipants->total() : $trainedParticipants->count();
+    $trainedParticipantStart = method_exists($trainedParticipants, 'firstItem') ? ($trainedParticipants->firstItem() ?? 1) : 1;
 
-    $trainedParticipantTotal = $isTrainedPaginated
-        ? $trainedParticipants->total()
-        : $trainedParticipants->count();
-
-    $trainedParticipantStart = method_exists($trainedParticipants, 'firstItem')
-        ? ($trainedParticipants->firstItem() ?? 1)
-        : 1;
+    /* Nilai maksimum untuk bar proporsional (hanya tampilan) */
+    $freqItems = $isFrequentPaginated ? $frequentParticipants->getCollection() : collect($frequentParticipants);
+    $trainedItems = $isTrainedPaginated ? $trainedParticipants->getCollection() : collect($trainedParticipants);
+    $maxFreq = max(1, (int) $freqItems->max('participations_count'));
+    $maxTrained = max(1, (int) $trainedItems->max('participations_count'));
 @endphp
 
-<div class="dashboard-admin">
+<div class="da da-nojs" id="da-root">
 
-    {{-- =====================================================
-         HEADER DASHBOARD
-    ====================================================== --}}
+    {{-- HEADER --}}
+    <header class="da-head">
+        <div class="da-year" aria-hidden="true">{{ $year }}</div>
 
-    <header class="dashboard-heading">
-        <div class="heading-copy">
-            <div class="heading-eyebrow">
-                Sistem Informasi Pelatihan
-            </div>
-
-            <h1>Dashboard Admin SIRAPIK</h1>
-
+        <div>
+            <div class="da-badge"><span class="da-dot"></span> Dashboard Admin SIRAPIK</div>
+            <h1>Pusat kendali data pelatihan.</h1>
             <p>
-                Pusat kendali data peserta dan program pelatihan.
-                Pantau perkembangan, evaluasi keikutsertaan, serta
-                telusuri data peserta berdasarkan tahun dan jenis profesi.
+                Pantau perkembangan, evaluasi keikutsertaan, serta telusuri
+                data peserta berdasarkan tahun dan jenis profesi.
             </p>
-        </div>
-
-        <div class="heading-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-                <rect x="14" y="3" width="7" height="5" rx="1.5"/>
-                <rect x="14" y="12" width="7" height="9" rx="1.5"/>
-                <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-            </svg>
         </div>
     </header>
 
 
-    {{-- =====================================================
-         RINGKASAN DATA
-    ====================================================== --}}
-
+    {{-- RINGKASAN DATA --}}
     <section aria-labelledby="summary-title">
 
-        <div class="section-intro">
+        <div class="da-intro da-rv">
             <div>
-                <span class="section-kicker">Ringkasan data</span>
-                <h2 id="summary-title">Gambaran Umum SIRAPIK</h2>
-                <p>
-                    Informasi peserta dan pelatihan pada tahun {{ $year }}.
-                </p>
+                <div class="da-kicker">Ringkasan data</div>
+                <h2 class="da-title" id="summary-title">Gambaran Umum SIRAPIK</h2>
+                <p class="da-sub">Informasi peserta dan pelatihan pada tahun {{ $year }}.</p>
             </div>
-
-            <div class="section-year">
-                Periode {{ $year }}
-            </div>
+            <div class="da-period">Periode {{ $year }}</div>
         </div>
 
         @if ($hasYearData)
 
-            <div class="stats-grid">
+            <div class="da-bento">
 
-                {{-- TOTAL PESERTA --}}
-                <article class="stat-card"
-                         style="--stat-accent:#2463a8;--stat-soft:#eaf2fb;">
-
-                    <div class="stat-topline">
-                        <span class="stat-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="1.8"
-                                 stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="10" cy="7" r="4"/>
-                                <path d="M2 21v-2a8 8 0 0 1 16 0v2"/>
-                                <path d="M19 8a3 3 0 0 1 0 6"/>
-                                <path d="M22 21v-2a5 5 0 0 0-3-4.58"/>
+                <article class="da-stat feature da-rv">
+                    <div class="da-stat-top">
+                        Peserta Terlatih Tahun {{ $year }}
+                        <span class="da-ico" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="10" cy="7" r="4"/><path d="M2 21v-2a8 8 0 0 1 16 0v2"/><path d="M19 8a3 3 0 0 1 0 6"/><path d="M22 21v-2a5 5 0 0 0-3-4.58"/>
                             </svg>
                         </span>
-
-                        <span class="stat-index">01 / PESERTA</span>
                     </div>
-
-                    <div class="stat-label">
-                        Peserta Terlatih Tahun {{ $year }}
-                    </div>
-
-                    <div class="stat-value">
-                        {{ number_format($totalParticipants, 0, ',', '.') }}
-                    </div>
-
-                    <div class="stat-caption">
-                        Jumlah peserta unik yang mengikuti pelatihan
-                        pada tahun terpilih.
-                    </div>
+                    <div class="da-val" data-count="{{ $totalParticipants }}">{{ number_format($totalParticipants, 0, ',', '.') }}</div>
+                    <p class="da-cap">Jumlah peserta unik yang mengikuti pelatihan pada tahun terpilih.</p>
                 </article>
 
-
-                {{-- TOTAL PELATIHAN --}}
-                <article class="stat-card"
-                         style="--stat-accent:#087f83;--stat-soft:#e8f5f3;">
-
-                    <div class="stat-topline">
-                        <span class="stat-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="1.8"
-                                 stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
-                                <path d="M8 7h8M8 11h7"/>
+                <article class="da-stat da-rv" style="transition-delay:.1s">
+                    <div class="da-stat-top">
+                        Total Pelatihan Tahun {{ $year }}
+                        <span class="da-ico" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M8 7h8M8 11h7"/>
                             </svg>
                         </span>
-
-                        <span class="stat-index">02 / PROGRAM</span>
                     </div>
-
-                    <div class="stat-label">
-                        Total Pelatihan Tahun {{ $year }}
-                    </div>
-
-                    <div class="stat-value">
-                        {{ number_format($totalTrainings, 0, ',', '.') }}
-                    </div>
-
-                    <div class="stat-caption">
-                        Jumlah program pelatihan yang dilaksanakan
-                        pada tahun terpilih.
-                    </div>
+                    <div class="da-val" data-count="{{ $totalTrainings }}">{{ number_format($totalTrainings, 0, ',', '.') }}</div>
+                    <p class="da-cap">Jumlah program pelatihan yang dilaksanakan pada tahun terpilih.</p>
                 </article>
 
             </div>
 
 
-            {{-- =================================================
-                 DIAGRAM JENIS KELAMIN
-            ================================================== --}}
-
+            {{-- JENIS KELAMIN --}}
             @if ($genderTotal > 0)
 
-                <section class="gender-card" aria-labelledby="gender-title">
+                <section class="da-gender da-rv" aria-labelledby="gender-title">
 
-                    <div class="gender-heading">
-                        <span class="section-kicker">Komposisi peserta</span>
-
-                        <h3 id="gender-title">
-                            Profil Peserta Berdasarkan Jenis Kelamin
-                        </h3>
-
+                    <div>
+                        <div class="da-kicker">Komposisi peserta</div>
+                        <h3 id="gender-title">Profil Peserta Berdasarkan Jenis Kelamin</h3>
                         <p>
-                            Perbandingan jumlah peserta laki-laki dan
-                            perempuan yang mengikuti pelatihan pada
-                            tahun {{ $year }}.
+                            Perbandingan jumlah peserta laki-laki dan perempuan
+                            yang mengikuti pelatihan pada tahun {{ $year }}.
                         </p>
-
-                        <div class="gender-total">
-                            Total peserta:
-                            <strong>
-                                {{ number_format($genderTotal, 0, ',', '.') }}
-                                orang
-                            </strong>
+                        <div class="da-gtotal">
+                            <strong>{{ number_format($genderTotal, 0, ',', '.') }}</strong>
+                            orang total peserta
                         </div>
                     </div>
 
-
-                    <div class="gender-chart-area">
-
-                        <div class="gender-chart-wrapper">
-                            <canvas
-                                id="genderPieChart"
-                                role="img"
-                                aria-label="Diagram lingkaran jenis kelamin peserta tahun {{ $year }}">
-                            </canvas>
+                    <div>
+                        <div class="da-chart">
+                            <canvas id="genderPieChart" role="img"
+                                    aria-label="Diagram lingkaran jenis kelamin peserta tahun {{ $year }}"></canvas>
                         </div>
 
-                        <div class="gender-legend">
-
-                            <div class="gender-legend-item">
-                                <span class="gender-dot"
-                                      style="background:#2463a8;"></span>
-
+                        <div class="da-legend">
+                            <div class="da-leg">
+                                <i style="background:#2457d6"></i>
                                 <div>
-                                    <div class="gender-legend-label">
-                                        Laki-laki
-                                    </div>
-
-                                    <span class="gender-legend-value">
-                                        {{ number_format($malePercent, 1, ',', '.') }}%
-                                        ({{ number_format($maleCount, 0, ',', '.') }})
-                                    </span>
+                                    <small>Laki-laki</small>
+                                    <b>{{ number_format($malePercent, 1, ',', '.') }}% ({{ number_format($maleCount, 0, ',', '.') }})</b>
                                 </div>
                             </div>
 
-
-                            <div class="gender-legend-item">
-                                <span class="gender-dot"
-                                      style="background:#d96b79;"></span>
-
+                            <div class="da-leg">
+                                <i style="background:#38c6e8"></i>
                                 <div>
-                                    <div class="gender-legend-label">
-                                        Perempuan
-                                    </div>
-
-                                    <span class="gender-legend-value">
-                                        {{ number_format($femalePercent, 1, ',', '.') }}%
-                                        ({{ number_format($femaleCount, 0, ',', '.') }})
-                                    </span>
+                                    <small>Perempuan</small>
+                                    <b>{{ number_format($femalePercent, 1, ',', '.') }}% ({{ number_format($femaleCount, 0, ',', '.') }})</b>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -1561,25 +349,17 @@
 
         @else
 
-            {{-- EMPTY STATE DATA TAHUN --}}
-            <div class="no-year-data">
-
-                <div class="empty-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="1.7"
-                         stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="9"/>
-                        <path d="M12 8v4m0 4h.01"/>
+            <div class="da-empty-year da-rv">
+                <div class="da-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9"/><path d="M12 8v4m0 4h.01"/>
                     </svg>
                 </div>
-
                 <h3>Data Tahun {{ $year }} Belum Tersedia</h3>
-
                 <p>
                     Belum terdapat data peserta maupun pelatihan pada tahun ini.
                     Ringkasan dan diagram akan ditampilkan setelah data tersedia.
                 </p>
-
             </div>
 
         @endif
@@ -1587,44 +367,25 @@
     </section>
 
 
-    {{-- =====================================================
-         JUMLAH KEIKUTSERTAAN PESERTA
-    ====================================================== --}}
+    {{-- KEIKUTSERTAAN PESERTA --}}
+    <section class="da-panel da-rv" aria-labelledby="frequent-title">
 
-    <section class="content-card" aria-labelledby="frequent-title">
-
-        <div class="panel-heading">
-
-            <div class="panel-heading-copy">
-                <span class="section-kicker">Pemantauan peserta</span>
-
-                <h2 id="frequent-title">
-                    Jumlah Keikutsertaan Peserta dalam Pelatihan
-                </h2>
-
-                <p>
+        <div class="da-panel-head">
+            <div>
+                <div class="da-kicker">Pemantauan peserta</div>
+                <h2 class="da-title" id="frequent-title">Jumlah Keikutsertaan Peserta dalam Pelatihan</h2>
+                <p class="da-sub">
                     Telusuri jumlah pelatihan yang diikuti setiap peserta
                     berdasarkan tahun dan urutan jumlah keikutsertaan.
                 </p>
             </div>
-
-            <div class="panel-number">
-                Data peserta
-            </div>
-
+            <div class="da-tag">Data peserta</div>
         </div>
 
+        <form method="GET" action="{{ url()->current() }}" class="da-filter">
 
-        {{-- FILTER KEIKUTSERTAAN --}}
-        <form method="GET"
-              action="{{ url()->current() }}"
-              class="filter-form">
-
-            <div class="filter-field">
-                <label for="participant-year">
-                    Tahun Pelatihan
-                </label>
-
+            <div class="da-field">
+                <label for="participant-year">Tahun Pelatihan</label>
                 <select id="participant-year" name="year">
                     @foreach ($years as $availableYear)
                         <option value="{{ $availableYear }}"
@@ -1635,50 +396,27 @@
                 </select>
             </div>
 
-
-            <div class="filter-field">
-                <label for="participant-sort">
-                    Urutan Jumlah Pelatihan
-                </label>
-
+            <div class="da-field">
+                <label for="participant-sort">Urutan Jumlah Pelatihan</label>
                 <select id="participant-sort" name="sort">
-                    <option value="asc"
-                        {{ $sort === 'asc' ? 'selected' : '' }}>
-                        Jumlah Terendah
-                    </option>
-
-                    <option value="desc"
-                        {{ $sort === 'desc' ? 'selected' : '' }}>
-                        Jumlah Tertinggi
-                    </option>
+                    <option value="asc" {{ $sort === 'asc' ? 'selected' : '' }}>Jumlah Terendah</option>
+                    <option value="desc" {{ $sort === 'desc' ? 'selected' : '' }}>Jumlah Tertinggi</option>
                 </select>
             </div>
 
-
-            <button type="submit" class="filter-button">
-                <svg viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round"
-                     aria-hidden="true">
+            <button type="submit" class="da-btn da-btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M3 4h18l-7 8v6l-4 2v-8L3 4Z"/>
                 </svg>
-
                 Terapkan Filter
             </button>
 
-
-            <a href="{{ url()->current() }}" class="reset-button">
-                Reset
-            </a>
+            <a href="{{ url()->current() }}" class="da-btn da-btn-ghost">Reset</a>
 
         </form>
 
-
-        {{-- TABEL PESERTA --}}
-        <div class="table-responsive">
-
+        <div class="da-table-wrap" data-bars>
             <table id="participantTable">
-
                 <thead>
                     <tr>
                         <th>Nama Peserta</th>
@@ -1688,126 +426,72 @@
                 </thead>
 
                 <tbody>
-
                     @forelse ($frequentParticipants as $participant)
-
+                        @php $freqCount = (int) ($participant->participations_count ?? 0); @endphp
                         <tr>
+                            <td>{{ $participant->name ?? '-' }}</td>
+                            <td>{{ $participant->nip ?? '-' }}</td>
                             <td>
-                                {{ $participant->name ?? '-' }}
-                            </td>
-
-                            <td>
-                                {{ $participant->nip ?? '-' }}
-                            </td>
-
-                            <td>
-                                <span class="number-pill">
-                                    {{ number_format((int) ($participant->participations_count ?? 0), 0, ',', '.') }}
-                                </span>
+                                <div class="da-count">
+                                    <span class="da-pill">{{ number_format($freqCount, 0, ',', '.') }}</span>
+                                    <span class="da-bar"><i style="--w: {{ round(($freqCount / $maxFreq) * 100) }}%"></i></span>
+                                </div>
                             </td>
                         </tr>
-
                     @empty
-
                         <tr>
-                            <td colspan="3" class="empty-state">
-                                Belum ada data peserta untuk tahun {{ $year }}.
-                            </td>
+                            <td colspan="3" class="da-empty">Belum ada data peserta untuk tahun {{ $year }}.</td>
                         </tr>
-
                     @endforelse
-
                 </tbody>
-
             </table>
-
         </div>
 
-
-        {{-- PAGINATION KEIKUTSERTAAN --}}
         @if ($isFrequentPaginated)
-
-            <div class="laravel-pagination">
-
+            <div class="da-pager">
                 <p>
-                    Menampilkan
-                    {{ $frequentParticipants->firstItem() ?? 0 }}
-                    sampai
-                    {{ $frequentParticipants->lastItem() ?? 0 }}
-                    dari
-                    {{ $frequentParticipants->total() }}
-                    peserta
+                    Menampilkan {{ $frequentParticipants->firstItem() ?? 0 }}
+                    sampai {{ $frequentParticipants->lastItem() ?? 0 }}
+                    dari {{ $frequentParticipants->total() }} peserta
                 </p>
-
                 {{ $frequentParticipants->onEachSide(1)->links() }}
-
             </div>
-
         @endif
 
-
-        {{-- CATATAN --}}
-        <div class="info-note">
-
-            <span class="info-note-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="9"/>
-                    <path d="M12 11v5m0-8h.01"/>
-                </svg>
-            </span>
-
+        <div class="da-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/>
+            </svg>
             <div>
                 <strong>Catatan:</strong>
                 Jumlah pelatihan dihitung berdasarkan riwayat keikutsertaan
                 peserta pada tahun yang dipilih. Gunakan pilihan urutan untuk
                 melihat peserta dengan jumlah pelatihan terendah atau tertinggi.
             </div>
-
         </div>
 
     </section>
 
 
-    {{-- =====================================================
-         PESERTA BERDASARKAN PROFESI
-    ====================================================== --}}
+    {{-- PESERTA BERDASARKAN PROFESI --}}
+    <section class="da-panel da-rv" aria-labelledby="profession-title">
 
-    <section class="content-card" aria-labelledby="profession-title">
-
-        <div class="panel-heading">
-
-            <div class="panel-heading-copy">
-                <span class="section-kicker">Data peserta terlatih</span>
-
-                <h2 id="profession-title">
-                    Peserta Terlatih Berdasarkan Jenis Profesi
-                </h2>
-
-                <p>
+        <div class="da-panel-head">
+            <div>
+                <div class="da-kicker">Data peserta terlatih</div>
+                <h2 class="da-title" id="profession-title">Peserta Terlatih Berdasarkan Jenis Profesi</h2>
+                <p class="da-sub">
                     Temukan daftar peserta berdasarkan kategori profesi
                     dan tahun pelaksanaan pelatihan.
                 </p>
             </div>
-
-            <div class="panel-number">
-                Data profesi
-            </div>
-
+            <div class="da-tag">Data profesi</div>
         </div>
 
+        <form method="GET" action="{{ url()->current() }}" class="da-filter">
 
-        {{-- FILTER PROFESI --}}
-        <form method="GET"
-              action="{{ url()->current() }}"
-              class="filter-form">
-
-            <div class="filter-field">
-                <label for="profession-year">
-                    Tahun Pelatihan
-                </label>
-
+            <div class="da-field">
+                <label for="profession-year">Tahun Pelatihan</label>
                 <select id="profession-year" name="year" required>
                     @foreach ($years as $availableYear)
                         <option value="{{ $availableYear }}"
@@ -1818,85 +502,42 @@
                 </select>
             </div>
 
-
-            <div class="filter-field">
-                <label for="profession">
-                    Jenis Profesi
-                </label>
-
+            <div class="da-field">
+                <label for="profession">Jenis Profesi</label>
                 <select id="profession" name="profession" required>
-
-                    <option value="">
-                        -- Pilih Profesi --
-                    </option>
-
+                    <option value="">-- Pilih Profesi --</option>
                     @foreach ($professionOptions as $professionOption)
-
                         <option value="{{ $professionOption }}"
                             {{ mb_strtolower(trim((string) $selectedProfession)) === mb_strtolower(trim((string) $professionOption)) ? 'selected' : '' }}>
                             {{ $professionOption }}
                         </option>
-
                     @endforeach
-
                 </select>
             </div>
 
-
             <input type="hidden" name="sort" value="{{ $sort }}">
 
-
-            <button type="submit" class="filter-button">
-
-                <svg viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round"
-                     aria-hidden="true">
+            <button type="submit" class="da-btn da-btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M3 4h18l-7 8v6l-4 2v-8L3 4Z"/>
                 </svg>
-
                 Tampilkan Peserta
-
             </button>
 
-
-            <a href="{{ url()->current() }}" class="reset-button">
-                Reset
-            </a>
+            <a href="{{ url()->current() }}" class="da-btn da-btn-ghost">Reset</a>
 
         </form>
 
-
         @if ($selectedProfession !== '')
 
-            {{-- RINGKASAN FILTER AKTIF --}}
-            <div class="profession-summary">
-
-                <span class="profession-chip">
-                    Profesi:
-                    <strong>{{ $selectedProfession }}</strong>
-                </span>
-
-                <span class="profession-chip">
-                    Tahun:
-                    <strong>{{ $year }}</strong>
-                </span>
-
-                <span class="profession-chip">
-                    Jumlah peserta:
-                    <strong>
-                        {{ number_format($trainedParticipantTotal, 0, ',', '.') }}
-                    </strong>
-                </span>
-
+            <div class="da-chips">
+                <span class="da-chip">Profesi: <strong>{{ $selectedProfession }}</strong></span>
+                <span class="da-chip">Tahun: <strong>{{ $year }}</strong></span>
+                <span class="da-chip">Jumlah peserta: <strong>{{ number_format($trainedParticipantTotal, 0, ',', '.') }}</strong></span>
             </div>
 
-
-            {{-- TABEL PESERTA PROFESI --}}
-            <div class="table-responsive">
-
+            <div class="da-table-wrap" data-bars>
                 <table id="professionTable">
-
                     <thead>
                         <tr>
                             <th>No.</th>
@@ -1908,104 +549,60 @@
                     </thead>
 
                     <tbody>
-
                         @forelse ($trainedParticipants as $index => $participant)
-
+                            @php $trainedCount = (int) ($participant->participations_count ?? 0); @endphp
                             <tr>
+                                <td>{{ $trainedParticipantStart + $index }}</td>
 
                                 <td>
-                                    {{ $trainedParticipantStart + $index }}
-                                </td>
-
-
-                                <td>
-                                    <div class="participant-name">
-
-                                        <span class="participant-icon"
-                                              aria-hidden="true">
-
-                                            <svg viewBox="0 0 24 24" fill="none"
-                                                 stroke="currentColor"
-                                                 stroke-width="1.8"
-                                                 stroke-linecap="round"
-                                                 stroke-linejoin="round">
-                                                <circle cx="12" cy="8" r="4"/>
-                                                <path d="M4 21v-2a8 8 0 0 1 16 0v2"/>
+                                    <div class="da-person">
+                                        <span class="da-avatar" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>
                                             </svg>
-
                                         </span>
-
                                         {{ $participant->name ?? '-' }}
-
                                     </div>
                                 </td>
 
+                                <td>{{ $participant->nip ?? '-' }}</td>
+                                <td>{{ $participant->profession ?? '-' }}</td>
 
                                 <td>
-                                    {{ $participant->nip ?? '-' }}
+                                    <div class="da-count">
+                                        <span class="da-pill">{{ number_format($trainedCount, 0, ',', '.') }}</span>
+                                        <span class="da-bar"><i style="--w: {{ round(($trainedCount / $maxTrained) * 100) }}%"></i></span>
+                                    </div>
                                 </td>
-
-
-                                <td>
-                                    {{ $participant->profession ?? '-' }}
-                                </td>
-
-
-                                <td>
-                                    <span class="number-pill">
-                                        {{ number_format((int) ($participant->participations_count ?? 0), 0, ',', '.') }}
-                                    </span>
-                                </td>
-
                             </tr>
-
                         @empty
-
                             <tr>
-                                <td colspan="5" class="empty-state">
+                                <td colspan="5" class="da-empty">
                                     Tidak ditemukan peserta dengan profesi
-                                    "{{ $selectedProfession }}"
-                                    pada tahun {{ $year }}.
+                                    "{{ $selectedProfession }}" pada tahun {{ $year }}.
                                 </td>
                             </tr>
-
                         @endforelse
-
                     </tbody>
-
                 </table>
-
             </div>
 
-
-            {{-- PAGINATION PROFESI --}}
             @if ($isTrainedPaginated)
-
-                <div class="laravel-pagination">
-
+                <div class="da-pager">
                     <p>
-                        Menampilkan
-                        {{ $trainedParticipants->firstItem() ?? 0 }}
-                        sampai
-                        {{ $trainedParticipants->lastItem() ?? 0 }}
-                        dari
-                        {{ $trainedParticipants->total() }}
-                        peserta
+                        Menampilkan {{ $trainedParticipants->firstItem() ?? 0 }}
+                        sampai {{ $trainedParticipants->lastItem() ?? 0 }}
+                        dari {{ $trainedParticipants->total() }} peserta
                     </p>
-
                     {{ $trainedParticipants->onEachSide(1)->links() }}
-
                 </div>
-
             @endif
 
         @else
 
-            {{-- EMPTY STATE SEBELUM PROFESI DIPILIH --}}
-            <div class="empty-state">
+            <div class="da-hint">
                 Pilih tahun dan jenis profesi, kemudian klik
-                <strong>Tampilkan Peserta</strong>
-                untuk melihat daftar peserta.
+                <strong>Tampilkan Peserta</strong> untuk melihat daftar peserta.
             </div>
 
         @endif
@@ -2015,99 +612,111 @@
 </div>
 
 
-{{-- =========================================================
-     CHART.JS
-========================================================= --}}
-
+{{-- CHART.JS — PIE CHART JENIS KELAMIN --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    const canvas = document.getElementById('genderPieChart');
+    var root = document.getElementById('da-root');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (!canvas || typeof Chart === 'undefined') {
-        return;
+    /* ---------- Reveal, bar, dan counter ---------- */
+    root.classList.remove('da-nojs');
+
+    var fmt = new Intl.NumberFormat('id-ID');
+
+    function count(el) {
+        var target = parseInt(el.dataset.count, 10);
+        if (isNaN(target) || reduce || target < 2) return;
+        var start = null, dur = 1400;
+        function step(t) {
+            if (start === null) start = t;
+            var p = Math.min((t - start) / dur, 1);
+            el.textContent = fmt.format(Math.round(target * (1 - Math.pow(1 - p, 4))));
+            if (p < 1) requestAnimationFrame(step); else el.textContent = fmt.format(target);
+        }
+        el.textContent = '0';
+        requestAnimationFrame(step);
     }
 
-    const maleCount = Number(@json($maleCount));
-    const femaleCount = Number(@json($femaleCount));
-    const total = maleCount + femaleCount;
+    var items = root.querySelectorAll('.da-rv, [data-bars], [data-count]');
 
-    new Chart(canvas, {
-        type: 'doughnut',
+    if ('IntersectionObserver' in window && !reduce) {
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+                if (!en.isIntersecting) return;
+                en.target.classList.add('da-in');
+                if (en.target.hasAttribute('data-count')) count(en.target);
+                io.unobserve(en.target);
+            });
+        }, { threshold: .12, rootMargin: '0px 0px -30px 0px' });
+
+        items.forEach(function (el) { io.observe(el); });
+    } else {
+        items.forEach(function (el) { el.classList.add('da-in'); });
+    }
+
+    /* ---------- Pie chart ---------- */
+    var canvas = document.getElementById('genderPieChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    var maleCount = Number(@json($maleCount));
+    var femaleCount = Number(@json($femaleCount));
+    var total = maleCount + femaleCount;
+
+    if (total <= 0) return;
+
+    new Chart(canvas.getContext('2d'), {
+        type: 'pie',
 
         data: {
             labels: ['Laki-laki', 'Perempuan'],
-
             datasets: [{
                 data: [maleCount, femaleCount],
-
-                backgroundColor: [
-                    '#2463a8',
-                    '#d96b79'
-                ],
-
-                borderColor: '#ffffff',
-                borderWidth: 5,
-                hoverOffset: 10,
-                borderRadius: 5,
-                spacing: 3
+                backgroundColor: ['#2457D6', '#38C6E8'],
+                hoverBackgroundColor: ['#1B45B0', '#1FB0D3'],
+                borderColor: '#F3F7FC',
+                borderWidth: 4,
+                hoverOffset: 12
             }]
         },
 
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '64%',
 
-            animation: {
-                duration: 850,
+            animation: reduce ? false : {
+                duration: 900,
                 easing: 'easeOutQuart',
                 animateRotate: true,
                 animateScale: true
             },
 
-            interaction: {
-                intersect: false
-            },
-
             plugins: {
-                legend: {
-                    display: false
-                },
+                legend: { display: false },
 
                 tooltip: {
-                    backgroundColor: '#102d50',
-                    titleFont: {
-                        family: 'DM Sans',
-                        size: 14,
-                        weight: '700'
-                    },
-                    bodyFont: {
-                        family: 'DM Sans',
-                        size: 13
-                    },
+                    backgroundColor: '#081B33',
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#FFFFFF',
+                    titleFont: { family: 'Plus Jakarta Sans', size: 14, weight: '700' },
+                    bodyFont: { family: 'Plus Jakarta Sans', size: 13 },
                     padding: 13,
-                    cornerRadius: 9,
+                    cornerRadius: 10,
                     displayColors: true,
 
                     callbacks: {
                         label: function (context) {
-                            const value = Number(context.raw) || 0;
+                            var value = Number(context.raw) || 0;
+                            var percentage = ((value / total) * 100).toLocaleString('id-ID', {
+                                minimumFractionDigits: 1,
+                                maximumFractionDigits: 1
+                            });
 
-                            const percentage = total > 0
-                                ? (value / total * 100).toLocaleString(
-                                    'id-ID',
-                                    { maximumFractionDigits: 1 }
-                                )
-                                : '0';
-
-                            return context.label + ': '
-                                + value.toLocaleString('id-ID')
-                                + ' peserta ('
-                                + percentage
-                                + '%)';
+                            return context.label + ': ' +
+                                value.toLocaleString('id-ID') +
+                                ' peserta (' + percentage + '%)';
                         }
                     }
                 }

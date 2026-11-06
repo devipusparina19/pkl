@@ -3,874 +3,275 @@
 @section('title', 'Import Data Peserta Pelatihan')
 
 @section('content')
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+
 <div class="sirapik-import">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
-
+        /* =====================================================
+           PREMIUM BLUE EDITORIAL — IMPORT DATA PESERTA
+           Semua selector di-scope ke .sirapik-import
+           ===================================================== */
         .sirapik-import {
-            --si-navy: #102b50;
-            --si-blue: #1761b5;
-            --si-blue-dark: #124b91;
-            --si-cyan: #28a6c7;
-            --si-ink: #1d2d42;
-            --si-muted: #697b91;
-            --si-line: #dce5ef;
-            --si-soft: #f3f7fc;
-            --si-white: #ffffff;
-            --si-amber: #c58a2a;
+            --navy: #081B33;
+            --midnight: #0B2545;
+            --royal: #2457D6;
+            --electric: #3478F6;
+            --soft: #EAF2FF;
+            --ice: #F3F7FC;
+            --slate: #64748B;
+            --text: #14243A;
+            --border: #E1E9F2;
+            --cyan: #38C6E8;
+            --danger: #A3202F;
+            --danger-bg: #FFF1F2;
+            --danger-line: #F7D1D5;
+            --ok: #0F6B4A;
+            --ok-bg: #E8F6EF;
+            --ok-line: #B7E2CC;
+            --warn: #8A5A12;
+            --warn-bg: #FFF8EB;
+            --warn-line: #F0DFB9;
+            --font-display: "Sora", "Segoe UI", Arial, sans-serif;
+            --font-body: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+            --ease: cubic-bezier(.2, .7, .2, 1);
 
-            width: 100%;
-            max-width: none;
-            padding: 26px clamp(18px, 2.2vw, 38px) 42px;
-            color: var(--si-ink);
-            font-family: 'DM Sans', sans-serif;
-            box-sizing: border-box;
+            width: 100%; color: var(--text);
+            font-family: var(--font-body); font-size: 15px; line-height: 1.65;
         }
-
-        .sirapik-import *,
-        .sirapik-import *::before,
-        .sirapik-import *::after {
-            box-sizing: border-box;
+        .sirapik-import *, .sirapik-import *::before, .sirapik-import *::after { box-sizing: border-box; }
+        .sirapik-import button, .sirapik-import input, .sirapik-import select { font: inherit; }
+        .sirapik-import svg.i {
+            width: 1em; height: 1em; flex: none;
+            fill: none; stroke: currentColor;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
         }
+        .sirapik-import :focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
 
-        .sirapik-import button,
-        .sirapik-import input,
-        .sirapik-import select {
-            font: inherit;
+        /* ---------- Header ---------- */
+        .si-head {
+            position: relative; isolation: isolate; overflow: hidden;
+            display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr);
+            align-items: end; gap: clamp(20px, 4vw, 56px);
+            margin-bottom: 26px; padding: clamp(28px, 4vw, 48px);
+            border-radius: 24px; color: #fff;
+            background: linear-gradient(120deg, var(--navy) 0%, var(--midnight) 60%, #173d86 100%);
+            animation: si-rise .8s var(--ease) both;
         }
-
-        /* HEADER */
-
-        .si-header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 24px;
-            margin-bottom: 27px;
+        .si-head::before {
+            content: ""; position: absolute; z-index: -1; right: -90px; top: -110px;
+            width: 340px; height: 340px; border-radius: 50%;
+            background: var(--royal); opacity: .45; filter: blur(60px);
+            animation: si-drift 24s ease-in-out infinite alternate;
         }
-
-        .si-heading-copy {
-            min-width: 0;
+        .si-head h1 {
+            margin: 0 0 12px; font-family: var(--font-display); font-weight: 800;
+            font-size: clamp(2rem, 4.6vw, 3.4rem); line-height: 1.08; letter-spacing: -.035em;
         }
-
-        .si-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            margin-bottom: 12px;
-            color: var(--si-blue);
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 1.8px;
-            text-transform: uppercase;
+        .si-head h1 span { display: block; color: var(--cyan); }
+        .si-head p { max-width: 560px; margin: 0; font-size: 15px; line-height: 1.8; color: rgba(255,255,255,.82); }
+        .si-head-mark {
+            display: flex; align-items: center; gap: 14px; padding: 18px 20px;
+            border-radius: 18px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08);
         }
-
-        .si-eyebrow::before {
-            content: '';
-            width: 26px;
-            height: 3px;
-            border-radius: 10px;
-            background: var(--si-cyan);
+        .si-head-mark .ic {
+            display: grid; place-items: center; width: 46px; height: 46px; flex: none;
+            border-radius: 13px; background: rgba(56,198,232,.15); color: var(--cyan); font-size: 22px;
         }
+        .si-head-mark strong { display: block; font-family: var(--font-display); font-size: 15px; font-weight: 600; }
+        .si-head-mark span { font-size: 13px; color: rgba(255,255,255,.72); }
 
-        .si-header h1 {
-            margin: 0;
-            color: var(--si-navy);
-            font-family: 'Manrope', sans-serif;
-            font-size: clamp(29px, 3vw, 40px);
-            font-weight: 800;
-            letter-spacing: -1.5px;
-            line-height: 1.2;
-        }
-
-        .si-header p {
-            max-width: 720px;
-            margin: 11px 0 0;
-            color: var(--si-muted);
-            font-size: 15px;
-            line-height: 1.8;
-        }
-
-        .si-header-mark {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 0 0 auto;
-            padding: 13px 17px;
-            border: 1px solid #d8e6f5;
-            border-radius: 12px;
-            background: #f5f9fe;
-        }
-
-        .si-header-mark-icon {
-            display: grid;
-            width: 39px;
-            height: 39px;
-            place-items: center;
-            border-radius: 10px;
-            background: #e2efff;
-            color: var(--si-blue);
-        }
-
-        .si-header-mark strong {
-            display: block;
-            color: var(--si-navy);
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .si-header-mark span {
-            display: block;
-            margin-top: 3px;
-            color: var(--si-muted);
-            font-size: 11px;
-        }
-
-        /* ALERT */
-
+        /* ---------- Alerts ---------- */
         .si-alert {
-            display: flex;
-            align-items: flex-start;
-            gap: 13px;
-            margin-bottom: 19px;
-            padding: 17px 19px;
-            border: 1px solid transparent;
-            border-radius: 12px;
-            animation: si-enter .35s ease both;
+            display: flex; align-items: flex-start; gap: 13px; margin-bottom: 18px;
+            padding: 16px 18px; border: 1px solid transparent; border-radius: 16px;
+            font-size: 14px; line-height: 1.7;
         }
+        .si-alert > .i { margin-top: 3px; font-size: 20px; }
+        .si-alert-content { min-width: 0; flex: 1; }
+        .si-alert strong.h { display: block; margin-bottom: 2px; font-family: var(--font-display); font-size: 15px; font-weight: 600; }
+        .si-alert ul { margin: 6px 0 0; padding-left: 20px; }
+        .si-alert li { overflow-wrap: anywhere; }
+        .si-alert-danger { color: var(--danger); background: var(--danger-bg); border-color: var(--danger-line); }
+        .si-alert-success { color: var(--ok); background: var(--ok-bg); border-color: var(--ok-line); }
+        .si-import-notes { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--ok-line); }
 
-        .si-alert-icon {
-            display: grid;
-            width: 30px;
-            height: 30px;
-            flex: 0 0 30px;
-            place-items: center;
-            border-radius: 9px;
-        }
-
-        .si-alert-content {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .si-alert strong {
-            display: block;
-            margin: 2px 0 5px;
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .si-alert ul {
-            margin: 7px 0 0;
-            padding-left: 19px;
-            font-size: 13px;
-            line-height: 1.8;
-        }
-
-        .si-alert li {
-            overflow-wrap: anywhere;
-        }
-
-        .si-alert-danger {
-            color: #902f37;
-            background: #fff4f3;
-            border-color: #f1d1d0;
-        }
-
-        .si-alert-danger .si-alert-icon {
-            color: #a3343d;
-            background: #fce2e1;
-        }
-
-        .si-alert-success {
-            color: #24623f;
-            background: #f0faf3;
-            border-color: #cce9d5;
-        }
-
-        .si-alert-success .si-alert-icon {
-            color: #267346;
-            background: #dcefe2;
-        }
-
-        .si-import-notes {
-            margin-top: 14px;
-            padding-top: 13px;
-            border-top: 1px solid #cce9d5;
-        }
-
-        /* MAIN LAYOUT */
-
+        /* ---------- Workspace ---------- */
         .si-workspace {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 280px;
-            align-items: start;
-            gap: 21px;
+            display: grid; grid-template-columns: minmax(0, 1fr) 320px;
+            align-items: start; gap: 24px;
         }
-
         .si-main-panel {
-            min-width: 0;
-            overflow: hidden;
-            border: 1px solid var(--si-line);
-            border-radius: 16px;
-            background: var(--si-white);
-            box-shadow: 0 5px 22px rgba(20, 48, 82, .045);
+            min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 22px;
+            background: #fff; box-shadow: 0 18px 44px rgba(8,27,51,.07);
         }
-
         .si-panel-heading {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 23px 26px;
-            border-bottom: 1px solid #e8eef5;
+            display: flex; align-items: center; gap: 14px;
+            padding: 22px clamp(20px, 3vw, 32px); border-bottom: 1px solid var(--border);
         }
-
         .si-panel-icon {
-            display: grid;
-            width: 49px;
-            height: 49px;
-            flex: 0 0 49px;
-            place-items: center;
-            border-radius: 13px;
-            background: #eaf2fc;
-            color: var(--si-blue);
+            display: grid; place-items: center; width: 48px; height: 48px; flex: none;
+            border-radius: 14px; background: var(--soft); color: var(--royal); font-size: 24px;
         }
+        .si-panel-heading h2 { margin: 0; font-family: var(--font-display); font-size: 19px; font-weight: 700; letter-spacing: -.02em; color: var(--navy); }
+        .si-panel-heading p { margin: 3px 0 0; font-size: 13px; color: var(--slate); }
+        .si-form-body { padding: clamp(20px, 3vw, 32px); }
 
-        .si-panel-heading h2 {
-            margin: 0;
-            color: var(--si-navy);
-            font-family: 'Manrope', sans-serif;
-            font-size: 19px;
-            font-weight: 800;
-            letter-spacing: -.35px;
+        /* Langkah form: urutan nyata, jadi bernomor */
+        .si-step { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; }
+        .si-step + .si-form-grid { margin-bottom: 0; }
+        .si-step-number {
+            display: grid; place-items: center; width: 30px; height: 30px; flex: none;
+            border-radius: 9px; background: var(--navy); color: #fff;
+            font-family: var(--font-display); font-size: 12px; font-weight: 700;
         }
+        .si-step strong { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--navy); }
+        .si-step i { flex: 1; height: 1px; background: var(--border); }
+        .si-step.gap { margin-top: 34px; }
 
-        .si-panel-heading p {
-            margin: 5px 0 0;
-            color: var(--si-muted);
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .si-form-body {
-            padding: 25px 27px 27px;
-        }
-
-        /* SECTION LABEL */
-
-        .si-section-label {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            margin: 0 0 19px;
-        }
-
-        .si-section-number {
-            display: grid;
-            width: 27px;
-            height: 27px;
-            flex: 0 0 27px;
-            place-items: center;
-            border-radius: 8px;
-            background: var(--si-navy);
-            color: white;
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .si-section-label strong {
-            color: var(--si-navy);
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .si-section-label span:last-child {
-            height: 1px;
-            flex: 1;
-            background: #e7edf4;
-        }
-
-        /* FORM */
-
-        .si-form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 21px 23px;
-        }
-
-        .si-field {
-            min-width: 0;
-        }
-
-        .si-field-full {
-            grid-column: 1 / -1;
-        }
-
+        .si-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 24px; }
+        .si-field { min-width: 0; }
+        .si-field-full { grid-column: 1 / -1; }
         .si-field label {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-bottom: 9px;
-            color: #293c53;
-            font-size: 14px;
-            font-weight: 800;
+            display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+            margin-bottom: 8px; font-size: 14px; font-weight: 700; color: var(--navy);
         }
-
-        .si-required {
-            color: #d34c51;
-            font-size: 15px;
-        }
-
+        .si-required { color: #C8323F; font-size: 15px; }
         .si-optional {
-            margin-left: 3px;
-            color: #8492a4;
-            font-size: 11px;
-            font-weight: 600;
+            padding: 2px 8px; border-radius: 999px; background: var(--ice);
+            color: var(--slate); font-size: 11px; font-weight: 600;
         }
-
-        .si-control-wrap {
-            position: relative;
-        }
-
         .sirapik-import .si-control {
-            display: block;
-            width: 100%;
-            min-width: 0;
-            min-height: 49px;
-            padding: 12px 15px;
-            border: 1px solid #cdd9e7;
-            border-radius: 9px;
-            outline: none;
-            background: #fff;
-            color: #25384e;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            box-shadow: 0 1px 2px rgba(16, 43, 80, .025);
-            transition:
-                border-color .2s ease,
-                box-shadow .2s ease,
-                background .2s ease;
+            display: block; width: 100%; min-width: 0; min-height: 52px; padding: 12px 15px;
+            color: var(--text); background: var(--ice);
+            border: 1.5px solid var(--border); border-radius: 12px;
+            font-size: 14px; line-height: 1.5;
+            transition: border-color .2s, box-shadow .2s, background .2s;
         }
-
-        .sirapik-import .si-control::placeholder {
-            color: #9aa8b8;
-        }
-
-        .sirapik-import .si-control:hover {
-            border-color: #9cb6d5;
-        }
-
+        .sirapik-import .si-control::placeholder { color: #8796aa; }
+        .sirapik-import .si-control:hover { border-color: #c5d3e4; }
         .sirapik-import .si-control:focus {
-            border-color: var(--si-blue);
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(23, 97, 181, .11);
+            outline: none; background: #fff; border-color: var(--electric);
+            box-shadow: 0 0 0 4px rgba(52,120,246,.16);
         }
-
-        .sirapik-import select.si-control {
-            padding-right: 39px;
-            cursor: pointer;
-        }
-
-        .sirapik-import input[type="file"].si-control {
-            padding: 8px 10px;
-            background: #f8fbff;
-        }
-
+        .sirapik-import select.si-control { cursor: pointer; }
+        .sirapik-import input[type="file"].si-control { padding: 9px 10px; background: var(--soft); border-style: dashed; border-color: #AFC8F2; }
         .sirapik-import input[type="file"]::file-selector-button {
-            min-height: 31px;
-            margin-right: 12px;
-            padding: 5px 12px;
-            border: 0;
-            border-radius: 6px;
-            background: #e5effc;
-            color: var(--si-blue-dark);
-            font-family: inherit;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: background .2s ease;
+            min-height: 34px; margin-right: 12px; padding: 6px 14px; border: 0; border-radius: 9px;
+            background: var(--royal); color: #fff; font-family: var(--font-display);
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: background .2s;
         }
-
-        .sirapik-import input[type="file"]::file-selector-button:hover {
-            background: #d5e6fb;
-        }
-
-        .si-field-help {
-            display: block;
-            margin-top: 8px;
-            color: #748399;
-            font-size: 12px;
-            line-height: 1.65;
-        }
+        .sirapik-import input[type="file"]::file-selector-button:hover { background: var(--electric); }
+        .si-field-help { display: block; margin-top: 7px; font-size: 12.5px; line-height: 1.6; color: var(--slate); }
 
         .si-selected-file {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 11px;
-            padding: 11px 13px;
-            border: 1px solid #d6e6f8;
-            border-radius: 9px;
-            background: #f2f7fd;
-            color: var(--si-blue-dark);
-            font-size: 13px;
-            font-weight: 600;
-            overflow-wrap: anywhere;
+            display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 11px 14px;
+            border: 1px solid var(--ok-line); border-radius: 12px; background: var(--ok-bg);
+            color: var(--ok); font-size: 13px; font-weight: 600; overflow-wrap: anywhere;
         }
+        .si-selected-file[hidden] { display: none; }
+        .si-selected-file .i { font-size: 20px; }
 
-        .si-selected-file[hidden] {
-            display: none;
-        }
-
-        .si-file-symbol {
-            display: grid;
-            width: 31px;
-            height: 31px;
-            flex: 0 0 31px;
-            place-items: center;
-            border-radius: 7px;
-            background: #dfebfb;
-        }
-
-        /* FORM FOOTER */
-
+        /* ---------- Footer & buttons ---------- */
         .si-form-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-top: 29px;
-            padding-top: 21px;
-            border-top: 1px solid #e7edf4;
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;
+            margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--border);
         }
-
-        .si-footer-note {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #7a899b;
-            font-size: 12px;
-        }
-
-        .si-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .si-footer-note { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--slate); }
+        .si-footer-note .i { font-size: 17px; color: var(--royal); }
+        .si-actions { display: flex; align-items: center; gap: 10px; }
         .sirapik-import .si-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            min-height: 45px;
-            padding: 11px 19px;
-            border: 1px solid transparent;
-            border-radius: 9px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 800;
-            cursor: pointer;
-            transition:
-                transform .2s ease,
-                background .2s ease,
-                border-color .2s ease,
-                box-shadow .2s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+            min-height: 52px; padding: 12px 22px; border: 1.5px solid transparent; border-radius: 14px;
+            font-family: var(--font-display); font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: transform .2s var(--ease), box-shadow .2s, background .2s, color .2s;
         }
+        .sirapik-import .si-btn .i { font-size: 18px; }
+        .sirapik-import .si-btn:active { transform: scale(.97); }
+        .sirapik-import .si-btn-primary { color: #fff; background: linear-gradient(110deg, var(--royal), var(--electric)); box-shadow: 0 12px 26px rgba(36,87,214,.3); }
+        .sirapik-import .si-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(36,87,214,.4); }
+        .sirapik-import .si-btn-primary:disabled { transform: none; opacity: .75; cursor: wait; box-shadow: none; }
+        .sirapik-import .si-btn-ghost { color: var(--slate); background: transparent; }
+        .sirapik-import .si-btn-ghost:hover { color: var(--navy); background: var(--ice); }
+        .si-spin { animation: si-spin 1s linear infinite; }
 
-        .sirapik-import .si-btn:focus-visible {
-            outline: 3px solid rgba(40, 166, 199, .35);
-            outline-offset: 3px;
+        /* ---------- Sisi: panduan editorial, bukan tumpukan kartu ---------- */
+        .si-side-column { position: sticky; top: 20px; display: flex; min-width: 0; flex-direction: column; gap: 18px; animation: si-rise .8s .1s var(--ease) both; }
+        .si-side-dark {
+            position: relative; isolation: isolate; overflow: hidden;
+            padding: 24px; border-radius: 22px; color: #fff; background: var(--navy);
         }
-
-        .sirapik-import .si-btn-primary {
-            background: var(--si-blue);
-            color: white;
-            box-shadow: 0 4px 10px rgba(23, 97, 181, .16);
+        .si-side-dark::after {
+            content: ""; position: absolute; z-index: -1; right: -60px; bottom: -80px;
+            width: 200px; height: 200px; border-radius: 50%; background: var(--royal); opacity: .5; filter: blur(40px);
         }
-
-        .sirapik-import .si-btn-primary:hover {
-            transform: translateY(-2px);
-            background: var(--si-blue-dark);
-            box-shadow: 0 7px 15px rgba(23, 97, 181, .2);
+        .si-side-dark .ic {
+            display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 14px;
+            border-radius: 13px; background: rgba(56,198,232,.15); color: var(--cyan); font-size: 22px;
         }
+        .si-side-dark h3 { margin: 0 0 8px; font-family: var(--font-display); font-size: 17px; font-weight: 600; line-height: 1.4; }
+        .si-side-dark p { margin: 0; font-size: 13px; line-height: 1.8; color: rgba(255,255,255,.78); }
 
-        .sirapik-import .si-btn-primary:disabled {
-            transform: none;
-            opacity: .7;
-            cursor: wait;
-            box-shadow: none;
-        }
-
-        .sirapik-import .si-btn-secondary {
-            border-color: #d4deea;
-            background: white;
-            color: #52647a;
-        }
-
-        .sirapik-import .si-btn-secondary:hover {
-            border-color: #aabdd4;
-            background: #f5f8fc;
-        }
-
-        /* SIDE PANEL */
-
-        .si-side-column {
-            display: flex;
-            min-width: 0;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .si-side-card {
-            overflow: hidden;
-            border: 1px solid var(--si-line);
-            border-radius: 14px;
-            background: white;
-            box-shadow: 0 4px 17px rgba(20, 48, 82, .035);
-        }
-
-        .si-side-blue {
-            position: relative;
-            padding: 22px 20px;
-            border-color: #183c68;
-            background: var(--si-navy);
-            color: white;
-        }
-
-        .si-side-blue::after {
-            position: absolute;
-            top: -39px;
-            right: -35px;
-            width: 130px;
-            height: 130px;
-            border: 1px solid rgba(255,255,255,.12);
-            border-radius: 50%;
-            content: '';
-        }
-
-        .si-side-blue::before {
-            position: absolute;
-            top: -17px;
-            right: -13px;
-            width: 85px;
-            height: 85px;
-            border: 1px solid rgba(255,255,255,.10);
-            border-radius: 50%;
-            content: '';
-        }
-
-        .si-side-blue .si-side-icon {
-            display: grid;
-            width: 41px;
-            height: 41px;
-            margin-bottom: 17px;
-            place-items: center;
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: 11px;
-            background: rgba(255,255,255,.1);
-            color: #a9ddff;
-        }
-
-        .si-side-blue h3 {
-            position: relative;
-            z-index: 1;
-            margin: 0 0 9px;
-            color: white;
-            font-family: 'Manrope', sans-serif;
-            font-size: 17px;
-            font-weight: 800;
-            line-height: 1.45;
-        }
-
-        .si-side-blue p {
-            position: relative;
-            z-index: 1;
-            margin: 0;
-            color: #c3d5e9;
-            font-size: 12px;
-            line-height: 1.8;
-        }
-
-        .si-side-content {
-            padding: 19px 19px 20px;
-        }
-
-        .si-side-title {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            margin-bottom: 15px;
-            color: var(--si-navy);
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .si-check-list {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-
+        .si-checklist h3 { margin: 0 0 14px; font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--navy); }
+        .si-check-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
         .si-check-list li {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            color: #5e7086;
-            font-size: 12px;
-            line-height: 1.7;
+            display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
+            border-top: 1px solid var(--border); font-size: 13px; line-height: 1.65; color: #4B5E75;
         }
+        .si-check { display: grid; place-items: center; width: 22px; height: 22px; flex: none; margin-top: 1px; border-radius: 7px; background: var(--soft); color: var(--royal); font-size: 13px; }
 
-        .si-check {
-            display: grid;
-            width: 20px;
-            height: 20px;
-            flex: 0 0 20px;
-            margin-top: 1px;
-            place-items: center;
-            border-radius: 6px;
-            background: #e9f3ff;
-            color: var(--si-blue);
+        .si-side-warning { padding: 18px 20px; border: 1px solid var(--warn-line); border-radius: 18px; background: var(--warn-bg); }
+        .si-warning-heading { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--warn); }
+        .si-warning-heading .i { font-size: 18px; }
+        .si-side-warning p { margin: 0; font-size: 13px; line-height: 1.8; color: #6F5A34; }
+
+        @keyframes si-rise { from { opacity: 0; transform: translate3d(0, 18px, 0); } to { opacity: 1; transform: none; } }
+        @keyframes si-drift { to { transform: translate3d(-40px, 40px, 0); } }
+        @keyframes si-spin { to { transform: rotate(360deg); } }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 1100px) {
+            .si-workspace { grid-template-columns: minmax(0, 1fr); }
+            .si-side-column { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+            .si-side-dark { grid-column: 1 / -1; }
         }
-
-        .si-side-warning {
-            padding: 17px 18px;
-            border: 1px solid #f0e1c3;
-            border-radius: 12px;
-            background: #fffaf0;
+        @media (max-width: 900px) { .si-head { grid-template-columns: 1fr; } }
+        @media (max-width: 640px) {
+            .si-form-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+            .si-field-full { grid-column: auto; }
+            .si-side-column { grid-template-columns: minmax(0, 1fr); }
+            .si-form-footer { align-items: stretch; flex-direction: column; }
+            .si-footer-note { order: 2; }
+            .si-actions { display: grid; grid-template-columns: 1fr; width: 100%; }
+            .sirapik-import .si-btn { width: 100%; }
         }
-
-        .si-warning-heading {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            margin-bottom: 8px;
-            color: #94631b;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .si-side-warning p {
-            margin: 0;
-            color: #826e4e;
-            font-size: 12px;
-            line-height: 1.8;
-        }
-
-        /* ANIMATION */
-
-        @keyframes si-enter {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .si-header,
-        .si-main-panel,
-        .si-side-column {
-            animation: si-enter .45s ease both;
-        }
-
-        .si-side-column {
-            animation-delay: .08s;
-        }
-
-        /* RESPONSIVE */
-
-        @media (min-width: 1500px) {
-            .si-workspace {
-                grid-template-columns: minmax(0, 1fr) 310px;
-                gap: 24px;
-            }
-
-            .si-form-body {
-                padding: 29px 32px 31px;
-            }
-
-            .si-panel-heading {
-                padding: 25px 32px;
-            }
-
-            .si-form-grid {
-                column-gap: 30px;
-                row-gap: 24px;
-            }
-        }
-
-        @media (max-width: 1050px) {
-            .si-workspace {
-                grid-template-columns: minmax(0, 1fr) 245px;
-                gap: 15px;
-            }
-
-            .si-form-body {
-                padding: 22px;
-            }
-
-            .si-panel-heading {
-                padding: 21px 22px;
-            }
-
-            .si-form-grid {
-                gap: 19px 16px;
-            }
-        }
-
-        @media (max-width: 820px) {
-            .sirapik-import {
-                padding: 23px 18px 34px;
-            }
-
-            .si-workspace {
-                grid-template-columns: minmax(0, 1fr);
-            }
-
-            .si-side-column {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                align-items: stretch;
-            }
-
-            .si-side-blue {
-                grid-row: span 2;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .sirapik-import {
-                padding: 20px 13px 30px;
-            }
-
-            .si-header {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 17px;
-                margin-bottom: 21px;
-            }
-
-            .si-header h1 {
-                font-size: 28px;
-                letter-spacing: -.8px;
-            }
-
-            .si-header p {
-                font-size: 13px;
-            }
-
-            .si-header-mark {
-                padding: 10px 13px;
-            }
-
-            .si-form-grid {
-                grid-template-columns: minmax(0, 1fr);
-                gap: 18px;
-            }
-
-            .si-field-full {
-                grid-column: auto;
-            }
-
-            .si-panel-heading {
-                padding: 18px 16px;
-            }
-
-            .si-panel-heading h2 {
-                font-size: 17px;
-            }
-
-            .si-panel-heading p {
-                font-size: 12px;
-            }
-
-            .si-panel-icon {
-                width: 43px;
-                height: 43px;
-                flex-basis: 43px;
-            }
-
-            .si-form-body {
-                padding: 19px 16px 20px;
-            }
-
-            .si-form-footer {
-                align-items: stretch;
-                flex-direction: column;
-            }
-
-            .si-footer-note {
-                order: 2;
-            }
-
-            .si-actions {
-                display: grid;
-                grid-template-columns: 1fr;
-                width: 100%;
-            }
-
-            .sirapik-import .si-btn {
-                width: 100%;
-            }
-
-            .si-side-column {
-                grid-template-columns: minmax(0, 1fr);
-            }
-
-            .si-side-blue {
-                grid-row: auto;
-            }
-        }
-
         @media (prefers-reduced-motion: reduce) {
-            .sirapik-import *,
-            .sirapik-import *::before,
-            .sirapik-import *::after {
-                scroll-behavior: auto !important;
-                animation-duration: .01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: .01ms !important;
+            .sirapik-import *, .sirapik-import *::before, .sirapik-import *::after {
+                animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important;
             }
         }
     </style>
 
     {{-- HEADER --}}
-    <header class="si-header">
-        <div class="si-heading-copy">
-            <div class="si-eyebrow">Manajemen Data SIRAPIK</div>
-
-            <h1>Import Data Peserta</h1>
-
+    <header class="si-head">
+        <div>
+            <h1>Import data peserta <span>dalam satu proses.</span></h1>
             <p>
-                Kelola data peserta dan riwayat pelatihan melalui satu proses
-                import yang terstruktur. Unggah file Excel, lengkapi informasi
-                pelatihan, lalu mulai proses import.
+                Unggah file Excel, lengkapi informasi pelatihan, lalu mulai
+                import data peserta dan riwayat pelatihan ke SIRAPIK.
             </p>
         </div>
 
-        <div class="si-header-mark">
-            <div class="si-header-mark-icon" aria-hidden="true">
-                <svg width="21" height="21" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 16V4"/>
-                    <path d="m7 9 5-5 5 5"/>
-                    <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
-                </svg>
-            </div>
+        <div class="si-head-mark">
+            <span class="ic" aria-hidden="true">
+                <svg class="i" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+            </span>
             <div>
                 <strong>Import Excel</strong>
-                <span>Pengelolaan data peserta</span>
+                <span>XLSX, XLS, atau CSV</span>
             </div>
         </div>
     </header>
@@ -878,18 +279,10 @@
     {{-- VALIDATION ERROR --}}
     @if ($errors->any())
         <div class="si-alert si-alert-danger" role="alert">
-            <div class="si-alert-icon" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 8v4"/>
-                    <path d="M12 16h.01"/>
-                </svg>
-            </div>
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
 
             <div class="si-alert-content">
-                <strong>Import belum dapat diproses.</strong>
+                <strong class="h">Import belum dapat diproses.</strong>
                 <span>Periksa kembali informasi berikut:</span>
                 <ul>
                     @foreach ($errors->all() as $error)
@@ -905,34 +298,16 @@
         @php($result = session('import_result'))
 
         <div class="si-alert si-alert-success" role="status">
-            <div class="si-alert-icon" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5"
-                     stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m5 12 4 4L19 6"/>
-                </svg>
-            </div>
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
 
             <div class="si-alert-content">
-                <strong>Import selesai diproses.</strong>
+                <strong class="h">Import selesai diproses.</strong>
 
                 <ul>
-                    <li>
-                        Peserta baru:
-                        <strong>{{ $result['created_participants'] ?? 0 }}</strong>
-                    </li>
-                    <li>
-                        Peserta diperbarui:
-                        <strong>{{ $result['updated_participants'] ?? 0 }}</strong>
-                    </li>
-                    <li>
-                        Pelatihan baru:
-                        <strong>{{ $result['created_trainings'] ?? 0 }}</strong>
-                    </li>
-                    <li>
-                        Riwayat pelatihan baru:
-                        <strong>{{ $result['created_histories'] ?? 0 }}</strong>
-                    </li>
+                    <li>Peserta baru: <strong>{{ $result['created_participants'] ?? 0 }}</strong></li>
+                    <li>Peserta diperbarui: <strong>{{ $result['updated_participants'] ?? 0 }}</strong></li>
+                    <li>Pelatihan baru: <strong>{{ $result['created_trainings'] ?? 0 }}</strong></li>
+                    <li>Riwayat pelatihan baru: <strong>{{ $result['created_histories'] ?? 0 }}</strong></li>
                 </ul>
 
                 @if (!empty($result['errors']))
@@ -953,21 +328,14 @@
     <div class="si-workspace">
 
         {{-- FORM PANEL --}}
-        <section class="si-main-panel">
+        <section class="si-main-panel" aria-labelledby="si-form-title">
 
             <div class="si-panel-heading">
                 <div class="si-panel-icon" aria-hidden="true">
-                    <svg width="25" height="25" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="1.8"
-                         stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 16V4"/>
-                        <path d="m7 9 5-5 5 5"/>
-                        <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
-                    </svg>
+                    <svg class="i" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
                 </div>
-
                 <div>
-                    <h2>Unggah file Excel</h2>
+                    <h2 id="si-form-title">Unggah file Excel</h2>
                     <p>Lengkapi informasi pelatihan sebelum memulai import data.</p>
                 </div>
             </div>
@@ -982,19 +350,18 @@
                 >
                     @csrf
 
-                    {{-- SECTION 1 --}}
-                    <div class="si-section-label">
-                        <span class="si-section-number">01</span>
+                    {{-- LANGKAH 1 --}}
+                    <div class="si-step">
+                        <span class="si-step-number">1</span>
                         <strong>File sumber data</strong>
-                        <span></span>
+                        <i></i>
                     </div>
 
                     <div class="si-form-grid">
-
                         <div class="si-field si-field-full">
                             <label for="file">
                                 File Excel
-                                <span class="si-required">*</span>
+                                <span class="si-required" aria-hidden="true">*</span>
                             </label>
 
                             <input
@@ -1003,40 +370,27 @@
                                 id="file"
                                 class="si-control"
                                 accept=".xlsx,.xls,.csv"
+                                aria-describedby="file-help"
                                 required
                             >
 
-                            <small class="si-field-help">
+                            <small class="si-field-help" id="file-help">
                                 Format yang didukung: XLSX, XLS, atau CSV.
                                 Ukuran file maksimal 10 MB.
                             </small>
 
-                            <div
-                                id="selectedFile"
-                                class="si-selected-file"
-                                hidden
-                            >
-                                <span class="si-file-symbol" aria-hidden="true">
-                                    <svg width="17" height="17" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor"
-                                         stroke-width="1.8" stroke-linecap="round"
-                                         stroke-linejoin="round">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                        <path d="M14 2v6h6"/>
-                                        <path d="M8 13h8M8 17h8"/>
-                                    </svg>
-                                </span>
+                            <div id="selectedFile" class="si-selected-file" hidden>
+                                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8"/></svg>
                                 <span id="selectedFileName"></span>
                             </div>
                         </div>
-
                     </div>
 
-                    {{-- SECTION 2 --}}
-                    <div class="si-section-label" style="margin-top:30px">
-                        <span class="si-section-number">02</span>
+                    {{-- LANGKAH 2 --}}
+                    <div class="si-step gap">
+                        <span class="si-step-number">2</span>
                         <strong>Informasi penyelenggaraan pelatihan</strong>
-                        <span></span>
+                        <i></i>
                     </div>
 
                     <div class="si-form-grid">
@@ -1067,7 +421,7 @@
                         <div class="si-field">
                             <label for="kabupaten_kota_mitra">
                                 Kabupaten/Kota/Mitra/Mandiri
-                                <span class="si-required">*</span>
+                                <span class="si-required" aria-hidden="true">*</span>
                             </label>
 
                             <select
@@ -1076,9 +430,7 @@
                                 class="si-control"
                                 required
                             >
-                                <option value="">
-                                    -- Pilih wilayah atau mitra --
-                                </option>
+                                <option value="">-- Pilih wilayah atau mitra --</option>
 
                                 @foreach ($districts as $district)
                                     <option
@@ -1101,7 +453,7 @@
                         <div class="si-field si-field-full">
                             <label for="sumber_dana">
                                 Sumber Dana
-                                <span class="si-required">*</span>
+                                <span class="si-required" aria-hidden="true">*</span>
                             </label>
 
                             <select
@@ -1110,9 +462,7 @@
                                 class="si-control"
                                 required
                             >
-                                <option value="">
-                                    -- Pilih sumber dana --
-                                </option>
+                                <option value="">-- Pilih sumber dana --</option>
 
                                 @foreach ($fundingSources as $source)
                                     <option
@@ -1133,16 +483,16 @@
 
                     </div>
 
-                    {{-- SECTION 3 --}}
-                    <div class="si-section-label" style="margin-top:30px">
-                        <span class="si-section-number">03</span>
+                    {{-- LANGKAH 3 --}}
+                    <div class="si-step gap">
+                        <span class="si-step-number">3</span>
                         <strong>Klasifikasi dan durasi pelatihan</strong>
-                        <span></span>
+                        <i></i>
                     </div>
 
                     <div class="si-form-grid">
 
-                        {{-- CATEGORY --}}
+                        {{-- KATEGORI --}}
                         <div class="si-field">
                             <label for="training_category_id">
                                 Kategori Pelatihan
@@ -1154,9 +504,7 @@
                                 id="training_category_id"
                                 class="si-control"
                             >
-                                <option value="">
-                                    -- Pilih kategori --
-                                </option>
+                                <option value="">-- Pilih kategori --</option>
 
                                 @foreach ($categories as $category)
                                     <option
@@ -1205,45 +553,18 @@
                     <div class="si-form-footer">
 
                         <div class="si-footer-note">
-                            <svg width="16" height="16" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor"
-                                 stroke-width="1.8" stroke-linecap="round"
-                                 stroke-linejoin="round" aria-hidden="true">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 16v-4M12 8h.01"/>
-                            </svg>
+                            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                             Pastikan data sudah benar sebelum diimport.
                         </div>
 
                         <div class="si-actions">
-                            <button
-                                type="reset"
-                                class="si-btn si-btn-secondary"
-                                id="resetButton"
-                            >
-                                <svg width="16" height="16" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor"
-                                     stroke-width="1.8" stroke-linecap="round"
-                                     stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
-                                    <path d="M3 3v5h5"/>
-                                </svg>
+                            <button type="reset" class="si-btn si-btn-ghost" id="resetButton">
+                                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
                                 Reset Form
                             </button>
 
-                            <button
-                                type="submit"
-                                class="si-btn si-btn-primary"
-                                id="submitButton"
-                            >
-                                <svg width="17" height="17" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor"
-                                     stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M12 16V4"/>
-                                    <path d="m7 9 5-5 5 5"/>
-                                    <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
-                                </svg>
+                            <button type="submit" class="si-btn si-btn-primary" id="submitButton">
+                                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
                                 <span>Import Excel</span>
                             </button>
                         </div>
@@ -1254,105 +575,48 @@
         </section>
 
         {{-- SIDE INFORMATION --}}
-        <aside class="si-side-column">
+        <aside class="si-side-column" aria-label="Panduan import">
 
-            <section class="si-side-card si-side-blue">
-                <div class="si-side-icon" aria-hidden="true">
-                    <svg width="22" height="22" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor"
-                         stroke-width="1.8" stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4z"/>
-                        <path d="m9 12 2 2 4-4"/>
-                    </svg>
+            <section class="si-side-dark">
+                <div class="ic" aria-hidden="true">
+                    <svg class="i" viewBox="0 0 24 24"><path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4z"/><path d="m9 12 2 2 4-4"/></svg>
                 </div>
-
                 <h3>Import data lebih terstruktur</h3>
-
                 <p>
-                    SIRAPIK membantu mengelola data peserta dan riwayat
-                    pelatihan dalam satu sistem yang terintegrasi.
-                    Pastikan file sumber dan informasi pelatihan sesuai
-                    sebelum memulai proses.
+                    SIRAPIK mengelola data peserta dan riwayat pelatihan dalam
+                    satu sistem terintegrasi. Pastikan file sumber dan informasi
+                    pelatihan sesuai sebelum memulai proses.
                 </p>
             </section>
 
-            <section class="si-side-card">
-                <div class="si-side-content">
-                    <div class="si-side-title">
-                        <svg width="18" height="18" viewBox="0 0 24 24"
-                             fill="none" stroke="#1761b5" stroke-width="2"
-                             stroke-linecap="round" stroke-linejoin="round"
-                             aria-hidden="true">
-                            <path d="m5 12 4 4L19 6"/>
-                        </svg>
-                        Checklist sebelum import
-                    </div>
+            <section class="si-checklist">
+                <h3>Checklist sebelum import</h3>
 
-                    <ul class="si-check-list">
-                        <li>
-                            <span class="si-check" aria-hidden="true">
-                                <svg width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor"
-                                     stroke-width="2.5" stroke-linecap="round"
-                                     stroke-linejoin="round">
-                                    <path d="m5 12 4 4L19 6"/>
-                                </svg>
-                            </span>
-                            File Excel memiliki susunan kolom yang sesuai.
-                        </li>
-
-                        <li>
-                            <span class="si-check" aria-hidden="true">
-                                <svg width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor"
-                                     stroke-width="2.5" stroke-linecap="round"
-                                     stroke-linejoin="round">
-                                    <path d="m5 12 4 4L19 6"/>
-                                </svg>
-                            </span>
-                            Data identitas peserta sudah diperiksa.
-                        </li>
-
-                        <li>
-                            <span class="si-check" aria-hidden="true">
-                                <svg width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor"
-                                     stroke-width="2.5" stroke-linecap="round"
-                                     stroke-linejoin="round">
-                                    <path d="m5 12 4 4L19 6"/>
-                                </svg>
-                            </span>
-                            Wilayah dan sumber dana sudah dipilih.
-                        </li>
-
-                        <li>
-                            <span class="si-check" aria-hidden="true">
-                                <svg width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor"
-                                     stroke-width="2.5" stroke-linecap="round"
-                                     stroke-linejoin="round">
-                                    <path d="m5 12 4 4L19 6"/>
-                                </svg>
-                            </span>
-                            Kategori dan JPL diisi jika informasinya tersedia.
-                        </li>
-                    </ul>
-                </div>
+                <ul class="si-check-list">
+                    <li>
+                        <span class="si-check" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>
+                        File Excel memiliki susunan kolom yang sesuai.
+                    </li>
+                    <li>
+                        <span class="si-check" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>
+                        Data identitas peserta sudah diperiksa.
+                    </li>
+                    <li>
+                        <span class="si-check" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>
+                        Wilayah dan sumber dana sudah dipilih.
+                    </li>
+                    <li>
+                        <span class="si-check" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>
+                        Kategori dan JPL diisi jika informasinya tersedia.
+                    </li>
+                </ul>
             </section>
 
             <section class="si-side-warning">
                 <div class="si-warning-heading">
-                    <svg width="17" height="17" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2"
-                         stroke-linecap="round" stroke-linejoin="round"
-                         aria-hidden="true">
-                        <path d="M10.3 3.9 2.5 17.4A2 2 0 0 0 4.2 20h15.6a2 2 0 0 0 1.7-2.6L13.7 3.9a2 2 0 0 0-3.4 0z"/>
-                        <path d="M12 9v4M12 17h.01"/>
-                    </svg>
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
                     Informasi penting
                 </div>
-
                 <p>
                     Peserta yang sudah terdaftar dapat diperbarui berdasarkan
                     NIP atau NIK. Riwayat pelatihan yang sama tidak dibuat
@@ -1424,18 +688,8 @@
                 submitButton.disabled = true;
 
                 submitButton.innerHTML = `
-                    <svg width="17" height="17" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor"
-                         stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round" aria-hidden="true">
-                        <path d="M12 2v4"/>
-                        <path d="M12 18v4"/>
-                        <path d="m4.93 4.93 2.83 2.83"/>
-                        <path d="m16.24 16.24 2.83 2.83"/>
-                        <path d="M2 12h4"/>
-                        <path d="M18 12h4"/>
-                        <path d="m4.93 19.07 2.83-2.83"/>
-                        <path d="m16.24 7.76 2.83-2.83"/>
+                    <svg class="i si-spin" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M21 12a9 9 0 1 1-6.22-8.56"/>
                     </svg>
                     <span>Memproses import...</span>
                 `;

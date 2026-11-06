@@ -4,6 +4,10 @@
 
 @section('content')
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+
 @php
     $columns = match ($category) {
         'provinces' => [
@@ -40,59 +44,45 @@
 
     {{-- HEADER HALAMAN --}}
     <header class="md-heading">
-        <div class="md-heading-main">
-            <div class="md-breadcrumb">
-                <span>SUPER ADMIN</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="m9 18 6-6-6-6"/>
-                </svg>
-                <span>MASTER DATA</span>
-            </div>
+        <div>
+            <nav class="md-breadcrumb" aria-label="Breadcrumb">
+                <span>Super Admin</span>
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                <span aria-current="page">Master Data</span>
+            </nav>
 
-            <div class="md-title-row">
-                <div>
-                    <span class="md-kicker">PENGELOLAAN REFERENSI SISTEM</span>
-                    <h1>Master Data</h1>
-                    <p class="md-description">
-                        Kelola {{ strtolower($config['title']) }}
-                        sebagai referensi utama sistem SIRAPIK.
-                    </p>
-                </div>
+            <h1>Master data <span>{{ strtolower($config['title']) }}.</span></h1>
 
-                <div class="md-heading-decoration" aria-hidden="true">
-                    <span class="md-decoration-line"></span>
-                    <span class="md-decoration-circle"></span>
-                    <span class="md-decoration-square"></span>
-                </div>
-            </div>
+            <p class="md-description">
+                Kelola {{ strtolower($config['title']) }}
+                sebagai referensi utama sistem SIRAPIK.
+            </p>
         </div>
 
-        <a
-            href="{{ route('super-admin.master-data.create', ['category' => $category]) }}"
-            class="md-add-button"
-        >
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 5v14M5 12h14"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"/>
-            </svg>
-            <span>Tambah Data</span>
-        </a>
+        <div class="md-heading-side">
+            <div class="md-total">
+                <small>
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/></svg>
+                    Total data
+                </small>
+                <strong id="md-counter" data-target="{{ (int) $totalItems }}">{{ number_format($totalItems, 0, ',', '.') }}</strong>
+                <span>Data terdaftar</span>
+            </div>
+
+            <a
+                href="{{ route('super-admin.master-data.create', ['category' => $category]) }}"
+                class="md-btn md-btn-primary md-add-button"
+            >
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                Tambah Data
+            </a>
+        </div>
     </header>
 
     {{-- NOTIFIKASI --}}
     @if (session('success'))
         <div class="md-alert md-alert-success" role="status">
-            <span class="md-alert-icon">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="m5 12 4 4L19 6"
-                        stroke="currentColor"
-                        stroke-width="2.2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"/>
-                </svg>
-            </span>
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
             <div>
                 <strong>Berhasil</strong>
                 <p>{{ session('success') }}</p>
@@ -102,16 +92,7 @@
 
     @if (session('error'))
         <div class="md-alert md-alert-error" role="alert">
-            <span class="md-alert-icon">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9"
-                        stroke="currentColor" stroke-width="2"/>
-                    <path d="M12 8v5m0 3h.01"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"/>
-                </svg>
-            </span>
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
             <div>
                 <strong>Data tidak dapat diproses</strong>
                 <p>{{ session('error') }}</p>
@@ -121,16 +102,7 @@
 
     @if ($errors->any())
         <div class="md-alert md-alert-error" role="alert">
-            <span class="md-alert-icon">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9"
-                        stroke="currentColor" stroke-width="2"/>
-                    <path d="M12 8v5m0 3h.01"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"/>
-                </svg>
-            </span>
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
             <div>
                 <strong>Periksa kembali data berikut</strong>
                 <ul>
@@ -142,58 +114,11 @@
         </div>
     @endif
 
-    {{-- RINGKASAN --}}
-    <section class="md-overview">
-        <div class="md-overview-copy">
-            <span class="md-overview-label">REFERENSI AKTIF</span>
-            <h2>{{ $config['title'] }}</h2>
-            <p>
-                Data master yang digunakan untuk mendukung
-                pengelolaan informasi dan operasional SIRAPIK.
-            </p>
-        </div>
-
-        <div class="md-overview-count">
-            <span class="md-count-label">TOTAL DATA</span>
-            <strong>{{ number_format($totalItems, 0, ',', '.') }}</strong>
-            <span class="md-count-caption">Data terdaftar</span>
-        </div>
-
-        <div class="md-overview-mark" aria-hidden="true">
-            <svg viewBox="0 0 120 120" fill="none">
-                <rect x="15" y="15" width="90" height="90" rx="22"
-                    stroke="currentColor" stroke-width="1.5"/>
-                <path d="M37 43h46M37 60h46M37 77h28"
-                    stroke="currentColor"
-                    stroke-width="4"
-                    stroke-linecap="round"/>
-                <circle cx="87" cy="78" r="12"
-                    fill="currentColor" opacity=".15"/>
-                <path d="m81 78 4 4 8-9"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
-            </svg>
-        </div>
-    </section>
-
     {{-- FILTER DAN PENCARIAN --}}
-    <section class="md-filter-panel">
+    <section class="md-filter-panel" aria-labelledby="md-filter-title">
         <div class="md-section-heading">
-            <div class="md-section-icon">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="11" cy="11" r="7"
-                        stroke="currentColor" stroke-width="1.8"/>
-                    <path d="m16 16 4 4"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"/>
-                </svg>
-            </div>
-
             <div>
-                <h2>Temukan Data</h2>
+                <h2 id="md-filter-title">Temukan data</h2>
                 <p>Gunakan pencarian dan filter untuk menemukan data.</p>
             </div>
 
@@ -209,25 +134,18 @@
             action="{{ route('super-admin.master-data.index', ['category' => $category]) }}"
             class="md-filter-form"
         >
-            <div class="md-field md-search-field">
+            <div class="md-field">
                 <label for="search">Pencarian Data</label>
 
                 <div class="md-input-wrap">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <circle cx="11" cy="11" r="7"
-                            stroke="currentColor" stroke-width="1.8"/>
-                        <path d="m16 16 4 4"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"/>
-                    </svg>
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
 
                     <input
                         type="text"
                         id="search"
                         name="search"
                         value="{{ $filters['search'] ?? '' }}"
-                        placeholder="Masukkan nama atau tahun..."
+                        placeholder="Masukkan nama atau tahun"
                     >
                 </div>
             </div>
@@ -252,31 +170,21 @@
                         </option>
                     </select>
 
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="m7 10 5 5 5-5"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"/>
-                    </svg>
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
             </div>
 
             <div class="md-filter-actions">
-                <button type="submit" class="md-filter-button">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="m4 5 6.5 7.5V19l3 1v-7.5L20 5H4Z"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linejoin="round"/>
-                    </svg>
+                <button type="submit" class="md-btn md-btn-primary">
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>
                     Terapkan Filter
                 </button>
 
                 <a
                     href="{{ route('super-admin.master-data.index', ['category' => $category]) }}"
-                    class="md-reset-button"
+                    class="md-btn md-btn-ghost"
                 >
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
                     Reset
                 </a>
             </div>
@@ -284,16 +192,12 @@
     </section>
 
     {{-- TABEL DATA --}}
-    <section class="md-table-panel">
+    <section class="md-table-panel" aria-labelledby="md-table-title">
 
         <div class="md-table-heading">
             <div>
-                <span class="md-table-kicker">DAFTAR REFERENSI</span>
-                <h2>Data {{ $config['title'] }}</h2>
-                <p>
-                    Berikut daftar data yang tersimpan
-                    pada sistem SIRAPIK.
-                </p>
+                <h2 id="md-table-title">Data {{ $config['title'] }}</h2>
+                <p>Berikut daftar data yang tersimpan pada sistem SIRAPIK.</p>
             </div>
 
             <div class="md-table-meta">
@@ -304,16 +208,17 @@
 
         <div class="md-table-container">
             <table class="md-table">
+                <caption class="md-sr">Daftar data {{ $config['title'] }}</caption>
                 <thead>
                     <tr>
-                        <th class="md-number-column">No.</th>
+                        <th scope="col" class="md-number-column">No.</th>
 
                         @foreach ($columns as $label)
-                            <th>{{ $label }}</th>
+                            <th scope="col">{{ $label }}</th>
                         @endforeach
 
-                        <th>Status</th>
-                        <th class="md-action-column">Aksi</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="md-action-column">Aksi</th>
                     </tr>
                 </thead>
 
@@ -388,14 +293,7 @@
                                         class="md-action md-action-edit"
                                         aria-label="Edit data"
                                     >
-                                        <svg viewBox="0 0 24 24" fill="none"
-                                            aria-hidden="true">
-                                            <path d="m14 6 4 4M4 20l4.5-1 10.8-10.8a2.12 2.12 0 0 0-3-3L5.5 16 4 20Z"
-                                                stroke="currentColor"
-                                                stroke-width="1.7"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"/>
-                                        </svg>
+                                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                                         Edit
                                     </a>
 
@@ -436,14 +334,7 @@
                                             type="submit"
                                             class="md-action md-action-delete"
                                         >
-                                            <svg viewBox="0 0 24 24" fill="none"
-                                                aria-hidden="true">
-                                                <path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"
-                                                    stroke="currentColor"
-                                                    stroke-width="1.7"
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"/>
-                                            </svg>
+                                            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                                             Hapus
                                         </button>
                                     </form>
@@ -459,20 +350,10 @@
                             >
                                 <div class="md-empty-state">
                                     <div class="md-empty-icon">
-                                        <svg viewBox="0 0 24 24" fill="none"
-                                            aria-hidden="true">
-                                            <path d="M4 5h16v14H4z"
-                                                stroke="currentColor"
-                                                stroke-width="1.7"
-                                                stroke-linejoin="round"/>
-                                            <path d="M8 10h8M8 14h5"
-                                                stroke="currentColor"
-                                                stroke-width="1.7"
-                                                stroke-linecap="round"/>
-                                        </svg>
+                                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
                                     </div>
 
-                                    <strong>Belum Ada Data</strong>
+                                    <strong>Belum ada data</strong>
 
                                     <p>
                                         Tidak ada data yang sesuai dengan
@@ -481,7 +362,7 @@
 
                                     <a
                                         href="{{ route('super-admin.master-data.create', ['category' => $category]) }}"
-                                        class="md-empty-link"
+                                        class="md-btn md-btn-secondary"
                                     >
                                         Tambahkan data pertama
                                     </a>
@@ -523,1242 +404,286 @@
 </div>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
+    /* =====================================================
+       PREMIUM BLUE EDITORIAL — MASTER DATA
+       Semua selector di-scope ke .md-page
+       ===================================================== */
     .md-page {
-        --md-navy: #102d50;
-        --md-blue: #1d5488;
-        --md-blue-bright: #2876b9;
-        --md-blue-soft: #eaf3fb;
-        --md-ink: #1d3047;
-        --md-muted: #718198;
-        --md-border: #e1e8f0;
-        --md-surface: #ffffff;
-        --md-background: #f4f7fb;
-        --md-teal: #168b83;
-        --md-green: #16805c;
-        --md-red: #c34b55;
+        --navy: #081B33;
+        --midnight: #0B2545;
+        --royal: #2457D6;
+        --electric: #3478F6;
+        --soft: #EAF2FF;
+        --ice: #F3F7FC;
+        --slate: #64748B;
+        --text: #14243A;
+        --border: #E1E9F2;
+        --cyan: #38C6E8;
+        --ok: #0F6B4A;
+        --ok-bg: #E8F6EF;
+        --ok-line: #B7E2CC;
+        --danger: #A3202F;
+        --danger-bg: #FFF1F2;
+        --danger-line: #F2BCC3;
+        --font-display: "Sora", "Segoe UI", Arial, sans-serif;
+        --font-body: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+        --ease: cubic-bezier(.2, .7, .2, 1);
 
-        width: 100%;
-        max-width: none;
-        min-width: 0;
-        color: var(--md-ink);
-        font-family: 'Plus Jakarta Sans', 'DM Sans', sans-serif;
-        font-size: 15px;
-        line-height: 1.65;
-        animation: md-enter .5s ease both;
+        width: 100%; min-width: 0; color: var(--text);
+        font-family: var(--font-body); font-size: 15px; line-height: 1.65;
     }
-
-    .md-page *,
-    .md-page *::before,
-    .md-page *::after {
-        box-sizing: border-box;
+    .md-page *, .md-page *::before, .md-page *::after { box-sizing: border-box; }
+    .md-page button, .md-page input, .md-page select { font: inherit; }
+    .md-page a { text-decoration: none; }
+    .md-page svg.i {
+        width: 1em; height: 1em; flex: none;
+        fill: none; stroke: currentColor;
+        stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
+    .md-page :focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+    .md-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-    .md-page button,
-    .md-page input,
-    .md-page select {
-        font: inherit;
-    }
-
-    .md-page a {
-        text-decoration: none;
-    }
-
-    .md-page svg {
-        display: block;
-        width: 20px;
-        height: 20px;
-        flex: 0 0 auto;
-    }
-
-    /* HEADER */
-
+    /* ---------- Hero ---------- */
     .md-heading {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 28px;
-        width: 100%;
-        padding: 10px 0 30px;
+        position: relative; isolation: isolate; overflow: hidden;
+        display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr);
+        align-items: end; gap: clamp(22px, 4vw, 56px);
+        margin-bottom: 24px; padding: clamp(28px, 4.5vw, 54px); border-radius: 26px; color: #fff;
+        background: linear-gradient(120deg, var(--navy) 0%, var(--midnight) 60%, #173d86 100%);
+        animation: md-rise .8s var(--ease) both;
     }
-
-    .md-heading-main {
-        min-width: 0;
-        flex: 1;
+    .md-heading::before {
+        content: ""; position: absolute; z-index: -1; right: -90px; top: -110px;
+        width: 360px; height: 360px; border-radius: 50%;
+        background: var(--royal); opacity: .45; filter: blur(60px);
+        animation: md-drift 24s ease-in-out infinite alternate;
     }
-
-    .md-breadcrumb {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        margin-bottom: 23px;
-        color: #8292a7;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 1.3px;
-    }
-
-    .md-breadcrumb svg {
-        width: 14px;
-        height: 14px;
-        color: #a4b2c3;
-    }
-
-    .md-breadcrumb span:last-child {
-        color: var(--md-blue);
-    }
-
-    .md-title-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-    }
-
-    .md-kicker,
-    .md-table-kicker {
-        display: block;
-        margin-bottom: 8px;
-        color: var(--md-blue-bright);
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1.8px;
-    }
-
+    .md-breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.7); }
+    .md-breadcrumb .i { font-size: 14px; }
+    .md-breadcrumb span:last-child { color: var(--cyan); }
     .md-heading h1 {
-        margin: 0;
-        color: var(--md-navy);
-        font-size: clamp(34px, 4vw, 48px);
-        font-weight: 800;
-        line-height: 1.2;
-        letter-spacing: -1.8px;
+        margin: 0 0 14px; font-family: var(--font-display); font-weight: 800;
+        font-size: clamp(2.1rem, 5vw, 3.8rem); line-height: 1.06; letter-spacing: -.035em;
     }
-
-    .md-description {
-        margin: 11px 0 0;
-        color: var(--md-muted);
-        font-size: 16px;
-        line-height: 1.7;
+    .md-heading h1 span { display: block; color: var(--cyan); }
+    .md-description { max-width: 540px; margin: 0; font-size: 15px; line-height: 1.8; color: rgba(255,255,255,.82); }
+    .md-heading-side { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; justify-self: end; }
+    .md-total small { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.78); }
+    .md-total small .i { font-size: 17px; color: var(--cyan); }
+    .md-total strong {
+        display: block; margin: 2px 0; font-family: var(--font-display); font-weight: 800; line-height: 1;
+        font-size: clamp(2.6rem, 5vw, 3.8rem); letter-spacing: -.04em; font-variant-numeric: tabular-nums;
     }
+    .md-total span { font-size: 13px; color: rgba(255,255,255,.7); }
 
-    .md-heading-decoration {
-        position: relative;
-        width: 150px;
-        height: 75px;
-        flex: 0 0 150px;
-        overflow: hidden;
-        opacity: .8;
+    /* ---------- Buttons ---------- */
+    .md-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        min-height: 50px; padding: 10px 20px; border: 1.5px solid transparent; border-radius: 12px;
+        font-family: var(--font-display); font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer;
+        transition: transform .2s var(--ease), box-shadow .2s, background .2s, color .2s, border-color .2s;
     }
+    .md-btn .i { font-size: 17px; }
+    .md-btn:active { transform: scale(.97); }
+    .md-btn-primary { color: #fff; background: linear-gradient(110deg, var(--royal), var(--electric)); box-shadow: 0 12px 26px rgba(36,87,214,.35); }
+    .md-btn-primary:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 16px 32px rgba(36,87,214,.45); }
+    .md-btn-secondary { color: var(--royal); background: #fff; border-color: #C5D6F5; }
+    .md-btn-secondary:hover { color: var(--royal); background: var(--soft); transform: translateY(-2px); }
+    .md-btn-ghost { color: var(--slate); background: transparent; }
+    .md-btn-ghost:hover { color: var(--navy); background: var(--ice); }
+    .md-add-button { min-height: 54px; padding: 12px 24px; font-size: 15px; }
 
-    .md-decoration-line {
-        position: absolute;
-        top: 36px;
-        left: 0;
-        width: 135px;
-        height: 1px;
-        background: #b7ccdf;
-        transform: rotate(-19deg);
-    }
-
-    .md-decoration-circle {
-        position: absolute;
-        top: 3px;
-        right: 28px;
-        width: 46px;
-        height: 46px;
-        border: 8px solid #d9e8f5;
-        border-radius: 50%;
-    }
-
-    .md-decoration-square {
-        position: absolute;
-        right: 5px;
-        bottom: 4px;
-        width: 17px;
-        height: 17px;
-        border-radius: 4px;
-        background: #2b77ad;
-        transform: rotate(25deg);
-    }
-
-    .md-add-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        min-height: 52px;
-        padding: 0 23px;
-        border: 1px solid var(--md-navy);
-        border-radius: 9px;
-        background: var(--md-navy);
-        color: #fff;
-        font-size: 15px;
-        font-weight: 700;
-        white-space: nowrap;
-        box-shadow: 0 7px 16px rgba(16, 45, 80, .14);
-        transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
-    }
-
-    .md-add-button:hover {
-        transform: translateY(-3px);
-        background: #1b4d7c;
-        box-shadow: 0 11px 22px rgba(16, 45, 80, .2);
-        color: #fff;
-    }
-
-    .md-add-button svg {
-        width: 19px;
-        height: 19px;
-    }
-
-    /* ALERT */
-
+    /* ---------- Alerts ---------- */
     .md-alert {
-        display: flex;
-        align-items: flex-start;
-        gap: 14px;
-        margin-bottom: 20px;
-        padding: 17px 20px;
-        border: 1px solid;
-        border-radius: 10px;
-        animation: md-enter .3s ease both;
+        display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px;
+        padding: 15px 18px; border: 1px solid transparent; border-radius: 16px; font-size: 14px; line-height: 1.7;
     }
+    .md-alert > .i { margin-top: 3px; font-size: 20px; }
+    .md-alert strong { display: block; font-family: var(--font-display); font-size: 15px; font-weight: 600; }
+    .md-alert p { margin: 2px 0 0; }
+    .md-alert ul { margin: 6px 0 0; padding-left: 20px; }
+    .md-alert-success { color: var(--ok); background: var(--ok-bg); border-color: var(--ok-line); }
+    .md-alert-error { color: var(--danger); background: var(--danger-bg); border-color: var(--danger-line); }
 
-    .md-alert-icon {
-        display: grid;
-        width: 35px;
-        height: 35px;
-        flex: 0 0 35px;
-        place-items: center;
-        border-radius: 9px;
-    }
-
-    .md-alert-icon svg {
-        width: 20px;
-        height: 20px;
-    }
-
-    .md-alert strong {
-        display: block;
-        margin-bottom: 2px;
-        font-size: 15px;
-        font-weight: 800;
-    }
-
-    .md-alert p {
-        margin: 0;
-        font-size: 14px;
-    }
-
-    .md-alert ul {
-        margin: 5px 0 0;
-        padding-left: 20px;
-        font-size: 14px;
-    }
-
-    .md-alert-success {
-        border-color: #b9e5d2;
-        background: #effaf5;
-        color: #176c50;
-    }
-
-    .md-alert-success .md-alert-icon {
-        background: #d9f3e6;
-    }
-
-    .md-alert-error {
-        border-color: #f0c8cb;
-        background: #fff5f5;
-        color: #a83943;
-    }
-
-    .md-alert-error .md-alert-icon {
-        background: #ffe5e6;
-    }
-
-    /* OVERVIEW */
-
-    .md-overview {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 30px;
-        min-height: 185px;
-        margin-bottom: 22px;
-        padding: 30px 36px;
-        overflow: hidden;
-        border: 1px solid #d8e5f1;
-        border-radius: 13px;
-        background:
-            linear-gradient(105deg, #edf5fc 0%, #f7faff 62%, #e8f2f9 100%);
-    }
-
-    .md-overview::before {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 6px;
-        height: 100%;
-        background: var(--md-blue);
-        content: "";
-    }
-
-    .md-overview-copy {
-        position: relative;
-        z-index: 1;
-        max-width: 650px;
-    }
-
-    .md-overview-label {
-        color: #3879aa;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1.6px;
-    }
-
-    .md-overview h2 {
-        margin: 8px 0 6px;
-        color: var(--md-navy);
-        font-size: clamp(23px, 2.5vw, 30px);
-        font-weight: 800;
-        line-height: 1.3;
-        letter-spacing: -.7px;
-    }
-
-    .md-overview-copy p {
-        max-width: 540px;
-        margin: 0;
-        color: #657b94;
-        font-size: 15px;
-    }
-
-    .md-overview-count {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        min-width: 145px;
-        padding-left: 28px;
-        border-left: 1px solid #cbdce9;
-    }
-
-    .md-count-label {
-        color: #6d839a;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1.4px;
-    }
-
-    .md-overview-count strong {
-        margin: 1px 0;
-        color: var(--md-navy);
-        font-size: 42px;
-        font-weight: 800;
-        line-height: 1.35;
-        letter-spacing: -1px;
-    }
-
-    .md-count-caption {
-        color: #71869c;
-        font-size: 13px;
-    }
-
-    .md-overview-mark {
-        position: absolute;
-        right: 165px;
-        bottom: -42px;
-        width: 160px;
-        height: 160px;
-        color: #7da6c9;
-        opacity: .13;
-        transform: rotate(-12deg);
-    }
-
-    .md-overview-mark svg {
-        width: 100%;
-        height: 100%;
-    }
-
-    /* FILTER */
-
-    .md-filter-panel,
-    .md-table-panel {
-        width: 100%;
-        margin-bottom: 22px;
-        border: 1px solid var(--md-border);
-        border-radius: 12px;
-        background: var(--md-surface);
-        box-shadow: 0 5px 20px rgba(22, 49, 78, .035);
-    }
-
+    /* ---------- Filter ---------- */
     .md-filter-panel {
-        padding: 25px 28px 28px;
+        margin-bottom: 20px; padding: clamp(18px, 2.6vw, 26px);
+        border: 1px solid var(--border); border-radius: 22px; background: #fff; box-shadow: 0 14px 36px rgba(8,27,51,.05);
     }
-
-    .md-section-heading {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-        margin-bottom: 22px;
-    }
-
-    .md-section-icon {
-        display: grid;
-        width: 43px;
-        height: 43px;
-        flex: 0 0 43px;
-        place-items: center;
-        border-radius: 10px;
-        background: var(--md-blue-soft);
-        color: var(--md-blue);
-    }
-
-    .md-section-icon svg {
-        width: 22px;
-        height: 22px;
-    }
-
-    .md-section-heading h2 {
-        margin: 0;
-        color: var(--md-navy);
-        font-size: 19px;
-        font-weight: 800;
-    }
-
-    .md-section-heading p {
-        margin: 2px 0 0;
-        color: var(--md-muted);
-        font-size: 13px;
-    }
-
+    .md-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .md-section-heading h2 { margin: 0 0 4px; font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: var(--navy); }
+    .md-section-heading p { margin: 0; font-size: 13.5px; color: var(--slate); }
     .md-filter-count {
-        margin-left: auto;
-        padding: 6px 11px;
-        border-radius: 20px;
-        background: #eaf4fb;
-        color: #28638e;
-        font-size: 12px;
-        font-weight: 700;
-        white-space: nowrap;
+        padding: 6px 12px; border-radius: 999px; background: var(--soft); border: 1px solid #D3E2FB;
+        color: var(--royal); font-size: 12.5px; font-weight: 700; white-space: nowrap;
     }
-
-    .md-filter-form {
-        display: grid;
-        grid-template-columns: minmax(220px, 1.7fr) minmax(180px, .8fr) auto;
-        align-items: end;
-        gap: 18px;
+    .md-filter-form { display: grid; grid-template-columns: minmax(220px, 1.7fr) minmax(180px, .8fr) auto; align-items: end; gap: 14px; }
+    .md-field { min-width: 0; }
+    .md-field label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 700; color: var(--navy); }
+    .md-input-wrap, .md-select-wrap {
+        position: relative; display: flex; align-items: center; min-height: 50px;
+        border: 1.5px solid var(--border); border-radius: 12px; background: var(--ice);
+        transition: border-color .2s, box-shadow .2s, background .2s;
     }
-
-    .md-field {
-        min-width: 0;
-    }
-
-    .md-field label {
-        display: block;
-        margin-bottom: 8px;
-        color: #344960;
-        font-size: 14px;
-        font-weight: 700;
-    }
-
-    .md-input-wrap,
-    .md-select-wrap {
-        position: relative;
-        display: flex;
-        align-items: center;
-        min-height: 49px;
-        border: 1px solid #dce5ee;
-        border-radius: 8px;
-        background: #fbfcfe;
-        transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
-    }
-
-    .md-input-wrap:focus-within,
-    .md-select-wrap:focus-within {
-        border-color: #4b8fc4;
-        background: #fff;
-        box-shadow: 0 0 0 3px rgba(40, 118, 185, .11);
-    }
-
-    .md-input-wrap {
-        gap: 11px;
-        padding: 0 14px;
-    }
-
-    .md-input-wrap svg {
-        color: #8294a8;
-    }
-
+    .md-input-wrap:hover, .md-select-wrap:hover { border-color: #c5d3e4; }
+    .md-input-wrap:focus-within, .md-select-wrap:focus-within { background: #fff; border-color: var(--electric); box-shadow: 0 0 0 4px rgba(52,120,246,.16); }
+    .md-input-wrap { gap: 11px; padding: 0 14px; }
+    .md-input-wrap .i, .md-select-wrap > .i { font-size: 18px; color: var(--slate); }
     .md-input-wrap input {
-        width: 100%;
-        min-width: 0;
-        height: 47px;
-        padding: 0;
-        border: 0;
-        outline: none;
-        background: transparent;
-        color: var(--md-ink);
-        font-size: 14px;
+        width: 100%; min-width: 0; height: 47px; padding: 0; border: 0; outline: none; background: transparent;
+        color: var(--text); font-size: 14px;
     }
-
-    .md-input-wrap input::placeholder {
-        color: #9aa8b8;
-    }
-
+    .md-input-wrap input::placeholder { color: #8796aa; }
     .md-select-wrap select {
-        width: 100%;
-        height: 47px;
-        padding: 0 40px 0 14px;
-        appearance: none;
-        border: 0;
-        outline: none;
-        background: transparent;
-        color: var(--md-ink);
-        font-size: 14px;
-        cursor: pointer;
+        width: 100%; height: 47px; padding: 0 40px 0 14px; appearance: none; border: 0; outline: none;
+        background: transparent; color: var(--text); font-size: 14px; cursor: pointer;
     }
+    .md-select-wrap > .i { position: absolute; right: 13px; pointer-events: none; }
+    .md-filter-actions { display: flex; align-items: center; gap: 8px; }
 
-    .md-select-wrap > svg {
-        position: absolute;
-        right: 13px;
-        width: 17px;
-        height: 17px;
-        color: #8294a8;
-        pointer-events: none;
-    }
-
-    .md-filter-actions {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-    }
-
-    .md-filter-button,
-    .md-reset-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        min-height: 49px;
-        padding: 0 17px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 750;
-        white-space: nowrap;
-        cursor: pointer;
-        transition: background .2s ease, transform .2s ease, border-color .2s ease;
-    }
-
-    .md-filter-button {
-        border: 1px solid var(--md-blue);
-        background: var(--md-blue);
-        color: #fff;
-    }
-
-    .md-filter-button:hover {
-        transform: translateY(-2px);
-        background: var(--md-navy);
-        color: #fff;
-    }
-
-    .md-filter-button svg {
-        width: 17px;
-        height: 17px;
-    }
-
-    .md-reset-button {
-        border: 1px solid #dce5ee;
-        background: #fff;
-        color: #5c6f84;
-    }
-
-    .md-reset-button:hover {
-        border-color: #b7cde0;
-        background: #f0f6fb;
-        color: var(--md-blue);
-    }
-
-    /* TABLE */
-
+    /* ---------- Tabel ---------- */
     .md-table-panel {
-        overflow: hidden;
+        overflow: hidden; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 22px;
+        background: #fff; box-shadow: 0 18px 44px rgba(8,27,51,.07);
     }
-
     .md-table-heading {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        padding: 26px 28px 22px;
-        border-bottom: 1px solid var(--md-border);
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+        padding: 20px clamp(18px, 2.6vw, 26px); border-bottom: 1px solid var(--border);
     }
-
-    .md-table-heading h2 {
-        margin: 0;
-        color: var(--md-navy);
-        font-size: 23px;
-        font-weight: 800;
-        letter-spacing: -.5px;
-    }
-
-    .md-table-heading p {
-        margin: 5px 0 0;
-        color: var(--md-muted);
-        font-size: 14px;
-    }
-
+    .md-table-heading h2 { margin: 0 0 3px; font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: var(--navy); }
+    .md-table-heading p { margin: 0; font-size: 13.5px; color: var(--slate); }
     .md-table-meta {
-        display: inline-flex;
-        align-items: center;
-        gap: 9px;
-        padding: 8px 13px;
-        border: 1px solid #dce9f2;
-        border-radius: 30px;
-        background: #f7fbff;
-        color: #5b728a;
-        font-size: 12px;
-        font-weight: 700;
-        white-space: nowrap;
+        display: inline-flex; align-items: center; gap: 9px; padding: 7px 14px; border-radius: 999px;
+        background: var(--soft); border: 1px solid #D3E2FB; color: var(--royal); font-size: 12.5px; font-weight: 700; white-space: nowrap;
     }
-
-    .md-live-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #24a17b;
-        box-shadow: 0 0 0 4px #dff4eb;
-    }
-
-    .md-table-container {
-        width: 100%;
-        overflow-x: auto;
-        scrollbar-color: #c5d5e4 #f3f6fa;
-        scrollbar-width: thin;
-    }
-
-    .md-table {
-        width: 100%;
-        min-width: 760px;
-        border-collapse: separate;
-        border-spacing: 0;
-        text-align: left;
-    }
-
+    .md-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #14A37A; box-shadow: 0 0 0 4px rgba(20,163,122,.16); }
+    .md-table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+    .md-table { width: 100%; min-width: 760px; border-collapse: collapse; text-align: left; }
     .md-table thead th {
-        padding: 15px 17px;
-        border-bottom: 1px solid #dfe7ef;
-        background: #f4f7fb;
-        color: #5b6f85;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: .35px;
-        white-space: nowrap;
+        padding: 15px 18px; background: var(--navy); color: #fff;
+        font-size: 12px; font-weight: 700; letter-spacing: .06em; white-space: nowrap;
     }
-
-    .md-table thead th:first-child {
-        padding-left: 25px;
-    }
-
-    .md-table tbody td {
-        padding: 17px;
-        border-bottom: 1px solid #edf1f5;
-        color: #53677d;
-        font-size: 14px;
-        vertical-align: middle;
-    }
-
-    .md-table tbody tr {
-        transition: background .18s ease;
-    }
-
-    .md-table tbody tr:hover {
-        background: #f7fbff;
-    }
-
-    .md-table tbody tr:last-child td {
-        border-bottom: 0;
-    }
-
-    .md-number-column {
-        width: 70px;
-    }
-
-    .md-number-cell {
-        padding-left: 25px !important;
-        color: #8b9bad !important;
-        font-weight: 700;
-    }
-
-    .md-primary-text {
-        color: #263d57;
-        font-weight: 700;
-        overflow-wrap: anywhere;
-    }
-
-    .md-type-label {
-        display: inline-flex;
-        padding: 5px 10px;
-        border: 1px solid #dbe8f3;
-        border-radius: 6px;
-        background: #f0f6fb;
-        color: #37668e;
-        font-size: 12px;
-        font-weight: 750;
-    }
-
+    .md-table tbody td { padding: 16px 18px; border-bottom: 1px solid #EBF0F6; font-size: 14px; color: #33465C; vertical-align: middle; }
+    .md-table tbody tr { transition: background .2s; }
+    .md-table tbody tr:hover { background: #F5F9FF; }
+    .md-table tbody tr:last-child td { border-bottom: 0; }
+    .md-number-column { width: 70px; }
+    .md-number-cell { font-weight: 700; color: #7C8DA3 !important; font-variant-numeric: tabular-nums; }
+    .md-primary-text { font-weight: 700; color: var(--navy); overflow-wrap: anywhere; }
+    .md-type-label { display: inline-flex; padding: 5px 12px; border-radius: 999px; background: var(--soft); color: var(--royal); font-size: 12.5px; font-weight: 700; }
     .md-year-label {
-        display: inline-flex;
-        min-width: 68px;
-        justify-content: center;
-        padding: 5px 10px;
-        border-radius: 6px;
-        background: #edf4fc;
-        color: #225985;
-        font-size: 14px;
-        font-weight: 800;
-        font-variant-numeric: tabular-nums;
+        display: inline-grid; place-items: center; min-width: 68px; height: 32px; padding: 0 10px; border-radius: 10px;
+        background: var(--soft); color: var(--royal); font-family: var(--font-display); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums;
     }
+    .md-status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+    .md-status > span { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .md-status-active { color: var(--ok); background: var(--ok-bg); }
+    .md-status-inactive { color: #5A6B7E; background: #ECF0F4; }
 
-    .md-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 11px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 750;
-        white-space: nowrap;
-    }
-
-    .md-status > span {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-    }
-
-    .md-status-active {
-        background: #eaf7f0;
-        color: #18734f;
-    }
-
-    .md-status-active > span {
-        background: #1c9a67;
-    }
-
-    .md-status-inactive {
-        background: #f0f2f5;
-        color: #68778a;
-    }
-
-    .md-status-inactive > span {
-        background: #8995a3;
-    }
-
-    .md-action-column {
-        min-width: 245px;
-    }
-
-    .md-row-actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 7px;
-    }
-
-    .md-row-actions form {
-        display: inline-flex;
-        margin: 0;
-    }
-
+    .md-action-column { min-width: 250px; }
+    .md-row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+    .md-row-actions form { display: inline-flex; margin: 0; }
     .md-action {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        min-height: 34px;
-        padding: 6px 10px;
-        border: 1px solid transparent;
-        border-radius: 6px;
-        background: #fff;
-        font-size: 12px;
-        font-weight: 750;
-        line-height: 1.3;
-        white-space: nowrap;
-        cursor: pointer;
-        transition: background .18s ease, border-color .18s ease, transform .18s ease;
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        min-height: 38px; padding: 7px 13px; border: 1.5px solid transparent; border-radius: 10px; background: #fff;
+        font-family: var(--font-body); font-size: 13px; font-weight: 700; line-height: 1.3; white-space: nowrap; cursor: pointer;
+        transition: transform .2s var(--ease), background .2s, color .2s, border-color .2s;
     }
+    .md-action:hover { transform: translateY(-2px); }
+    .md-action .i { font-size: 15px; }
+    .md-action-edit { color: var(--royal); border-color: #C5D6F5; }
+    .md-action-edit:hover { color: #fff; background: var(--royal); border-color: var(--royal); }
+    .md-action-status { color: #4B5E75; border-color: var(--border); }
+    .md-action-status:hover { color: var(--navy); background: var(--ice); border-color: #c5d3e4; }
+    .md-action-delete { color: var(--danger); border-color: var(--danger-line); }
+    .md-action-delete:hover { color: #fff; background: var(--danger); border-color: var(--danger); }
 
-    .md-action:hover {
-        transform: translateY(-1px);
-    }
+    .md-empty-cell { padding: 0 !important; }
+    .md-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 280px; padding: 36px 20px; text-align: center; }
+    .md-empty-icon { display: grid; place-items: center; width: 60px; height: 60px; margin-bottom: 14px; border-radius: 18px; background: var(--soft); color: var(--royal); font-size: 28px; }
+    .md-empty-state strong { font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--navy); }
+    .md-empty-state p { max-width: 400px; margin: 6px 0 16px; font-size: 14px; color: var(--slate); }
 
-    .md-action svg {
-        width: 15px;
-        height: 15px;
-    }
-
-    .md-action-edit {
-        border-color: #cfe1f2;
-        background: #f0f7fd;
-        color: #245f91;
-    }
-
-    .md-action-edit:hover {
-        border-color: #9dc1df;
-        background: #e2f0fc;
-        color: #174b78;
-    }
-
-    .md-action-status {
-        border-color: #e2e8ee;
-        background: #f8fafc;
-        color: #617387;
-    }
-
-    .md-action-status:hover {
-        border-color: #c4d2df;
-        background: #edf3f8;
-    }
-
-    .md-action-delete {
-        border-color: #f2d6d8;
-        background: #fff7f7;
-        color: #b34b53;
-    }
-
-    .md-action-delete:hover {
-        border-color: #eab8bc;
-        background: #ffeded;
-        color: #a52e39;
-    }
-
-    /* EMPTY STATE */
-
-    .md-empty-cell {
-        padding: 0 !important;
-    }
-
-    .md-empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 280px;
-        padding: 35px 20px;
-        text-align: center;
-    }
-
-    .md-empty-icon {
-        display: grid;
-        width: 62px;
-        height: 62px;
-        margin-bottom: 14px;
-        place-items: center;
-        border-radius: 17px;
-        background: #edf4fb;
-        color: #3975a6;
-    }
-
-    .md-empty-icon svg {
-        width: 29px;
-        height: 29px;
-    }
-
-    .md-empty-state strong {
-        color: var(--md-navy);
-        font-size: 19px;
-        font-weight: 800;
-    }
-
-    .md-empty-state p {
-        max-width: 400px;
-        margin: 7px 0 14px;
-        color: var(--md-muted);
-        font-size: 14px;
-    }
-
-    .md-empty-link {
-        color: var(--md-blue);
-        font-size: 14px;
-        font-weight: 800;
-        text-decoration: underline !important;
-        text-underline-offset: 4px;
-    }
-
-    /* PAGINATION */
-
+    /* ---------- Pagination ---------- */
     .md-pagination {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        padding: 18px 25px;
-        border-top: 1px solid var(--md-border);
-        background: #fbfcfe;
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;
+        padding: 16px clamp(18px, 2.6vw, 26px); border-top: 1px solid var(--border);
     }
-
-    .md-pagination-info {
-        color: #7a899a;
-        font-size: 13px;
+    .md-pagination-info { font-size: 13px; color: var(--slate); }
+    .md-pagination-info strong { color: var(--navy); }
+    .md-pagination-links { min-width: 0; overflow-x: auto; }
+    .md-pagination-links nav { display: flex; align-items: center; gap: 5px; }
+    .md-pagination-links nav > div:first-child { display: none; }
+    .md-pagination-links nav > div:last-child { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+    .md-pagination-links a, .md-pagination-links span[aria-current="page"] span, .md-pagination-links span[aria-disabled="true"] span {
+        display: inline-flex; align-items: center; justify-content: center; min-width: 38px; min-height: 38px; padding: 6px 10px;
+        color: var(--royal); background: var(--ice); border: 1px solid var(--border); border-radius: 10px;
+        font-size: 13px; font-weight: 600; transition: .2s;
     }
+    .md-pagination-links a:hover { color: #fff; background: var(--royal); border-color: var(--royal); }
+    .md-pagination-links span[aria-current="page"] span { color: #fff; background: var(--royal); border-color: var(--royal); }
+    .md-pagination-links svg { width: 17px; height: 17px; }
 
-    .md-pagination-info strong {
-        color: #344c65;
-        font-weight: 800;
-    }
+    .md-footer { display: flex; justify-content: space-between; gap: 15px; padding: 4px 2px 16px; font-size: 12.5px; color: var(--slate); }
+    .md-footer span:first-child { font-family: var(--font-display); font-weight: 700; color: var(--navy); }
 
-    .md-pagination-links {
-        min-width: 0;
-    }
+    @keyframes md-rise { from { opacity: 0; transform: translate3d(0, 18px, 0); } to { opacity: 1; transform: none; } }
+    @keyframes md-drift { to { transform: translate3d(-40px, 40px, 0); } }
 
-    .md-pagination-links nav {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .md-pagination-links nav > div:first-child {
-        display: none;
-    }
-
-    .md-pagination-links nav > div:last-child > span,
-    .md-pagination-links nav > div:last-child > a {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 36px;
-        min-height: 36px;
-        margin: 0 2px;
-        padding: 5px 10px;
-        border: 1px solid #e0e8f0;
-        border-radius: 7px;
-        background: #fff;
-        color: #526a83;
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none;
-    }
-
-    .md-pagination-links nav > div:last-child span[aria-current="page"] span {
-        border-color: var(--md-blue);
-        background: var(--md-blue);
-        color: #fff;
-    }
-
-    .md-pagination-links nav > div:last-child a:hover {
-        border-color: #a9c7df;
-        background: #edf5fc;
-        color: var(--md-blue);
-    }
-
-    /* FOOTER */
-
-    .md-footer {
-        display: flex;
-        justify-content: space-between;
-        gap: 15px;
-        padding: 7px 2px 18px;
-        color: #8998a9;
-        font-size: 12px;
-    }
-
-    .md-footer span:first-child {
-        color: #496b8c;
-        font-weight: 800;
-        letter-spacing: 1px;
-    }
-
-    /* ANIMASI */
-
-    @keyframes md-enter {
-        from {
-            opacity: 0;
-            transform: translateY(9px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* TABLET */
-
+    /* ---------- Responsive ---------- */
     @media (max-width: 1050px) {
-        .md-heading-decoration {
-            display: none;
-        }
-
-        .md-filter-form {
-            grid-template-columns: minmax(200px, 1fr) minmax(160px, .7fr);
-        }
-
-        .md-filter-actions {
-            grid-column: 1 / -1;
-        }
-
-        .md-overview-mark {
-            right: 130px;
-        }
+        .md-heading { grid-template-columns: 1fr; align-items: start; }
+        .md-heading-side { justify-self: start; }
+        .md-filter-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .md-filter-actions { grid-column: 1 / -1; }
     }
+    @media (max-width: 700px) {
+        .md-add-button, .md-filter-actions .md-btn { width: 100%; }
+        .md-filter-form { grid-template-columns: 1fr; }
+        .md-filter-actions { flex-direction: column; align-items: stretch; }
+        .md-section-heading { flex-direction: column; }
+        .md-pagination { flex-direction: column; align-items: flex-start; }
 
-    @media (max-width: 760px) {
-        .md-heading {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .md-add-button {
-            width: 100%;
-        }
-
-        .md-overview {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 22px;
-            padding: 25px 25px 25px 29px;
-        }
-
-        .md-overview-count {
-            width: 100%;
-            min-width: 0;
-            padding: 15px 0 0;
-            border-top: 1px solid #cbdce9;
-            border-left: 0;
-        }
-
-        .md-overview-count strong {
-            font-size: 36px;
-        }
-
-        .md-overview-mark {
-            right: 15px;
-            bottom: 25px;
-            width: 110px;
-            height: 110px;
-        }
-
-        .md-filter-panel {
-            padding: 22px 20px;
-        }
-
-        .md-filter-form {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .md-filter-actions {
-            grid-column: auto;
-        }
-
-        .md-filter-button,
-        .md-reset-button {
-            flex: 1;
-        }
-
-        .md-table-heading {
-            align-items: flex-start;
-            flex-direction: column;
-            padding: 23px 20px;
-        }
-
-        .md-pagination {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-
-        .md-pagination-links {
-            width: 100%;
-            overflow-x: auto;
-        }
-    }
-
-    /* MOBILE */
-
-    @media (max-width: 600px) {
-        .md-page {
-            font-size: 14px;
-        }
-
-        .md-breadcrumb {
-            margin-bottom: 16px;
-            font-size: 10px;
-        }
-
-        .md-heading h1 {
-            font-size: 34px;
-        }
-
-        .md-description {
-            font-size: 14px;
-        }
-
-        .md-heading {
-            padding-bottom: 22px;
-        }
-
-        .md-overview {
-            min-height: auto;
-            padding: 22px 20px 22px 25px;
-        }
-
-        .md-overview h2 {
-            font-size: 23px;
-        }
-
-        .md-overview-copy p {
-            font-size: 13px;
-        }
-
-        .md-overview-mark {
-            right: -5px;
-            bottom: 30px;
-            width: 85px;
-            height: 85px;
-        }
-
-        .md-section-heading {
-            flex-wrap: wrap;
-        }
-
-        .md-filter-count {
-            margin-left: 0;
-        }
-
-        .md-filter-actions {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .md-filter-button,
-        .md-reset-button {
-            width: 100%;
-        }
-
-        .md-table-heading h2 {
-            font-size: 21px;
-        }
-
-        .md-table-heading p {
-            font-size: 13px;
-        }
-
-        .md-table-container {
-            overflow: visible;
-            padding: 12px;
-            background: #f7f9fc;
-        }
-
-        .md-table {
-            display: block;
-            width: 100%;
-            min-width: 0;
-        }
-
-        .md-table thead {
-            display: none;
-        }
-
-        .md-table tbody {
-            display: flex;
-            flex-direction: column;
-            gap: 13px;
-        }
-
-        .md-table tbody tr {
-            display: block;
-            overflow: hidden;
-            border: 1px solid #e0e8f0;
-            border-radius: 10px;
-            background: #fff;
-            box-shadow: 0 3px 10px rgba(20, 47, 76, .035);
-        }
-
-        .md-table tbody tr:hover {
-            background: #fff;
-        }
-
+        /* tabel menjadi kartu per baris */
+        .md-table-container { overflow: visible; }
+        .md-table { display: block; min-width: 0; }
+        .md-table thead { display: none; }
+        .md-table tbody { display: grid; gap: 12px; padding: 12px; }
+        .md-table tbody tr { display: block; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; }
         .md-table tbody td {
-            display: grid;
-            grid-template-columns: minmax(105px, 36%) minmax(0, 1fr);
-            align-items: center;
-            gap: 12px;
-            padding: 12px 13px;
-            border-bottom: 1px solid #edf1f5;
-            font-size: 13px;
-            overflow-wrap: anywhere;
+            display: grid; grid-template-columns: minmax(100px, 36%) minmax(0, 1fr); gap: 10px; align-items: center;
+            padding: 11px 14px; font-size: 14px; border-bottom: 1px solid #EDF1F5; overflow-wrap: anywhere;
         }
-
-        .md-table tbody td::before {
-            content: attr(data-label);
-            color: #78899b;
-            font-size: 12px;
-            font-weight: 750;
-        }
-
-        .md-table tbody td:last-child {
-            border-bottom: 0;
-        }
-
-        .md-table tbody td.md-empty-cell {
-            display: block;
-            padding: 0 !important;
-            border: 0;
-        }
-
-        .md-table tbody td.md-empty-cell::before {
-            display: none;
-        }
-
-        .md-row-actions {
-            justify-content: flex-start;
-            gap: 6px;
-        }
-
-        .md-action {
-            min-height: 32px;
-            padding: 6px 8px;
-            font-size: 11px;
-        }
-
-        .md-pagination {
-            padding: 17px;
-        }
-
-        .md-footer {
-            flex-direction: column;
-            gap: 3px;
-        }
+        .md-table tbody td[data-label]::before { content: attr(data-label); font-size: 13px; font-weight: 600; color: var(--slate); }
+        .md-table tbody tr td:last-child { display: block; border-bottom: 0; }
+        .md-table tbody td.md-empty-cell { display: block; border: 0; }
+        .md-action-column { min-width: 0; }
+        .md-row-actions .md-action { flex: 1 1 auto; }
+        .md-footer { flex-direction: column; gap: 2px; }
     }
-
-    @media (max-width: 380px) {
-        .md-table tbody td {
-            grid-template-columns: minmax(85px, 34%) minmax(0, 1fr);
-            gap: 8px;
-            padding: 10px;
-        }
-
-        .md-action {
-            padding: 5px 7px;
-        }
-
-        .md-overview-mark {
-            opacity: .07;
-        }
-    }
-
     @media (prefers-reduced-motion: reduce) {
-        .md-page *,
-        .md-page *::before,
-        .md-page *::after {
-            scroll-behavior: auto !important;
-            animation-duration: .01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: .01ms !important;
-        }
+        .md-page *, .md-page *::before, .md-page *::after { animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
     }
 </style>
+
+<script>
+    (function () {
+        var el = document.getElementById('md-counter');
+        if (!el) { return; }
+        var target = parseInt(el.getAttribute('data-target'), 10) || 0;
+        if (target < 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
+
+        var fmt = new Intl.NumberFormat('id-ID');
+        var start = null, dur = 900;
+        el.textContent = '0';
+
+        requestAnimationFrame(function step(t) {
+            if (start === null) { start = t; }
+            var p = Math.min((t - start) / dur, 1);
+            el.textContent = fmt.format(Math.round(target * (1 - Math.pow(1 - p, 3))));
+            if (p < 1) { requestAnimationFrame(step); }
+        });
+    })();
+</script>
 
 @endsection
