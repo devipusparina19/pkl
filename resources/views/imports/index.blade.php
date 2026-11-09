@@ -6,284 +6,345 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 
-<div class="sirapik-import">
+<style>
+    /* =====================================================
+       IMPORT DATA PESERTA — SIRAPIK (Premium Blue Editorial)
+    ===================================================== */
+    .im {
+        --navy: #081b33; --midnight: #0b2545; --royal: #2457d6;
+        --electric: #3478f6; --soft: #eaf2ff; --ice: #f3f7fc;
+        --slate: #64748b; --ink: #14243a; --line: #e1e9f2; --cyan: #38c6e8;
+        --red: #991b1b; --red-soft: #fef2f2; --red-line: #fecaca;
+        --green: #166534; --green-soft: #f0fdf4; --green-line: #bbf7d0;
+        --amber: #7a4f0e; --amber-soft: #fffaf0; --amber-line: #f0dfb9;
+        --f-display: 'Sora', system-ui, sans-serif;
+        --f-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+        --ease: cubic-bezier(.2, .7, .3, 1);
 
-    <style>
-        /* =====================================================
-           PREMIUM BLUE EDITORIAL — IMPORT DATA PESERTA
-           Semua selector di-scope ke .sirapik-import
-           ===================================================== */
-        .sirapik-import {
-            --navy: #081B33;
-            --midnight: #0B2545;
-            --royal: #2457D6;
-            --electric: #3478F6;
-            --soft: #EAF2FF;
-            --ice: #F3F7FC;
-            --slate: #64748B;
-            --text: #14243A;
-            --border: #E1E9F2;
-            --cyan: #38C6E8;
-            --danger: #A3202F;
-            --danger-bg: #FFF1F2;
-            --danger-line: #F7D1D5;
-            --ok: #0F6B4A;
-            --ok-bg: #E8F6EF;
-            --ok-line: #B7E2CC;
-            --warn: #8A5A12;
-            --warn-bg: #FFF8EB;
-            --warn-line: #F0DFB9;
-            --font-display: "Sora", "Segoe UI", Arial, sans-serif;
-            --font-body: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
-            --ease: cubic-bezier(.2, .7, .2, 1);
+        width: 100%;
+        color: var(--ink);
+        font-family: var(--f-body);
+        font-size: 16px;
+        line-height: 1.7;
+    }
 
-            width: 100%; color: var(--text);
-            font-family: var(--font-body); font-size: 15px; line-height: 1.65;
-        }
-        .sirapik-import *, .sirapik-import *::before, .sirapik-import *::after { box-sizing: border-box; }
-        .sirapik-import button, .sirapik-import input, .sirapik-import select { font: inherit; }
-        .sirapik-import svg.i {
-            width: 1em; height: 1em; flex: none;
-            fill: none; stroke: currentColor;
-            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-        }
-        .sirapik-import :focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+    .im *, .im *::before, .im *::after { box-sizing: border-box; }
+    .im svg { display: block; flex: 0 0 auto; }
+    .im input, .im select, .im button { font: inherit; }
 
-        /* ---------- Header ---------- */
-        .si-head {
-            position: relative; isolation: isolate; overflow: hidden;
-            display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr);
-            align-items: end; gap: clamp(20px, 4vw, 56px);
-            margin-bottom: 26px; padding: clamp(28px, 4vw, 48px);
-            border-radius: 24px; color: #fff;
-            background: linear-gradient(120deg, var(--navy) 0%, var(--midnight) 60%, #173d86 100%);
-            animation: si-rise .8s var(--ease) both;
-        }
-        .si-head::before {
-            content: ""; position: absolute; z-index: -1; right: -90px; top: -110px;
-            width: 340px; height: 340px; border-radius: 50%;
-            background: var(--royal); opacity: .45; filter: blur(60px);
-            animation: si-drift 24s ease-in-out infinite alternate;
-        }
-        .si-head h1 {
-            margin: 0 0 12px; font-family: var(--font-display); font-weight: 800;
-            font-size: clamp(2rem, 4.6vw, 3.4rem); line-height: 1.08; letter-spacing: -.035em;
-        }
-        .si-head h1 span { display: block; color: var(--cyan); }
-        .si-head p { max-width: 560px; margin: 0; font-size: 15px; line-height: 1.8; color: rgba(255,255,255,.82); }
-        .si-head-mark {
-            display: flex; align-items: center; gap: 14px; padding: 18px 20px;
-            border-radius: 18px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08);
-        }
-        .si-head-mark .ic {
-            display: grid; place-items: center; width: 46px; height: 46px; flex: none;
-            border-radius: 13px; background: rgba(56,198,232,.15); color: var(--cyan); font-size: 22px;
-        }
-        .si-head-mark strong { display: block; font-family: var(--font-display); font-size: 15px; font-weight: 600; }
-        .si-head-mark span { font-size: 13px; color: rgba(255,255,255,.72); }
+    .im :focus-visible {
+        outline: 3px solid rgba(52, 120, 246, .55);
+        outline-offset: 3px;
+        border-radius: 8px;
+    }
 
-        /* ---------- Alerts ---------- */
-        .si-alert {
-            display: flex; align-items: flex-start; gap: 13px; margin-bottom: 18px;
-            padding: 16px 18px; border: 1px solid transparent; border-radius: 16px;
-            font-size: 14px; line-height: 1.7;
-        }
-        .si-alert > .i { margin-top: 3px; font-size: 20px; }
-        .si-alert-content { min-width: 0; flex: 1; }
-        .si-alert strong.h { display: block; margin-bottom: 2px; font-family: var(--font-display); font-size: 15px; font-weight: 600; }
-        .si-alert ul { margin: 6px 0 0; padding-left: 20px; }
-        .si-alert li { overflow-wrap: anywhere; }
-        .si-alert-danger { color: var(--danger); background: var(--danger-bg); border-color: var(--danger-line); }
-        .si-alert-success { color: var(--ok); background: var(--ok-bg); border-color: var(--ok-line); }
-        .si-import-notes { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--ok-line); }
+    .im-progress {
+        position: fixed; top: 0; left: 0; z-index: 60;
+        width: 100%; height: 3px;
+        background: linear-gradient(90deg, var(--electric), var(--cyan));
+        transform: scaleX(0); transform-origin: 0 50%;
+        pointer-events: none;
+    }
 
-        /* ---------- Workspace ---------- */
-        .si-workspace {
-            display: grid; grid-template-columns: minmax(0, 1fr) 320px;
-            align-items: start; gap: 24px;
-        }
-        .si-main-panel {
-            min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 22px;
-            background: #fff; box-shadow: 0 18px 44px rgba(8,27,51,.07);
-        }
-        .si-panel-heading {
-            display: flex; align-items: center; gap: 14px;
-            padding: 22px clamp(20px, 3vw, 32px); border-bottom: 1px solid var(--border);
-        }
-        .si-panel-icon {
-            display: grid; place-items: center; width: 48px; height: 48px; flex: none;
-            border-radius: 14px; background: var(--soft); color: var(--royal); font-size: 24px;
-        }
-        .si-panel-heading h2 { margin: 0; font-family: var(--font-display); font-size: 19px; font-weight: 700; letter-spacing: -.02em; color: var(--navy); }
-        .si-panel-heading p { margin: 3px 0 0; font-size: 13px; color: var(--slate); }
-        .si-form-body { padding: clamp(20px, 3vw, 32px); }
+    .im.is-js [data-reveal] {
+        opacity: 0; transform: translateY(20px);
+        transition: opacity .7s var(--ease), transform .7s var(--ease);
+    }
+    .im.is-js [data-reveal].is-in { opacity: 1; transform: none; }
 
-        /* Langkah form: urutan nyata, jadi bernomor */
-        .si-step { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; }
-        .si-step + .si-form-grid { margin-bottom: 0; }
-        .si-step-number {
-            display: grid; place-items: center; width: 30px; height: 30px; flex: none;
-            border-radius: 9px; background: var(--navy); color: #fff;
-            font-family: var(--font-display); font-size: 12px; font-weight: 700;
-        }
-        .si-step strong { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--navy); }
-        .si-step i { flex: 1; height: 1px; background: var(--border); }
-        .si-step.gap { margin-top: 34px; }
+    /* =====================================================
+       HERO
+    ===================================================== */
+    .im-hero {
+        position: relative; isolation: isolate; overflow: hidden;
+        margin-bottom: 28px; padding: clamp(28px, 5vw, 52px);
+        color: #fff; border-radius: 24px;
+        background: linear-gradient(160deg, var(--navy) 0%, var(--midnight) 100%);
+    }
 
-        .si-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 24px; }
-        .si-field { min-width: 0; }
-        .si-field-full { grid-column: 1 / -1; }
-        .si-field label {
-            display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
-            margin-bottom: 8px; font-size: 14px; font-weight: 700; color: var(--navy);
-        }
-        .si-required { color: #C8323F; font-size: 15px; }
-        .si-optional {
-            padding: 2px 8px; border-radius: 999px; background: var(--ice);
-            color: var(--slate); font-size: 11px; font-weight: 600;
-        }
-        .sirapik-import .si-control {
-            display: block; width: 100%; min-width: 0; min-height: 52px; padding: 12px 15px;
-            color: var(--text); background: var(--ice);
-            border: 1.5px solid var(--border); border-radius: 12px;
-            font-size: 14px; line-height: 1.5;
-            transition: border-color .2s, box-shadow .2s, background .2s;
-        }
-        .sirapik-import .si-control::placeholder { color: #8796aa; }
-        .sirapik-import .si-control:hover { border-color: #c5d3e4; }
-        .sirapik-import .si-control:focus {
-            outline: none; background: #fff; border-color: var(--electric);
-            box-shadow: 0 0 0 4px rgba(52,120,246,.16);
-        }
-        .sirapik-import select.si-control { cursor: pointer; }
-        .sirapik-import input[type="file"].si-control { padding: 9px 10px; background: var(--soft); border-style: dashed; border-color: #AFC8F2; }
-        .sirapik-import input[type="file"]::file-selector-button {
-            min-height: 34px; margin-right: 12px; padding: 6px 14px; border: 0; border-radius: 9px;
-            background: var(--royal); color: #fff; font-family: var(--font-display);
-            font-size: 12px; font-weight: 600; cursor: pointer; transition: background .2s;
-        }
-        .sirapik-import input[type="file"]::file-selector-button:hover { background: var(--electric); }
-        .si-field-help { display: block; margin-top: 7px; font-size: 12.5px; line-height: 1.6; color: var(--slate); }
+    .im-hero::before {
+        content: ""; position: absolute; inset: 0; z-index: -2; opacity: .1;
+        background-image:
+            linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
+        background-size: 56px 56px;
+        -webkit-mask-image: linear-gradient(160deg, #000 5%, transparent 75%);
+        mask-image: linear-gradient(160deg, #000 5%, transparent 75%);
+    }
 
-        .si-selected-file {
-            display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 11px 14px;
-            border: 1px solid var(--ok-line); border-radius: 12px; background: var(--ok-bg);
-            color: var(--ok); font-size: 13px; font-weight: 600; overflow-wrap: anywhere;
-        }
-        .si-selected-file[hidden] { display: none; }
-        .si-selected-file .i { font-size: 20px; }
+    .im-orbit {
+        position: absolute; z-index: -1; right: -150px; bottom: -190px;
+        width: 460px; height: 460px; border-radius: 50%;
+        border: 1px solid rgba(130,183,255,.25);
+        box-shadow: 0 0 0 54px rgba(130,183,255,.04), 0 0 0 108px rgba(130,183,255,.025);
+        animation: im-float 14s ease-in-out infinite;
+    }
+    @keyframes im-float { 50% { transform: translateY(-18px); } }
 
-        /* ---------- Footer & buttons ---------- */
-        .si-form-footer {
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;
-            margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--border);
-        }
-        .si-footer-note { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--slate); }
-        .si-footer-note .i { font-size: 17px; color: var(--royal); }
-        .si-actions { display: flex; align-items: center; gap: 10px; }
-        .sirapik-import .si-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-            min-height: 52px; padding: 12px 22px; border: 1.5px solid transparent; border-radius: 14px;
-            font-family: var(--font-display); font-size: 14px; font-weight: 600; cursor: pointer;
-            transition: transform .2s var(--ease), box-shadow .2s, background .2s, color .2s;
-        }
-        .sirapik-import .si-btn .i { font-size: 18px; }
-        .sirapik-import .si-btn:active { transform: scale(.97); }
-        .sirapik-import .si-btn-primary { color: #fff; background: linear-gradient(110deg, var(--royal), var(--electric)); box-shadow: 0 12px 26px rgba(36,87,214,.3); }
-        .sirapik-import .si-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(36,87,214,.4); }
-        .sirapik-import .si-btn-primary:disabled { transform: none; opacity: .75; cursor: wait; box-shadow: none; }
-        .sirapik-import .si-btn-ghost { color: var(--slate); background: transparent; }
-        .sirapik-import .si-btn-ghost:hover { color: var(--navy); background: var(--ice); }
-        .si-spin { animation: si-spin 1s linear infinite; }
+    .im-eyebrow {
+        display: inline-flex; align-items: center; gap: 12px;
+        margin-bottom: 20px; color: #bcd8ff; font-size: 14px; font-weight: 700;
+    }
+    .im-eyebrow::before { content: ""; width: 32px; height: 2px; background: var(--cyan); }
 
-        /* ---------- Sisi: panduan editorial, bukan tumpukan kartu ---------- */
-        .si-side-column { position: sticky; top: 20px; display: flex; min-width: 0; flex-direction: column; gap: 18px; animation: si-rise .8s .1s var(--ease) both; }
-        .si-side-dark {
-            position: relative; isolation: isolate; overflow: hidden;
-            padding: 24px; border-radius: 22px; color: #fff; background: var(--navy);
-        }
-        .si-side-dark::after {
-            content: ""; position: absolute; z-index: -1; right: -60px; bottom: -80px;
-            width: 200px; height: 200px; border-radius: 50%; background: var(--royal); opacity: .5; filter: blur(40px);
-        }
-        .si-side-dark .ic {
-            display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 14px;
-            border-radius: 13px; background: rgba(56,198,232,.15); color: var(--cyan); font-size: 22px;
-        }
-        .si-side-dark h3 { margin: 0 0 8px; font-family: var(--font-display); font-size: 17px; font-weight: 600; line-height: 1.4; }
-        .si-side-dark p { margin: 0; font-size: 13px; line-height: 1.8; color: rgba(255,255,255,.78); }
+    .im-hero-grid {
+        display: grid; align-items: end; gap: 36px;
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    }
 
-        .si-checklist h3 { margin: 0 0 14px; font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--navy); }
-        .si-check-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
-        .si-check-list li {
-            display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
-            border-top: 1px solid var(--border); font-size: 13px; line-height: 1.65; color: #4B5E75;
+    .im-hero h1 {
+        margin: 0; font-family: var(--f-display);
+        font-size: clamp(34px, 5.2vw, 68px);
+        font-weight: 800; letter-spacing: -.05em; line-height: 1.02;
+    }
+    .im-hero h1 span { display: block; color: #82b7ff; }
+
+    .im-hero p {
+        max-width: 52ch; margin: 20px 0 0;
+        color: rgba(255,255,255,.76); font-size: clamp(16px, 1.3vw, 18px); line-height: 1.8;
+    }
+
+    .im-flow { margin: 0; padding: 0; list-style: none; border-top: 1px solid rgba(255,255,255,.2); counter-reset: flow; }
+    .im-flow li {
+        display: flex; align-items: center; gap: 14px; padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,.12);
+        color: rgba(255,255,255,.84); font-size: 14px; line-height: 1.5;
+        counter-increment: flow;
+    }
+    .im-flow li::before {
+        content: counter(flow); display: grid; place-items: center;
+        width: 28px; height: 28px; border-radius: 50%;
+        border: 1px solid rgba(255,255,255,.3); color: var(--cyan);
+        font-family: var(--f-display); font-size: 12px; font-weight: 700;
+    }
+    .im-flow-title { margin: 0 0 4px; color: #bcd8ff; font-size: 13px; font-weight: 700; }
+
+    /* =====================================================
+       ALERT
+    ===================================================== */
+    .im-alert {
+        display: flex; align-items: flex-start; gap: 14px;
+        margin-bottom: 24px; padding: 18px 20px;
+        border: 1px solid transparent; border-left-width: 4px; border-radius: 14px;
+        font-size: 14px; line-height: 1.7;
+    }
+    .im-alert > svg { width: 22px; height: 22px; margin-top: 2px; }
+    .im-alert-body { min-width: 0; flex: 1; }
+    .im-alert strong.h { display: block; font-family: var(--f-display); font-size: 16px; font-weight: 700; }
+    .im-alert ul { margin: 8px 0 0; padding-left: 20px; }
+    .im-alert li { overflow-wrap: anywhere; }
+    .im-alert-danger { color: var(--red); background: var(--red-soft); border-color: var(--red-line); }
+    .im-alert-success { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
+
+    /* Hasil import: angka besar */
+    .im-result { display: grid; gap: 0; margin-top: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .im-result-item { padding: 4px 18px; border-left: 1px solid var(--green-line); }
+    .im-result-item:first-child { padding-left: 0; border-left: 0; }
+    .im-result-num {
+        font-family: var(--f-display); font-size: clamp(28px, 3.4vw, 42px);
+        font-weight: 800; letter-spacing: -.04em; line-height: 1;
+        font-variant-numeric: tabular-nums; color: var(--navy);
+    }
+    .im-result-label { margin-top: 6px; font-size: 13px; font-weight: 600; line-height: 1.4; }
+
+    .im-notes { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--green-line); }
+
+    /* =====================================================
+       FORM — SECTION SPLIT
+    ===================================================== */
+    .im-section {
+        display: grid; gap: 28px 56px;
+        grid-template-columns: minmax(0, .5fr) minmax(0, 1.5fr);
+        padding: 36px 0; border-top: 2px solid var(--navy);
+    }
+
+    .im-section-head { align-self: start; position: sticky; top: 90px; }
+    .im-num { display: block; margin-bottom: 10px; color: var(--royal); font-family: var(--f-display); font-size: 15px; font-weight: 800; }
+    .im-section-head h2 {
+        margin: 0; color: var(--navy); font-family: var(--f-display);
+        font-size: clamp(24px, 2.6vw, 34px); font-weight: 800; letter-spacing: -.04em; line-height: 1.12;
+    }
+    .im-section-head p { margin: 10px 0 0; color: var(--slate); font-size: 14px; line-height: 1.7; }
+
+    .im-grid { display: grid; gap: 22px 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .im-field { min-width: 0; }
+    .im-full { grid-column: 1 / -1; }
+
+    .im-field label {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+        margin-bottom: 9px; color: #40536a; font-size: 14px; font-weight: 700;
+    }
+    .im-req { color: var(--red); font-size: 16px; line-height: 1; }
+    .im-opt { color: #7a8aa0; font-size: 12px; font-weight: 600; }
+
+    .im .im-control {
+        display: block; width: 100%; min-width: 0; height: 56px;
+        padding: 0 16px; border: 1.5px solid var(--line); border-radius: 14px;
+        outline: none; background: #fff; color: var(--ink); font-size: 16px;
+        transition: border-color .25s, box-shadow .25s;
+    }
+    .im .im-control::placeholder { color: #8998ab; }
+    .im .im-control:hover { border-color: #a6bddb; }
+    .im .im-control:focus { border-color: var(--royal); box-shadow: 0 0 0 4px rgba(36,87,214,.12); }
+    .im select.im-control { padding-right: 40px; cursor: pointer; }
+
+    .im-help { display: block; margin-top: 8px; color: var(--slate); font-size: 13px; line-height: 1.6; }
+
+    /* Dropzone */
+    .im-drop {
+        position: relative; display: flex; align-items: center; gap: 18px;
+        padding: 28px; border: 2px dashed #a6bddb; border-radius: 18px;
+        background: var(--ice);
+        transition: border-color .25s, background .25s, box-shadow .25s;
+    }
+    .im-drop:hover, .im-drop.is-over { border-color: var(--royal); background: var(--soft); }
+    .im-drop:focus-within { border-color: var(--royal); box-shadow: 0 0 0 4px rgba(36,87,214,.12); }
+
+    .im-drop input[type="file"] {
+        position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%;
+        margin: 0; opacity: 0; cursor: pointer;
+    }
+
+    .im-drop-icon {
+        display: grid; place-items: center; width: 56px; height: 56px;
+        border-radius: 16px; background: #fff; color: var(--royal);
+        box-shadow: 0 8px 20px rgba(8,27,51,.08);
+    }
+    .im-drop-icon svg { width: 26px; height: 26px; }
+    .im-drop strong { display: block; color: var(--navy); font-family: var(--f-display); font-size: 17px; font-weight: 700; }
+    .im-drop span.s { display: block; margin-top: 2px; color: var(--slate); font-size: 14px; }
+
+    .im-selected {
+        display: flex; align-items: center; gap: 12px; margin-top: 14px;
+        padding: 13px 16px; border: 1px solid var(--green-line); border-radius: 14px;
+        background: var(--green-soft); color: var(--green);
+        font-size: 14px; font-weight: 600; overflow-wrap: anywhere;
+    }
+    .im-selected[hidden] { display: none; }
+    .im-selected svg { width: 20px; height: 20px; }
+
+    /* Aksi */
+    .im-footer {
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px;
+        padding: 26px 0 0; border-top: 2px solid var(--navy);
+    }
+    .im-note { display: flex; align-items: flex-start; gap: 10px; max-width: 60ch; color: var(--slate); font-size: 13px; line-height: 1.7; }
+    .im-note svg { width: 18px; height: 18px; margin-top: 2px; }
+    .im-note b { color: var(--red); }
+    .im-actions { display: flex; align-items: center; gap: 12px; }
+
+    .im .im-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+        min-height: 54px; padding: 12px 26px; border: 1.5px solid transparent; border-radius: 999px;
+        font-size: 15px; font-weight: 700; cursor: pointer;
+        transition: transform .25s var(--ease), box-shadow .25s, background .25s, color .25s, border-color .25s;
+    }
+    .im .im-btn svg { width: 18px; height: 18px; }
+    .im .im-btn:active { transform: scale(.98); }
+    .im .im-btn-primary { background: var(--royal); color: #fff; }
+    .im .im-btn-primary:hover { background: var(--navy); transform: translateY(-2px); box-shadow: 0 14px 30px rgba(36,87,214,.28); }
+    .im .im-btn-primary:disabled { background: #7f9bd8; box-shadow: none; transform: none; cursor: wait; }
+    .im .im-btn-ghost { background: transparent; border-color: var(--line); color: #40536a; }
+    .im .im-btn-ghost:hover { border-color: var(--royal); color: var(--royal); }
+
+    @keyframes im-spin { to { transform: rotate(360deg); } }
+    .im .is-spin { animation: im-spin 1s linear infinite; }
+
+    /* Informasi penting */
+    .im-warn {
+        display: flex; align-items: flex-start; gap: 14px; margin-top: 30px;
+        padding: 18px 20px; border: 1px solid var(--amber-line); border-left: 4px solid #d9a441;
+        border-radius: 14px; background: var(--amber-soft);
+    }
+    .im-warn svg { width: 22px; height: 22px; margin-top: 2px; color: var(--amber); }
+    .im-warn strong { display: block; color: var(--amber); font-size: 15px; }
+    .im-warn p { margin: 4px 0 0; color: #6f5a34; font-size: 14px; line-height: 1.7; }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+    @media (max-width: 1000px) {
+        .im-hero-grid { grid-template-columns: 1fr; }
+        .im-section { grid-template-columns: 1fr; gap: 22px; padding: 30px 0; }
+        .im-section-head { position: static; }
+        .im-result { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 0; }
+        .im-result-item:nth-child(3) { padding-left: 0; border-left: 0; }
+    }
+
+    @media (max-width: 640px) {
+        .im-hero { border-radius: 18px; }
+        .im-grid { grid-template-columns: 1fr; gap: 20px; }
+        .im-full { grid-column: auto; }
+        .im .im-control { height: 54px; }
+        .im-drop { flex-direction: column; align-items: flex-start; padding: 22px; }
+        .im-footer { flex-direction: column; align-items: stretch; }
+        .im-actions { flex-direction: column-reverse; align-items: stretch; }
+        .im .im-btn { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .im *, .im *::before, .im *::after {
+            animation: none !important;
+            transition-duration: .01ms !important;
         }
-        .si-check { display: grid; place-items: center; width: 22px; height: 22px; flex: none; margin-top: 1px; border-radius: 7px; background: var(--soft); color: var(--royal); font-size: 13px; }
+        .im.is-js [data-reveal] { opacity: 1; transform: none; }
+    }
+</style>
 
-        .si-side-warning { padding: 18px 20px; border: 1px solid var(--warn-line); border-radius: 18px; background: var(--warn-bg); }
-        .si-warning-heading { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--warn); }
-        .si-warning-heading .i { font-size: 18px; }
-        .si-side-warning p { margin: 0; font-size: 13px; line-height: 1.8; color: #6F5A34; }
+<div class="im" id="im">
 
-        @keyframes si-rise { from { opacity: 0; transform: translate3d(0, 18px, 0); } to { opacity: 1; transform: none; } }
-        @keyframes si-drift { to { transform: translate3d(-40px, 40px, 0); } }
-        @keyframes si-spin { to { transform: rotate(360deg); } }
+    <div class="im-progress" id="imProgress" aria-hidden="true"></div>
 
-        /* ---------- Responsive ---------- */
-        @media (max-width: 1100px) {
-            .si-workspace { grid-template-columns: minmax(0, 1fr); }
-            .si-side-column { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
-            .si-side-dark { grid-column: 1 / -1; }
-        }
-        @media (max-width: 900px) { .si-head { grid-template-columns: 1fr; } }
-        @media (max-width: 640px) {
-            .si-form-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-            .si-field-full { grid-column: auto; }
-            .si-side-column { grid-template-columns: minmax(0, 1fr); }
-            .si-form-footer { align-items: stretch; flex-direction: column; }
-            .si-footer-note { order: 2; }
-            .si-actions { display: grid; grid-template-columns: 1fr; width: 100%; }
-            .sirapik-import .si-btn { width: 100%; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .sirapik-import *, .sirapik-import *::before, .sirapik-import *::after {
-                animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important;
-            }
-        }
-    </style>
+    {{-- =================================================
+         HERO
+    ================================================== --}}
+    <header class="im-hero" data-reveal>
+        <div class="im-orbit" aria-hidden="true"></div>
 
-    {{-- HEADER --}}
-    <header class="si-head">
-        <div>
-            <h1>Import data peserta <span>dalam satu proses.</span></h1>
-            <p>
-                Unggah file Excel, lengkapi informasi pelatihan, lalu mulai
-                import data peserta dan riwayat pelatihan ke SIRAPIK.
-            </p>
-        </div>
+        <span class="im-eyebrow">Import Excel SIRAPIK</span>
 
-        <div class="si-head-mark">
-            <span class="ic" aria-hidden="true">
-                <svg class="i" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
-            </span>
+        <div class="im-hero-grid">
+
             <div>
-                <strong>Import Excel</strong>
-                <span>XLSX, XLS, atau CSV</span>
+                <h1>Import data peserta <span>dalam satu proses.</span></h1>
+
+                <p>
+                    Unggah file Excel, lengkapi informasi pelatihan, lalu mulai
+                    import data peserta dan riwayat pelatihan ke SIRAPIK.
+                </p>
             </div>
+
+            <div>
+                <p class="im-flow-title">Alur import</p>
+
+                <ol class="im-flow">
+                    <li>Unggah file XLSX, XLS, atau CSV</li>
+                    <li>Lengkapi informasi penyelenggaraan</li>
+                    <li>Tentukan kategori dan durasi</li>
+                </ol>
+            </div>
+
         </div>
     </header>
 
-    {{-- VALIDATION ERROR --}}
+    {{-- =================================================
+         VALIDATION ERROR
+    ================================================== --}}
     @if ($errors->any())
-        <div class="si-alert si-alert-danger" role="alert">
-            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        <div class="im-alert im-alert-danger" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4"/>
+                <path d="M12 16h.01"/>
+            </svg>
 
-            <div class="si-alert-content">
+            <div class="im-alert-body">
                 <strong class="h">Import belum dapat diproses.</strong>
                 <span>Periksa kembali informasi berikut:</span>
+
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -293,26 +354,45 @@
         </div>
     @endif
 
-    {{-- IMPORT RESULT --}}
+    {{-- =================================================
+         HASIL IMPORT
+    ================================================== --}}
     @if (session('import_result'))
         @php($result = session('import_result'))
 
-        <div class="si-alert si-alert-success" role="status">
-            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        <div class="im-alert im-alert-success" role="status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="m9 12 2 2 4-4"/>
+            </svg>
 
-            <div class="si-alert-content">
+            <div class="im-alert-body">
                 <strong class="h">Import selesai diproses.</strong>
 
-                <ul>
-                    <li>Peserta baru: <strong>{{ $result['created_participants'] ?? 0 }}</strong></li>
-                    <li>Peserta diperbarui: <strong>{{ $result['updated_participants'] ?? 0 }}</strong></li>
-                    <li>Pelatihan baru: <strong>{{ $result['created_trainings'] ?? 0 }}</strong></li>
-                    <li>Riwayat pelatihan baru: <strong>{{ $result['created_histories'] ?? 0 }}</strong></li>
-                </ul>
+                <div class="im-result">
+                    <div class="im-result-item">
+                        <div class="im-result-num" data-count="{{ $result['created_participants'] ?? 0 }}">{{ $result['created_participants'] ?? 0 }}</div>
+                        <div class="im-result-label">Peserta baru</div>
+                    </div>
+                    <div class="im-result-item">
+                        <div class="im-result-num" data-count="{{ $result['updated_participants'] ?? 0 }}">{{ $result['updated_participants'] ?? 0 }}</div>
+                        <div class="im-result-label">Peserta diperbarui</div>
+                    </div>
+                    <div class="im-result-item">
+                        <div class="im-result-num" data-count="{{ $result['created_trainings'] ?? 0 }}">{{ $result['created_trainings'] ?? 0 }}</div>
+                        <div class="im-result-label">Pelatihan baru</div>
+                    </div>
+                    <div class="im-result-item">
+                        <div class="im-result-num" data-count="{{ $result['created_histories'] ?? 0 }}">{{ $result['created_histories'] ?? 0 }}</div>
+                        <div class="im-result-label">Riwayat pelatihan baru</div>
+                    </div>
+                </div>
 
                 @if (!empty($result['errors']))
-                    <div class="si-import-notes">
+                    <div class="im-notes">
                         <strong>Catatan baris yang perlu diperiksa:</strong>
+
                         <ul>
                             @foreach ($result['errors'] as $error)
                                 <li>{{ $error }}</li>
@@ -324,315 +404,306 @@
         </div>
     @endif
 
-    {{-- MAIN WORKSPACE --}}
-    <div class="si-workspace">
+    {{-- =================================================
+         FORM
+    ================================================== --}}
+    <form
+        id="importForm"
+        action="{{ route('imports.store') }}"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+        @csrf
 
-        {{-- FORM PANEL --}}
-        <section class="si-main-panel" aria-labelledby="si-form-title">
-
-            <div class="si-panel-heading">
-                <div class="si-panel-icon" aria-hidden="true">
-                    <svg class="i" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
-                </div>
-                <div>
-                    <h2 id="si-form-title">Unggah file Excel</h2>
-                    <p>Lengkapi informasi pelatihan sebelum memulai import data.</p>
-                </div>
+        {{-- 01 FILE --}}
+        <section class="im-section" data-reveal aria-labelledby="imFile">
+            <div class="im-section-head">
+                <span class="im-num">01</span>
+                <h2 id="imFile">File sumber data</h2>
+                <p>Unggah file Excel yang berisi data peserta pelatihan.</p>
             </div>
 
-            <div class="si-form-body">
+            <div class="im-grid">
+                <div class="im-field im-full">
+                    <label for="file">
+                        File Excel
+                        <span class="im-req" aria-hidden="true">*</span>
+                    </label>
 
-                <form
-                    id="importForm"
-                    action="{{ route('imports.store') }}"
-                    method="POST"
-                    enctype="multipart/form-data"
-                >
-                    @csrf
+                    <div class="im-drop" id="dropZone">
+                        <div class="im-drop-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 16V4"/>
+                                <path d="m7 9 5-5 5 5"/>
+                                <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
+                            </svg>
+                        </div>
 
-                    {{-- LANGKAH 1 --}}
-                    <div class="si-step">
-                        <span class="si-step-number">1</span>
-                        <strong>File sumber data</strong>
-                        <i></i>
+                        <div>
+                            <strong>Pilih atau tarik file ke sini</strong>
+                            <span class="s">XLSX, XLS, atau CSV</span>
+                        </div>
+
+                        <input
+                            type="file"
+                            name="file"
+                            id="file"
+                            accept=".xlsx,.xls,.csv"
+                            aria-describedby="file-help"
+                            required
+                        >
                     </div>
 
-                    <div class="si-form-grid">
-                        <div class="si-field si-field-full">
-                            <label for="file">
-                                File Excel
-                                <span class="si-required" aria-hidden="true">*</span>
-                            </label>
+                    <small class="im-help" id="file-help">
+                        Format yang didukung: XLSX, XLS, atau CSV.
+                        Ukuran file maksimal 10 MB.
+                    </small>
 
-                            <input
-                                type="file"
-                                name="file"
-                                id="file"
-                                class="si-control"
-                                accept=".xlsx,.xls,.csv"
-                                aria-describedby="file-help"
-                                required
-                            >
-
-                            <small class="si-field-help" id="file-help">
-                                Format yang didukung: XLSX, XLS, atau CSV.
-                                Ukuran file maksimal 10 MB.
-                            </small>
-
-                            <div id="selectedFile" class="si-selected-file" hidden>
-                                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8"/></svg>
-                                <span id="selectedFileName"></span>
-                            </div>
-                        </div>
+                    <div id="selectedFile" class="im-selected" hidden>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <path d="M14 2v6h6"/>
+                            <path d="M8 13h8M8 17h8"/>
+                        </svg>
+                        <span id="selectedFileName"></span>
                     </div>
-
-                    {{-- LANGKAH 2 --}}
-                    <div class="si-step gap">
-                        <span class="si-step-number">2</span>
-                        <strong>Informasi penyelenggaraan pelatihan</strong>
-                        <i></i>
-                    </div>
-
-                    <div class="si-form-grid">
-
-                        {{-- ANGKATAN --}}
-                        <div class="si-field">
-                            <label for="angkatan">
-                                Angkatan
-                                <span class="si-optional">Opsional</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                name="angkatan"
-                                id="angkatan"
-                                class="si-control"
-                                value="{{ old('angkatan') }}"
-                                placeholder="Contoh: Angkatan I Tahun 2026"
-                                maxlength="100"
-                            >
-
-                            <small class="si-field-help">
-                                Kosongkan jika pelatihan tidak memiliki informasi angkatan.
-                            </small>
-                        </div>
-
-                        {{-- WILAYAH --}}
-                        <div class="si-field">
-                            <label for="kabupaten_kota_mitra">
-                                Kabupaten/Kota/Mitra/Mandiri
-                                <span class="si-required" aria-hidden="true">*</span>
-                            </label>
-
-                            <select
-                                name="kabupaten_kota_mitra"
-                                id="kabupaten_kota_mitra"
-                                class="si-control"
-                                required
-                            >
-                                <option value="">-- Pilih wilayah atau mitra --</option>
-
-                                @foreach ($districts as $district)
-                                    <option
-                                        value="{{ $district->name }}"
-                                        @selected(
-                                            old('kabupaten_kota_mitra') === $district->name
-                                        )
-                                    >
-                                        {{ $district->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <small class="si-field-help">
-                                Pilihan mengikuti Master Data SIRAPIK.
-                            </small>
-                        </div>
-
-                        {{-- SUMBER DANA --}}
-                        <div class="si-field si-field-full">
-                            <label for="sumber_dana">
-                                Sumber Dana
-                                <span class="si-required" aria-hidden="true">*</span>
-                            </label>
-
-                            <select
-                                name="sumber_dana"
-                                id="sumber_dana"
-                                class="si-control"
-                                required
-                            >
-                                <option value="">-- Pilih sumber dana --</option>
-
-                                @foreach ($fundingSources as $source)
-                                    <option
-                                        value="{{ $source->name }}"
-                                        @selected(
-                                            old('sumber_dana') === $source->name
-                                        )
-                                    >
-                                        {{ $source->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <small class="si-field-help">
-                                Pilihan mengikuti Master Data Sumber Dana SIRAPIK.
-                            </small>
-                        </div>
-
-                    </div>
-
-                    {{-- LANGKAH 3 --}}
-                    <div class="si-step gap">
-                        <span class="si-step-number">3</span>
-                        <strong>Klasifikasi dan durasi pelatihan</strong>
-                        <i></i>
-                    </div>
-
-                    <div class="si-form-grid">
-
-                        {{-- KATEGORI --}}
-                        <div class="si-field">
-                            <label for="training_category_id">
-                                Kategori Pelatihan
-                                <span class="si-optional">Opsional</span>
-                            </label>
-
-                            <select
-                                name="training_category_id"
-                                id="training_category_id"
-                                class="si-control"
-                            >
-                                <option value="">-- Pilih kategori --</option>
-
-                                @foreach ($categories as $category)
-                                    <option
-                                        value="{{ $category->id }}"
-                                        @selected(
-                                            (string) old('training_category_id', '') ===
-                                            (string) $category->id
-                                        )
-                                    >
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <small class="si-field-help">
-                                Mengikuti Master Data Kategori Pelatihan.
-                            </small>
-                        </div>
-
-                        {{-- JPL --}}
-                        <div class="si-field">
-                            <label for="jpl">
-                                Jumlah JPL
-                                <span class="si-optional">Opsional</span>
-                            </label>
-
-                            <input
-                                type="number"
-                                name="jpl"
-                                id="jpl"
-                                class="si-control"
-                                value="{{ old('jpl') }}"
-                                min="0"
-                                step="1"
-                                placeholder="Contoh: 32"
-                            >
-
-                            <small class="si-field-help">
-                                Isi jumlah Jam Pelajaran jika tersedia.
-                            </small>
-                        </div>
-
-                    </div>
-
-                    {{-- ACTIONS --}}
-                    <div class="si-form-footer">
-
-                        <div class="si-footer-note">
-                            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                            Pastikan data sudah benar sebelum diimport.
-                        </div>
-
-                        <div class="si-actions">
-                            <button type="reset" class="si-btn si-btn-ghost" id="resetButton">
-                                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-                                Reset Form
-                            </button>
-
-                            <button type="submit" class="si-btn si-btn-primary" id="submitButton">
-                                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
-                                <span>Import Excel</span>
-                            </button>
-                        </div>
-
-                    </div>
-                </form>
+                </div>
             </div>
         </section>
 
-        {{-- SIDE INFORMATION --}}
-        <aside class="si-side-column" aria-label="Panduan import">
+        {{-- 02 PENYELENGGARAAN --}}
+        <section class="im-section" data-reveal aria-labelledby="imPenyelenggaraan">
+            <div class="im-section-head">
+                <span class="im-num">02</span>
+                <h2 id="imPenyelenggaraan">Penyelenggaraan pelatihan</h2>
+                <p>Angkatan, wilayah, dan sumber dana untuk seluruh data dalam file.</p>
+            </div>
 
-            <section class="si-side-dark">
-                <div class="ic" aria-hidden="true">
-                    <svg class="i" viewBox="0 0 24 24"><path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4z"/><path d="m9 12 2 2 4-4"/></svg>
+            <div class="im-grid">
+
+                {{-- ANGKATAN --}}
+                <div class="im-field">
+                    <label for="angkatan">
+                        Angkatan
+                        <span class="im-opt">Opsional</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        name="angkatan"
+                        id="angkatan"
+                        class="im-control"
+                        value="{{ old('angkatan') }}"
+                        placeholder="Contoh: Angkatan I Tahun 2026"
+                        maxlength="100"
+                    >
+
+                    <small class="im-help">
+                        Kosongkan jika pelatihan tidak memiliki informasi angkatan.
+                    </small>
                 </div>
-                <h3>Import data lebih terstruktur</h3>
-                <p>
-                    SIRAPIK mengelola data peserta dan riwayat pelatihan dalam
-                    satu sistem terintegrasi. Pastikan file sumber dan informasi
-                    pelatihan sesuai sebelum memulai proses.
-                </p>
-            </section>
 
-            <section class="si-checklist">
-                <h3>Checklist sebelum import</h3>
+                {{-- WILAYAH --}}
+                <div class="im-field">
+                    <label for="kabupaten_kota_mitra">
+                        Kabupaten/Kota/Mitra/Mandiri
+                        <span class="im-req" aria-hidden="true">*</span>
+                    </label>
 
-                <ul class="si-check-list">
-                    <li>
-                        <span class="si-check" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>
-                        File Excel memiliki susunan kolom yang sesuai.
-                    </li>
-                    <li>
-                        <span class="si-check" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>
-                        Data identitas peserta sudah diperiksa.
-                    </li>
-                    <li>
-                        <span class="si-check" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>
-                        Wilayah dan sumber dana sudah dipilih.
-                    </li>
-                    <li>
-                        <span class="si-check" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>
-                        Kategori dan JPL diisi jika informasinya tersedia.
-                    </li>
-                </ul>
-            </section>
+                    <select
+                        name="kabupaten_kota_mitra"
+                        id="kabupaten_kota_mitra"
+                        class="im-control"
+                        required
+                    >
+                        <option value="">-- Pilih wilayah atau mitra --</option>
 
-            <section class="si-side-warning">
-                <div class="si-warning-heading">
-                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-                    Informasi penting
+                        @foreach ($districts as $district)
+                            <option
+                                value="{{ $district->name }}"
+                                @selected(old('kabupaten_kota_mitra') === $district->name)
+                            >
+                                {{ $district->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <small class="im-help">
+                        Pilihan mengikuti Master Data SIRAPIK.
+                    </small>
                 </div>
-                <p>
-                    Peserta yang sudah terdaftar dapat diperbarui berdasarkan
-                    NIP atau NIK. Riwayat pelatihan yang sama tidak dibuat
-                    berulang. Kategori Pelatihan dan JPL boleh dikosongkan
-                    jika informasinya belum tersedia.
-                </p>
-            </section>
 
-        </aside>
-    </div>
+                {{-- SUMBER DANA --}}
+                <div class="im-field im-full">
+                    <label for="sumber_dana">
+                        Sumber Dana
+                        <span class="im-req" aria-hidden="true">*</span>
+                    </label>
+
+                    <select
+                        name="sumber_dana"
+                        id="sumber_dana"
+                        class="im-control"
+                        required
+                    >
+                        <option value="">-- Pilih sumber dana --</option>
+
+                        @foreach ($fundingSources as $source)
+                            <option
+                                value="{{ $source->name }}"
+                                @selected(old('sumber_dana') === $source->name)
+                            >
+                                {{ $source->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <small class="im-help">
+                        Pilihan mengikuti Master Data Sumber Dana SIRAPIK.
+                    </small>
+                </div>
+
+            </div>
+        </section>
+
+        {{-- 03 KLASIFIKASI --}}
+        <section class="im-section" data-reveal aria-labelledby="imKlasifikasi">
+            <div class="im-section-head">
+                <span class="im-num">03</span>
+                <h2 id="imKlasifikasi">Klasifikasi dan durasi</h2>
+                <p>Kategori dan jumlah JPL, jika informasinya tersedia.</p>
+            </div>
+
+            <div class="im-grid">
+
+                {{-- KATEGORI --}}
+                <div class="im-field">
+                    <label for="training_category_id">
+                        Kategori Pelatihan
+                        <span class="im-opt">Opsional</span>
+                    </label>
+
+                    <select
+                        name="training_category_id"
+                        id="training_category_id"
+                        class="im-control"
+                    >
+                        <option value="">-- Pilih kategori --</option>
+
+                        @foreach ($categories as $category)
+                            <option
+                                value="{{ $category->id }}"
+                                @selected(
+                                    (string) old('training_category_id', '') ===
+                                    (string) $category->id
+                                )
+                            >
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <small class="im-help">
+                        Mengikuti Master Data Kategori Pelatihan.
+                    </small>
+                </div>
+
+                {{-- JPL --}}
+                <div class="im-field">
+                    <label for="jpl">
+                        Jumlah JPL
+                        <span class="im-opt">Opsional</span>
+                    </label>
+
+                    <input
+                        type="number"
+                        name="jpl"
+                        id="jpl"
+                        class="im-control"
+                        value="{{ old('jpl') }}"
+                        min="0"
+                        step="1"
+                        placeholder="Contoh: 32"
+                    >
+
+                    <small class="im-help">
+                        Isi jumlah Jam Pelajaran jika tersedia.
+                    </small>
+                </div>
+
+            </div>
+        </section>
+
+        {{-- AKSI --}}
+        <div class="im-footer" data-reveal>
+
+            <div class="im-note">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4"/>
+                    <path d="M12 8h.01"/>
+                </svg>
+
+                <span>
+                    Kolom bertanda <b>*</b> wajib diisi. Pastikan data sudah
+                    benar sebelum diimport.
+                </span>
+            </div>
+
+            <div class="im-actions">
+                <button type="reset" class="im-btn im-btn-ghost" id="resetButton">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                    Reset Form
+                </button>
+
+                <button type="submit" class="im-btn im-btn-primary" id="submitButton">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 16V4"/>
+                        <path d="m7 9 5-5 5 5"/>
+                        <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
+                    </svg>
+                    <span>Import Excel</span>
+                </button>
+            </div>
+
+        </div>
+
+    </form>
+
+    {{-- INFORMASI PENTING --}}
+    <aside class="im-warn" data-reveal aria-label="Informasi penting">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+            <path d="M12 9v4"/>
+            <path d="M12 17h.01"/>
+        </svg>
+
+        <div>
+            <strong>Informasi penting</strong>
+            <p>
+                Peserta yang sudah terdaftar dapat diperbarui berdasarkan
+                NIP atau NIK. Riwayat pelatihan yang sama tidak dibuat
+                berulang. Kategori Pelatihan dan JPL boleh dikosongkan
+                jika informasinya belum tersedia.
+            </p>
+        </div>
+    </aside>
+
 </div>
 
 <script>
 (function () {
     function initializeImportPage() {
-        const page = document.querySelector('.sirapik-import');
+        const page = document.getElementById('im');
 
         if (!page || page.dataset.initialized === 'true') {
             return;
@@ -640,23 +711,80 @@
 
         page.dataset.initialized = 'true';
 
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* Scroll reveal */
+        if ('IntersectionObserver' in window && !reduce) {
+            page.classList.add('is-js');
+
+            const io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-in');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: .1, rootMargin: '0px 0px -40px 0px' });
+
+            page.querySelectorAll('[data-reveal]').forEach(function (el) {
+                io.observe(el);
+            });
+        }
+
+        /* Counter hasil import */
+        if (!reduce) {
+            page.querySelectorAll('[data-count]').forEach(function (el) {
+                const target = parseInt(el.dataset.count, 10) || 0;
+                if (target === 0) return;
+
+                const start = performance.now();
+
+                function tick(now) {
+                    const p = Math.min((now - start) / 900, 1);
+                    el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+                    if (p < 1) requestAnimationFrame(tick);
+                }
+
+                el.textContent = '0';
+                requestAnimationFrame(tick);
+            });
+        }
+
+        /* Progress bar scroll */
+        const bar = document.getElementById('imProgress');
+        let ticking = false;
+
+        function update() {
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const ratio = max > 0 ? window.scrollY / max : 0;
+            bar.style.transform = 'scaleX(' + Math.min(Math.max(ratio, 0), 1) + ')';
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', function () {
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(update);
+            }
+        }, { passive: true });
+
+        update();
+
+        /* Form */
         const fileInput = page.querySelector('#file');
+        const dropZone = page.querySelector('#dropZone');
         const selectedFile = page.querySelector('#selectedFile');
         const selectedFileName = page.querySelector('#selectedFileName');
         const importForm = page.querySelector('#importForm');
         const submitButton = page.querySelector('#submitButton');
         const resetButton = page.querySelector('#resetButton');
 
-        const defaultButtonContent = submitButton
-            ? submitButton.innerHTML
-            : '';
+        const defaultButtonContent = submitButton ? submitButton.innerHTML : '';
 
-        // Menampilkan nama file yang dipilih.
+        /* Nama file yang dipilih */
         if (fileInput && selectedFile && selectedFileName) {
             fileInput.addEventListener('change', function () {
-                const file = this.files && this.files.length
-                    ? this.files[0]
-                    : null;
+                const file = this.files && this.files.length ? this.files[0] : null;
 
                 if (!file) {
                     selectedFileName.textContent = '';
@@ -666,14 +794,27 @@
 
                 const fileSize = (file.size / 1024 / 1024).toFixed(2);
 
-                selectedFileName.textContent =
-                    file.name + ' · ' + fileSize + ' MB';
-
+                selectedFileName.textContent = file.name + ' · ' + fileSize + ' MB';
                 selectedFile.hidden = false;
             });
         }
 
-        // Mencegah pengiriman berulang saat proses import dimulai.
+        /* Efek saat file diseret ke area unggah */
+        if (dropZone) {
+            ['dragenter', 'dragover'].forEach(function (name) {
+                dropZone.addEventListener(name, function () {
+                    dropZone.classList.add('is-over');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(function (name) {
+                dropZone.addEventListener(name, function () {
+                    dropZone.classList.remove('is-over');
+                });
+            });
+        }
+
+        /* Cegah pengiriman berulang */
         if (importForm && submitButton) {
             importForm.addEventListener('submit', function (event) {
                 if (!importForm.checkValidity()) {
@@ -688,7 +829,10 @@
                 submitButton.disabled = true;
 
                 submitButton.innerHTML = `
-                    <svg class="i si-spin" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg class="is-spin" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
                         <path d="M21 12a9 9 0 1 1-6.22-8.56"/>
                     </svg>
                     <span>Memproses import...</span>
@@ -696,7 +840,7 @@
             });
         }
 
-        // Reset tampilan setelah form direset.
+        /* Reset tampilan setelah form direset */
         if (resetButton) {
             resetButton.addEventListener('click', function () {
                 window.setTimeout(function () {
@@ -715,6 +859,14 @@
                 }, 0);
             });
         }
+
+        /* Pulihkan tombol jika kembali lewat riwayat browser */
+        window.addEventListener('pageshow', function () {
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.innerHTML = defaultButtonContent;
+            }
+        });
     }
 
     if (document.readyState === 'loading') {
@@ -724,4 +876,5 @@
     }
 })();
 </script>
+
 @endsection
