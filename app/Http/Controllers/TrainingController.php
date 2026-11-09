@@ -8,6 +8,7 @@ use App\Models\TrainingCategory;
 use App\Models\FundingSource;
 use App\Models\District;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class TrainingController extends Controller
@@ -322,4 +323,24 @@ class TrainingController extends Controller
             ->route('trainings.index')
             ->with('success', 'Data pelatihan berhasil dihapus.');
     }
+
+    /**
+ * Mengunduh template Excel resmi SIRAPIK.
+ */
+public function downloadTemplate()
+{
+    $path = storage_path('app/templates/Template_sirapik.xlsx');
+
+    if (!file_exists($path)) {
+        abort(404, 'File template Excel tidak ditemukan. Periksa folder storage/app/templates.');
+    }
+
+    return response()->download(
+        $path,
+        'Template_SIRAPIK.xlsx',
+        [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]
+    );
+}
 }

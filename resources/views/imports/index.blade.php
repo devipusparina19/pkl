@@ -458,6 +458,7 @@
                     <small class="im-help" id="file-help">
                         Format yang didukung: XLSX, XLS, atau CSV.
                         Ukuran file maksimal 10 MB.
+                        Silakan download template Excel terlebih dahulu sebelum mengisi dan mengunggah file.
                     </small>
 
                     <div id="selectedFile" class="im-selected" hidden>
@@ -471,6 +472,11 @@
                     </div>
                 </div>
             </div>
+            <a href="{{ route('training.download-template') }}"
+   class="btn btn-success">
+    <i class="fas fa-download"></i>
+    Download Template Excel
+</a>
         </section>
 
         {{-- 02 PENYELENGGARAAN --}}
@@ -496,7 +502,7 @@
                         id="angkatan"
                         class="im-control"
                         value="{{ old('angkatan') }}"
-                        placeholder="Contoh: Angkatan I Tahun 2026"
+                        placeholder="Contoh: 1"
                         maxlength="100"
                     >
 

@@ -40,6 +40,11 @@ Route::get('/riwayat-pelatihan/hasil', [
     'result',
 ])->name('public.training-history.result');
 
+Route::get(
+    '/training/download-template',
+    [TrainingController::class, 'downloadTemplate']
+)->name('training.download-template');
+
 
 /*
 |--------------------------------------------------------------------------
