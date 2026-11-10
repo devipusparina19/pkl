@@ -19,51 +19,42 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         /*
-         * FILTER TAHUN
-         * Menggunakan daftar tahun yang benar-benar memiliki data
-         * pelatihan, sama seperti Dashboard Admin.
+         * DAFTAR TAHUN OTOMATIS DARI DATABASE.
          */
         $years = $this->getAvailableTrainingYears();
 
-        $requestedYear = (int) $request->input('year', now()->year);
-
-        if ($years->isNotEmpty()) {
-            $year = $years->contains($requestedYear)
-                ? $requestedYear
-                : (int) $years->first();
-        } else {
-            $year = $requestedYear ?: now()->year;
-        }
+        /*
+         * TAHUN TERPILIH.
+         * Default menggunakan tahun terbaru yang memiliki data.
+         */
+        $year = $this->resolveYear($request, $years);
 
         $minimum = max(1, min(100, (int) $request->input('minimum', 4)));
         $search = trim((string) $request->input('search', ''));
 
         /*
-         * QUERY PELATIHAN TAHUN TERPILIH
+         * ID PELATIHAN PADA TAHUN TERPILIH.
          */
         $trainingIds = Training::query()
             ->whereYear('start_date', $year)
             ->select('id');
 
         /*
-         * TOTAL PELATIHAN
-         * Sama dengan Dashboard Admin.
+         * TOTAL PELATIHAN.
          */
         $totalTrainings = Training::query()
             ->whereYear('start_date', $year)
             ->count();
 
         /*
-         * TOTAL KEIKUTSERTAAN
-         * Satu baris training_histories dihitung satu keikutsertaan.
+         * TOTAL KEIKUTSERTAAN.
          */
         $totalParticipations = TrainingHistory::query()
             ->whereIn('training_id', $trainingIds)
             ->count();
 
         /*
-         * TOTAL PESERTA TERLATIH
-         * Peserta yang sama hanya dihitung satu kali dalam satu tahun.
+         * TOTAL PESERTA UNIK.
          */
         $totalTrainedParticipants = TrainingHistory::query()
             ->whereIn('training_id', $trainingIds)
@@ -71,9 +62,7 @@ class ReportController extends Controller
             ->count('participant_id');
 
         /*
-         * STATISTIK JENIS KELAMIN
-         * Mengikuti rumus Dashboard Admin:
-         * peserta dihitung unik dan variasi penulisan gender dinormalisasi.
+         * STATISTIK JENIS KELAMIN.
          */
         $genderCounts = DB::table('training_histories')
             ->join(
@@ -132,7 +121,7 @@ class ReportController extends Controller
             : 0;
 
         /*
-         * FILTER RIWAYAT PESERTA TAHUN TERPILIH
+         * FILTER RIWAYAT BERDASARKAN TAHUN TERPILIH.
          */
         $historyInYear = function ($query) use ($year) {
             $query->whereHas('training', function ($trainingQuery) use ($year) {
@@ -141,8 +130,7 @@ class ReportController extends Controller
         };
 
         /*
-         * TABEL PESERTA
-         * Hanya peserta yang memiliki riwayat pada tahun terpilih.
+         * DATA PESERTA PADA TAHUN TERPILIH.
          */
         $participantQuery = Participant::query()
             ->whereHas('histories', $historyInYear)
@@ -165,8 +153,7 @@ class ReportController extends Controller
             ->withQueryString();
 
         /*
-         * PESERTA YANG PERLU DITINJAU
-         * Berdasarkan batas minimal jumlah keikutsertaan.
+         * PESERTA YANG PERLU DITINJAU.
          */
         $participantsToReviewQuery = Participant::query()
             ->whereHas('histories', $historyInYear)
@@ -186,22 +173,43 @@ class ReportController extends Controller
         $participantsToReview = $participantsToReviewQuery->count();
 
         /*
-         * REKAP KABUPATEN / KOTA / MITRA / MANDIRI
-         * Menghitung jumlah kegiatan pelatihan per wilayah.
+         * REKAP PESERTA BERDASARKAN WILAYAH.
+         *
+         * Sumber wilayah peserta:
+         * participants.district
+         *
+         * Bukan trainings.district.
+         *
+         * Satu peserta dihitung satu kali pada wilayah
+         * terbarunya dalam tahun yang dipilih.
          */
-        $districtRecap = Training::query()
-            ->whereYear('start_date', $year)
-            ->whereNotNull('district')
-            ->whereRaw("TRIM(district) != ''")
-            ->selectRaw('TRIM(district) as name, COUNT(*) as total')
-            ->groupByRaw('TRIM(district)')
+        $districtRecap = DB::table('training_histories')
+            ->join(
+                'trainings',
+                'trainings.id',
+                '=',
+                'training_histories.training_id'
+            )
+            ->join(
+                'participants',
+                'participants.id',
+                '=',
+                'training_histories.participant_id'
+            )
+            ->whereYear('trainings.start_date', $year)
+            ->whereNotNull('participants.district')
+            ->whereRaw("TRIM(participants.district) != ''")
+            ->selectRaw("
+                TRIM(participants.district) AS name,
+                COUNT(DISTINCT training_histories.participant_id) AS total
+            ")
+            ->groupByRaw('TRIM(participants.district)')
             ->orderByDesc('total')
             ->orderBy('name')
             ->get();
 
         /*
-         * PESERTA UNIK BERDASARKAN PROFESI
-         * Sama seperti Dashboard Admin.
+         * REKAP PESERTA BERDASARKAN PROFESI.
          */
         $nakesCounts = DB::table('training_histories')
             ->join(
@@ -220,8 +228,8 @@ class ReportController extends Controller
             ->whereNotNull('participants.profession')
             ->whereRaw("TRIM(participants.profession) != ''")
             ->selectRaw("
-                TRIM(participants.profession) as name,
-                COUNT(DISTINCT training_histories.participant_id) as total
+                TRIM(participants.profession) AS name,
+                COUNT(DISTINCT training_histories.participant_id) AS total
             ")
             ->groupByRaw('TRIM(participants.profession)')
             ->orderByDesc('total')
@@ -229,8 +237,7 @@ class ReportController extends Controller
             ->keyBy(fn ($item) => mb_strtolower(trim($item->name)));
 
         /*
-         * GABUNGKAN MASTER PROFESI DAN PROFESI DALAM DATA PESERTA.
-         * Profesi yang belum memiliki peserta tetap ditampilkan dengan nilai 0.
+         * GABUNGKAN MASTER PROFESI DAN DATA PESERTA.
          */
         $professionNames = collect();
 
@@ -268,7 +275,7 @@ class ReportController extends Controller
             ->values();
 
         /*
-         * 5 PROFESI DENGAN PESERTA TERBANYAK.
+         * 5 PROFESI PESERTA TERBANYAK.
          */
         $topNakes = $nakesByType
             ->filter(fn ($item) => $item->total > 0)
@@ -277,7 +284,7 @@ class ReportController extends Controller
             ->values();
 
         /*
-         * 5 PROFESI DENGAN PESERTA PALING SEDIKIT.
+         * 5 PROFESI PESERTA PALING SEDIKIT.
          */
         $bottomNakes = $nakesByType
             ->filter(fn ($item) => $item->total > 0)
@@ -309,11 +316,14 @@ class ReportController extends Controller
     }
 
     /**
-     * Ekspor laporan ke Excel.
+     * Export laporan Excel berdasarkan tahun terpilih.
      */
     public function export(Request $request)
     {
-        $year = (int) $request->input('year', now()->year);
+        $years = $this->getAvailableTrainingYears();
+
+        $year = $this->resolveYear($request, $years);
+
         $search = trim((string) $request->input('search', ''));
 
         $filename = 'laporan-riwayat-pelatihan-' . $year . '.xlsx';
@@ -325,27 +335,50 @@ class ReportController extends Controller
     }
 
     /**
-     * Mengambil tahun yang benar-benar memiliki data pelatihan.
-     * Dibuat sama dengan DashboardController.
+     * Mengambil seluruh tahun yang memiliki data pelatihan.
+     *
+     * Tahun diambil dari trainings.start_date.
+     * Hasil diurutkan dari tahun terbaru ke terlama.
      */
     private function getAvailableTrainingYears()
     {
-        $yearsQuery = Training::query()
+        $query = Training::query()
             ->whereNotNull('start_date');
 
         if (DB::connection()->getDriverName() === 'sqlite') {
-            $yearsQuery->selectRaw(
-                "CAST(strftime('%Y', start_date) AS INTEGER) as year"
+            $query->selectRaw(
+                "CAST(strftime('%Y', start_date) AS INTEGER) AS year"
             );
         } else {
-            $yearsQuery->selectRaw('YEAR(start_date) as year');
+            $query->selectRaw('YEAR(start_date) AS year');
         }
 
-        return $yearsQuery
+        return $query
             ->distinct()
             ->orderByDesc('year')
             ->pluck('year')
-            ->map(fn ($item) => (int) $item)
+            ->filter(fn ($year) => (int) $year > 0)
+            ->map(fn ($year) => (int) $year)
             ->values();
+    }
+
+    /**
+     * Menentukan tahun yang digunakan halaman atau export.
+     */
+    private function resolveYear(Request $request, $years): int
+    {
+        $requestedYear = (int) $request->input('year');
+
+        if ($years->isEmpty()) {
+            return $requestedYear > 0
+                ? $requestedYear
+                : (int) now()->year;
+        }
+
+        if ($requestedYear > 0 && $years->contains($requestedYear)) {
+            return $requestedYear;
+        }
+
+        return (int) $years->first();
     }
 }

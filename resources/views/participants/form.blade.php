@@ -277,7 +277,7 @@
                         'Gunakan nama lengkap sesuai identitas resmi.',
                         'Pastikan NIP tidak salah ketik.',
                         'Gunakan alamat email yang masih aktif.',
-                        'Pilih wilayah kerja sesuai data peserta.',
+                        'Pilih Kabupaten/Kota/Mitra/Mandiri sesuai asal atau wilayah kerja peserta.',
                     ] as $tip)
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -468,6 +468,10 @@
                             >
                                 {{ $district }}
                             </option>
+                            <small style="display:block; margin-top:8px; color:#64748b; font-size:12px;">
+    Wilayah ini merupakan data asal/wilayah kerja peserta.
+    Perubahan akan memperbarui data peserta dan menjadi acuan rekapitulasi laporan serta dashboard.
+</small>
                         @endforeach
                     </select>
                     @error('district')
@@ -512,45 +516,6 @@
                         @error('phone') aria-invalid="true" @enderror
                     >
                     @error('phone')
-                        <small class="fm-error">{{ $message }}</small>
-                    @enderror
-                </div>
-
-            </div>
-        </section>
-
-        {{-- 04 PELATIHAN --}}
-        <section class="fm-section" data-reveal aria-labelledby="fmPelatihan">
-            <div class="fm-section-head">
-                <span class="fm-num">04</span>
-                <h2 id="fmPelatihan">Informasi Pelatihan</h2>
-                <p>Angkatan dan sumber dana pelatihan, jika tersedia.</p>
-            </div>
-
-            <div class="fm-grid">
-
-                <div class="fm-field">
-                    <label for="angkatan">Angkatan <span class="fm-opt">Opsional</span></label>
-                    <input
-                        class="fm-control" id="angkatan" name="angkatan" type="text"
-                        value="{{ old('angkatan') }}"
-                        maxlength="50" placeholder="Contoh: 1"
-                        @error('angkatan') aria-invalid="true" @enderror
-                    >
-                    @error('angkatan')
-                        <small class="fm-error">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                <div class="fm-field">
-                    <label for="sumber_dana">Sumber Dana <span class="fm-opt">Opsional</span></label>
-                    <input
-                        class="fm-control" id="sumber_dana" name="sumber_dana" type="text"
-                        value="{{ old('sumber_dana') }}"
-                        maxlength="255" placeholder="Contoh: APBN"
-                        @error('sumber_dana') aria-invalid="true" @enderror
-                    >
-                    @error('sumber_dana')
                         <small class="fm-error">{{ $message }}</small>
                     @enderror
                 </div>

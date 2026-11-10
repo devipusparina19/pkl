@@ -12,30 +12,48 @@ use Illuminate\Validation\Rule;
 
 class ParticipantController extends Controller
 {
+    /**
+     * Menampilkan daftar peserta.
+     */
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
 
-        // Mengambil daftar tahun berdasarkan tanggal mulai pelatihan
-        // yang memiliki riwayat peserta.
-        $years = DB::table('training_histories')
+        /*
+         * Mengambil tahun pelatihan yang memiliki riwayat peserta.
+         * Mendukung MySQL dan SQLite.
+         */
+        $yearsQuery = DB::table('training_histories')
             ->join(
                 'trainings',
                 'trainings.id',
                 '=',
                 'training_histories.training_id'
             )
-            ->whereNotNull('trainings.start_date')
-            ->selectRaw('YEAR(trainings.start_date) as year')
+            ->whereNotNull('trainings.start_date');
+
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            $yearsQuery->selectRaw(
+                "CAST(strftime('%Y', trainings.start_date) AS INTEGER) as year"
+            );
+        } else {
+            $yearsQuery->selectRaw(
+                'YEAR(trainings.start_date) as year'
+            );
+        }
+
+        $years = $yearsQuery
             ->distinct()
             ->orderByDesc('year')
             ->pluck('year')
-            ->map(fn ($year) => (string) $year);
+            ->map(fn ($year) => (string) $year)
+            ->values();
 
-        // Menentukan filter tahun.
+        /*
+         * Filter tahun.
+         */
         $yearFilter = (string) $request->query('year', 'all');
 
-        // Jika tahun tidak tersedia, tampilkan semua tahun.
         if (
             $yearFilter !== 'all' &&
             !$years->contains($yearFilter)
@@ -47,25 +65,31 @@ class ParticipantController extends Controller
             ? $yearFilter
             : null;
 
-        // Query utama data peserta.
+        /*
+         * Query utama peserta.
+         */
         $participants = Participant::query()
             ->with(['histories.training'])
             ->withCount('histories')
 
-            // Filter berdasarkan tahun pelatihan.
             ->when($selectedYear, function ($query) use ($selectedYear) {
-                $query->whereHas('histories.training', function ($trainingQuery) use ($selectedYear) {
-                    $trainingQuery->whereYear(
-                        'start_date',
-                        $selectedYear
-                    );
-                });
+                $query->whereHas(
+                    'histories.training',
+                    function ($trainingQuery) use ($selectedYear) {
+                        $trainingQuery->whereYear(
+                            'start_date',
+                            $selectedYear
+                        );
+                    }
+                );
             })
 
-            // Pencarian peserta.
+            /*
+             * Pencarian peserta.
+             */
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($subQuery) use ($search) {
-                    foreach ([
+                    $columns = [
                         'name',
                         'nip',
                         'institution',
@@ -73,22 +97,22 @@ class ParticipantController extends Controller
                         'profession',
                         'email',
                         'phone',
-                    ] as $column) {
-                        if (Schema::hasColumn('participants', $column)) {
+                        'nik',
+                    ];
+
+                    foreach ($columns as $column) {
+                        if (
+                            Schema::hasColumn(
+                                'participants',
+                                $column
+                            )
+                        ) {
                             $subQuery->orWhere(
                                 $column,
                                 'like',
                                 "%{$search}%"
                             );
                         }
-                    }
-
-                    if (Schema::hasColumn('participants', 'nik')) {
-                        $subQuery->orWhere(
-                            'nik',
-                            'like',
-                            "%{$search}%"
-                        );
                     }
                 });
             })
@@ -106,6 +130,9 @@ class ParticipantController extends Controller
         ));
     }
 
+    /**
+     * Menampilkan detail peserta.
+     */
     public function show(Participant $participant)
     {
         $participant->load([
@@ -123,19 +150,38 @@ class ParticipantController extends Controller
         return view('participants.show', compact('participant'));
     }
 
+    /**
+     * Menampilkan form edit peserta.
+     */
     public function edit(Participant $participant)
     {
+        /*
+         * Ambil semua wilayah aktif dari master data.
+         */
         $districts = District::query()
             ->where('is_active', true)
             ->orderBy('name')
             ->pluck('name');
 
+        /*
+         * Pertahankan wilayah lama jika sudah tidak aktif
+         * atau belum terdaftar di master data.
+         *
+         * Tujuannya agar data lama tidak hilang saat diedit.
+         */
+        $currentDistrict = trim(
+            (string) $participant->district
+        );
+
         if (
-            $participant->district &&
-            !$districts->contains($participant->district)
+            $currentDistrict !== '' &&
+            !$districts->contains($currentDistrict)
         ) {
-            $districts->push($participant->district);
-            $districts = $districts->sort()->values();
+            $districts->push($currentDistrict);
+            $districts = $districts
+                ->unique()
+                ->sort()
+                ->values();
         }
 
         return view('participants.form', compact(
@@ -144,26 +190,58 @@ class ParticipantController extends Controller
         ));
     }
 
-    public function update(Request $request, Participant $participant)
-    {
-        $data = $this->validateParticipant($request, $participant);
+    /**
+     * Memperbarui data peserta.
+     */
+    public function update(
+        Request $request,
+        Participant $participant
+    ) {
+        $data = $this->validateParticipant(
+            $request,
+            $participant
+        );
 
         DB::transaction(function () use ($data, $participant) {
+            /*
+             * Perbarui data peserta.
+             * Kolom district ikut diperbarui di sini.
+             */
             $participant->update($data);
 
+            /*
+             * Sinkronkan nama dan email akun pengguna
+             * jika peserta memiliki akun.
+             */
             if ($participant->user_id) {
-                User::whereKey($participant->user_id)->update([
-                    'name' => $data['name'],
-                    'email' => $data['email'] ?? null,
-                ]);
+                $userData = [];
+
+                if (array_key_exists('name', $data)) {
+                    $userData['name'] = $data['name'];
+                }
+
+                if (array_key_exists('email', $data)) {
+                    $userData['email'] = $data['email'];
+                }
+
+                if (!empty($userData)) {
+                    User::whereKey($participant->user_id)
+                        ->update($userData);
+                }
             }
         });
 
         return redirect()
             ->route('participants.show', $participant)
-            ->with('success', 'Data peserta berhasil diperbarui.');
+            ->with(
+                'success',
+                'Data peserta berhasil diperbarui.'
+            );
     }
 
+    /**
+     * Menghapus peserta.
+     */
     public function destroy(Participant $participant)
     {
         DB::transaction(function () use ($participant) {
@@ -179,9 +257,15 @@ class ParticipantController extends Controller
 
         return redirect()
             ->route('participants.index')
-            ->with('success', 'Data peserta berhasil dihapus.');
+            ->with(
+                'success',
+                'Data peserta berhasil dihapus.'
+            );
     }
 
+    /**
+     * Validasi data peserta.
+     */
     private function validateParticipant(
         Request $request,
         ?Participant $participant = null
@@ -191,49 +275,111 @@ class ParticipantController extends Controller
                 'required',
                 'string',
                 'max:30',
-                Rule::unique('participants', 'nip')->ignore($participant?->id),
+                Rule::unique('participants', 'nip')
+                    ->ignore($participant?->id),
             ],
-            'name' => ['required', 'string', 'max:255'],
-            'gender' => ['nullable', Rule::in(['L', 'P'])],
-            'rank' => ['nullable', 'string', 'max:100'],
-            'institution' => ['nullable', 'string', 'max:255'],
-            'district' => ['nullable', 'string', 'max:255'],
-            'profession' => ['nullable', 'string', 'max:255'],
+
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'gender' => [
+                'nullable',
+                Rule::in(['L', 'P']),
+            ],
+
+            'rank' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'institution' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            /*
+             * Wilayah harus berasal dari master data District.
+             */
+            'district' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::exists('districts', 'name')
+                    ->where('is_active', true),
+            ],
+
+            'profession' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
             'email' => [
                 'nullable',
                 'email',
                 'max:255',
-                Rule::unique('participants', 'email')->ignore($participant?->id),
+                Rule::unique('participants', 'email')
+                    ->ignore($participant?->id),
             ],
-            'phone' => ['nullable', 'string', 'max:30'],
+
+            'phone' => [
+                'nullable',
+                'string',
+                'max:30',
+            ],
         ];
 
+        /*
+         * Validasi NIK jika kolom tersedia.
+         */
         if (Schema::hasColumn('participants', 'nik')) {
             $rules['nik'] = [
                 'nullable',
                 'string',
                 'max:30',
-                Rule::unique('participants', 'nik')->ignore($participant?->id),
+                Rule::unique('participants', 'nik')
+                    ->ignore($participant?->id),
             ];
         }
 
-        if (!Schema::hasColumn('participants', 'gender')) {
-            unset($rules['gender']);
-        }
+        /*
+         * Hilangkan aturan untuk kolom yang tidak tersedia.
+         */
+        $optionalColumns = [
+            'gender',
+            'rank',
+            'email',
+            'phone',
+            'institution',
+            'district',
+            'profession',
+        ];
 
-        if (!Schema::hasColumn('participants', 'rank')) {
-            unset($rules['rank']);
-        }
-
-        if (!Schema::hasColumn('participants', 'email')) {
-            unset($rules['email']);
+        foreach ($optionalColumns as $column) {
+            if (
+                !Schema::hasColumn('participants', $column)
+            ) {
+                unset($rules[$column]);
+            }
         }
 
         $data = $request->validate($rules);
 
+        /*
+         * Hanya simpan kolom yang benar-benar tersedia
+         * pada tabel participants.
+         */
         return array_filter(
             $data,
-            fn ($value, $key) => Schema::hasColumn('participants', $key),
+            fn ($value, $key) => Schema::hasColumn(
+                'participants',
+                $key
+            ),
             ARRAY_FILTER_USE_BOTH
         );
     }

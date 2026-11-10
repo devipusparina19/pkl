@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Participant extends Model
 {
+    /**
+     * Kolom yang dapat diisi melalui mass assignment.
+     */
     protected $fillable = [
         'user_id',
         'nik',
@@ -26,14 +29,17 @@ class Participant extends Model
         'notes',
     ];
 
+    /**
+     * Relasi peserta dengan akun pengguna.
+     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(
-            User::class,
-            'user_id'
-        );
+        return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * Relasi peserta dengan riwayat pelatihan.
+     */
     public function histories(): HasMany
     {
         return $this->hasMany(

@@ -20,8 +20,7 @@ class DashboardController extends Controller
     public function publicIndex(Request $request)
     {
         /*
-         * PILIHAN TAHUN
-         * Pastikan tahun yang dipilih tersedia sebelum query dibuat.
+         * PILIHAN TAHUN.
          */
         $years = $this->getAvailableTrainingYears();
 
@@ -35,56 +34,94 @@ class DashboardController extends Controller
             $year = $requestedYear ?: now()->year;
         }
 
-        $district = $request->input('district');
-        $fundingSource = $request->input('funding_source');
+        /*
+         * FILTER WILAYAH DAN SUMBER DANA.
+         *
+         * district mengacu ke participants.district,
+         * bukan trainings.district.
+         */
+        $district = trim((string) $request->input('district', ''));
+        $fundingSource = trim((string) $request->input('funding_source', ''));
+
+        $district = $district !== '' ? $district : null;
+        $fundingSource = $fundingSource !== '' ? $fundingSource : null;
 
         /*
-         * QUERY DASAR PELATIHAN
+         * QUERY DASAR PELATIHAN.
+         *
+         * Tahun dan sumber dana berasal dari data pelatihan.
+         * Filter wilayah dilakukan melalui data peserta.
          */
         $base = Training::query()
             ->whereYear('start_date', $year)
-            ->when($district, function ($query) use ($district) {
-                $query->where('district', $district);
-            })
             ->when($fundingSource, function ($query) use ($fundingSource) {
                 $query->where('funding_source', $fundingSource);
+            })
+            ->when($district, function ($query) use ($district) {
+                $query->whereHas('histories.participant', function ($participantQuery) use ($district) {
+                    $participantQuery->whereRaw(
+                        'TRIM(participants.district) = ?',
+                        [$district]
+                    );
+                });
             });
 
         $trainingIds = (clone $base)->select('id');
 
         /*
-         * STATISTIK UTAMA
+         * STATISTIK UTAMA.
+         *
+         * Jika filter wilayah dipilih, jumlah pelatihan hanya menghitung
+         * pelatihan yang memiliki peserta dari wilayah tersebut.
          */
         $totalTrainings = (clone $base)->count();
 
-        $totalParticipations = TrainingHistory::query()
+        $historyQuery = TrainingHistory::query()
             ->whereIn('training_id', $trainingIds)
-            ->count();
+            ->when($district, function ($query) use ($district) {
+                $query->whereHas('participant', function ($participantQuery) use ($district) {
+                    $participantQuery->whereRaw(
+                        'TRIM(participants.district) = ?',
+                        [$district]
+                    );
+                });
+            });
 
-        $totalParticipants = TrainingHistory::query()
-            ->whereIn('training_id', $trainingIds)
+        $totalParticipations = (clone $historyQuery)->count();
+
+        $totalParticipants = (clone $historyQuery)
             ->distinct()
             ->count('participant_id');
 
         /*
-         * PILIHAN KABUPATEN/KOTA
+         * PILIHAN KABUPATEN/KOTA/MITRA/MANDIRI.
+         *
+         * Menggabungkan master wilayah aktif dan wilayah yang masih
+         * tercatat pada data peserta, termasuk data lama.
          */
-        $districts = District::query()
+        $activeDistricts = District::query()
             ->where('is_active', true)
             ->orderBy('name')
             ->pluck('name');
 
-        if ($districts->isEmpty()) {
-            $districts = Training::query()
-                ->whereNotNull('district')
-                ->where('district', '!=', '')
-                ->distinct()
-                ->orderBy('district')
-                ->pluck('district');
-        }
+        $participantDistricts = Participant::query()
+            ->whereNotNull('district')
+            ->whereRaw("TRIM(district) != ''")
+            ->selectRaw('TRIM(district) AS district_name')
+            ->distinct()
+            ->orderBy('district_name')
+            ->pluck('district_name');
+
+        $districts = $activeDistricts
+            ->merge($participantDistricts)
+            ->map(fn ($name) => trim((string) $name))
+            ->filter(fn ($name) => $name !== '')
+            ->unique()
+            ->sort()
+            ->values();
 
         /*
-         * PILIHAN SUMBER DANA
+         * PILIHAN SUMBER DANA.
          */
         $fundingSources = FundingSource::query()
             ->where('is_active', true)
@@ -94,34 +131,86 @@ class DashboardController extends Controller
         if ($fundingSources->isEmpty()) {
             $fundingSources = Training::query()
                 ->whereNotNull('funding_source')
-                ->where('funding_source', '!=', '')
+                ->whereRaw("TRIM(funding_source) != ''")
+                ->select('funding_source')
                 ->distinct()
                 ->orderBy('funding_source')
                 ->pluck('funding_source');
         }
 
         /*
-         * DATA PELATIHAN BERDASARKAN KABUPATEN/KOTA
+         * JUMLAH PESERTA UNIK BERDASARKAN KABUPATEN/KOTA/MITRA/MANDIRI.
+         *
+         * Sumber wilayah: participants.district.
+         * Peserta yang mengikuti beberapa pelatihan tetap dihitung satu kali.
          */
-        $byDistrict = (clone $base)
-            ->select('district', DB::raw('COUNT(*) as total'))
-            ->whereNotNull('district')
-            ->where('district', '!=', '')
-            ->groupBy('district')
+        $byDistrict = DB::table('training_histories')
+            ->join(
+                'trainings',
+                'trainings.id',
+                '=',
+                'training_histories.training_id'
+            )
+            ->join(
+                'participants',
+                'participants.id',
+                '=',
+                'training_histories.participant_id'
+            )
+            ->whereYear('trainings.start_date', $year)
+            ->when($fundingSource, function ($query) use ($fundingSource) {
+                $query->where('trainings.funding_source', $fundingSource);
+            })
+            ->when($district, function ($query) use ($district) {
+                $query->whereRaw(
+                    'TRIM(participants.district) = ?',
+                    [$district]
+                );
+            })
+            ->whereNotNull('participants.district')
+            ->whereRaw("TRIM(participants.district) != ''")
+            ->selectRaw("
+                TRIM(participants.district) AS district,
+                COUNT(DISTINCT training_histories.participant_id) AS total
+            ")
+            ->groupByRaw('TRIM(participants.district)')
             ->orderByDesc('total')
+            ->orderBy('district')
             ->get();
 
         /*
-         * PELATIHAN TERBARU
+         * PERTAHANKAN NAMA VARIABEL UNTUK KOMPATIBILITAS VIEW.
+         *
+         * Catatan: byDistrict dan trainingByDistrict sekarang berisi
+         * jumlah peserta unik per wilayah, bukan jumlah pelatihan.
+         */
+        $trainingByDistrict = $byDistrict;
+
+        /*
+         * PELATIHAN TERBARU.
+         *
+         * Jika filter wilayah dipilih, tampilkan hanya pelatihan
+         * yang memiliki peserta dari wilayah tersebut.
          */
         $recentTrainings = (clone $base)
-            ->withCount('histories')
+            ->withCount([
+                'histories' => function ($query) use ($district) {
+                    $query->when($district, function ($historyQuery) use ($district) {
+                        $historyQuery->whereHas('participant', function ($participantQuery) use ($district) {
+                            $participantQuery->whereRaw(
+                                'TRIM(participants.district) = ?',
+                                [$district]
+                            );
+                        });
+                    });
+                },
+            ])
             ->orderByDesc('start_date')
             ->limit(8)
             ->get();
 
         /*
-         * MASTER JENIS TENAGA KESEHATAN
+         * MASTER JENIS TENAGA KESEHATAN.
          */
         $healthWorkerTypes = HealthWorkerType::query()
             ->where('is_active', true)
@@ -129,29 +218,44 @@ class DashboardController extends Controller
             ->get();
 
         /*
-         * JUMLAH PESERTA BERDASARKAN PROFESI
+         * JUMLAH PESERTA UNIK BERDASARKAN PROFESI.
          */
         $nakesCounts = DB::table('training_histories')
+            ->join(
+                'trainings',
+                'trainings.id',
+                '=',
+                'training_histories.training_id'
+            )
             ->join(
                 'participants',
                 'participants.id',
                 '=',
                 'training_histories.participant_id'
             )
-            ->whereIn('training_histories.training_id', $trainingIds)
+            ->whereYear('trainings.start_date', $year)
+            ->when($fundingSource, function ($query) use ($fundingSource) {
+                $query->where('trainings.funding_source', $fundingSource);
+            })
+            ->when($district, function ($query) use ($district) {
+                $query->whereRaw(
+                    'TRIM(participants.district) = ?',
+                    [$district]
+                );
+            })
             ->whereNotNull('participants.profession')
             ->whereRaw("TRIM(participants.profession) != ''")
-            ->selectRaw(
-                'TRIM(participants.profession) as name,
-                 COUNT(DISTINCT training_histories.participant_id) as total'
-            )
+            ->selectRaw("
+                TRIM(participants.profession) AS name,
+                COUNT(DISTINCT training_histories.participant_id) AS total
+            ")
             ->groupByRaw('TRIM(participants.profession)')
             ->orderByDesc('total')
             ->get()
             ->keyBy(fn ($item) => mb_strtolower(trim($item->name)));
 
         /*
-         * GABUNGKAN MASTER PROFESI DAN PROFESI YANG ADA DI DATA PESERTA
+         * GABUNGKAN MASTER PROFESI DAN PROFESI DALAM DATA PESERTA.
          */
         $nakesNames = collect();
 
@@ -184,7 +288,7 @@ class DashboardController extends Controller
             ->values();
 
         /*
-         * LIMA PROFESI DENGAN JUMLAH PESERTA TERBANYAK
+         * LIMA PROFESI DENGAN JUMLAH PESERTA TERBANYAK.
          */
         $topNakes = $nakesByType
             ->filter(fn ($item) => $item->total > 0)
@@ -193,15 +297,13 @@ class DashboardController extends Controller
             ->values();
 
         /*
-         * LIMA PROFESI DENGAN JUMLAH PESERTA PALING SEDIKIT
+         * LIMA PROFESI DENGAN JUMLAH PESERTA PALING SEDIKIT.
          */
         $bottomNakes = $nakesByType
             ->filter(fn ($item) => $item->total > 0)
             ->sortBy('total')
             ->take(5)
             ->values();
-
-        $trainingByDistrict = $byDistrict;
 
         return view('welcome', compact(
             'year',
@@ -246,7 +348,7 @@ class DashboardController extends Controller
         );
 
         /*
-         * FILTER TAHUN DAN URUTAN
+         * FILTER TAHUN DAN URUTAN.
          */
         $requestedYear = (int) $request->input('year', now()->year);
 
@@ -261,7 +363,7 @@ class DashboardController extends Controller
         );
 
         /*
-         * PILIHAN TAHUN BERDASARKAN DATA PELATIHAN
+         * PILIHAN TAHUN.
          */
         $years = $this->getAvailableTrainingYears();
 
@@ -274,14 +376,14 @@ class DashboardController extends Controller
         }
 
         /*
-         * QUERY PELATIHAN TAHUN TERPILIH
+         * QUERY PELATIHAN TAHUN TERPILIH.
          */
         $trainingIdsThisYear = Training::query()
             ->whereYear('start_date', $year)
             ->select('id');
 
         /*
-         * STATISTIK UTAMA
+         * STATISTIK UTAMA.
          */
         $totalTrainings = Training::query()
             ->whereYear('start_date', $year)
@@ -300,7 +402,7 @@ class DashboardController extends Controller
         $participationsThisYear = $totalParticipations;
 
         /*
-         * STATISTIK JENIS KELAMIN
+         * STATISTIK JENIS KELAMIN.
          * Peserta dihitung satu kali pada tahun terpilih.
          */
         $genderCounts = DB::table('training_histories')
@@ -351,7 +453,37 @@ class DashboardController extends Controller
         ];
 
         /*
-         * JUMLAH KEIKUTSERTAAN SETIAP PESERTA
+         * REKAP PESERTA UNIK BERDASARKAN KABUPATEN/KOTA/MITRA/MANDIRI.
+         *
+         * Sumber wilayah selalu participants.district.
+         */
+        $districtRecap = DB::table('training_histories')
+            ->join(
+                'trainings',
+                'trainings.id',
+                '=',
+                'training_histories.training_id'
+            )
+            ->join(
+                'participants',
+                'participants.id',
+                '=',
+                'training_histories.participant_id'
+            )
+            ->whereYear('trainings.start_date', $year)
+            ->whereNotNull('participants.district')
+            ->whereRaw("TRIM(participants.district) != ''")
+            ->selectRaw("
+                TRIM(participants.district) AS name,
+                COUNT(DISTINCT training_histories.participant_id) AS total
+            ")
+            ->groupByRaw('TRIM(participants.district)')
+            ->orderByDesc('total')
+            ->orderBy('name')
+            ->get();
+
+        /*
+         * JUMLAH KEIKUTSERTAAN SETIAP PESERTA.
          */
         $frequentParticipants = Participant::query()
             ->whereHas('histories', function ($query) use ($year) {
@@ -372,7 +504,7 @@ class DashboardController extends Controller
             ->withQueryString();
 
         /*
-         * STATISTIK BIDANG/KATEGORI PELATIHAN
+         * STATISTIK BIDANG/KATEGORI PELATIHAN.
          */
         $fieldStats = DB::table('trainings')
             ->leftJoin(
@@ -385,8 +517,8 @@ class DashboardController extends Controller
             ->whereNotNull('training_categories.name')
             ->where('training_categories.name', '!=', '')
             ->selectRaw('
-                training_categories.name as name,
-                COUNT(trainings.id) as total
+                training_categories.name AS name,
+                COUNT(trainings.id) AS total
             ')
             ->groupBy(
                 'training_categories.id',
@@ -397,7 +529,7 @@ class DashboardController extends Controller
             ->get();
 
         /*
-         * PILIHAN PROFESI
+         * PILIHAN PROFESI.
          */
         $professionOptions = HealthWorkerType::query()
             ->where('is_active', true)
@@ -405,7 +537,7 @@ class DashboardController extends Controller
             ->pluck('name');
 
         /*
-         * PESERTA TERLATIH BERDASARKAN PROFESI
+         * PESERTA TERLATIH BERDASARKAN PROFESI.
          */
         $trainedParticipants = collect();
 
@@ -440,13 +572,13 @@ class DashboardController extends Controller
         }
 
         /*
-         * RIWAYAT TERBARU
+         * RIWAYAT TERBARU.
          * Variabel dipertahankan untuk kompatibilitas view.
          */
         $recentHistories = collect();
 
         /*
-         * DATA UNTUK VIEW
+         * DATA UNTUK VIEW.
          */
         $data = compact(
             'totalParticipants',
@@ -463,7 +595,8 @@ class DashboardController extends Controller
             'selectedProfession',
             'professionOptions',
             'trainedParticipants',
-            'genderStats'
+            'genderStats',
+            'districtRecap'
         );
 
         if ($role === 'admin') {
@@ -483,10 +616,10 @@ class DashboardController extends Controller
 
         if (DB::connection()->getDriverName() === 'sqlite') {
             $yearsQuery->selectRaw(
-                "CAST(strftime('%Y', start_date) AS INTEGER) as year"
+                "CAST(strftime('%Y', start_date) AS INTEGER) AS year"
             );
         } else {
-            $yearsQuery->selectRaw('YEAR(start_date) as year');
+            $yearsQuery->selectRaw('YEAR(start_date) AS year');
         }
 
         return $yearsQuery

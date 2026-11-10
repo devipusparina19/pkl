@@ -362,8 +362,9 @@ img{display:block;max-width:100%}
 
       <p class="hero-lead">
         SIRAPIK menyajikan informasi dan ringkasan data pelatihan Bapelkes
-        Provinsi Kalimantan Selatan. Temukan data berdasarkan tahun,
-        kabupaten/kota atau mitra, serta sumber dana dalam satu sistem terintegrasi.
+Provinsi Kalimantan Selatan. Temukan data berdasarkan tahun,
+kabupaten/kota atau mitra asal peserta, serta sumber dana
+dalam satu sistem terintegrasi.
       </p>
 
       <div class="hero-actions">
@@ -426,8 +427,9 @@ img{display:block;max-width:100%}
       </p>
       <p>
         Informasi yang tersedia mencakup ringkasan pelatihan, jumlah peserta,
-        rekap berdasarkan kabupaten/kota atau mitra, serta partisipasi tenaga
-        kesehatan, sehingga gambaran data pelatihan lebih mudah dipahami.
+rekap berdasarkan kabupaten/kota atau mitra asal peserta, serta
+partisipasi tenaga kesehatan, sehingga gambaran data pelatihan
+lebih mudah dipahami.
       </p>
 
       <ul class="about-list">
@@ -481,9 +483,9 @@ img{display:block;max-width:100%}
         </div>
 
         <div class="field">
-          <label for="district">Kabupaten/Kota/Mitra/Mandiri</label>
+          <label for="district">Asal Kabupaten/Kota/Mitra/Mandiri Peserta</label>
           <select name="district" id="district">
-            <option value="">Semua Kabupaten/Kota/Mitra/Mandiri</option>
+            <option value="">Semua Wilayah Peserta</option>
             @foreach ($districts as $item)
               <option value="{{ $item }}" @selected($district === $item)>{{ $item }}</option>
             @endforeach
@@ -543,26 +545,42 @@ img{display:block;max-width:100%}
     <div class="panels">
 
       <section class="panel reveal">
-        <div class="panel-head">
-          <h3>Rekap Kabupaten/Kota/Mitra/Mandiri</h3>
-          <p>Jumlah pelatihan berdasarkan wilayah atau mitra yang tercatat dalam sistem.</p>
-        </div>
-        <div class="panel-body">
-          @if (collect($trainingByDistrict)->isNotEmpty())
+    <div class="panel-head">
+        <h3>Rekap Peserta Berdasarkan Wilayah</h3>
+        <p>
+            Jumlah peserta unik berdasarkan Kabupaten/Kota/Mitra/Mandiri
+            yang tercatat pada data peserta. Wilayah mengikuti data asal
+            atau wilayah kerja peserta terbaru.
+        </p>
+    </div>
+
+    <div class="panel-body">
+        @if (collect($trainingByDistrict)->isNotEmpty())
             <ul class="rows" data-bars>
-              @foreach ($trainingByDistrict as $row)
-                <li class="row">
-                  <span class="row-name">{{ $row->district }}</span>
-                  <span class="row-total">{{ number_format($row->total, 0, ',', '.') }}</span>
-                  <span class="bar"><i style="--w: {{ round(($row->total / $maxDistrict) * 100) }}%"></i></span>
-                </li>
-              @endforeach
+                @foreach ($trainingByDistrict as $row)
+                    <li class="row">
+                        <span class="row-name">
+                            {{ $row->district }}
+                        </span>
+
+                        <span class="row-total">
+                            {{ number_format((int) $row->total, 0, ',', '.') }}
+                            <small>org</small>
+                        </span>
+
+                        <span class="bar">
+                            <i style="--w: {{ round(((int) $row->total / $maxDistrict) * 100) }}%"></i>
+                        </span>
+                    </li>
+                @endforeach
             </ul>
-          @else
-            <div class="empty">Belum ada data untuk filter ini.</div>
-          @endif
-        </div>
-      </section>
+        @else
+            <div class="empty">
+                Belum ada data peserta untuk filter ini.
+            </div>
+        @endif
+    </div>
+</section>
 
       <section class="panel reveal d1">
         <div class="panel-head">

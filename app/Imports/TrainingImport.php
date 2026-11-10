@@ -33,8 +33,22 @@ class TrainingImport implements ToCollection
         public ?int $jpl = null,
     ) {}
 
+    /**
+     * Memproses data peserta dari Excel.
+     *
+     * Baris 7  = header.
+     * Baris 8+ = data peserta.
+     */
     public function collection(Collection $rows): void
     {
+        $district = trim($this->district);
+
+        if ($district === '') {
+            $this->errors[] =
+                'Kabupaten/Kota/Mitra/Mandiri wajib dipilih sebelum import.';
+            return;
+        }
+
         // Header peserta berada pada baris Excel ke-7.
         $headerRow = $rows->get(6);
 
@@ -98,6 +112,7 @@ class TrainingImport implements ToCollection
                 $nip = trim((string) ($data['nip'] ?? ''));
                 $nik = trim((string) ($data['nik'] ?? ''));
 
+                // Lewati baris yang benar-benar kosong.
                 if ($name === '' && $nip === '' && $nik === '') {
                     continue;
                 }
@@ -114,16 +129,17 @@ class TrainingImport implements ToCollection
                     continue;
                 }
 
-                DB::transaction(function () use (
+                $result = DB::transaction(function () use (
                     $data,
                     $name,
                     $nip,
                     $nik,
-                    $training
-                ): void {
+                    $training,
+                    $district
+                ): array {
                     $participant = null;
 
-                    // Cari berdasarkan NIP terlebih dahulu.
+                    // Cari peserta berdasarkan NIP terlebih dahulu.
                     if (
                         $nip !== '' &&
                         Schema::hasColumn('participants', 'nip')
@@ -150,76 +166,79 @@ class TrainingImport implements ToCollection
                         $participant = new Participant();
                     }
 
+                    // Identitas peserta.
                     $participant->name = $name;
 
-                    $this->setIfColumnExists(
+                    $this->setParticipantColumn(
                         $participant,
                         'nip',
                         $nip
                     );
 
-                    $this->setIfColumnExists(
+                    $this->setParticipantColumn(
                         $participant,
                         'nik',
                         $nik
                     );
 
-                    $this->setIfColumnExists(
+                    // Data pribadi dan pekerjaan.
+                    $this->setParticipantColumn(
                         $participant,
                         'gender',
                         $data['gender'] ?? null
                     );
 
-                    $this->setIfColumnExists(
+                    $this->setParticipantColumn(
                         $participant,
                         'rank',
                         $data['rank'] ?? null
                     );
 
-                    $this->setIfColumnExists(
+                    $this->setParticipantColumn(
                         $participant,
                         'profession',
                         $data['profession'] ?? null
                     );
 
-                    $this->setIfColumnExists(
+                    $this->setParticipantColumn(
                         $participant,
                         'email',
                         $data['email'] ?? null
                     );
 
-                    $this->setIfColumnExists(
+                    $this->setParticipantColumn(
                         $participant,
                         'phone',
                         $data['phone'] ?? null
                     );
 
-                    $this->setIfColumnExists(
+                    $this->setParticipantColumn(
                         $participant,
                         'institution',
                         $data['institution'] ?? null
                     );
 
-                    $this->setIfColumnExists(
+                    /*
+                     * SINKRONISASI WILAYAH PESERTA
+                     *
+                     * Wilayah yang dipilih pada form import
+                     * disimpan ke kolom participants.district.
+                     *
+                     * Jika peserta sudah ada, wilayah lamanya
+                     * diperbarui dengan pilihan wilayah terbaru.
+                     */
+                    $this->setParticipantColumn(
                         $participant,
                         'district',
-                        $this->district
+                        $district,
+                        true
                     );
 
                     $participant->save();
 
-                    if ($isNew) {
-                        $this->createdParticipants++;
-                    } else {
-                        $this->updatedParticipants++;
-                    }
-
                     /*
-                     * BAGIAN PENTING:
                      * Hubungkan peserta dengan pelatihan.
-                     *
-                     * Kombinasi participant_id dan training_id
-                     * tidak dibuat berulang jika sudah ada.
+                     * Riwayat tidak dibuat berulang jika sudah ada.
                      */
                     $history = TrainingHistory::firstOrCreate(
                         [
@@ -231,10 +250,22 @@ class TrainingImport implements ToCollection
                         ]
                     );
 
-                    if ($history->wasRecentlyCreated) {
-                        $this->createdHistories++;
-                    }
+                    return [
+                        'is_new' => $isNew,
+                        'history_created' => $history->wasRecentlyCreated,
+                    ];
                 });
+
+                // Hitung hasil hanya setelah transaksi berhasil.
+                if ($result['is_new']) {
+                    $this->createdParticipants++;
+                } else {
+                    $this->updatedParticipants++;
+                }
+
+                if ($result['history_created']) {
+                    $this->createdHistories++;
+                }
             } catch (\Throwable $e) {
                 $this->errors[] =
                     "Baris {$excelRow}: " . $e->getMessage();
@@ -242,31 +273,41 @@ class TrainingImport implements ToCollection
         }
     }
 
+    /**
+     * Normalisasi nama kolom Excel.
+     */
     private function normalizeHeaders(Collection $row): array
     {
         $headers = [];
 
         foreach ($row as $index => $value) {
-            $headers[$index] = Str::of((string) $value)
-                ->lower()
-                ->replace(['/', '.', '-', '_'], ' ')
-                ->squish()
-                ->toString();
+            $headers[$index] = $this->normalizeText($value);
         }
 
         return $headers;
     }
 
+    /**
+     * Normalisasi teks agar pencocokan lebih konsisten.
+     */
+    private function normalizeText(mixed $value): string
+    {
+        return Str::of((string) $value)
+            ->lower()
+            ->replace(['/', '.', '-', '_'], ' ')
+            ->squish()
+            ->toString();
+    }
+
+    /**
+     * Mencari indeks kolom berdasarkan beberapa nama alternatif.
+     */
     private function findColumn(
         array $headers,
         array $aliases
     ): ?int {
         $normalizedAliases = array_map(
-            fn ($alias) => Str::of($alias)
-                ->lower()
-                ->replace(['/', '.', '-', '_'], ' ')
-                ->squish()
-                ->toString(),
+            fn ($alias) => $this->normalizeText($alias),
             $aliases
         );
 
@@ -279,6 +320,9 @@ class TrainingImport implements ToCollection
         return null;
     }
 
+    /**
+     * Membaca data satu baris Excel.
+     */
     private function mapRow(
         Collection $row,
         array $headers
@@ -335,6 +379,7 @@ class TrainingImport implements ToCollection
 
         foreach ($aliases as $field => $names) {
             $column = $this->findColumn($headers, $names);
+
             $value = $column !== null
                 ? $row->get($column)
                 : null;
@@ -347,9 +392,13 @@ class TrainingImport implements ToCollection
         return $result;
     }
 
+    /**
+     * Membuat atau menemukan data pelatihan.
+     */
     private function findOrCreateTraining(): Training
     {
         $batchNumber = trim($this->batchNumber);
+        $district = trim($this->district);
 
         $codeSource = implode('|', [
             trim($this->trainingName),
@@ -358,7 +407,7 @@ class TrainingImport implements ToCollection
             trim($this->organizer),
             $batchNumber,
             trim($this->fundingSource),
-            trim($this->district),
+            $district,
             (string) ($this->trainingCategoryId ?? ''),
             (string) ($this->jpl ?? ''),
         ]);
@@ -387,10 +436,11 @@ class TrainingImport implements ToCollection
             trim($this->fundingSource)
         );
 
+        // Wilayah penyelenggaraan pelatihan.
         $this->setTrainingColumn(
             $training,
             'district',
-            trim($this->district)
+            $district
         );
 
         $this->setTrainingColumn(
@@ -399,14 +449,12 @@ class TrainingImport implements ToCollection
             trim($this->organizer)
         );
 
-        // Kategori dari Master Data Super Admin.
         $this->setTrainingColumn(
             $training,
             'training_category_id',
             $this->trainingCategoryId
         );
 
-        // JPL dari form import.
         $this->setTrainingColumn(
             $training,
             'jpl',
@@ -459,6 +507,32 @@ class TrainingImport implements ToCollection
         return $training;
     }
 
+    /**
+     * Mengisi kolom peserta jika kolom tersedia.
+     *
+     * $allowEmpty = true digunakan untuk kolom yang memang
+     * harus diperbarui walaupun nilainya kosong.
+     */
+    private function setParticipantColumn(
+        Participant $participant,
+        string $column,
+        mixed $value,
+        bool $allowEmpty = false
+    ): void {
+        if (!Schema::hasColumn($participant->getTable(), $column)) {
+            return;
+        }
+
+        if (!$allowEmpty && ($value === null || $value === '')) {
+            return;
+        }
+
+        $participant->{$column} = $value;
+    }
+
+    /**
+     * Mengisi kolom pelatihan jika tersedia di database.
+     */
     private function setTrainingColumn(
         Training $training,
         string $column,
@@ -466,20 +540,6 @@ class TrainingImport implements ToCollection
     ): void {
         if (Schema::hasColumn($training->getTable(), $column)) {
             $training->{$column} = $value;
-        }
-    }
-
-    private function setIfColumnExists(
-        Participant $participant,
-        string $column,
-        mixed $value
-    ): void {
-        if (
-            $value !== null &&
-            $value !== '' &&
-            Schema::hasColumn($participant->getTable(), $column)
-        ) {
-            $participant->{$column} = $value;
         }
     }
 }

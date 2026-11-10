@@ -77,7 +77,6 @@ class ImportController extends Controller
                     ->where('is_active', true),
             ],
 
-            // Kategori opsional.
             'training_category_id' => [
                 'nullable',
                 'integer',
@@ -85,7 +84,6 @@ class ImportController extends Controller
                     ->where('is_active', true),
             ],
 
-            // JPL opsional.
             'jpl' => [
                 'nullable',
                 'integer',
@@ -115,11 +113,22 @@ class ImportController extends Controller
         ]);
 
         try {
+            /*
+             * Ambil wilayah dari master data.
+             *
+             * Nilai yang dikirim ke importer berasal dari
+             * record District yang aktif, bukan teks bebas.
+             */
             $district = District::query()
                 ->where('name', $validated['kabupaten_kota_mitra'])
                 ->where('is_active', true)
                 ->firstOrFail();
 
+            $districtName = trim($district->name);
+
+            /*
+             * Baca metadata Excel.
+             */
             $filePath = $request->file('file')->getRealPath();
 
             $spreadsheet = IOFactory::load($filePath);
@@ -186,16 +195,22 @@ class ImportController extends Controller
                 (string) ($validated['angkatan'] ?? '')
             );
 
-            $trainingCategoryId = $validated['training_category_id']
-                ?? null;
+            $trainingCategoryId = isset(
+                $validated['training_category_id']
+            )
+                ? (int) $validated['training_category_id']
+                : null;
 
-            $jpl = $validated['jpl'] ?? null;
+            $jpl = isset($validated['jpl'])
+                ? (int) $validated['jpl']
+                : null;
 
             /*
-             * Membuat proses import.
+             * Kirim seluruh metadata ke TrainingImport.
              *
-             * TrainingImport perlu menerima dua parameter tambahan:
-             * trainingCategoryId dan jpl.
+             * districtName akan digunakan untuk:
+             * 1. participants.district
+             * 2. trainings.district
              */
             $import = new TrainingImport(
                 batchNumber: $batchNumber,
@@ -205,7 +220,7 @@ class ImportController extends Controller
                 organizer: $cooperation,
                 startDate: $startDate,
                 endDate: $endDate,
-                district: $district->name,
+                district: $districtName,
                 trainingCategoryId: $trainingCategoryId,
                 jpl: $jpl,
             );
@@ -214,6 +229,16 @@ class ImportController extends Controller
                 $import,
                 $request->file('file')
             );
+
+            Log::info('Import Excel SIRAPIK selesai', [
+                'training_name' => $trainingName,
+                'district' => $districtName,
+                'created_participants' => $import->createdParticipants,
+                'updated_participants' => $import->updatedParticipants,
+                'created_trainings' => $import->createdTrainings,
+                'created_histories' => $import->createdHistories,
+                'error_count' => count($import->errors),
+            ]);
 
             return redirect()
                 ->route('imports.index')
@@ -394,14 +419,14 @@ class ImportController extends Controller
             '/\s+/',
             ' ',
             $normalized
-        );
+        ) ?? $normalized;
 
         $parts = preg_split(
             '/\s*[-–—]\s*/',
             $normalized
         );
 
-        if (count($parts) !== 2) {
+        if (!$parts || count($parts) !== 2) {
             throw new \RuntimeException(
                 'Format tanggal pada baris 5 Excel tidak dikenali. ' .
                 'Contoh: 18 MEI 2026 - 23 MEI 2026.'
