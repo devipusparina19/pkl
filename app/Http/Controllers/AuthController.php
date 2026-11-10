@@ -139,19 +139,19 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout pengguna.
-     */
-    public function logout(Request $request)
-    {
-        Auth::logout();
+ * Logout pengguna.
+ */
+public function logout(Request $request)
+{
+    Auth::logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
-        return redirect()
-            ->route('public.dashboard')
-            ->with('success', 'Anda berhasil keluar dari sistem.');
-    }
+    return redirect()
+        ->route('login')
+        ->with('success', 'Anda berhasil keluar dari sistem.');
+}
 
     /**
      * Batasi role yang diperbolehkan pada URL login.
