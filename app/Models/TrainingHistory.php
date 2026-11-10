@@ -16,6 +16,9 @@ class TrainingHistory extends Model
         'notes',
     ];
 
+    /**
+     * Relasi ke peserta.
+     */
     public function participant(): BelongsTo
     {
         return $this->belongsTo(
@@ -24,6 +27,9 @@ class TrainingHistory extends Model
         );
     }
 
+    /**
+     * Relasi ke data pelatihan.
+     */
     public function training(): BelongsTo
     {
         return $this->belongsTo(

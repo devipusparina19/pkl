@@ -39,6 +39,9 @@ class Training extends Model
         ];
     }
 
+    /**
+     * Relasi ke kategori pelatihan.
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(
@@ -47,6 +50,9 @@ class Training extends Model
         );
     }
 
+    /**
+     * Relasi ke riwayat peserta yang mengikuti pelatihan.
+     */
     public function histories(): HasMany
     {
         return $this->hasMany(

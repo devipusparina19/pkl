@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\PdfExportController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\MasterDataController;
 use App\Http\Controllers\PublicTrainingHistoryController;
@@ -53,6 +55,7 @@ Route::get(
 */
 
 Route::middleware('guest')->group(function () {
+
     Route::get('/login', [AuthController::class, 'showLogin'])
         ->name('login');
 
@@ -74,6 +77,12 @@ Route::middleware('guest')->group(function () {
 */
 
 Route::middleware('auth')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logout dan Dashboard
+    |--------------------------------------------------------------------------
+    */
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
@@ -195,11 +204,52 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role:admin,pimpinan')->group(function () {
 
+        /*
+         * Halaman laporan
+         */
         Route::get('/reports', [ReportController::class, 'index'])
             ->name('reports.index');
 
+        /*
+         * Ekspor laporan Excel
+         */
         Route::get('/reports/export', [ReportController::class, 'export'])
             ->name('reports.export');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ekspor PDF
+        |--------------------------------------------------------------------------
+        */
+
+        // PDF daftar seluruh peserta
+        Route::get('/export/pdf/participants', [
+            PdfExportController::class,
+            'participants',
+        ])->name('pdf.participants');
+
+
+        // PDF riwayat pelatihan peserta
+        Route::get('/export/pdf/training-history', [
+            PdfExportController::class,
+            'trainingHistory',
+        ])->name('pdf.training-history');
+
+
+        // PDF laporan tahunan
+        Route::get('/export/pdf/report', [
+            PdfExportController::class,
+            'report',
+        ])->name('pdf.report');
+
+
+        // PDF rekap peserta berdasarkan wilayah
+        Route::get('/export/pdf/district-recap', [
+            PdfExportController::class,
+            'districtRecap',
+        ])->name('pdf.district-recap');
+
     });
 
 
@@ -333,4 +383,5 @@ Route::middleware('auth')->group(function () {
                 ->whereNumber('id')
                 ->name('destroy');
         });
+
 });
