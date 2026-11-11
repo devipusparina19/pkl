@@ -17,16 +17,18 @@ class DashboardController extends Controller
 {
     /**
      * Dashboard publik.
+     * Tetap menggunakan tahun yang memiliki data pelatihan.
      */
     public function publicIndex(Request $request)
     {
-        // Dashboard publik tetap menggunakan tahun yang memiliki data pelatihan.
         $years = $this->getAvailableTrainingYears();
 
         $requestedYear = (int) $request->input('year', now()->year);
 
         $year = $years->isNotEmpty()
-            ? ($years->contains($requestedYear) ? $requestedYear : (int) $years->first())
+            ? ($years->contains($requestedYear)
+                ? $requestedYear
+                : (int) $years->first())
             : ($requestedYear ?: now()->year);
 
         $district = trim((string) $request->input('district', ''));
@@ -50,7 +52,6 @@ class DashboardController extends Controller
             });
 
         $trainingIds = (clone $base)->select('id');
-
         $totalTrainings = (clone $base)->count();
 
         $historyQuery = TrainingHistory::query()
@@ -257,22 +258,24 @@ class DashboardController extends Controller
         );
 
         /*
-         * PILIHAN TAHUN DARI MASTER DATA SUPER ADMIN.
-         *
-         * Hanya tahun dengan is_active = true yang dapat dipilih.
+         * DAFTAR TAHUN DARI MASTER DATA SUPER ADMIN.
          */
         $years = $this->getActiveTrainingYears();
 
-        $requestedYear = $request->input('year');
+        /*
+         * NORMALISASI PILIHAN TAHUN.
+         * Nilai "all" berarti seluruh tahun.
+         */
+        $requestedYear = trim((string) $request->input('year', ''));
 
-        if (
-            $requestedYear !== null
-            && ctype_digit((string) $requestedYear)
+        if ($requestedYear === 'all') {
+            $year = 'all';
+        } elseif (
+            ctype_digit($requestedYear)
             && $years->contains((int) $requestedYear)
         ) {
             $year = (int) $requestedYear;
         } else {
-            // Tahun aktif terbaru menjadi pilihan default.
             $year = $years->isNotEmpty()
                 ? (int) $years->first()
                 : (int) now()->year;
@@ -292,25 +295,32 @@ class DashboardController extends Controller
         );
 
         /*
-         * QUERY PELATIHAN PADA TAHUN TERPILIH.
+         * QUERY PELATIHAN SESUAI PILIHAN TAHUN.
          */
-        $trainingIdsThisYear = Training::query()
-            ->whereYear('start_date', $year)
-            ->select('id');
+        $trainingIdsThisYear = Training::query();
+
+        $this->applyTrainingYearFilter(
+            $trainingIdsThisYear,
+            $year
+        );
+
+        $trainingIdsThisYear = $trainingIdsThisYear->select('id');
 
         /*
          * STATISTIK UTAMA.
          */
-        $totalTrainings = Training::query()
-            ->whereYear('start_date', $year)
-            ->count();
+        $trainingQuery = Training::query();
 
-        $totalParticipations = TrainingHistory::query()
-            ->whereIn('training_id', $trainingIdsThisYear)
-            ->count();
+        $this->applyTrainingYearFilter($trainingQuery, $year);
 
-        $totalParticipants = TrainingHistory::query()
-            ->whereIn('training_id', $trainingIdsThisYear)
+        $totalTrainings = $trainingQuery->count();
+
+        $participationQuery = TrainingHistory::query()
+            ->whereIn('training_id', $trainingIdsThisYear);
+
+        $totalParticipations = (clone $participationQuery)->count();
+
+        $totalParticipants = (clone $participationQuery)
             ->distinct()
             ->count('participant_id');
 
@@ -320,10 +330,17 @@ class DashboardController extends Controller
         /*
          * STATISTIK JENIS KELAMIN.
          */
-        $genderCounts = DB::table('training_histories')
+        $genderQuery = DB::table('training_histories')
             ->join('trainings', 'trainings.id', '=', 'training_histories.training_id')
-            ->join('participants', 'participants.id', '=', 'training_histories.participant_id')
-            ->whereYear('trainings.start_date', $year)
+            ->join('participants', 'participants.id', '=', 'training_histories.participant_id');
+
+        $this->applyTrainingYearFilter(
+            $genderQuery,
+            $year,
+            'trainings.start_date'
+        );
+
+        $genderCounts = $genderQuery
             ->whereRaw("
                 LOWER(TRIM(participants.gender)) IN (
                     'l',
@@ -360,10 +377,17 @@ class DashboardController extends Controller
         /*
          * REKAP PESERTA UNIK BERDASARKAN WILAYAH.
          */
-        $districtRecap = DB::table('training_histories')
+        $districtQuery = DB::table('training_histories')
             ->join('trainings', 'trainings.id', '=', 'training_histories.training_id')
-            ->join('participants', 'participants.id', '=', 'training_histories.participant_id')
-            ->whereYear('trainings.start_date', $year)
+            ->join('participants', 'participants.id', '=', 'training_histories.participant_id');
+
+        $this->applyTrainingYearFilter(
+            $districtQuery,
+            $year,
+            'trainings.start_date'
+        );
+
+        $districtRecap = $districtQuery
             ->whereNotNull('participants.district')
             ->whereRaw("TRIM(participants.district) != ''")
             ->selectRaw("
@@ -381,13 +405,13 @@ class DashboardController extends Controller
         $frequentParticipants = Participant::query()
             ->whereHas('histories', function ($query) use ($year) {
                 $query->whereHas('training', function ($trainingQuery) use ($year) {
-                    $trainingQuery->whereYear('start_date', $year);
+                    $this->applyTrainingYearFilter($trainingQuery, $year);
                 });
             })
             ->withCount([
                 'histories as participations_count' => function ($query) use ($year) {
                     $query->whereHas('training', function ($trainingQuery) use ($year) {
-                        $trainingQuery->whereYear('start_date', $year);
+                        $this->applyTrainingYearFilter($trainingQuery, $year);
                     });
                 },
             ])
@@ -399,14 +423,21 @@ class DashboardController extends Controller
         /*
          * DISTRIBUSI KATEGORI PELATIHAN.
          */
-        $fieldStats = DB::table('trainings')
+        $categoryQuery = DB::table('trainings')
             ->leftJoin(
                 'training_categories',
                 'training_categories.id',
                 '=',
                 'trainings.training_category_id'
-            )
-            ->whereYear('trainings.start_date', $year)
+            );
+
+        $this->applyTrainingYearFilter(
+            $categoryQuery,
+            $year,
+            'trainings.start_date'
+        );
+
+        $fieldStats = $categoryQuery
             ->whereNotNull('training_categories.name')
             ->where('training_categories.name', '!=', '')
             ->selectRaw("
@@ -447,13 +478,13 @@ class DashboardController extends Controller
                 ])
                 ->whereHas('histories', function ($query) use ($year) {
                     $query->whereHas('training', function ($trainingQuery) use ($year) {
-                        $trainingQuery->whereYear('start_date', $year);
+                        $this->applyTrainingYearFilter($trainingQuery, $year);
                     });
                 })
                 ->withCount([
                     'histories as participations_count' => function ($query) use ($year) {
                         $query->whereHas('training', function ($trainingQuery) use ($year) {
-                            $trainingQuery->whereYear('start_date', $year);
+                            $this->applyTrainingYearFilter($trainingQuery, $year);
                         });
                     },
                 ])
@@ -496,7 +527,23 @@ class DashboardController extends Controller
     }
 
     /**
-     * Mengambil daftar tahun aktif dari master data Super Admin.
+     * Menerapkan filter tahun pada query.
+     * Jika tahun bernilai "all", query tidak dibatasi tahun.
+     */
+    private function applyTrainingYearFilter(
+        $query,
+        $year,
+        string $column = 'start_date'
+    ) {
+        if ($year !== 'all') {
+            $query->whereYear($column, (int) $year);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Mengambil daftar tahun aktif dari Master Data Super Admin.
      */
     private function getActiveTrainingYears()
     {
@@ -511,7 +558,7 @@ class DashboardController extends Controller
 
     /**
      * Mengambil tahun yang memiliki data pelatihan.
-     * Digunakan khusus untuk dashboard publik.
+     * Khusus dashboard publik.
      */
     private function getAvailableTrainingYears()
     {

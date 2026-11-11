@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -806,10 +805,14 @@
                     id="dashboard-year"
                     required
                 >
+                    <option value="all" {{ $year === 'all' ? 'selected' : '' }}>
+                        Semua Tahun
+                    </option>
+
                     @foreach ($years as $availableYear)
                         <option
                             value="{{ $availableYear }}"
-                            {{ (int) $year === (int) $availableYear ? 'selected' : '' }}
+                            {{ (string) $year === (string) $availableYear ? 'selected' : '' }}
                         >
                             {{ $availableYear }}
                         </option>
@@ -836,12 +839,12 @@
                 <span class="section-kicker">Ikhtisar sistem</span>
 
                 <h2 id="leader-summary-title">
-                    Gambaran Umum Pelatihan Tahun {{ $year }}
+                    Gambaran Umum Pelatihan {{ $year === 'all' ? 'Semua Tahun' : 'Tahun ' . $year }}
                 </h2>
 
                 <p>
                     Indikator utama pelatihan dan keikutsertaan peserta
-                    pada tahun {{ $year }}.
+                    pada {{ $year === 'all' ? 'seluruh tahun' : 'tahun ' . $year }}.
                 </p>
             </div>
 
@@ -878,7 +881,7 @@
                 </div>
 
                 <div class="stat-note">
-                    Peserta yang mengikuti pelatihan pada tahun {{ $year }}
+                    Peserta yang mengikuti pelatihan pada {{ $year === 'all' ? 'seluruh tahun' : 'tahun ' . $year }}
                 </div>
             </article>
 
@@ -909,7 +912,7 @@
                 </div>
 
                 <div class="stat-note">
-                    Jumlah pelaksanaan pelatihan pada tahun {{ $year }}
+                    Jumlah pelaksanaan pelatihan pada {{ $year === 'all' ? 'seluruh tahun' : 'tahun ' . $year }}
                 </div>
             </article>
 
@@ -929,7 +932,7 @@
 
                 <p>
                     Perbandingan jumlah pelaksanaan pelatihan berdasarkan
-                    kategori pada tahun {{ $year }}.
+                    kategori pada {{ $year === 'all' ? 'seluruh tahun' : 'tahun ' . $year }}.
                 </p>
             </div>
 
@@ -999,7 +1002,7 @@
                     </div>
 
                     <div>
-                        Belum ada data kategori pelatihan pada tahun {{ $year }}.
+                        Belum ada data kategori pelatihan pada {{ $year === 'all' ? 'seluruh tahun' : 'tahun ' . $year }}.
                     </div>
                 </div>
 
@@ -1032,8 +1035,8 @@
                 </h2>
 
                 <p>
-                    Dashboard ini sedang menampilkan data tahun
-                    <strong>{{ $year }}</strong>.
+                    Dashboard ini sedang menampilkan data
+                    <strong>{{ $year === 'all' ? 'seluruh tahun' : 'tahun ' . $year }}</strong>.
                     Gunakan menu <strong>Laporan Pelatihan</strong> pada sidebar
                     untuk melihat rincian laporan dan memantau pelaksanaan
                     pelatihan berdasarkan data yang tercatat di SIRAPIK.
