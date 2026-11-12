@@ -497,28 +497,6 @@
                     </span>
                 </div>
 
-                <div class="field reveal" style="--i:2">
-                    <label for="name">Nama lengkap sesuai KTP</label>
-                    <div class="control">
-                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        <input
-                            class="form-control"
-                            type="text"
-                            id="name"
-                            name="name"
-                            value="{{ old('name') }}"
-                            placeholder="Masukkan nama lengkap sesuai KTP"
-                            maxlength="255"
-                            autocomplete="name"
-                            aria-describedby="name-help"
-                            required
-                        >
-                    </div>
-                    <span class="help" id="name-help">
-                        Penulisan nama harus sesuai dengan nama yang tercatat pada data peserta.
-                    </span>
-                </div>
-
                 <div class="reveal" style="--i:3">
                     <button class="btn-submit" type="submit" id="submit-btn">
                         <span class="spinner" id="submit-spinner" hidden aria-hidden="true"></span>

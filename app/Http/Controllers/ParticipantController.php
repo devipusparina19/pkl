@@ -66,13 +66,46 @@ class ParticipantController extends Controller
             : null;
 
         /*
+         * Mengambil daftar Kabupaten/Kota/Mitra
+         * dari master data District yang aktif.
+         */
+        $districts = District::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name')
+            ->filter(fn ($name) => trim((string) $name) !== '')
+            ->unique()
+            ->values();
+
+        /*
+         * Filter Kabupaten/Kota/Mitra.
+         * Pilihan yang tidak terdaftar di master aktif
+         * tidak diterapkan sebagai filter.
+         */
+        $districtFilter = trim(
+            (string) $request->query('district', '')
+        );
+
+        if (
+            $districtFilter !== '' &&
+            !$districts->contains($districtFilter)
+        ) {
+            $districtFilter = '';
+        }
+
+        /*
          * Query utama peserta.
          */
-        $participants = Participant::query()
+        $participantsQuery = Participant::query()
             ->with(['histories.training'])
-            ->withCount('histories')
+            ->withCount('histories');
 
-            ->when($selectedYear, function ($query) use ($selectedYear) {
+        /*
+         * Filter berdasarkan tahun pelatihan.
+         */
+        $participantsQuery->when(
+            $selectedYear,
+            function ($query) use ($selectedYear) {
                 $query->whereHas(
                     'histories.training',
                     function ($trainingQuery) use ($selectedYear) {
@@ -82,12 +115,28 @@ class ParticipantController extends Controller
                         );
                     }
                 );
-            })
+            }
+        );
 
-            /*
-             * Pencarian peserta.
-             */
-            ->when($search !== '', function ($query) use ($search) {
+        /*
+         * Filter berdasarkan Kabupaten/Kota/Mitra.
+         */
+        if (
+            $districtFilter !== '' &&
+            Schema::hasColumn('participants', 'district')
+        ) {
+            $participantsQuery->where(
+                'district',
+                $districtFilter
+            );
+        }
+
+        /*
+         * Pencarian peserta.
+         */
+        $participantsQuery->when(
+            $search !== '',
+            function ($query) use ($search) {
                 $query->where(function ($subQuery) use ($search) {
                     $columns = [
                         'name',
@@ -115,8 +164,10 @@ class ParticipantController extends Controller
                         }
                     }
                 });
-            })
+            }
+        );
 
+        $participants = $participantsQuery
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
@@ -126,7 +177,9 @@ class ParticipantController extends Controller
             'search',
             'years',
             'selectedYear',
-            'yearFilter'
+            'yearFilter',
+            'districts',
+            'districtFilter'
         ));
     }
 
@@ -166,8 +219,6 @@ class ParticipantController extends Controller
         /*
          * Pertahankan wilayah lama jika sudah tidak aktif
          * atau belum terdaftar di master data.
-         *
-         * Tujuannya agar data lama tidak hilang saat diedit.
          */
         $currentDistrict = trim(
             (string) $participant->district
@@ -178,6 +229,7 @@ class ParticipantController extends Controller
             !$districts->contains($currentDistrict)
         ) {
             $districts->push($currentDistrict);
+
             $districts = $districts
                 ->unique()
                 ->sort()
@@ -203,10 +255,6 @@ class ParticipantController extends Controller
         );
 
         DB::transaction(function () use ($data, $participant) {
-            /*
-             * Perbarui data peserta.
-             * Kolom district ikut diperbarui di sini.
-             */
             $participant->update($data);
 
             /*
@@ -361,9 +409,7 @@ class ParticipantController extends Controller
         ];
 
         foreach ($optionalColumns as $column) {
-            if (
-                !Schema::hasColumn('participants', $column)
-            ) {
+            if (!Schema::hasColumn('participants', $column)) {
                 unset($rules[$column]);
             }
         }
