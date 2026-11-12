@@ -71,6 +71,62 @@ class DashboardController extends Controller
             ->distinct()
             ->count('participant_id');
 
+        /*
+         * STATISTIK JENIS KELAMIN PESERTA.
+         * Mengikuti filter tahun, wilayah, dan sumber dana.
+         * Peserta dihitung secara unik.
+         */
+        $genderQuery = DB::table('training_histories')
+            ->join('trainings', 'trainings.id', '=', 'training_histories.training_id')
+            ->join('participants', 'participants.id', '=', 'training_histories.participant_id')
+            ->whereYear('trainings.start_date', $year)
+            ->when($fundingSource, function ($query) use ($fundingSource) {
+                $query->where('trainings.funding_source', $fundingSource);
+            })
+            ->when($district, function ($query) use ($district) {
+                $query->whereRaw(
+                    'TRIM(participants.district) = ?',
+                    [$district]
+                );
+            });
+
+        $genderCounts = $genderQuery
+            ->whereRaw("
+                LOWER(TRIM(participants.gender)) IN (
+                    'l',
+                    'p',
+                    'laki-laki',
+                    'laki laki',
+                    'laki',
+                    'perempuan'
+                )
+            ")
+            ->selectRaw("
+                CASE
+                    WHEN LOWER(TRIM(participants.gender))
+                        IN ('l', 'laki-laki', 'laki laki', 'laki')
+                        THEN 'L'
+                    WHEN LOWER(TRIM(participants.gender))
+                        IN ('p', 'perempuan')
+                        THEN 'P'
+                END AS gender_code,
+                COUNT(DISTINCT training_histories.participant_id) AS total
+            ")
+            ->groupBy('gender_code')
+            ->get()
+            ->keyBy('gender_code');
+
+        $maleRow = $genderCounts->get('L');
+        $femaleRow = $genderCounts->get('P');
+
+        $genderStats = [
+            'L' => (int) ($maleRow->total ?? 0),
+            'P' => (int) ($femaleRow->total ?? 0),
+        ];
+
+        /*
+         * DAFTAR WILAYAH.
+         */
         $activeDistricts = District::query()
             ->where('is_active', true)
             ->orderBy('name')
@@ -92,6 +148,9 @@ class DashboardController extends Controller
             ->sort()
             ->values();
 
+        /*
+         * DAFTAR SUMBER DANA.
+         */
         $fundingSources = FundingSource::query()
             ->where('is_active', true)
             ->orderBy('name')
@@ -107,6 +166,9 @@ class DashboardController extends Controller
                 ->pluck('funding_source');
         }
 
+        /*
+         * REKAP PESERTA BERDASARKAN WILAYAH.
+         */
         $byDistrict = DB::table('training_histories')
             ->join('trainings', 'trainings.id', '=', 'training_histories.training_id')
             ->join('participants', 'participants.id', '=', 'training_histories.participant_id')
@@ -130,6 +192,9 @@ class DashboardController extends Controller
 
         $trainingByDistrict = $byDistrict;
 
+        /*
+         * PELATIHAN TERBARU.
+         */
         $recentTrainings = (clone $base)
             ->withCount([
                 'histories' => function ($query) use ($district) {
@@ -147,11 +212,17 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
+        /*
+         * JENIS TENAGA KESEHATAN.
+         */
         $healthWorkerTypes = HealthWorkerType::query()
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
+        /*
+         * REKAP PESERTA BERDASARKAN PROFESI.
+         */
         $nakesCounts = DB::table('training_histories')
             ->join('trainings', 'trainings.id', '=', 'training_histories.training_id')
             ->join('participants', 'participants.id', '=', 'training_histories.participant_id')
@@ -215,6 +286,9 @@ class DashboardController extends Controller
             ->take(5)
             ->values();
 
+        /*
+         * DATA UNTUK DASHBOARD PUBLIK.
+         */
         return view('welcome', compact(
             'year',
             'district',
@@ -231,7 +305,8 @@ class DashboardController extends Controller
             'healthWorkerTypes',
             'nakesByType',
             'topNakes',
-            'bottomNakes'
+            'bottomNakes',
+            'genderStats'
         ));
     }
 

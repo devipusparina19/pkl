@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -11,17 +12,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+<!-- Chart.js untuk diagram pie -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-/* ============ DESIGN TOKENS ============ */
 :root{
   --navy:#081b33; --midnight:#0b2545; --royal:#2457d6; --electric:#3478f6;
   --soft:#eaf2ff; --ice:#f3f7fc; --white:#fff; --slate:#64748b; --ink:#14243a;
   --border:#e1e9f2; --cyan:#38c6e8; --green:#16845b; --green-bg:#eaf7f0;
   --amber:#b2692f; --amber-bg:#fff3e9;
-
   --f-display:'Sora',system-ui,sans-serif;
   --f-body:'Plus Jakarta Sans',system-ui,sans-serif;
-
   --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:112px;
   --r-sm:8px; --r:14px; --r-lg:28px;
   --shadow:0 18px 50px rgba(8,27,51,.09);
@@ -29,6 +30,7 @@
   --ease:cubic-bezier(.2,.7,.3,1);
   --container:1360px;
 }
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:96px}
 body{min-width:320px;overflow-x:hidden;color:var(--ink);background:var(--white);
@@ -41,11 +43,11 @@ img{display:block;max-width:100%}
 .icon{width:20px;height:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 :focus-visible{outline:3px solid rgba(52,120,246,.55);outline-offset:3px;border-radius:6px}
 
-/* ============ SCROLL PROGRESS ============ */
+/* SCROLL PROGRESS */
 .progress{position:fixed;inset:0 0 auto;height:3px;z-index:200;background:linear-gradient(90deg,var(--electric),var(--cyan));
   transform:scaleX(0);transform-origin:left;will-change:transform}
 
-/* ============ TOPBAR + HEADER ============ */
+/* TOPBAR + HEADER */
 .topbar{background:var(--navy);color:rgba(255,255,255,.7);font-size:14px}
 .topbar-inner{min-height:40px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .topbar span{display:flex;align-items:center;gap:8px}
@@ -76,7 +78,7 @@ img{display:block;max-width:100%}
 
 .menu-toggle{display:none;width:46px;height:46px;place-items:center;border:1px solid var(--border);border-radius:12px;background:#fff;color:var(--navy)}
 
-/* ============ BUTTONS ============ */
+/* BUTTONS */
 .btn{min-height:56px;display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:0 28px;border-radius:999px;
   font-size:16px;font-weight:700;border:1.5px solid transparent;transition:transform .25s var(--ease),background .25s,color .25s,border-color .25s,box-shadow .25s}
 .btn:active{transform:scale(.97)}
@@ -85,7 +87,7 @@ img{display:block;max-width:100%}
 .btn-ghost{color:#fff;border-color:rgba(255,255,255,.3)}
 .btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.08)}
 
-/* ============ HERO ============ */
+/* HERO */
 .hero{position:relative;overflow:hidden;isolation:isolate;color:#fff;background:var(--navy)}
 .hero-bg{position:absolute;inset:0;z-index:-3;
   background:linear-gradient(100deg,rgba(5,22,42,.98) 0%,rgba(8,34,63,.93) 55%,rgba(9,39,70,.8) 100%),
@@ -99,14 +101,13 @@ img{display:block;max-width:100%}
   color:transparent;-webkit-text-stroke:1.5px rgba(130,183,255,.16);user-select:none;pointer-events:none}
 
 .hero-inner{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,.7fr);align-items:center;gap:var(--s5);padding-block:112px 120px}
-.hero h1{font:800 clamp(44px,7.2vw,96px)/1.02 var(--f-display);letter-spacing:-.045em;max-width:12ch;max-width:none}
+.hero h1{font:800 clamp(44px,7.2vw,96px)/1.02 var(--f-display);letter-spacing:-.045em;max-width:none}
 .hero h1 span{display:block;color:#82b7ff}
 .hero-lead{max-width:56ch;margin-top:var(--s3);font-size:clamp(16px,1.4vw,19px);line-height:1.8;color:rgba(255,255,255,.74)}
 .hero-actions{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s4)}
 .hero-trust{display:flex;align-items:center;gap:10px;margin-top:var(--s3);font-size:15px;color:rgba(255,255,255,.62)}
 .hero-trust .icon{color:var(--cyan)}
 
-/* Signature element: live data plate */
 .plate{position:relative;padding:var(--s4) 36px 32px;border-radius:var(--r-lg);border:1px solid rgba(255,255,255,.18);
   background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04));box-shadow:var(--shadow-lg);
   backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transform:rotate(1.6deg);transition:transform .6s var(--ease)}
@@ -124,13 +125,13 @@ img{display:block;max-width:100%}
 .dot{width:9px;height:9px;border-radius:50%;background:#54d69b;box-shadow:0 0 0 4px rgba(84,214,155,.18);animation:pulse 2.6s ease-in-out infinite}
 @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(84,214,155,0)}}
 
-/* ============ SECTION HEADS ============ */
+/* SECTION HEADS */
 .kicker{display:inline-flex;align-items:center;gap:12px;margin-bottom:var(--s2);font-size:15px;font-weight:700;color:var(--royal)}
 .kicker::before{content:"";width:32px;height:2px;background:var(--cyan)}
 .title{font:800 clamp(34px,4.6vw,60px)/1.1 var(--f-display);letter-spacing:-.04em;color:var(--navy)}
 .lead{font-size:18px;line-height:1.8;color:var(--slate)}
 
-/* ============ ABOUT (editorial, no cards) ============ */
+/* ABOUT */
 .about{padding-block:var(--s6)}
 .about-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:var(--s5);align-items:start}
 .about-side{position:sticky;top:130px}
@@ -144,14 +145,14 @@ img{display:block;max-width:100%}
 .about-list .tick{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:var(--soft);color:var(--royal);flex-shrink:0}
 .about-list .tick .icon{width:18px;height:18px}
 
-/* ============ DASHBOARD ============ */
+/* DASHBOARD */
 .dash{position:relative;padding-block:var(--s6);background:var(--ice)}
 .dash::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--navy) 0 30%,var(--royal) 30% 75%,var(--cyan) 75%)}
 .dash-head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s3);margin-bottom:var(--s4)}
 .dash-head .lead{max-width:60ch;margin-top:var(--s2)}
 .live{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border:1px solid #d4e3f5;border-radius:999px;background:#fff;font-size:14px;font-weight:700;color:var(--royal);white-space:nowrap}
 
-/* Filter */
+/* FILTER */
 .filter{margin-bottom:var(--s3);padding:var(--s3) 28px 28px;border:1px solid var(--border);border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow)}
 .filter-title{display:flex;align-items:center;gap:12px;margin-bottom:var(--s3);font:700 20px/1.3 var(--f-display);letter-spacing:-.02em;color:var(--navy)}
 .filter-ico{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:var(--soft);color:var(--royal)}
@@ -169,7 +170,7 @@ img{display:block;max-width:100%}
 .btn-apply .icon{width:18px;height:18px;transition:transform .25s var(--ease)}
 .btn-apply:hover .icon{transform:translateX(4px)}
 
-/* Bento stats */
+/* BENTO STATS */
 .bento{display:grid;grid-template-columns:1.35fr 1fr 1fr;grid-template-rows:auto;gap:var(--s2);margin-bottom:var(--s3)}
 .stat{position:relative;overflow:hidden;padding:30px;border:1px solid var(--border);border-radius:var(--r-lg);background:#fff;transition:transform .35s var(--ease),box-shadow .35s}
 .stat:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
@@ -184,7 +185,7 @@ img{display:block;max-width:100%}
 .stat.feature .stat-cap{color:rgba(255,255,255,.65)}
 .stat.feature::after{content:"";position:absolute;right:-90px;bottom:-130px;width:320px;height:320px;border-radius:50%;border:1px solid rgba(130,183,255,.25);box-shadow:0 0 0 44px rgba(130,183,255,.05)}
 
-/* Data panels */
+/* DATA PANELS */
 .panels{display:grid;grid-template-columns:.95fr 1.2fr;gap:var(--s2);align-items:start}
 .panel{min-width:0;overflow:hidden;border:1px solid var(--border);border-radius:var(--r-lg);background:#fff}
 .panel-head{padding:28px 30px 22px;border-bottom:1px solid var(--border)}
@@ -217,7 +218,96 @@ img{display:block;max-width:100%}
 .pos{display:inline-grid;place-items:center;width:26px;height:26px;margin-right:10px;border-radius:8px;background:var(--soft);color:var(--royal);font:700 12px var(--f-display)}
 .row-name{display:flex;align-items:center}
 
-/* ============ FOOTER ============ */
+/* DIAGRAM JENIS KELAMIN */
+.gender-panel{
+  grid-column:1 / -1;
+}
+.gender-content{
+  padding:30px;
+  display:grid;
+  grid-template-columns:minmax(240px, .85fr) minmax(260px, 1fr);
+  align-items:center;
+  justify-content:center;
+  gap:40px;
+}
+.gender-chart-wrap{
+  width:100%;
+  max-width:340px;
+  aspect-ratio:1 / 1;
+  margin:0 auto;
+  position:relative;
+}
+.gender-chart-wrap canvas{
+  width:100% !important;
+  height:100% !important;
+}
+.gender-summary{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.gender-total{
+  padding-bottom:18px;
+  border-bottom:1px solid var(--border);
+}
+.gender-total strong{
+  display:block;
+  font:800 42px/1.2 var(--f-display);
+  letter-spacing:-.04em;
+  color:var(--navy);
+}
+.gender-total span{
+  font-size:14px;
+  color:var(--slate);
+}
+.gender-legend{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.gender-legend-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 18px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:#fff;
+}
+.gender-legend-label{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:15px;
+  font-weight:700;
+  color:#3c4f66;
+}
+.gender-color{
+  width:13px;
+  height:13px;
+  flex-shrink:0;
+  border-radius:50%;
+}
+.gender-legend-value{
+  text-align:right;
+}
+.gender-legend-value strong{
+  display:block;
+  font:700 20px/1.3 var(--f-display);
+  color:var(--navy);
+}
+.gender-legend-value small{
+  font-size:13px;
+  color:var(--slate);
+}
+.gender-note{
+  font-size:13px;
+  line-height:1.7;
+  color:var(--slate);
+}
+
+/* FOOTER */
 .footer{position:relative;overflow:hidden;background:var(--navy);color:#fff}
 .footer::before{content:"";position:absolute;top:-240px;right:-140px;width:520px;height:520px;border-radius:50%;border:1px solid rgba(255,255,255,.08);box-shadow:0 0 0 70px rgba(255,255,255,.02)}
 .footer-main{position:relative;display:grid;grid-template-columns:1.4fr .6fr;gap:var(--s5);padding-block:var(--s5) var(--s4)}
@@ -232,12 +322,12 @@ img{display:block;max-width:100%}
 .footer-bottom{position:relative;border-top:1px solid rgba(255,255,255,.1)}
 .footer-bottom .container{display:flex;justify-content:space-between;gap:var(--s2);padding-block:22px;font-size:14px;color:rgba(255,255,255,.55)}
 
-/* ============ REVEAL ============ */
+/* REVEAL */
 .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s var(--ease)}
 .reveal.in,.no-js .reveal{opacity:1;transform:none}
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}
 
-/* ============ RESPONSIVE ============ */
+/* RESPONSIVE */
 @media (max-width:1100px){
   .container{width:calc(100% - 56px)}
   .nav-link{padding:10px 12px}
@@ -250,6 +340,7 @@ img{display:block;max-width:100%}
   .bento{grid-template-columns:1fr 1fr}
   .stat.feature{grid-column:1/-1}
   .panels{grid-template-columns:1fr}
+  .gender-panel{grid-column:1}
 }
 @media (max-width:760px){
   body{font-size:16px}
@@ -277,6 +368,13 @@ img{display:block;max-width:100%}
   .rank-wrap{grid-template-columns:1fr}
   .rank{padding:22px 20px}
   .rank+.rank{border-left:0;border-top:1px solid var(--border)}
+  .gender-content{
+    grid-template-columns:1fr;
+    gap:24px;
+    padding:24px 20px;
+  }
+  .gender-chart-wrap{max-width:280px}
+  .gender-total strong{font-size:36px}
   .footer-main{grid-template-columns:1fr;gap:var(--s4)}
   .footer-bottom .container{flex-direction:column;gap:4px}
 }
@@ -294,6 +392,18 @@ img{display:block;max-width:100%}
     $maxDistrict = max(1, (int) collect($trainingByDistrict)->max('total'));
     $maxTop      = max(1, (int) collect($topNakes ?? [])->max('total'));
     $maxBottom   = max(1, (int) collect($bottomNakes ?? [])->max('total'));
+
+    $maleCount = (int) ($genderStats['L'] ?? 0);
+    $femaleCount = (int) ($genderStats['P'] ?? 0);
+    $genderTotal = $maleCount + $femaleCount;
+
+    $malePercentage = $genderTotal > 0
+        ? round(($maleCount / $genderTotal) * 100, 1)
+        : 0;
+
+    $femalePercentage = $genderTotal > 0
+        ? round(($femaleCount / $genderTotal) * 100, 1)
+        : 0;
 @endphp
 
 <div class="progress" id="progress" aria-hidden="true"></div>
@@ -315,7 +425,6 @@ img{display:block;max-width:100%}
 <!-- HEADER -->
 <header class="site-header" id="site-header">
   <div class="container nav-inner">
-
     <a href="{{ route('public.dashboard') }}" class="brand" aria-label="SIRAPIK Beranda">
       <div class="brand-logo">
         <img src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}" alt="Logo Provinsi Kalimantan Selatan">
@@ -340,7 +449,6 @@ img{display:block;max-width:100%}
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </nav>
-
   </div>
 </header>
 
@@ -353,7 +461,6 @@ img{display:block;max-width:100%}
   <div class="hero-year" aria-hidden="true">{{ $year }}</div>
 
   <div class="container hero-inner">
-
     <div>
       <h1>
         Informasi Pelatihan Kesehatan
@@ -362,9 +469,9 @@ img{display:block;max-width:100%}
 
       <p class="hero-lead">
         SIRAPIK menyajikan informasi dan ringkasan data pelatihan Bapelkes
-Provinsi Kalimantan Selatan. Temukan data berdasarkan tahun,
-kabupaten/kota atau mitra asal peserta, serta sumber dana
-dalam satu sistem terintegrasi.
+        Provinsi Kalimantan Selatan. Temukan data berdasarkan tahun,
+        kabupaten/kota atau mitra asal peserta, serta sumber dana
+        dalam satu sistem terintegrasi.
       </p>
 
       <div class="hero-actions">
@@ -407,14 +514,12 @@ dalam satu sistem terintegrasi.
 
       <div class="plate-note"><span class="dot"></span> Mengikuti filter pada bagian Data Pelatihan</div>
     </aside>
-
   </div>
 </section>
 
 <!-- ABOUT -->
 <section class="about" id="tentang">
   <div class="container about-grid">
-
     <div class="about-side reveal">
       <div class="kicker">Mengenal SIRAPIK</div>
       <h2 class="title">Mendukung pengelolaan informasi pelatihan kesehatan.</h2>
@@ -427,9 +532,9 @@ dalam satu sistem terintegrasi.
       </p>
       <p>
         Informasi yang tersedia mencakup ringkasan pelatihan, jumlah peserta,
-rekap berdasarkan kabupaten/kota atau mitra asal peserta, serta
-partisipasi tenaga kesehatan, sehingga gambaran data pelatihan
-lebih mudah dipahami.
+        rekap berdasarkan kabupaten/kota atau mitra asal peserta, serta
+        partisipasi tenaga kesehatan, sehingga gambaran data pelatihan
+        lebih mudah dipahami.
       </p>
 
       <ul class="about-list">
@@ -441,7 +546,6 @@ lebih mudah dipahami.
         @endforeach
       </ul>
     </div>
-
   </div>
 </section>
 
@@ -511,7 +615,6 @@ lebih mudah dipahami.
 
     <!-- BENTO STATS -->
     <div class="bento">
-
       <article class="stat feature reveal">
         <div class="stat-top">
           Peserta yang Sudah Dilatih
@@ -538,50 +641,101 @@ lebih mudah dipahami.
         <div class="stat-val">{{ $year }}</div>
         <p class="stat-cap">Tahun pelaksanaan pelatihan yang sedang ditampilkan</p>
       </article>
-
     </div>
 
     <!-- DATA PANELS -->
     <div class="panels">
 
+      <!-- REKAP WILAYAH -->
       <section class="panel reveal">
-    <div class="panel-head">
-        <h3>Rekap Peserta Berdasarkan Wilayah</h3>
-        <p>
+        <div class="panel-head">
+          <h3>Rekap Peserta Berdasarkan Wilayah</h3>
+          <p>
             Jumlah peserta unik berdasarkan Kabupaten/Kota/Mitra/Mandiri
             yang tercatat pada data peserta. Wilayah mengikuti data asal
             atau wilayah kerja peserta terbaru.
-        </p>
-    </div>
+          </p>
+        </div>
 
-    <div class="panel-body">
-        @if (collect($trainingByDistrict)->isNotEmpty())
+        <div class="panel-body">
+          @if (collect($trainingByDistrict)->isNotEmpty())
             <ul class="rows" data-bars>
-                @foreach ($trainingByDistrict as $row)
-                    <li class="row">
-                        <span class="row-name">
-                            {{ $row->district }}
-                        </span>
-
-                        <span class="row-total">
-                            {{ number_format((int) $row->total, 0, ',', '.') }}
-                            <small>org</small>
-                        </span>
-
-                        <span class="bar">
-                            <i style="--w: {{ round(((int) $row->total / $maxDistrict) * 100) }}%"></i>
-                        </span>
-                    </li>
-                @endforeach
+              @foreach ($trainingByDistrict as $row)
+                <li class="row">
+                  <span class="row-name">{{ $row->district }}</span>
+                  <span class="row-total">
+                    {{ number_format((int) $row->total, 0, ',', '.') }}
+                    <small>org</small>
+                  </span>
+                  <span class="bar">
+                    <i style="--w: {{ round(((int) $row->total / $maxDistrict) * 100) }}%"></i>
+                  </span>
+                </li>
+              @endforeach
             </ul>
-        @else
-            <div class="empty">
-                Belum ada data peserta untuk filter ini.
-            </div>
-        @endif
-    </div>
-</section>
+          @else
+            <div class="empty">Belum ada data peserta untuk filter ini.</div>
+          @endif
+        </div>
+      </section>
 
+      <!-- DIAGRAM PIE JENIS KELAMIN -->
+      <section class="panel gender-panel reveal">
+        <div class="panel-head">
+          <h3>Profil Peserta Berdasarkan Jenis Kelamin</h3>
+          <p>
+            Perbandingan jumlah peserta laki-laki dan perempuan yang mengikuti
+            pelatihan pada tahun {{ $year }} sesuai filter yang dipilih.
+          </p>
+        </div>
+
+        <div class="gender-content">
+          <div class="gender-chart-wrap">
+            <canvas id="genderChart"
+                    role="img"
+                    aria-label="Diagram pie perbandingan peserta laki-laki dan perempuan">
+            </canvas>
+          </div>
+
+          <div class="gender-summary">
+            <div class="gender-total">
+              <strong>{{ number_format($genderTotal, 0, ',', '.') }}</strong>
+              <span>Total peserta dengan data jenis kelamin</span>
+            </div>
+
+            <div class="gender-legend">
+              <div class="gender-legend-item">
+                <div class="gender-legend-label">
+                  <span class="gender-color" style="background:#2457D6"></span>
+                  Laki-laki
+                </div>
+                <div class="gender-legend-value">
+                  <strong>{{ number_format($maleCount, 0, ',', '.') }}</strong>
+                  <small>{{ number_format($malePercentage, 1, ',', '.') }}%</small>
+                </div>
+              </div>
+
+              <div class="gender-legend-item">
+                <div class="gender-legend-label">
+                  <span class="gender-color" style="background:#38C6E8"></span>
+                  Perempuan
+                </div>
+                <div class="gender-legend-value">
+                  <strong>{{ number_format($femaleCount, 0, ',', '.') }}</strong>
+                  <small>{{ number_format($femalePercentage, 1, ',', '.') }}%</small>
+                </div>
+              </div>
+            </div>
+
+            <p class="gender-note">
+              Data dihitung berdasarkan peserta unik yang mengikuti pelatihan.
+              Peserta tanpa data jenis kelamin tidak dimasukkan dalam diagram.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PARTISIPASI TENAGA KESEHATAN -->
       <section class="panel reveal d1">
         <div class="panel-head">
           <h3>Partisipasi Tenaga Kesehatan</h3>
@@ -589,7 +743,6 @@ lebih mudah dipahami.
         </div>
 
         <div class="rank-wrap">
-
           <div class="rank high">
             <div class="rank-title">
               <span class="rank-ico"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
@@ -631,7 +784,6 @@ lebih mudah dipahami.
               <div class="empty">Belum ada data peserta untuk ditampilkan pada filter ini.</div>
             @endif
           </div>
-
         </div>
       </section>
 
@@ -682,20 +834,29 @@ document.addEventListener('DOMContentLoaded', function () {
   var icoClose = document.getElementById('ico-close');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* Header state + scroll progress */
+  /* HEADER + SCROLL PROGRESS */
   var ticking = false;
+
   function onScroll() {
     header.classList.toggle('scrolled', window.scrollY > 15);
+
     var max = document.documentElement.scrollHeight - window.innerHeight;
+
     progress.style.transform = 'scaleX(' + (max > 0 ? window.scrollY / max : 0) + ')';
+
     ticking = false;
   }
+
   onScroll();
+
   window.addEventListener('scroll', function () {
-    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(onScroll);
+    }
   }, { passive: true });
 
-  /* Mobile menu */
+  /* MOBILE MENU */
   function setMenu(open) {
     menu.classList.toggle('open', open);
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -703,54 +864,184 @@ document.addEventListener('DOMContentLoaded', function () {
     icoOpen.style.display = open ? 'none' : 'inline-block';
     icoClose.style.display = open ? 'inline-block' : 'none';
   }
-  btn.addEventListener('click', function () { setMenu(btn.getAttribute('aria-expanded') !== 'true'); });
-  menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setMenu(false); });
-  window.addEventListener('resize', function () { if (window.innerWidth > 760) setMenu(false); });
 
-  /* Counter */
+  btn.addEventListener('click', function () {
+    setMenu(btn.getAttribute('aria-expanded') !== 'true');
+  });
+
+  menu.querySelectorAll('a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      setMenu(false);
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setMenu(false);
+  });
+
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 760) setMenu(false);
+  });
+
+  /* COUNTER */
   var fmt = new Intl.NumberFormat('id-ID');
+
   function count(el) {
     var target = parseInt(el.dataset.count, 10);
+
     if (isNaN(target) || reduce || target < 2) return;
-    var start = null, dur = 1400;
+
+    var start = null;
+    var dur = 1400;
+
     function step(t) {
       if (start === null) start = t;
+
       var p = Math.min((t - start) / dur, 1);
-      el.textContent = fmt.format(Math.round(target * (1 - Math.pow(1 - p, 4))));
-      if (p < 1) requestAnimationFrame(step); else el.textContent = fmt.format(target);
+
+      el.textContent = fmt.format(
+        Math.round(target * (1 - Math.pow(1 - p, 4)))
+      );
+
+      if (p < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = fmt.format(target);
+      }
     }
+
     el.textContent = '0';
     requestAnimationFrame(step);
   }
 
-  /* Reveal + bars + counters */
+  /* REVEAL + BARS + COUNTERS */
   var items = document.querySelectorAll('.reveal, [data-bars], [data-count]');
+
   if ('IntersectionObserver' in window && !reduce) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (!en.isIntersecting) return;
+
         en.target.classList.add('in');
-        if (en.target.hasAttribute('data-count')) count(en.target);
+
+        if (en.target.hasAttribute('data-count')) {
+          count(en.target);
+        }
+
         io.unobserve(en.target);
       });
-    }, { threshold: .15, rootMargin: '0px 0px -30px 0px' });
-    items.forEach(function (el) { io.observe(el); });
+    }, {
+      threshold: .15,
+      rootMargin: '0px 0px -30px 0px'
+    });
+
+    items.forEach(function (el) {
+      io.observe(el);
+    });
   } else {
-    items.forEach(function (el) { el.classList.add('in'); });
+    items.forEach(function (el) {
+      el.classList.add('in');
+    });
   }
 
-  /* Active nav */
+  /* ACTIVE NAV */
   var links = document.querySelectorAll('.nav-link[href^="#"]');
+
   if ('IntersectionObserver' in window) {
     var so = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (!en.isIntersecting) return;
-        links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('href') === '#' + en.target.id); });
+
+        links.forEach(function (l) {
+          l.classList.toggle(
+            'active',
+            l.getAttribute('href') === '#' + en.target.id
+          );
+        });
       });
-    }, { rootMargin: '-25% 0px -60% 0px' });
-    document.querySelectorAll('#beranda, #tentang, #dashboard').forEach(function (s) { so.observe(s); });
+    }, {
+      rootMargin: '-25% 0px -60% 0px'
+    });
+
+    document.querySelectorAll('#beranda, #tentang, #dashboard').forEach(function (s) {
+      so.observe(s);
+    });
   }
+
+  /* DIAGRAM PIE JENIS KELAMIN */
+  var genderCanvas = document.getElementById('genderChart');
+
+  if (genderCanvas && typeof Chart !== 'undefined') {
+    var maleCount = {{ $maleCount }};
+    var femaleCount = {{ $femaleCount }};
+    var genderTotal = maleCount + femaleCount;
+
+    new Chart(genderCanvas, {
+      type: 'pie',
+
+      data: {
+        labels: ['Laki-laki', 'Perempuan'],
+
+        datasets: [{
+          data: [maleCount, femaleCount],
+          backgroundColor: [
+            '#2457D6',
+            '#38C6E8'
+          ],
+          borderColor: '#ffffff',
+          borderWidth: 4,
+          hoverOffset: 10
+        }]
+      },
+
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 1,
+
+        plugins: {
+          legend: {
+            display: false
+          },
+
+          tooltip: {
+            enabled: true,
+            backgroundColor: '#081b33',
+            titleFont: {
+              family: 'Plus Jakarta Sans',
+              size: 13,
+              weight: '700'
+            },
+            bodyFont: {
+              family: 'Plus Jakarta Sans',
+              size: 12
+            },
+            padding: 12,
+            cornerRadius: 10,
+
+            callbacks: {
+              label: function (context) {
+                var value = Number(context.raw || 0);
+                var percentage = genderTotal > 0
+                  ? ((value / genderTotal) * 100).toFixed(1)
+                  : '0.0';
+
+                return ' ' + value.toLocaleString('id-ID') +
+                  ' peserta (' + percentage.replace('.', ',') + '%)';
+              }
+            }
+          }
+        },
+
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          duration: 1000
+        }
+      }
+    });
+  }
+
 });
 </script>
 
