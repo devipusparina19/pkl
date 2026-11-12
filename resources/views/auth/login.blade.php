@@ -2,20 +2,34 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#081b33">
 
-    <title>Login Internal — SIRAPIK</title>
+    <title>Login Internal — ARTA</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('css/sirapik.css') }}">
+    {{-- sirapik.css sengaja tidak dimuat: halaman ini self-contained dan stylesheet lama menggeser layout --}}
 
     <style>
+        /* Reset defensif (spesifisitas rendah) agar header/footer tidak terpengaruh CSS global */
+        :where(.login-layout) :is(header, footer) {
+            position: static;
+            width: auto;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            transform: none;
+        }
+
         /* =====================================================
-           SIRAPIK — LOGIN INTERNAL (Premium Blue Editorial)
+           ARTA — LOGIN INTERNAL (Premium Blue Editorial)
         ===================================================== */
         :root {
             --navy: #081b33;
@@ -42,14 +56,14 @@
         }
 
         *, *::before, *::after { box-sizing: border-box; }
-
         [hidden] { display: none !important; }
-
-        html { min-height: 100%; }
+        html { min-height: 100%; -webkit-text-size-adjust: 100%; }
 
         body {
             min-height: 100vh;
+            min-height: 100dvh;
             margin: 0;
+            overflow-x: hidden;
             color: var(--ink);
             background: #fff;
             font-family: var(--f-body);
@@ -68,10 +82,30 @@
             border-radius: 8px;
         }
 
+        /* Progress bar tipis saat submit */
+        .top-progress {
+            position: fixed;
+            inset: 0 0 auto 0;
+            z-index: 50;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--electric));
+            transform: scaleX(0);
+            transform-origin: left;
+            opacity: 0;
+        }
+        .top-progress.run {
+            opacity: 1;
+            transform: scaleX(.85);
+            transition: transform 6s cubic-bezier(.1, .8, .2, 1), opacity .2s;
+        }
+
+        /* Layout: penuh layar, bukan kotak di tengah */
         .login-layout {
             display: grid;
             grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+            width: 100%;
             min-height: 100vh;
+            min-height: 100dvh;
         }
 
         /* =====================================================
@@ -84,7 +118,7 @@
             flex-direction: column;
             justify-content: space-between;
             min-width: 0;
-            padding: 48px 56px;
+            padding: 48px clamp(28px, 4.5vw, 72px);
             overflow: hidden;
             color: #fff;
             background: var(--navy);
@@ -93,16 +127,17 @@
         .brand-bg {
             position: absolute;
             inset: 0;
-            z-index: -3;
+            z-index: -4;
             background:
-                linear-gradient(160deg, rgba(5,22,42,.97) 0%, rgba(8,34,63,.9) 55%, rgba(9,39,70,.8) 100%),
+                radial-gradient(900px 500px at 85% 10%, rgba(52,120,246,.28), transparent 60%),
+                linear-gradient(160deg, rgba(5,22,42,.97) 0%, rgba(8,34,63,.92) 55%, rgba(9,39,70,.85) 100%),
                 url("{{ asset('images/login-bapelkes.jpg') }}") center / cover no-repeat;
         }
 
         .brand-grid {
             position: absolute;
             inset: 0;
-            z-index: -2;
+            z-index: -3;
             opacity: .12;
             background-image:
                 linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
@@ -112,8 +147,20 @@
             -webkit-mask-image: linear-gradient(160deg, #000 10%, transparent 80%);
             animation: grid-drift 40s linear infinite;
         }
-
         @keyframes grid-drift { to { background-position: 64px 64px; } }
+
+        /* Orb ambient (bergerak lambat + parallax mouse) */
+        .orb {
+            position: absolute;
+            z-index: -2;
+            border-radius: 50%;
+            filter: blur(60px);
+            will-change: transform;
+        }
+        .orb-a { top: -120px; right: -100px; width: 420px; height: 420px; background: rgba(52,120,246,.35); animation: float-a 16s ease-in-out infinite; }
+        .orb-b { bottom: -140px; left: -80px; width: 380px; height: 380px; background: rgba(56,198,232,.2); animation: float-b 20s ease-in-out infinite; }
+        @keyframes float-a { 50% { transform: translate3d(-50px, 60px, 0); } }
+        @keyframes float-b { 50% { transform: translate3d(70px, -40px, 0); } }
 
         .brand-orbit {
             position: absolute;
@@ -124,16 +171,12 @@
             height: 560px;
             border: 1px solid rgba(130,183,255,.22);
             border-radius: 50%;
-            box-shadow:
-                0 0 0 60px rgba(130,183,255,.04),
-                0 0 0 120px rgba(130,183,255,.025);
+            box-shadow: 0 0 0 60px rgba(130,183,255,.04), 0 0 0 120px rgba(130,183,255,.025);
+            animation: spin 90s linear infinite;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .brand-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .brand-header { display: flex; align-items: center; gap: 16px; }
 
         .brand-logo {
             flex: 0 0 56px;
@@ -143,13 +186,7 @@
             background: #fff;
             border-radius: 16px;
         }
-
-        .brand-logo img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+        .brand-logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
 
         .brand-heading strong {
             display: block;
@@ -159,15 +196,9 @@
             letter-spacing: -.03em;
             line-height: 1.2;
         }
+        .brand-heading span { display: block; margin-top: 2px; color: rgba(255,255,255,.7); font-size: 14px; }
 
-        .brand-heading span {
-            display: block;
-            margin-top: 2px;
-            color: rgba(255,255,255,.7);
-            font-size: 14px;
-        }
-
-        .brand-content { margin: 56px 0; }
+        .brand-content { margin: 48px 0; }
 
         .brand-label {
             display: inline-flex;
@@ -182,7 +213,6 @@
             font-size: 14px;
             font-weight: 600;
         }
-
         .brand-label i {
             width: 9px;
             height: 9px;
@@ -191,27 +221,80 @@
             box-shadow: 0 0 0 4px rgba(84,214,155,.18);
             animation: pulse 2.6s ease-in-out infinite;
         }
-
         @keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(84,214,155,0); } }
 
         .brand-content h1 {
             margin: 0;
             font-family: var(--f-display);
-            font-size: clamp(56px, 8.4vw, 124px);
+            font-size: clamp(64px, 10vw, 148px);
             font-weight: 800;
             letter-spacing: -.06em;
-            line-height: .95;
+            line-height: .92;
+            background: linear-gradient(180deg, #fff 30%, #82b7ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        .brand-content h1 span { display: block; color: #82b7ff; }
+        .brand-fullname {
+            margin: 18px 0 0;
+            font-family: var(--f-display);
+            font-size: clamp(17px, 1.7vw, 24px);
+            font-weight: 600;
+            letter-spacing: -.02em;
+            line-height: 1.35;
+            color: #dbe9ff;
+        }
+        .brand-fullname b { color: var(--cyan); font-weight: 700; }
 
         .brand-content > p {
-            max-width: 46ch;
-            margin: 28px 0 0;
-            color: rgba(255,255,255,.76);
-            font-size: clamp(16px, 1.3vw, 18px);
+            max-width: 48ch;
+            margin: 18px 0 0;
+            color: rgba(255,255,255,.74);
+            font-size: clamp(15px, 1.2vw, 17px);
             line-height: 1.8;
         }
+
+        /* Garis ECG bergerak — simbol tenaga kesehatan */
+        .ecg {
+            position: relative;
+            width: 100%;
+            max-width: 560px;
+            height: 70px;
+            margin-top: 32px;
+            overflow: hidden;
+            mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+        }
+        .ecg svg {
+            display: block;
+            width: 200%;
+            height: 100%;
+            animation: ecg-run 7s linear infinite;
+        }
+        @keyframes ecg-run { to { transform: translateX(-50%); } }
+
+        /* Chip fitur melayang */
+        .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border: 1px solid rgba(255,255,255,.16);
+            border-radius: 999px;
+            background: rgba(255,255,255,.07);
+            color: #e4efff;
+            font-size: 13px;
+            font-weight: 600;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            animation: bob 5s ease-in-out infinite;
+        }
+        .chip:nth-child(2) { animation-delay: -1.6s; }
+        .chip:nth-child(3) { animation-delay: -3.2s; }
+        .chip svg { width: 16px; height: 16px; color: var(--cyan); }
+        @keyframes bob { 50% { transform: translateY(-6px); } }
 
         .brand-footer {
             display: flex;
@@ -220,7 +303,6 @@
             padding-top: 24px;
             border-top: 1px solid rgba(255,255,255,.18);
         }
-
         .security-icon {
             flex: 0 0 44px;
             width: 44px;
@@ -232,39 +314,29 @@
             background: rgba(255,255,255,.08);
             color: var(--cyan);
         }
-
         .security-icon svg { width: 22px; height: 22px; }
-
-        .brand-footer p {
-            margin: 0;
-            color: rgba(255,255,255,.78);
-            font-size: 14px;
-            line-height: 1.75;
-        }
+        .brand-footer p { margin: 0; color: rgba(255,255,255,.78); font-size: 14px; line-height: 1.75; }
 
         /* =====================================================
            LOGIN PANEL
         ===================================================== */
         .login-panel {
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
             min-width: 0;
-            padding: 48px clamp(28px, 6vw, 88px);
-            background: #fff;
+            padding: 48px clamp(28px, 5vw, 80px);
+            background:
+                radial-gradient(600px 300px at 100% 0%, var(--soft), transparent 70%),
+                #fff;
         }
 
-        .login-inner {
-            width: 100%;
-            max-width: 460px;
-            margin-inline: auto;
-            animation: rise .7s var(--ease) both;
-        }
+        .login-inner { width: 100%; max-width: 560px; margin-inline: auto; }
 
-        @keyframes rise {
-            from { opacity: 0; transform: translateY(18px); }
-            to { opacity: 1; transform: none; }
-        }
+        /* Reveal bertahap */
+        .reveal { opacity: 0; transform: translateY(18px); animation: rise .7s var(--ease) forwards; animation-delay: calc(var(--i, 0) * 90ms + 80ms); }
+        @keyframes rise { to { opacity: 1; transform: none; } }
 
         .login-heading { margin-bottom: 32px; }
 
@@ -277,24 +349,18 @@
             font-size: 15px;
             font-weight: 700;
         }
-
-        .login-eyebrow::before {
-            content: "";
-            width: 32px;
-            height: 2px;
-            background: var(--cyan);
-        }
+        .login-eyebrow::before { content: ""; width: 32px; height: 2px; background: var(--cyan); }
 
         .login-heading h2 {
             margin: 0 0 12px;
             color: var(--navy);
             font-family: var(--f-display);
-            font-size: clamp(34px, 4vw, 48px);
+            font-size: clamp(34px, 4vw, 52px);
             font-weight: 800;
             letter-spacing: -.045em;
             line-height: 1.08;
         }
-
+        .login-heading h2 em { font-style: normal; color: var(--royal); }
         .login-heading p { margin: 0; color: var(--slate); font-size: 17px; line-height: 1.7; }
 
         /* Alerts */
@@ -307,15 +373,12 @@
             line-height: 1.6;
             animation: rise .4s var(--ease) both;
         }
-
         .alert-success { border-color: #bbf7d0; background: var(--green-soft); color: var(--green); }
         .alert-error { border-color: #fecaca; background: var(--red-soft); color: var(--red); }
 
         /* Form */
         .form-group { margin-bottom: 22px; }
-
-        .form-group > label,
-        .group-label {
+        .form-group > label, .group-label {
             display: block;
             margin-bottom: 9px;
             color: #40536a;
@@ -323,19 +386,30 @@
             font-weight: 700;
         }
 
-        /* Role: segmented control */
+        /* Role: segmented control dengan indikator geser */
         .role-switch {
+            position: relative;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
+            gap: 0;
             padding: 5px;
             border: 1px solid var(--border);
             border-radius: var(--r);
             background: var(--ice);
         }
-
-        .role-switch label { position: relative; margin: 0; cursor: pointer; }
-
+        .role-indicator {
+            position: absolute;
+            top: 5px;
+            bottom: 5px;
+            left: 5px;
+            width: calc((100% - 10px) / 3);
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 4px 14px rgba(8,27,51,.12);
+            transform: translateX(calc(var(--idx, 0) * 100%));
+            transition: transform .4s var(--ease);
+        }
+        .role-switch label { position: relative; z-index: 1; margin: 0; cursor: pointer; }
         .role-switch input {
             position: absolute;
             inset: 0;
@@ -345,12 +419,11 @@
             opacity: 0;
             cursor: pointer;
         }
-
         .role-switch span {
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 44px;
+            min-height: 46px;
             padding: 8px 6px;
             border-radius: 10px;
             color: #506176;
@@ -358,25 +431,14 @@
             font-weight: 700;
             text-align: center;
             line-height: 1.3;
-            transition: background .25s var(--ease), color .25s, box-shadow .25s;
+            transition: color .25s;
         }
-
         .role-switch label:hover span { color: var(--royal); }
-
-        .role-switch input:checked + span {
-            background: #fff;
-            color: var(--royal);
-            box-shadow: 0 4px 12px rgba(8,27,51,.1);
-        }
-
-        .role-switch input:focus-visible + span {
-            outline: 3px solid rgba(52,120,246,.55);
-            outline-offset: 2px;
-        }
+        .role-switch input:checked + span { color: var(--royal); }
+        .role-switch input:focus-visible + span { outline: 3px solid rgba(52,120,246,.55); outline-offset: 2px; }
 
         /* Inputs */
         .input-wrap { position: relative; display: flex; align-items: center; }
-
         .input-icon {
             position: absolute;
             left: 16px;
@@ -386,31 +448,24 @@
             pointer-events: none;
             transition: color .25s;
         }
-
         .input-icon svg { width: 20px; height: 20px; }
 
         .form-control {
             display: block;
             width: 100%;
-            height: 56px;
+            height: 58px;
             padding: 0 16px 0 48px;
             border: 1.5px solid var(--border);
             border-radius: var(--r);
             outline: none;
             background: #fff;
             color: var(--ink);
-            font-size: 16px;
+            font-size: 16px; /* 16px mencegah zoom otomatis di iOS */
             transition: border-color .25s, box-shadow .25s;
         }
-
         .form-control::placeholder { color: #8998ab; }
         .form-control:hover { border-color: #a6bddb; }
-
-        .form-control:focus {
-            border-color: var(--royal);
-            box-shadow: 0 0 0 4px rgba(36,87,214,.12);
-        }
-
+        .form-control:focus { border-color: var(--royal); box-shadow: 0 0 0 4px rgba(36,87,214,.12); }
         .input-wrap:focus-within .input-icon { color: var(--royal); }
 
         .password-input { padding-right: 58px; }
@@ -420,8 +475,8 @@
             top: 50%;
             right: 6px;
             z-index: 3;
-            width: 44px;
-            height: 44px;
+            width: 46px;
+            height: 46px;
             display: grid;
             place-items: center;
             border: 0;
@@ -432,18 +487,19 @@
             transform: translateY(-50%);
             transition: background .25s, color .25s;
         }
-
         .toggle-password:hover { background: var(--soft); color: var(--royal); }
         .toggle-password svg { width: 21px; height: 21px; }
 
         /* Submit */
         .btn-login {
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
             width: 100%;
-            min-height: 58px;
+            min-height: 60px;
             margin-top: 6px;
             padding: 12px 22px;
             border: 0;
@@ -455,76 +511,73 @@
             cursor: pointer;
             transition: background .25s, transform .25s var(--ease), box-shadow .25s;
         }
+        .btn-login::after { /* kilau bergerak */
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 40%;
+            background: linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent);
+            transform: translateX(-160%) skewX(-20deg);
+            animation: shine 4.5s ease-in-out infinite;
+        }
+        @keyframes shine { 60%, 100% { transform: translateX(380%) skewX(-20deg); } }
 
         .btn-login svg { width: 20px; height: 20px; transition: transform .25s var(--ease); }
-
-        .btn-login:hover {
-            background: var(--navy);
-            transform: translateY(-2px);
-            box-shadow: 0 14px 30px rgba(36,87,214,.28);
-        }
-
+        .btn-login:hover { background: var(--navy); transform: translateY(-2px); box-shadow: 0 14px 30px rgba(36,87,214,.28); }
         .btn-login:hover svg { transform: translateX(4px); }
         .btn-login:active { transform: scale(.98); }
+        .btn-login:disabled { background: #7f9bd8; box-shadow: none; transform: none; cursor: wait; }
+        .btn-login:disabled::after { animation: none; opacity: 0; }
 
-        .btn-login:disabled {
-            background: #7f9bd8;
-            box-shadow: none;
-            transform: none;
-            cursor: wait;
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255,255,255,.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
         }
 
         /* Bottom */
-        .login-bottom {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-        }
-
+        .login-bottom { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; }
         .login-bottom a {
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            padding: 8px 4px;
             color: var(--royal);
             font-size: 15px;
             font-weight: 700;
             transition: color .25s;
         }
-
         .login-bottom a svg { width: 18px; height: 18px; transition: transform .25s var(--ease); }
         .login-bottom a:hover { color: var(--navy); }
         .login-bottom a:hover svg { transform: translateX(-4px); }
-
-        .login-bottom p { margin: 14px 0 0; color: var(--slate); font-size: 13px; line-height: 1.6; }
+        .login-bottom p { margin: 10px 0 0; color: var(--slate); font-size: 13px; line-height: 1.6; }
 
         /* =====================================================
            RESPONSIVE
         ===================================================== */
         @media (max-width: 1000px) {
             .login-layout { grid-template-columns: 1fr; }
+            .login-brand { padding: 32px clamp(20px, 5vw, 40px) 36px; }
+            .brand-content { margin: 32px 0 28px; }
+            .brand-content h1 { font-size: clamp(64px, 16vw, 110px); }
+            .brand-footer { display: none; }
 
-            .login-brand { padding: 36px 32px; }
-            .brand-content { margin: 40px 0; }
-            .brand-content h1 { font-size: clamp(56px, 12vw, 100px); }
-
-            .login-panel { padding: 48px 32px 56px; }
+            .login-panel { padding: 40px clamp(20px, 5vw, 40px) 48px; }
+            .login-inner { max-width: none; }
         }
 
         @media (max-width: 560px) {
-            .login-brand { padding: 26px 20px; }
             .brand-logo { flex-basis: 48px; width: 48px; height: 48px; border-radius: 14px; }
-            .brand-content { margin: 32px 0; }
-            .brand-content > p { margin-top: 20px; }
-            .brand-footer { padding-top: 18px; }
+            .brand-label { margin-bottom: 16px; }
+            .ecg { height: 56px; margin-top: 22px; }
+            .chips { display: none; }
             .brand-orbit { right: -260px; bottom: -260px; }
-
-            .login-panel { padding: 36px 20px 44px; }
             .login-heading { margin-bottom: 26px; }
             .login-heading p { font-size: 16px; }
-
-            .role-switch span { min-height: 46px; font-size: 13px; }
-            .form-control { height: 54px; }
+            .role-switch span { min-height: 48px; font-size: 13px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -533,20 +586,25 @@
                 scroll-behavior: auto !important;
                 transition-duration: .01ms !important;
             }
+            .reveal { opacity: 1; transform: none; }
         }
     </style>
 </head>
 
 <body>
+<div class="top-progress" id="topProgress" aria-hidden="true"></div>
+
 <main class="login-layout">
 
     {{-- BRAND --}}
-    <section class="login-brand">
+    <section class="login-brand" id="brandPanel">
         <div class="brand-bg" aria-hidden="true"></div>
         <div class="brand-grid" aria-hidden="true"></div>
+        <div class="orb orb-a" aria-hidden="true" data-depth="30"></div>
+        <div class="orb orb-b" aria-hidden="true" data-depth="-24"></div>
         <div class="brand-orbit" aria-hidden="true"></div>
 
-        <header class="brand-header">
+        <header class="brand-header reveal" style="--i:0">
             <div class="brand-logo">
                 <img
                     src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
@@ -555,24 +613,53 @@
             </div>
 
             <div class="brand-heading">
-                <strong>SIRAPIK</strong>
+                <strong>ARTA</strong>
                 <span>Bapelkes Provinsi Kalimantan Selatan</span>
             </div>
         </header>
 
         <div class="brand-content">
-            <span class="brand-label"><i></i> Sistem Informasi</span>
+            <span class="brand-label reveal" style="--i:1"><i></i> Sistem Informasi</span>
 
-            <h1>SIRAPIK</h1>
+            <h1 class="reveal" style="--i:2">ARTA</h1>
 
-            <p>
-                Sistem informasi internal untuk mendukung
-                pengelolaan data dan pelayanan yang lebih tertib,
+            <p class="brand-fullname reveal" style="--i:3">
+                <b>A</b>plikasi <b>R</b>ekam <b>R</b>iwayat <b>P</b>elatihan<br>
+                <b>T</b>enaga Kesehatan
+            </p>
+
+            <p class="reveal" style="--i:4">
+                Sistem informasi internal untuk mencatat dan mengelola
+                riwayat pelatihan tenaga kesehatan secara tertib,
                 efektif, dan terpadu.
             </p>
+
+            {{-- ECG --}}
+            <div class="ecg reveal" style="--i:5" aria-hidden="true">
+                <svg viewBox="0 0 1200 70" preserveAspectRatio="none" fill="none"
+                     stroke="#38c6e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M0 35 H80 L100 35 L115 12 L135 58 L150 35 H260 L275 35 L290 22 L305 35 H600
+                             M600 35 H680 L700 35 L715 12 L735 58 L750 35 H860 L875 35 L890 22 L905 35 H1200"/>
+                </svg>
+            </div>
+
+            <div class="chips reveal" style="--i:6" aria-hidden="true">
+                <span class="chip">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    Riwayat Pelatihan
+                </span>
+                <span class="chip">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/></svg>
+                    Tenaga Kesehatan
+                </span>
+                <span class="chip">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/></svg>
+                    Data Terlindungi
+                </span>
+            </div>
         </div>
 
-        <footer class="brand-footer">
+        <footer class="brand-footer reveal" style="--i:7">
             <div class="security-icon" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      viewBox="0 0 24 24" fill="none"
@@ -594,9 +681,9 @@
     <section class="login-panel">
         <div class="login-inner">
 
-            <header class="login-heading">
+            <header class="login-heading reveal" style="--i:0">
                 <span class="login-eyebrow">Area Login Internal</span>
-                <h2>Selamat Datang</h2>
+                <h2>Selamat Datang di <em>ARTA</em></h2>
                 <p>Silakan masuk menggunakan akun internal Anda.</p>
             </header>
 
@@ -631,10 +718,11 @@
                     $selectedRole = old('role', $loginRole ?? 'admin');
                 @endphp
 
-                <div class="form-group">
+                <div class="form-group reveal" style="--i:1">
                     <span class="group-label" id="roleLabel">Masuk Sebagai</span>
 
-                    <div class="role-switch" role="radiogroup" aria-labelledby="roleLabel">
+                    <div class="role-switch" id="roleSwitch" role="radiogroup" aria-labelledby="roleLabel">
+                        <span class="role-indicator" aria-hidden="true" style="display:block;min-height:0;padding:0"></span>
 
                         <label>
                             <input type="radio" name="role" value="admin"
@@ -653,11 +741,10 @@
                                 {{ $selectedRole === 'pimpinan' ? 'checked' : '' }}>
                             <span>Pimpinan</span>
                         </label>
-
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group reveal" style="--i:2">
                     <label for="username">Username atau Email</label>
 
                     <div class="input-wrap">
@@ -680,12 +767,11 @@
                             placeholder="Masukkan username atau email"
                             autocomplete="username"
                             required
-                            autofocus
                         >
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group reveal" style="--i:3">
                     <label for="password">Password</label>
 
                     <div class="input-wrap">
@@ -740,21 +826,24 @@
                     </div>
                 </div>
 
-                <button class="btn-login" type="submit" id="loginSubmit">
-                    <span id="loginSubmitText">Masuk ke Sistem</span>
+                <div class="reveal" style="--i:4">
+                    <button class="btn-login" type="submit" id="loginSubmit">
+                        <span class="spinner" id="loginSpinner" hidden aria-hidden="true"></span>
+                        <span id="loginSubmitText">Masuk ke Sistem</span>
 
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2"
-                         stroke-linecap="round" stroke-linejoin="round"
-                         aria-hidden="true">
-                        <path d="M5 12h14"/>
-                        <path d="m12 5 7 7-7 7"/>
-                    </svg>
-                </button>
+                        <svg id="loginArrow" xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round"
+                             aria-hidden="true">
+                            <path d="M5 12h14"/>
+                            <path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
             </form>
 
-            <footer class="login-bottom">
+            <footer class="login-bottom reveal" style="--i:5">
                 <a href="{{ route('public.dashboard') }}">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 24 24" fill="none"
@@ -769,7 +858,8 @@
                 </a>
 
                 <p>
-                    &copy; {{ date('Y') }} SIRAPIK. Seluruh hak dilindungi.
+                    &copy; {{ date('Y') }} ARTA — Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan.
+                    Seluruh hak dilindungi.
                 </p>
             </footer>
 
@@ -779,20 +869,39 @@
 
 <script>
     (() => {
+        const SCROLL_KEY = 'arta_login_scroll';
+
+        /* Tetap di posisi scroll semula setelah submit / reload */
+        try {
+            const saved = sessionStorage.getItem(SCROLL_KEY);
+            if (saved !== null) {
+                sessionStorage.removeItem(SCROLL_KEY);
+                window.scrollTo(0, parseInt(saved, 10) || 0);
+            }
+        } catch (e) {}
+
         const loginForm = document.getElementById('loginForm');
-        const roleInputs = document.querySelectorAll('input[name="role"]');
+        const roleInputs = Array.from(document.querySelectorAll('input[name="role"]'));
+        const roleSwitch = document.getElementById('roleSwitch');
         const loginBaseUrl = @json(url('/login'));
 
-        /* Tujuan form mengikuti role yang dipilih */
+        /* Tujuan form + indikator geser mengikuti role terpilih */
         function updateRole() {
             const checked = document.querySelector('input[name="role"]:checked');
             const role = checked ? checked.value : 'admin';
 
             loginForm.action = loginBaseUrl + '/' + encodeURIComponent(role);
+            roleSwitch.style.setProperty('--idx', Math.max(0, roleInputs.indexOf(checked)));
         }
 
         roleInputs.forEach((input) => input.addEventListener('change', updateRole));
         updateRole();
+
+        /* Fokus awal tanpa melompat/scroll (hanya layar lebar) */
+        const username = document.getElementById('username');
+        if (window.matchMedia('(min-width: 1001px)').matches) {
+            username.focus({ preventScroll: true });
+        }
 
         /* Tampilkan / sembunyikan password */
         const passwordInput = document.getElementById('password');
@@ -812,24 +921,54 @@
                 'aria-label',
                 showPassword ? 'Sembunyikan password' : 'Tampilkan password'
             );
+            passwordInput.focus({ preventScroll: true });
         });
 
-        /* Umpan balik saat form dikirim (mencegah klik ganda) */
+        /* Umpan balik saat submit (mencegah klik ganda, tanpa lompat ke atas) */
         const submitButton = document.getElementById('loginSubmit');
         const submitText = document.getElementById('loginSubmitText');
+        const spinner = document.getElementById('loginSpinner');
+        const arrow = document.getElementById('loginArrow');
+        const progress = document.getElementById('topProgress');
 
         function resetSubmit() {
             submitButton.disabled = false;
             submitText.textContent = 'Masuk ke Sistem';
+            spinner.hidden = true;
+            arrow.hidden = false;
+            progress.classList.remove('run');
         }
 
         loginForm.addEventListener('submit', () => {
+            try { sessionStorage.setItem(SCROLL_KEY, String(window.scrollY)); } catch (e) {}
+
             submitButton.disabled = true;
             submitText.textContent = 'Memproses...';
+            spinner.hidden = false;
+            arrow.hidden = true;
+            progress.classList.add('run');
         });
 
         /* Pulihkan tombol jika pengguna kembali lewat riwayat browser */
         window.addEventListener('pageshow', resetSubmit);
+
+        /* Parallax halus pada orb (hanya transform, nonaktif jika reduced-motion) */
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const brand = document.getElementById('brandPanel');
+        const orbs = brand.querySelectorAll('.orb');
+
+        if (!reduce && window.matchMedia('(hover: hover)').matches) {
+            brand.addEventListener('pointermove', (e) => {
+                const r = brand.getBoundingClientRect();
+                const x = (e.clientX - r.left) / r.width - .5;
+                const y = (e.clientY - r.top) / r.height - .5;
+
+                orbs.forEach((orb) => {
+                    const d = parseFloat(orb.dataset.depth || 20);
+                    orb.style.translate = (x * d) + 'px ' + (y * d) + 'px';
+                });
+            }, { passive: true });
+        }
     })();
 </script>
 </body>

@@ -2,11 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#081b33">
 
-    <title>@yield('title', 'Dashboard') - SIRAPIK</title>
+    <title>@yield('title', 'Dashboard') - ARTA</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
 
     <style>
         /* =====================================================
-           SIRAPIK — APP SHELL (Premium Blue Editorial)
+           ARTA — APP SHELL (Premium Blue Editorial)
            Nama variabel & class lama dipertahankan agar halaman
            yang belum diredesign tetap tampil benar.
         ===================================================== */
@@ -33,7 +33,7 @@
 
             /* Neutrals */
             --text: #14243a;
-            --muted: #64748b;
+            --muted: #56657a;
             --border: #e1e9f2;
             --bg: #f3f7fc;
             --white: #ffffff;
@@ -45,6 +45,7 @@
             /* Layout */
             --sidebar-width: 288px;
             --header-height: 80px;
+            --pad-x: clamp(16px, 2.6vw, 48px);
 
             /* Shape */
             --radius-sm: 10px;
@@ -61,10 +62,15 @@
 
         *, *::before, *::after { box-sizing: border-box; }
 
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+        }
 
         body {
             margin: 0;
+            min-width: 320px;
+            overflow-x: clip;
             font-family: var(--font-body);
             font-size: 16px;
             line-height: 1.7;
@@ -81,13 +87,31 @@
 
         button:focus-visible,
         a:focus-visible,
-        summary:focus-visible {
+        summary:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
             outline: 3px solid rgba(52, 120, 246, .55);
             outline-offset: 3px;
             border-radius: 8px;
         }
 
-        .app-shell { min-height: 100vh; }
+        .app-shell { min-height: 100vh; min-height: 100dvh; }
+
+        .skip-link {
+            position: fixed;
+            left: 16px;
+            top: -64px;
+            z-index: 400;
+            padding: 12px 18px;
+            color: #fff;
+            background: var(--blue);
+            border-radius: 10px;
+            font-weight: 700;
+            transition: top .2s;
+        }
+
+        .skip-link:focus { top: 12px; }
 
         /* Scroll progress */
         .scroll-progress {
@@ -103,7 +127,7 @@
         }
 
         /* =====================================================
-           ICON
+           ICON (satu sistem, gaya Lucide)
         ===================================================== */
         .icon {
             width: 21px;
@@ -131,11 +155,14 @@
             flex-direction: column;
             width: var(--sidebar-width);
             height: 100vh;
+            height: 100dvh;
             overflow-x: hidden;
             overflow-y: auto;
+            overscroll-behavior: contain;
             color: #fff;
             background:
-                radial-gradient(circle at 0% 0%, rgba(52,120,246,.22), transparent 45%),
+                radial-gradient(circle at 0% 0%, rgba(52,120,246,.26), transparent 46%),
+                radial-gradient(circle at 100% 100%, rgba(56,198,232,.10), transparent 40%),
                 var(--navy);
             border-right: 1px solid rgba(255,255,255,.06);
             scrollbar-width: thin;
@@ -151,6 +178,8 @@
             border-bottom: 1px solid rgba(255,255,255,.1);
         }
 
+        .brand-link { display: block; color: inherit; }
+
         .brand h2 {
             display: flex;
             align-items: center;
@@ -158,7 +187,7 @@
             margin: 0 0 14px;
             color: #fff;
             font-family: var(--font-display);
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 800;
             letter-spacing: -.04em;
             line-height: 1.1;
@@ -173,11 +202,14 @@
             object-fit: contain;
             background: #fff;
             border-radius: 14px;
+            transition: transform var(--transition);
         }
+
+        .brand-link:hover .brand-logo { transform: rotate(-6deg) scale(1.05); }
 
         .brand p {
             margin: 0;
-            color: #a9c0de;
+            color: #b4c9e3;
             font-size: 13px;
             line-height: 1.7;
         }
@@ -187,7 +219,7 @@
 
         .nav-label {
             padding: 24px 12px 8px;
-            color: #6f8cb0;
+            color: #86a3c7;
             font-size: 12px;
             font-weight: 700;
             letter-spacing: .08em;
@@ -202,7 +234,7 @@
             min-height: 48px;
             margin: 4px 0;
             padding: 11px 14px;
-            color: #cbdaee;
+            color: #d3e0f1;
             border-radius: 12px;
             font-size: 15px;
             font-weight: 600;
@@ -210,7 +242,7 @@
             transition: background var(--transition), color var(--transition), transform var(--transition);
         }
 
-        .nav-link .icon { color: #8fb0d8; transition: color var(--transition); }
+        .nav-link .icon { color: #8fb0d8; transition: color var(--transition), transform var(--transition); }
 
         .nav-link:hover {
             background: rgba(255,255,255,.07);
@@ -218,10 +250,10 @@
             transform: translateX(3px);
         }
 
-        .nav-link:hover .icon { color: #fff; }
+        .nav-link:hover .icon { color: #fff; transform: scale(1.1); }
 
         .nav-link.active {
-            background: rgba(52,120,246,.2);
+            background: rgba(52,120,246,.22);
             color: #fff;
             font-weight: 700;
         }
@@ -249,7 +281,7 @@
             gap: 10px;
             min-height: 48px;
             padding: 11px 14px;
-            color: #cbdaee;
+            color: #d3e0f1;
             border-radius: 12px;
             font-size: 15px;
             font-weight: 600;
@@ -269,7 +301,7 @@
         }
 
         .nav-group-summary.active {
-            background: rgba(52,120,246,.2);
+            background: rgba(52,120,246,.22);
             color: #fff;
         }
 
@@ -284,11 +316,11 @@
             margin: 6px 0 10px 26px;
             padding: 4px 0 4px 14px;
             border-left: 1px solid rgba(255,255,255,.18);
-            animation: submenu-in .2s ease;
+            animation: submenu-in .25s ease;
         }
 
         @keyframes submenu-in {
-            from { opacity: 0; transform: translateY(-4px); }
+            from { opacity: 0; transform: translateY(-6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -298,12 +330,12 @@
             min-height: 40px;
             margin: 3px 0;
             padding: 9px 12px;
-            color: #b4c9e3;
+            color: #c0d2e8;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 500;
             line-height: 1.45;
-            transition: background var(--transition), color var(--transition);
+            transition: background var(--transition), color var(--transition), transform var(--transition);
         }
 
         .nav-sublink::before {
@@ -313,13 +345,14 @@
             flex: 0 0 5px;
             margin-right: 11px;
             border-radius: 50%;
-            background: #5d7fa8;
-            transition: background var(--transition);
+            background: #6c8db6;
+            transition: background var(--transition), transform var(--transition);
         }
 
-        .nav-sublink:hover { background: rgba(255,255,255,.07); color: #fff; }
+        .nav-sublink:hover { background: rgba(255,255,255,.07); color: #fff; transform: translateX(3px); }
+        .nav-sublink:hover::before { transform: scale(1.5); }
 
-        .nav-sublink.active { background: rgba(52,120,246,.2); color: #fff; font-weight: 700; }
+        .nav-sublink.active { background: rgba(52,120,246,.22); color: #fff; font-weight: 700; }
         .nav-sublink.active::before { background: var(--cyan); }
 
         /* Logout */
@@ -377,12 +410,13 @@
         .mobile-menu-button[aria-expanded="true"] .icon-sm { transform: rotate(180deg); }
 
         /* =====================================================
-           MAIN AREA
+           MAIN AREA (penuh layar, tidak condong ke tengah)
         ===================================================== */
         .main-area {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            min-height: 100dvh;
             margin-left: var(--sidebar-width);
         }
 
@@ -396,7 +430,7 @@
             justify-content: space-between;
             gap: 20px;
             min-height: var(--header-height);
-            padding: 14px 40px;
+            padding: 14px var(--pad-x);
             background: rgba(243,247,252,.88);
             border-bottom: 1px solid transparent;
             backdrop-filter: blur(16px);
@@ -417,7 +451,7 @@
             margin: 0 0 2px;
             color: var(--navy);
             font-family: var(--font-display);
-            font-size: clamp(19px, 2vw, 23px);
+            font-size: clamp(19px, 2vw, 24px);
             font-weight: 700;
             letter-spacing: -.03em;
             line-height: 1.3;
@@ -447,7 +481,10 @@
             background: #fff;
             border: 1px solid var(--border);
             border-radius: 999px;
+            transition: box-shadow var(--transition), transform var(--transition);
         }
+
+        .user-info:hover { box-shadow: var(--shadow-soft); transform: translateY(-1px); }
 
         .user-avatar {
             display: flex;
@@ -486,7 +523,24 @@
         }
 
         /* Main content */
-        .main-content { flex: 1; min-width: 0; padding: 24px 40px 40px; }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            padding: 24px var(--pad-x) 40px;
+        }
+
+        /* Animasi masuk halaman (opacity + transform saja) */
+        .main-content > * { animation: page-in .55s var(--transition) both; }
+        .main-content > *:nth-child(2) { animation-delay: .05s; }
+        .main-content > *:nth-child(3) { animation-delay: .1s; }
+        .main-content > *:nth-child(4) { animation-delay: .15s; }
+        .main-content > *:nth-child(n+5) { animation-delay: .2s; }
+
+        @keyframes page-in {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: none; }
+        }
 
         /* =====================================================
            CONTENT COMPONENTS (kompatibel dengan halaman lama)
@@ -506,7 +560,7 @@
             margin: 0 0 8px;
             color: var(--navy);
             font-family: var(--font-display);
-            font-size: clamp(28px, 3.4vw, 40px);
+            font-size: clamp(28px, 3.4vw, 42px);
             font-weight: 800;
             letter-spacing: -.04em;
             line-height: 1.15;
@@ -538,6 +592,7 @@
         .content-card,
         .panel,
         .form-card {
+            position: relative;
             padding: 28px;
             background: #fff;
             border: 1px solid var(--border);
@@ -545,8 +600,22 @@
             box-shadow: var(--shadow-soft);
         }
 
-        .stat-card { transition: transform var(--transition), box-shadow var(--transition); }
+        .stat-card { overflow: hidden; transition: transform var(--transition), box-shadow var(--transition); }
         .stat-card:hover { transform: translateY(-4px); box-shadow: 0 18px 44px rgba(8,27,51,.09); }
+
+        /* aksen garis atas pada kartu statistik */
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .5s var(--transition);
+        }
+
+        .stat-card:hover::before { transform: scaleX(1); }
 
         .stat-label { color: var(--muted); font-size: 14px; font-weight: 600; line-height: 1.6; }
 
@@ -555,10 +624,11 @@
             margin-top: 10px;
             color: var(--navy);
             font-family: var(--font-display);
-            font-size: clamp(32px, 3.2vw, 44px);
+            font-size: clamp(32px, 3.2vw, 46px);
             font-weight: 800;
             letter-spacing: -.04em;
             line-height: 1.15;
+            font-variant-numeric: tabular-nums;
             overflow-wrap: anywhere;
         }
 
@@ -619,13 +689,38 @@
         .btn-secondary { color: #334155; background: #e8eef6; }
         .btn-secondary:hover { color: var(--navy); background: #dbe5f2; box-shadow: none; }
 
-        .btn-outline { color: #506176; background: #fff; border-color: var(--border); }
+        .btn-outline { color: #43546a; background: #fff; border-color: var(--border); }
         .btn-outline:hover { color: var(--blue); background: var(--blue-soft); border-color: #b9cfec; box-shadow: none; }
+
+        .btn-ghost { color: var(--blue); background: transparent; }
+        .btn-ghost:hover { background: var(--blue-soft); color: var(--blue); box-shadow: none; }
 
         .btn-danger { color: #fff; background: #c2410c; }
         .btn-danger:hover { background: #9a3412; box-shadow: 0 10px 22px rgba(194,65,12,.25); }
 
         .btn-sm { min-height: 36px; padding: 6px 14px; font-size: 13px; }
+
+        /* status loading otomatis untuk form submit */
+        .btn.is-loading,
+        button.is-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: .85;
+        }
+
+        .btn.is-loading::after,
+        button.is-loading::after {
+            content: "";
+            width: 15px;
+            height: 15px;
+            margin-left: 8px;
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .inline-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
 
@@ -678,12 +773,6 @@
             border: 1px solid #bfdbfe;
             border-radius: var(--radius-md);
             font-size: 15px;
-            animation: alert-in .4s var(--transition) both;
-        }
-
-        @keyframes alert-in {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: none; }
         }
 
         .alert-success { color: var(--success); background: #f0fdf4; border-color: #bbf7d0; }
@@ -785,7 +874,7 @@
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 18px;
-            padding: 24px 40px;
+            padding: 24px var(--pad-x);
             color: var(--muted);
             background: #fff;
             border-top: 1px solid var(--border);
@@ -827,10 +916,6 @@
         @media (max-width: 900px) {
             :root { --sidebar-width: 252px; }
 
-            .main-content { padding: 20px 24px 32px; }
-            .topbar { padding: 14px 24px; }
-            .app-footer { padding: 22px 24px; }
-
             .filter-grid { grid-template-columns: 1fr 1fr; }
             .filter-grid .filter-actions { grid-column: 1 / -1; }
 
@@ -838,9 +923,11 @@
         }
 
         /* =====================================================
-           RESPONSIVE — MOBILE
+           RESPONSIVE — MOBILE (penuh layar)
         ===================================================== */
         @media (max-width: 760px) {
+            :root { --pad-x: 14px; }
+
             .sidebar {
                 position: relative;
                 inset: auto;
@@ -850,15 +937,15 @@
                 overflow: visible;
             }
 
-            .brand { padding: 18px 20px; }
-            .brand h2 { margin-bottom: 8px; font-size: 25px; }
+            .brand { padding: 18px 16px; }
+            .brand h2 { margin-bottom: 8px; font-size: 26px; }
             .brand-logo { width: 42px; height: 42px; flex-basis: 42px; }
             .brand p { font-size: 12px; }
 
-            .mobile-menu-button { display: inline-flex; margin: 0 16px 16px; }
+            .mobile-menu-button { display: inline-flex; margin: 0 14px 14px; }
 
             .sidebar nav { display: none; padding: 4px 12px 14px; }
-            .sidebar.mobile-open nav { display: block; }
+            .sidebar.mobile-open nav { display: block; animation: submenu-in .25s ease; }
 
             .nav-label { padding-top: 16px; }
             .nav-link.active::before { left: -12px; }
@@ -873,18 +960,18 @@
                 align-items: flex-start;
                 flex-direction: column;
                 gap: 14px;
-                padding: 18px;
+                padding: 18px var(--pad-x);
             }
 
             .topbar-left, .topbar-right { width: 100%; }
             .topbar-right { justify-content: flex-start; }
             .user-name { max-width: 240px; }
 
-            .main-content { padding: 18px 16px 28px; }
+            .main-content { padding: 18px var(--pad-x) 28px; }
 
             .stat-card, .content-card, .panel, .form-card { padding: 20px; border-radius: 18px; }
 
-            .app-footer { align-items: flex-start; flex-direction: column; padding: 20px 16px; }
+            .app-footer { align-items: flex-start; flex-direction: column; padding: 20px var(--pad-x); }
             .footer-meta { text-align: left; }
         }
 
@@ -900,9 +987,6 @@
             .user-name { max-width: calc(100vw - 130px); }
 
             th, td { padding: 12px; }
-
-            .main-content { padding: 16px 12px 26px; }
-            .topbar { padding: 16px 14px; }
         }
 
         /* =====================================================
@@ -922,6 +1006,7 @@
 </head>
 
 <body>
+<a href="#mainContent" class="skip-link">Lewati ke konten utama</a>
 <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
 <div class="app-shell">
@@ -970,7 +1055,7 @@
         );
     @endphp
 
-    {{-- SVG ICON LIBRARY --}}
+    {{-- SVG ICON LIBRARY (gaya Lucide) --}}
     <svg xmlns="http://www.w3.org/2000/svg"
          style="position:absolute;width:0;height:0;overflow:hidden"
          aria-hidden="true">
@@ -1052,19 +1137,23 @@
     <aside class="sidebar" id="appSidebar">
 
         <div class="brand">
-            <h2>
-                <img
-                    src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
-                    alt="Logo Provinsi Kalimantan Selatan"
-                    class="brand-logo"
-                >
-                <span>SIRAPIK</span>
-            </h2>
+            <a href="{{ url('/') }}" class="brand-link" aria-label="ARTA">
+                <h2>
+                    <img
+                        src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+                        alt="Logo Provinsi Kalimantan Selatan"
+                        class="brand-logo"
+                        width="48"
+                        height="48"
+                    >
+                    <span>ARTA</span>
+                </h2>
 
-            <p>
-                Sistem Informasi Riwayat Pelatihan<br>
-                Bapelkes Kalimantan Selatan
-            </p>
+                <p>
+                    Aplikasi Rekam Riwayat Pelatihan<br>
+                    Tenaga Kesehatan · Bapelkes Kalimantan Selatan
+                </p>
+            </a>
         </div>
 
         {{-- MOBILE MENU BUTTON --}}
@@ -1361,7 +1450,7 @@
         </header>
 
         {{-- CONTENT --}}
-        <main class="main-content">
+        <main class="main-content" id="mainContent">
 
             @if (session('success'))
                 <div class="alert alert-success" role="status">
@@ -1397,16 +1486,16 @@
             <div class="footer-brand">
 
                 <div class="footer-mark" aria-hidden="true">
-                    SP
+                    AR
                 </div>
 
                 <div>
                     <span class="footer-title">
-                        SIRAPIK
+                        ARTA
                     </span>
 
                     <span class="footer-description">
-                        Sistem Informasi Riwayat Pelatihan
+                        Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan
                         · Bapelkes Kalimantan Selatan
                     </span>
                 </div>
@@ -1420,7 +1509,7 @@
                 </div>
 
                 <div>
-                    Sistem pencatatan dan pemantauan riwayat pelatihan.
+                    Sistem pencatatan dan pemantauan riwayat pelatihan tenaga kesehatan.
                 </div>
             </div>
 
@@ -1433,13 +1522,64 @@
 {{-- SHELL INTERACTION --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const sidebar = document.getElementById('appSidebar');
-        const menuButton = document.getElementById('mobileMenuButton');
-        const topbar = document.getElementById('appTopbar');
-        const progress = document.getElementById('scrollProgress');
+        var root = document.documentElement;
+        var sidebar = document.getElementById('appSidebar');
+        var menuButton = document.getElementById('mobileMenuButton');
+        var topbar = document.getElementById('appTopbar');
+        var progress = document.getElementById('scrollProgress');
+
+        /* =========================================================
+           POSISI SCROLL TETAP
+           Disimpan sebelum form dikirim / link filter diklik,
+           lalu dipulihkan setelah halaman dimuat ulang.
+           Juga menyimpan posisi scroll sidebar.
+           ========================================================= */
+        var SK = 'arta:scroll';
+        var SIDE = 'arta:sidebar';
+        var saved = null;
+        var userMoved = false;
+
+        try {
+            var raw = sessionStorage.getItem(SK);
+            if (raw) {
+                var d = JSON.parse(raw);
+                if (d && d.path === location.pathname && Date.now() - d.t < 20000) {
+                    saved = d;
+                }
+                sessionStorage.removeItem(SK);
+            }
+
+            var sy = sessionStorage.getItem(SIDE);
+            if (sy && sidebar) {
+                sidebar.scrollTop = parseInt(sy, 10) || 0;
+            }
+        } catch (e) {}
+
+        function jumpTo(y) {
+            root.style.scrollBehavior = 'auto';
+            window.scrollTo(0, y);
+            root.style.scrollBehavior = '';
+            onScroll();
+        }
+
+        function saveScroll() {
+            try {
+                sessionStorage.setItem(SK, JSON.stringify({
+                    y: window.scrollY,
+                    path: location.pathname,
+                    t: Date.now()
+                }));
+            } catch (e) {}
+        }
+
+        function saveSidebar() {
+            try {
+                if (sidebar) sessionStorage.setItem(SIDE, String(sidebar.scrollTop));
+            } catch (e) {}
+        }
 
         /* Topbar state + scroll progress */
-        let ticking = false;
+        var ticking = false;
 
         function onScroll() {
             if (topbar) {
@@ -1447,7 +1587,7 @@
             }
 
             if (progress) {
-                const max = document.documentElement.scrollHeight - window.innerHeight;
+                var max = root.scrollHeight - window.innerHeight;
                 progress.style.transform = 'scaleX(' + (max > 0 ? window.scrollY / max : 0) + ')';
             }
 
@@ -1462,6 +1602,71 @@
                 requestAnimationFrame(onScroll);
             }
         }, { passive: true });
+
+        if (saved) {
+            jumpTo(saved.y);
+
+            ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (ev) {
+                window.addEventListener(ev, function () { userMoved = true; }, { passive: true, once: true });
+            });
+
+            /* font & gambar bisa mengubah tinggi halaman: koreksi sekali setelah load */
+            window.addEventListener('load', function () {
+                if (!userMoved && Math.abs(window.scrollY - saved.y) > 4) {
+                    jumpTo(saved.y);
+                }
+            });
+        }
+
+        /* Form GET (filter/pencarian) dan link pagination: tetap di posisi yang sama.
+           Form POST (simpan/hapus) biasanya redirect ke halaman lain,
+           jadi hanya status loading yang dipasang. */
+        document.addEventListener('submit', function (event) {
+            var form = event.target;
+            if (!(form instanceof HTMLFormElement) || event.defaultPrevented) return;
+
+            var method = (form.getAttribute('method') || 'GET').toUpperCase();
+            var isLogout = form.closest('.sidebar-bottom');
+
+            if (!isLogout && method === 'GET') {
+                saveScroll();
+            }
+
+            /* cegah klik ganda + tampilkan spinner */
+            var submitter = event.submitter || form.querySelector('button[type="submit"], input[type="submit"]');
+            if (submitter && !form.hasAttribute('data-no-loading')) {
+                setTimeout(function () {
+                    submitter.classList.add('is-loading');
+                    submitter.setAttribute('aria-busy', 'true');
+                    submitter.disabled = true;
+                }, 0);
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            var link = event.target.closest('a[href]');
+            if (!link) return;
+
+            /* pagination & link yang diberi data-keep-scroll */
+            if (link.closest('.pagination') || link.hasAttribute('data-keep-scroll')) {
+                saveScroll();
+            }
+
+            if (link.closest('#sidebarNavigation')) {
+                saveSidebar();
+            }
+        });
+
+        /* Tombol Back / bfcache: pastikan status loading hilang */
+        window.addEventListener('pageshow', function (event) {
+            if (!event.persisted) return;
+
+            document.querySelectorAll('.is-loading').forEach(function (el) {
+                el.classList.remove('is-loading');
+                el.removeAttribute('aria-busy');
+                el.disabled = false;
+            });
+        });
 
         /* Mobile sidebar */
         if (!sidebar || !menuButton) {
