@@ -19,52 +19,161 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         /*
-         * DAFTAR TAHUN OTOMATIS DARI DATABASE.
-         */
+        |--------------------------------------------------------------------------
+        | FILTER UTAMA
+        |--------------------------------------------------------------------------
+        */
+
         $years = $this->getAvailableTrainingYears();
 
-        /*
-         * TAHUN TERPILIH.
-         * Default menggunakan tahun terbaru yang memiliki data.
-         */
         $year = $this->resolveYear($request, $years);
 
-        $minimum = max(1, min(100, (int) $request->input('minimum', 4)));
+        // Default 1 agar semua peserta yang memiliki riwayat pelatihan tampil.
+        $minimum = max(
+            1,
+            min(100, (int) $request->input('minimum', 1))
+        );
+
         $search = trim((string) $request->input('search', ''));
 
-        /*
-         * ID PELATIHAN PADA TAHUN TERPILIH.
-         */
-        $trainingIds = Training::query()
-            ->whereYear('start_date', $year)
-            ->select('id');
+        $districtFilter = trim(
+            (string) $request->input('district', '')
+        );
+
+        $institutionFilter = trim(
+            (string) $request->input('institution', '')
+        );
+
 
         /*
-         * TOTAL PELATIHAN.
-         */
+        |--------------------------------------------------------------------------
+        | PILIHAN FILTER KABUPATEN/KOTA DAN INSTANSI
+        |--------------------------------------------------------------------------
+        */
+
+        $districts = Participant::query()
+            ->whereNotNull('district')
+            ->whereRaw("TRIM(district) != ''")
+            ->selectRaw('TRIM(district) AS name')
+            ->distinct()
+            ->orderBy('name')
+            ->pluck('name');
+
+        $institutions = Participant::query()
+            ->whereNotNull('institution')
+            ->whereRaw("TRIM(institution) != ''")
+            ->selectRaw('TRIM(institution) AS name')
+            ->distinct()
+            ->orderBy('name')
+            ->pluck('name');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | QUERY FILTER PESERTA
+        |--------------------------------------------------------------------------
+        */
+
+        $historyInYear = function ($query) use ($year) {
+            $query->whereHas('training', function ($trainingQuery) use ($year) {
+                $trainingQuery->whereYear('start_date', $year);
+            });
+        };
+
+        $applyParticipantFilters = function ($query) use (
+            $search,
+            $districtFilter,
+            $institutionFilter
+        ) {
+            if ($districtFilter !== '') {
+                $query->whereRaw(
+                    'TRIM(participants.district) = ?',
+                    [$districtFilter]
+                );
+            }
+
+            if ($institutionFilter !== '') {
+                $query->whereRaw(
+                    'TRIM(participants.institution) = ?',
+                    [$institutionFilter]
+                );
+            }
+
+            if ($search !== '') {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->where('participants.name', 'like', "%{$search}%")
+                        ->orWhere('participants.nik', 'like', "%{$search}%")
+                        ->orWhere('participants.nip', 'like', "%{$search}%");
+                });
+            }
+
+            return $query;
+        };
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL PELATIHAN PADA TAHUN TERPILIH
+        |--------------------------------------------------------------------------
+        */
+
         $totalTrainings = Training::query()
             ->whereYear('start_date', $year)
             ->count();
 
+
         /*
-         * TOTAL KEIKUTSERTAAN.
-         */
+        |--------------------------------------------------------------------------
+        | DAFTAR PESERTA DAN JUMLAH KEIKUTSERTAAN
+        |--------------------------------------------------------------------------
+        */
+
+        $participantQuery = Participant::query()
+            ->whereHas('histories', $historyInYear)
+            ->withCount([
+                'histories as participations_count' => $historyInYear,
+            ]);
+
+        $applyParticipantFilters($participantQuery);
+
+        $participants = $participantQuery
+            ->orderByDesc('participations_count')
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL PESERTA UNIK DAN TOTAL KEIKUTSERTAAN
+        |--------------------------------------------------------------------------
+        */
+
+        $summaryQuery = Participant::query()
+            ->whereHas('histories', $historyInYear);
+
+        $applyParticipantFilters($summaryQuery);
+
+        $filteredParticipantIds = (clone $summaryQuery)->select('participants.id');
+
+        $totalTrainedParticipants = (clone $summaryQuery)->count();
+
         $totalParticipations = TrainingHistory::query()
-            ->whereIn('training_id', $trainingIds)
+            ->whereIn('participant_id', $filteredParticipantIds)
+            ->whereHas('training', function ($query) use ($year) {
+                $query->whereYear('start_date', $year);
+            })
             ->count();
 
-        /*
-         * TOTAL PESERTA UNIK.
-         */
-        $totalTrainedParticipants = TrainingHistory::query()
-            ->whereIn('training_id', $trainingIds)
-            ->distinct()
-            ->count('participant_id');
 
         /*
-         * STATISTIK JENIS KELAMIN.
-         */
-        $genderCounts = DB::table('training_histories')
+        |--------------------------------------------------------------------------
+        | STATISTIK JENIS KELAMIN
+        |--------------------------------------------------------------------------
+        */
+
+        $genderQuery = DB::table('training_histories')
             ->join(
                 'trainings',
                 'trainings.id',
@@ -77,7 +186,31 @@ class ReportController extends Controller
                 '=',
                 'training_histories.participant_id'
             )
-            ->whereYear('trainings.start_date', $year)
+            ->whereYear('trainings.start_date', $year);
+
+        if ($districtFilter !== '') {
+            $genderQuery->whereRaw(
+                'TRIM(participants.district) = ?',
+                [$districtFilter]
+            );
+        }
+
+        if ($institutionFilter !== '') {
+            $genderQuery->whereRaw(
+                'TRIM(participants.institution) = ?',
+                [$institutionFilter]
+            );
+        }
+
+        if ($search !== '') {
+            $genderQuery->where(function ($query) use ($search) {
+                $query->where('participants.name', 'like', "%{$search}%")
+                    ->orWhere('participants.nik', 'like', "%{$search}%")
+                    ->orWhere('participants.nip', 'like', "%{$search}%");
+            });
+        }
+
+        $genderCounts = $genderQuery
             ->whereRaw("
                 LOWER(TRIM(participants.gender)) IN (
                     'l',
@@ -110,6 +243,7 @@ class ReportController extends Controller
 
         $maleCount = $genderStats['L'];
         $femaleCount = $genderStats['P'];
+
         $genderTotal = $maleCount + $femaleCount;
 
         $malePercent = $genderTotal > 0
@@ -120,70 +254,14 @@ class ReportController extends Controller
             ? round(($femaleCount / $genderTotal) * 100, 1)
             : 0;
 
-        /*
-         * FILTER RIWAYAT BERDASARKAN TAHUN TERPILIH.
-         */
-        $historyInYear = function ($query) use ($year) {
-            $query->whereHas('training', function ($trainingQuery) use ($year) {
-                $trainingQuery->whereYear('start_date', $year);
-            });
-        };
 
         /*
-         * DATA PESERTA PADA TAHUN TERPILIH.
-         */
-        $participantQuery = Participant::query()
-            ->whereHas('histories', $historyInYear)
-            ->withCount([
-                'histories as participations_count' => $historyInYear,
-            ]);
+        |--------------------------------------------------------------------------
+        | REKAP PESERTA BERDASARKAN KABUPATEN/KOTA
+        |--------------------------------------------------------------------------
+        */
 
-        if ($search !== '') {
-            $participantQuery->where(function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('nip', 'like', "%{$search}%")
-                    ->orWhere('nik', 'like', "%{$search}%");
-            });
-        }
-
-        $participants = $participantQuery
-            ->orderByDesc('participations_count')
-            ->orderBy('name')
-            ->paginate(15)
-            ->withQueryString();
-
-        /*
-         * PESERTA YANG PERLU DITINJAU.
-         */
-        $participantsToReviewQuery = Participant::query()
-            ->whereHas('histories', $historyInYear)
-            ->withCount([
-                'histories as participations_count' => $historyInYear,
-            ])
-            ->having('participations_count', '>=', $minimum);
-
-        if ($search !== '') {
-            $participantsToReviewQuery->where(function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('nip', 'like', "%{$search}%")
-                    ->orWhere('nik', 'like', "%{$search}%");
-            });
-        }
-
-        $participantsToReview = $participantsToReviewQuery->count();
-
-        /*
-         * REKAP PESERTA BERDASARKAN WILAYAH.
-         *
-         * Sumber wilayah peserta:
-         * participants.district
-         *
-         * Bukan trainings.district.
-         *
-         * Satu peserta dihitung satu kali pada wilayah
-         * terbarunya dalam tahun yang dipilih.
-         */
-        $districtRecap = DB::table('training_histories')
+        $districtQuery = DB::table('training_histories')
             ->join(
                 'trainings',
                 'trainings.id',
@@ -198,7 +276,31 @@ class ReportController extends Controller
             )
             ->whereYear('trainings.start_date', $year)
             ->whereNotNull('participants.district')
-            ->whereRaw("TRIM(participants.district) != ''")
+            ->whereRaw("TRIM(participants.district) != ''");
+
+        if ($districtFilter !== '') {
+            $districtQuery->whereRaw(
+                'TRIM(participants.district) = ?',
+                [$districtFilter]
+            );
+        }
+
+        if ($institutionFilter !== '') {
+            $districtQuery->whereRaw(
+                'TRIM(participants.institution) = ?',
+                [$institutionFilter]
+            );
+        }
+
+        if ($search !== '') {
+            $districtQuery->where(function ($query) use ($search) {
+                $query->where('participants.name', 'like', "%{$search}%")
+                    ->orWhere('participants.nik', 'like', "%{$search}%")
+                    ->orWhere('participants.nip', 'like', "%{$search}%");
+            });
+        }
+
+        $districtRecap = $districtQuery
             ->selectRaw("
                 TRIM(participants.district) AS name,
                 COUNT(DISTINCT training_histories.participant_id) AS total
@@ -208,10 +310,14 @@ class ReportController extends Controller
             ->orderBy('name')
             ->get();
 
+
         /*
-         * REKAP PESERTA BERDASARKAN PROFESI.
-         */
-        $nakesCounts = DB::table('training_histories')
+        |--------------------------------------------------------------------------
+        | REKAP PESERTA BERDASARKAN PROFESI
+        |--------------------------------------------------------------------------
+        */
+
+        $professionQuery = DB::table('training_histories')
             ->join(
                 'trainings',
                 'trainings.id',
@@ -226,7 +332,31 @@ class ReportController extends Controller
             )
             ->whereYear('trainings.start_date', $year)
             ->whereNotNull('participants.profession')
-            ->whereRaw("TRIM(participants.profession) != ''")
+            ->whereRaw("TRIM(participants.profession) != ''");
+
+        if ($districtFilter !== '') {
+            $professionQuery->whereRaw(
+                'TRIM(participants.district) = ?',
+                [$districtFilter]
+            );
+        }
+
+        if ($institutionFilter !== '') {
+            $professionQuery->whereRaw(
+                'TRIM(participants.institution) = ?',
+                [$institutionFilter]
+            );
+        }
+
+        if ($search !== '') {
+            $professionQuery->where(function ($query) use ($search) {
+                $query->where('participants.name', 'like', "%{$search}%")
+                    ->orWhere('participants.nik', 'like', "%{$search}%")
+                    ->orWhere('participants.nip', 'like', "%{$search}%");
+            });
+        }
+
+        $nakesCounts = $professionQuery
             ->selectRaw("
                 TRIM(participants.profession) AS name,
                 COUNT(DISTINCT training_histories.participant_id) AS total
@@ -236,9 +366,13 @@ class ReportController extends Controller
             ->get()
             ->keyBy(fn ($item) => mb_strtolower(trim($item->name)));
 
+
         /*
-         * GABUNGKAN MASTER PROFESI DAN DATA PESERTA.
-         */
+        |--------------------------------------------------------------------------
+        | GABUNGKAN MASTER PROFESI DAN DATA PESERTA
+        |--------------------------------------------------------------------------
+        */
+
         $professionNames = collect();
 
         $healthWorkerTypes = HealthWorkerType::query()
@@ -274,34 +408,45 @@ class ReportController extends Controller
             ->sortByDesc('total')
             ->values();
 
+
         /*
-         * 5 PROFESI PESERTA TERBANYAK.
-         */
+        |--------------------------------------------------------------------------
+        | PROFESI TERBANYAK DAN PALING SEDIKIT
+        |--------------------------------------------------------------------------
+        */
+
         $topNakes = $nakesByType
             ->filter(fn ($item) => $item->total > 0)
             ->sortByDesc('total')
             ->take(5)
             ->values();
 
-        /*
-         * 5 PROFESI PESERTA PALING SEDIKIT.
-         */
         $bottomNakes = $nakesByType
             ->filter(fn ($item) => $item->total > 0)
             ->sortBy('total')
             ->take(5)
             ->values();
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | KIRIM DATA KE BLADE
+        |--------------------------------------------------------------------------
+        */
+
         return view('reports.index', compact(
             'year',
             'years',
             'minimum',
             'search',
+            'districtFilter',
+            'institutionFilter',
+            'districts',
+            'institutions',
             'participants',
             'totalTrainings',
             'totalParticipations',
             'totalTrainedParticipants',
-            'participantsToReview',
             'genderStats',
             'maleCount',
             'femaleCount',
@@ -315,8 +460,9 @@ class ReportController extends Controller
         ));
     }
 
+
     /**
-     * Export laporan Excel berdasarkan tahun terpilih.
+     * Export laporan Excel.
      */
     public function export(Request $request)
     {
@@ -324,21 +470,38 @@ class ReportController extends Controller
 
         $year = $this->resolveYear($request, $years);
 
+        $minimum = max(
+            1,
+            min(100, (int) $request->input('minimum', 1))
+        );
+
         $search = trim((string) $request->input('search', ''));
+
+        $districtFilter = trim(
+            (string) $request->input('district', '')
+        );
+
+        $institutionFilter = trim(
+            (string) $request->input('institution', '')
+        );
 
         $filename = 'laporan-riwayat-pelatihan-' . $year . '.xlsx';
 
         return Excel::download(
-            new TrainingHistoryExport($year, $search),
+            new TrainingHistoryExport(
+                $year,
+                $search,
+                $minimum,
+                $districtFilter,
+                $institutionFilter
+            ),
             $filename
         );
     }
 
+
     /**
-     * Mengambil seluruh tahun yang memiliki data pelatihan.
-     *
-     * Tahun diambil dari trainings.start_date.
-     * Hasil diurutkan dari tahun terbaru ke terlama.
+     * Mengambil seluruh tahun pelatihan yang tersedia.
      */
     private function getAvailableTrainingYears()
     {
@@ -362,8 +525,9 @@ class ReportController extends Controller
             ->values();
     }
 
+
     /**
-     * Menentukan tahun yang digunakan halaman atau export.
+     * Menentukan tahun laporan.
      */
     private function resolveYear(Request $request, $years): int
     {

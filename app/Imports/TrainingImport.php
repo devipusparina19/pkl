@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use Throwable;
 
 class TrainingImport implements ToCollection
 {
@@ -18,6 +20,33 @@ class TrainingImport implements ToCollection
     public int $createdTrainings = 0;
     public int $createdHistories = 0;
 
+    /**
+     * Total baris peserta yang tidak kosong dan diperiksa.
+     * Termasuk baris yang berhasil maupun gagal.
+     */
+    public int $processedParticipants = 0;
+
+    /**
+     * Jumlah baris peserta yang gagal.
+     */
+    public int $failedParticipants = 0;
+
+    /**
+     * Jumlah baris peserta yang berhasil disimpan.
+     */
+    public int $successfulParticipants = 0;
+
+    /**
+     * Format error:
+     *
+     * [
+     *     'row' => 8,
+     *     'name' => 'Nama peserta',
+     *     'column' => 'Email (Kolom G)',
+     *     'value' => 'email-salah',
+     *     'message' => 'Format email tidak valid.',
+     * ]
+     */
     public array $errors = [];
 
     public function __construct(
@@ -31,12 +60,11 @@ class TrainingImport implements ToCollection
         public string $district = '',
         public ?int $trainingCategoryId = null,
         public ?int $jpl = null,
-    ) {}
+    ) {
+    }
 
     /**
-     * Memproses data peserta dari Excel.
-     *
-     * Baris 7  = header.
+     * Baris 7  = header peserta.
      * Baris 8+ = data peserta.
      */
     public function collection(Collection $rows): void
@@ -44,22 +72,39 @@ class TrainingImport implements ToCollection
         $district = trim($this->district);
 
         if ($district === '') {
-            $this->errors[] =
-                'Kabupaten/Kota/Mitra/Mandiri wajib dipilih sebelum import.';
+            $this->addError(
+                0,
+                '-',
+                'Kabupaten/Kota/Mitra/Mandiri',
+                '',
+                'Wilayah wajib dipilih sebelum import.'
+            );
+
             return;
         }
 
-        // Header peserta berada pada baris Excel ke-7.
+        /*
+         * Header peserta berada pada baris Excel ke-7.
+         */
         $headerRow = $rows->get(6);
 
         if (!$headerRow instanceof Collection) {
-            $this->errors[] =
-                'Header peserta tidak ditemukan pada baris 7.';
+            $this->addError(
+                7,
+                '-',
+                'Baris header',
+                '',
+                'Header peserta tidak ditemukan pada baris 7 Excel. Pastikan template yang digunakan benar.'
+            );
+
             return;
         }
 
         $headers = $this->normalizeHeaders($headerRow);
 
+        /*
+         * Pastikan kolom wajib tersedia.
+         */
         $nameColumn = $this->findColumn($headers, [
             'nama lengkap',
             'nama peserta',
@@ -78,26 +123,50 @@ class TrainingImport implements ToCollection
         ]);
 
         if ($nameColumn === null) {
-            $this->errors[] =
-                'Kolom NAMA tidak ditemukan pada baris 7 Excel.';
+            $this->addError(
+                7,
+                '-',
+                'Nama peserta',
+                '',
+                'Kolom nama tidak ditemukan pada baris header. Gunakan nama kolom "Nama Lengkap", "Nama Peserta", atau "Nama".'
+            );
+
             return;
         }
 
         if ($nipColumn === null && $nikColumn === null) {
-            $this->errors[] =
-                'Kolom NIP atau NIK tidak ditemukan pada Excel.';
+            $this->addError(
+                7,
+                '-',
+                'NIP / NIK',
+                '',
+                'Kolom NIP maupun NIK tidak ditemukan. Tambahkan salah satu kolom tersebut pada template Excel.'
+            );
+
             return;
         }
 
+        /*
+         * Buat atau temukan data pelatihan satu kali.
+         */
         try {
             $training = $this->findOrCreateTraining();
-        } catch (\Throwable $e) {
-            $this->errors[] =
-                'Gagal menyimpan data pelatihan: ' . $e->getMessage();
+        } catch (Throwable $e) {
+            $this->addError(
+                0,
+                '-',
+                'Data pelatihan',
+                $this->trainingName,
+                'Gagal menyimpan data pelatihan: ' .
+                    $this->explainError($e)
+            );
+
             return;
         }
 
-        // Data peserta dimulai dari baris Excel ke-8.
+        /*
+         * Data peserta dimulai dari baris Excel ke-8.
+         */
         foreach ($rows->slice(7)->values() as $index => $row) {
             $excelRow = $index + 8;
 
@@ -105,30 +174,97 @@ class TrainingImport implements ToCollection
                 continue;
             }
 
+            $data = $this->mapRow($row, $headers);
+
+            $name = trim((string) ($data['name'] ?? ''));
+            $nip = trim((string) ($data['nip'] ?? ''));
+            $nik = trim((string) ($data['nik'] ?? ''));
+
+            /*
+             * Lewati baris yang benar-benar kosong.
+             */
+            if ($this->isEmptyRow($data)) {
+                continue;
+            }
+
+            /*
+             * Hitung sebelum validasi agar baris gagal
+             * tetap masuk dalam jumlah peserta diproses.
+             */
+            $this->processedParticipants++;
+
+            /*
+             * Validasi nama.
+             */
+            if ($name === '') {
+                $this->addParticipantError(
+                    $excelRow,
+                    '-',
+                    $this->getColumnLabel($headers, 'name'),
+                    '',
+                    'Nama peserta wajib diisi. Lengkapi kolom nama pada baris ini.'
+                );
+
+                continue;
+            }
+
+            /*
+             * Validasi identitas.
+             */
+            if ($nip === '' && $nik === '') {
+                $this->addParticipantError(
+                    $excelRow,
+                    $name,
+                    'NIP / NIK',
+                    '',
+                    'NIP atau NIK wajib diisi. Lengkapi minimal salah satu nomor identitas peserta.'
+                );
+
+                continue;
+            }
+
+            /*
+             * Validasi email jika diisi.
+             */
+            $email = trim((string) ($data['email'] ?? ''));
+
+            if (
+                $email !== '' &&
+                !filter_var($email, FILTER_VALIDATE_EMAIL)
+            ) {
+                $this->addParticipantError(
+                    $excelRow,
+                    $name,
+                    $this->getColumnLabel($headers, 'email'),
+                    $email,
+                    'Format email tidak valid. Contoh format yang benar: nama@email.com.'
+                );
+
+                continue;
+            }
+
+            /*
+             * Validasi NIP dan NIK.
+             */
+            $identityError = $this->validateIdentity(
+                $nip,
+                $nik,
+                $name,
+                $excelRow
+            );
+
+            if ($identityError) {
+                continue;
+            }
+
             try {
-                $data = $this->mapRow($row, $headers);
-
-                $name = trim((string) ($data['name'] ?? ''));
-                $nip = trim((string) ($data['nip'] ?? ''));
-                $nik = trim((string) ($data['nik'] ?? ''));
-
-                // Lewati baris yang benar-benar kosong.
-                if ($name === '' && $nip === '' && $nik === '') {
-                    continue;
-                }
-
-                if ($name === '') {
-                    $this->errors[] =
-                        "Baris {$excelRow}: nama peserta kosong.";
-                    continue;
-                }
-
-                if ($nip === '' && $nik === '') {
-                    $this->errors[] =
-                        "Baris {$excelRow}: NIP atau NIK wajib diisi.";
-                    continue;
-                }
-
+                /*
+                 * Setiap peserta menggunakan transaksi sendiri.
+                 *
+                 * Jika satu peserta gagal, transaksi peserta
+                 * tersebut dibatalkan, tetapi peserta lainnya
+                 * tetap dapat diproses.
+                 */
                 $result = DB::transaction(function () use (
                     $data,
                     $name,
@@ -137,28 +273,10 @@ class TrainingImport implements ToCollection
                     $training,
                     $district
                 ): array {
-                    $participant = null;
-
-                    // Cari peserta berdasarkan NIP terlebih dahulu.
-                    if (
-                        $nip !== '' &&
-                        Schema::hasColumn('participants', 'nip')
-                    ) {
-                        $participant = Participant::query()
-                            ->where('nip', $nip)
-                            ->first();
-                    }
-
-                    // Jika belum ditemukan, cari berdasarkan NIK.
-                    if (
-                        !$participant &&
-                        $nik !== '' &&
-                        Schema::hasColumn('participants', 'nik')
-                    ) {
-                        $participant = Participant::query()
-                            ->where('nik', $nik)
-                            ->first();
-                    }
+                    $participant = $this->findParticipant(
+                        $nip,
+                        $nik
+                    );
 
                     $isNew = !$participant;
 
@@ -166,7 +284,9 @@ class TrainingImport implements ToCollection
                         $participant = new Participant();
                     }
 
-                    // Identitas peserta.
+                    /*
+                     * Data utama peserta.
+                     */
                     $participant->name = $name;
 
                     $this->setParticipantColumn(
@@ -181,7 +301,9 @@ class TrainingImport implements ToCollection
                         $nik
                     );
 
-                    // Data pribadi dan pekerjaan.
+                    /*
+                     * Data pribadi dan pekerjaan.
+                     */
                     $this->setParticipantColumn(
                         $participant,
                         'gender',
@@ -219,13 +341,7 @@ class TrainingImport implements ToCollection
                     );
 
                     /*
-                     * SINKRONISASI WILAYAH PESERTA
-                     *
-                     * Wilayah yang dipilih pada form import
-                     * disimpan ke kolom participants.district.
-                     *
-                     * Jika peserta sudah ada, wilayah lamanya
-                     * diperbarui dengan pilihan wilayah terbaru.
+                     * Sinkronisasi wilayah peserta.
                      */
                     $this->setParticipantColumn(
                         $participant,
@@ -237,8 +353,7 @@ class TrainingImport implements ToCollection
                     $participant->save();
 
                     /*
-                     * Hubungkan peserta dengan pelatihan.
-                     * Riwayat tidak dibuat berulang jika sudah ada.
+                     * Buat riwayat pelatihan jika belum ada.
                      */
                     $history = TrainingHistory::firstOrCreate(
                         [
@@ -256,7 +371,10 @@ class TrainingImport implements ToCollection
                     ];
                 });
 
-                // Hitung hasil hanya setelah transaksi berhasil.
+                /*
+                 * Penghitung hanya bertambah setelah transaksi
+                 * peserta berhasil diselesaikan.
+                 */
                 if ($result['is_new']) {
                     $this->createdParticipants++;
                 } else {
@@ -266,11 +384,185 @@ class TrainingImport implements ToCollection
                 if ($result['history_created']) {
                     $this->createdHistories++;
                 }
-            } catch (\Throwable $e) {
-                $this->errors[] =
-                    "Baris {$excelRow}: " . $e->getMessage();
+
+                $this->successfulParticipants++;
+
+            } catch (Throwable $e) {
+                /*
+                 * Error satu peserta dicatat.
+                 * Proses kemudian lanjut ke baris berikutnya.
+                 */
+                [$column, $value] = $this->identifyErrorField(
+                    $e,
+                    $data,
+                    $headers
+                );
+
+                $this->addParticipantError(
+                    $excelRow,
+                    $name,
+                    $column,
+                    $value,
+                    $this->explainError($e)
+                );
             }
         }
+    }
+
+    /**
+     * Memeriksa apakah NIP atau NIK sudah digunakan
+     * oleh peserta lain yang berbeda.
+     */
+    private function validateIdentity(
+        string $nip,
+        string $nik,
+        string $name,
+        int $excelRow
+    ): bool {
+        $participantByNip = null;
+        $participantByNik = null;
+
+        if (
+            $nip !== '' &&
+            Schema::hasColumn('participants', 'nip')
+        ) {
+            $participantByNip = Participant::query()
+                ->where('nip', $nip)
+                ->first();
+        }
+
+        if (
+            $nik !== '' &&
+            Schema::hasColumn('participants', 'nik')
+        ) {
+            $participantByNik = Participant::query()
+                ->where('nik', $nik)
+                ->first();
+        }
+
+        /*
+         * NIP dan NIK mengarah ke dua peserta berbeda.
+         */
+        if (
+            $participantByNip &&
+            $participantByNik &&
+            $participantByNip->id !== $participantByNik->id
+        ) {
+            $this->addParticipantError(
+                $excelRow,
+                $name,
+                'NIP / NIK',
+                "NIP: {$nip}; NIK: {$nik}",
+                'NIP dan NIK pada baris ini terdaftar pada dua peserta yang berbeda. Periksa kembali nomor identitas dan pastikan keduanya milik orang yang sama.'
+            );
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Mencari peserta berdasarkan NIP terlebih dahulu,
+     * kemudian NIK.
+     */
+    private function findParticipant(
+        string $nip,
+        string $nik
+    ): ?Participant {
+        $participant = null;
+
+        if (
+            $nip !== '' &&
+            Schema::hasColumn('participants', 'nip')
+        ) {
+            $participant = Participant::query()
+                ->where('nip', $nip)
+                ->first();
+        }
+
+        if (
+            !$participant &&
+            $nik !== '' &&
+            Schema::hasColumn('participants', 'nik')
+        ) {
+            $participant = Participant::query()
+                ->where('nik', $nik)
+                ->first();
+        }
+
+        return $participant;
+    }
+
+    /**
+     * Menambahkan error umum.
+     *
+     * Error header atau metadata tidak menambah
+     * penghitung failedParticipants.
+     */
+    private function addError(
+        int $row,
+        string $name,
+        string $column,
+        mixed $value,
+        string $message
+    ): void {
+        $this->errors[] = [
+            'row' => $row,
+            'name' => $name,
+            'column' => $column,
+            'value' => $value === null ? '' : (string) $value,
+            'message' => $message,
+        ];
+    }
+
+    /**
+     * Menambahkan error peserta dan menghitung kegagalannya.
+     */
+    private function addParticipantError(
+        int $row,
+        string $name,
+        string $column,
+        mixed $value,
+        string $message
+    ): void {
+        $this->addError(
+            $row,
+            $name,
+            $column,
+            $value,
+            $message
+        );
+
+        $this->failedParticipants++;
+    }
+
+    /**
+     * Memeriksa apakah seluruh kolom utama pada baris kosong.
+     */
+    private function isEmptyRow(array $data): bool
+    {
+        $fields = [
+            'name',
+            'nip',
+            'nik',
+            'gender',
+            'rank',
+            'profession',
+            'email',
+            'phone',
+            'institution',
+        ];
+
+        foreach ($fields as $field) {
+            if (
+                trim((string) ($data[$field] ?? '')) !== ''
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -288,7 +580,7 @@ class TrainingImport implements ToCollection
     }
 
     /**
-     * Normalisasi teks agar pencocokan lebih konsisten.
+     * Normalisasi teks agar pencocokan konsisten.
      */
     private function normalizeText(mixed $value): string
     {
@@ -300,7 +592,7 @@ class TrainingImport implements ToCollection
     }
 
     /**
-     * Mencari indeks kolom berdasarkan beberapa nama alternatif.
+     * Mencari indeks kolom berdasarkan nama alternatif.
      */
     private function findColumn(
         array $headers,
@@ -312,7 +604,13 @@ class TrainingImport implements ToCollection
         );
 
         foreach ($headers as $index => $header) {
-            if (in_array($header, $normalizedAliases, true)) {
+            if (
+                in_array(
+                    $header,
+                    $normalizedAliases,
+                    true
+                )
+            ) {
                 return $index;
             }
         }
@@ -334,33 +632,40 @@ class TrainingImport implements ToCollection
                 'nama',
                 'name',
             ],
+
             'nip' => [
                 'nip',
                 'nomor induk pegawai',
             ],
+
             'nik' => [
                 'nik',
                 'nomor induk kependudukan',
             ],
+
             'gender' => [
                 'jenis kelamin',
                 'gender',
                 'jk',
             ],
+
             'rank' => [
                 'pangkat golongan',
                 'pangkat gol',
                 'golongan',
             ],
+
             'profession' => [
                 'profesi nakes',
                 'profesi',
                 'jenis tenaga kesehatan',
             ],
+
             'email' => [
                 'email',
                 'alamat email',
             ],
+
             'phone' => [
                 'nomor telepon',
                 'no telepon',
@@ -368,6 +673,7 @@ class TrainingImport implements ToCollection
                 'no hp',
                 'nomor hp',
             ],
+
             'institution' => [
                 'instansi unit kerja',
                 'instansi',
@@ -378,7 +684,10 @@ class TrainingImport implements ToCollection
         $result = [];
 
         foreach ($aliases as $field => $names) {
-            $column = $this->findColumn($headers, $names);
+            $column = $this->findColumn(
+                $headers,
+                $names
+            );
 
             $value = $column !== null
                 ? $row->get($column)
@@ -390,6 +699,286 @@ class TrainingImport implements ToCollection
         }
 
         return $result;
+    }
+
+    /**
+     * Menghasilkan label kolom berdasarkan header Excel.
+     */
+    private function getColumnLabel(
+        array $headers,
+        string $field
+    ): string {
+        $aliases = $this->getFieldAliases();
+
+        $columnIndex = $this->findColumn(
+            $headers,
+            $aliases[$field] ?? []
+        );
+
+        if ($columnIndex === null) {
+            return strtoupper($field);
+        }
+
+        $headerName = trim(
+            (string) ($headers[$columnIndex] ?? '')
+        );
+
+        $excelColumn = Coordinate::stringFromColumnIndex(
+            $columnIndex + 1
+        );
+
+        $label = $headerName !== ''
+            ? Str::title($headerName)
+            : strtoupper($field);
+
+        return "{$label} (Kolom {$excelColumn})";
+    }
+
+    /**
+     * Daftar alias untuk setiap field peserta.
+     */
+    private function getFieldAliases(): array
+    {
+        return [
+            'name' => [
+                'nama lengkap',
+                'nama peserta',
+                'nama',
+                'name',
+            ],
+
+            'nip' => [
+                'nip',
+                'nomor induk pegawai',
+            ],
+
+            'nik' => [
+                'nik',
+                'nomor induk kependudukan',
+            ],
+
+            'gender' => [
+                'jenis kelamin',
+                'gender',
+                'jk',
+            ],
+
+            'rank' => [
+                'pangkat golongan',
+                'pangkat gol',
+                'golongan',
+            ],
+
+            'profession' => [
+                'profesi nakes',
+                'profesi',
+                'jenis tenaga kesehatan',
+            ],
+
+            'email' => [
+                'email',
+                'alamat email',
+            ],
+
+            'phone' => [
+                'nomor telepon',
+                'no telepon',
+                'telepon',
+                'no hp',
+                'nomor hp',
+            ],
+
+            'institution' => [
+                'instansi unit kerja',
+                'instansi',
+                'unit kerja',
+            ],
+        ];
+    }
+
+    /**
+     * Mendeteksi field yang bermasalah berdasarkan pesan database.
+     */
+    private function identifyErrorField(
+        Throwable $e,
+        array $data,
+        array $headers
+    ): array {
+        $message = strtolower($e->getMessage());
+
+        $columnMap = [
+            'name' => [
+                'participants.name',
+                'name',
+            ],
+
+            'nip' => [
+                'participants.nip',
+                'nip',
+            ],
+
+            'nik' => [
+                'participants.nik',
+                'nik',
+            ],
+
+            'gender' => [
+                'gender',
+                'jenis kelamin',
+            ],
+
+            'rank' => [
+                'rank',
+                'pangkat',
+                'golongan',
+            ],
+
+            'profession' => [
+                'profession',
+                'profesi',
+            ],
+
+            'email' => [
+                'email',
+            ],
+
+            'phone' => [
+                'phone',
+                'telepon',
+                'no_hp',
+            ],
+
+            'institution' => [
+                'institution',
+                'instansi',
+                'unit_kerja',
+            ],
+
+            'district' => [
+                'district',
+                'wilayah',
+            ],
+        ];
+
+        foreach ($columnMap as $field => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (str_contains($message, $keyword)) {
+                    $column = $this->getColumnLabel(
+                        $headers,
+                        $field
+                    );
+
+                    $value = $data[$field] ?? '';
+
+                    return [
+                        $column,
+                        (string) $value,
+                    ];
+                }
+            }
+        }
+
+        if (
+            str_contains($message, 'duplicate') ||
+            str_contains($message, 'unique constraint')
+        ) {
+            return [
+                'NIP / NIK',
+                'NIP: ' . ($data['nip'] ?? '') .
+                    '; NIK: ' . ($data['nik'] ?? ''),
+            ];
+        }
+
+        if (
+            str_contains($message, 'foreign key') ||
+            str_contains($message, 'constraint')
+        ) {
+            return [
+                'Relasi data peserta / pelatihan',
+                '',
+            ];
+        }
+
+        return [
+            'Data peserta (periksa format atau struktur kolom)',
+            '',
+        ];
+    }
+
+    /**
+     * Mengubah exception menjadi penjelasan yang mudah dipahami.
+     */
+    private function explainError(Throwable $e): string
+    {
+        $message = $e->getMessage();
+        $lower = strtolower($message);
+
+        if (
+            str_contains($lower, 'duplicate entry') ||
+            str_contains($lower, 'unique constraint') ||
+            str_contains($lower, 'unique violation')
+        ) {
+            return 'Data memiliki nomor identitas yang sudah digunakan dan ditolak oleh aturan unik database. Periksa NIP atau NIK peserta dan pastikan tidak digunakan oleh peserta lain.';
+        }
+
+        if (
+            str_contains($lower, 'foreign key constraint') ||
+            str_contains($lower, 'foreign key')
+        ) {
+            return 'Data memiliki relasi yang tidak sesuai. Periksa kembali data peserta, pelatihan, dan relasi pada database.';
+        }
+
+        if (
+            str_contains($lower, 'data too long') ||
+            str_contains($lower, 'value too long') ||
+            str_contains($lower, 'string data right truncation')
+        ) {
+            return 'Nilai terlalu panjang untuk kolom database. Persingkat isi data pada kolom tersebut.';
+        }
+
+        if (
+            str_contains($lower, 'cannot be null') ||
+            str_contains($lower, 'not null constraint') ||
+            str_contains($lower, 'doesn\'t have a default value')
+        ) {
+            return 'Ada kolom wajib pada database yang belum memiliki nilai. Lengkapi data yang diperlukan.';
+        }
+
+        if (
+            str_contains($lower, 'incorrect date') ||
+            str_contains($lower, 'invalid datetime') ||
+            str_contains($lower, 'date/time field value out of range')
+        ) {
+            return 'Format tanggal tidak sesuai. Periksa format tanggal pada file Excel.';
+        }
+
+        if (
+            str_contains($lower, 'incorrect integer') ||
+            str_contains($lower, 'invalid input syntax for type integer') ||
+            str_contains($lower, 'out of range')
+        ) {
+            return 'Nilai harus berupa angka atau berada di luar batas yang diizinkan. Periksa kembali isi kolom tersebut.';
+        }
+
+        if (
+            str_contains($lower, 'no such column') ||
+            str_contains($lower, 'unknown column')
+        ) {
+            return 'Kolom yang dibutuhkan tidak ditemukan pada database. Periksa nama kolom dan struktur tabel.';
+        }
+
+        if (
+            str_contains($lower, 'connection refused') ||
+            str_contains($lower, 'could not connect')
+        ) {
+            return 'Koneksi ke database bermasalah. Periksa koneksi database lalu coba kembali.';
+        }
+
+        /*
+         * Pesan asli disertakan untuk membantu penelusuran
+         * masalah teknis yang belum dikenali.
+         */
+        return 'Data gagal disimpan: ' . $message;
     }
 
     /**
@@ -436,7 +1025,6 @@ class TrainingImport implements ToCollection
             trim($this->fundingSource)
         );
 
-        // Wilayah penyelenggaraan pelatihan.
         $this->setTrainingColumn(
             $training,
             'district',
@@ -486,8 +1074,13 @@ class TrainingImport implements ToCollection
         }
 
         if ($this->startDate && $this->endDate) {
-            $start = new \DateTimeImmutable($this->startDate);
-            $end = new \DateTimeImmutable($this->endDate);
+            $start = new \DateTimeImmutable(
+                $this->startDate
+            );
+
+            $end = new \DateTimeImmutable(
+                $this->endDate
+            );
 
             $duration = $start->diff($end)->days + 1;
 
@@ -509,9 +1102,6 @@ class TrainingImport implements ToCollection
 
     /**
      * Mengisi kolom peserta jika kolom tersedia.
-     *
-     * $allowEmpty = true digunakan untuk kolom yang memang
-     * harus diperbarui walaupun nilainya kosong.
      */
     private function setParticipantColumn(
         Participant $participant,
@@ -519,11 +1109,19 @@ class TrainingImport implements ToCollection
         mixed $value,
         bool $allowEmpty = false
     ): void {
-        if (!Schema::hasColumn($participant->getTable(), $column)) {
+        if (
+            !Schema::hasColumn(
+                $participant->getTable(),
+                $column
+            )
+        ) {
             return;
         }
 
-        if (!$allowEmpty && ($value === null || $value === '')) {
+        if (
+            !$allowEmpty &&
+            ($value === null || $value === '')
+        ) {
             return;
         }
 
@@ -538,7 +1136,12 @@ class TrainingImport implements ToCollection
         string $column,
         mixed $value
     ): void {
-        if (Schema::hasColumn($training->getTable(), $column)) {
+        if (
+            Schema::hasColumn(
+                $training->getTable(),
+                $column
+            )
+        ) {
             $training->{$column} = $value;
         }
     }

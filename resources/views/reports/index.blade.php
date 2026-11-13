@@ -20,31 +20,30 @@
     --text:#14243A;
     --border:#E1E9F2;
     --cyan:#38C6E8;
-    --ok:#0F6B4A;
-    --ok-bg:#E8F6EF;
-    --warn:#8A5A12;
-    --warn-bg:#FFF4E3;
-    --font-display:"Sora","Segoe UI",Arial,sans-serif;
-    --font-body:"Plus Jakarta Sans","Segoe UI",Arial,sans-serif;
     --ease:cubic-bezier(.2,.7,.2,1);
-
     position:relative;
     width:100%;
     color:var(--text);
-    font-family:var(--font-body);
+    font-family:"Plus Jakarta Sans","Segoe UI",Arial,sans-serif;
     font-size:16px;
     line-height:1.65;
 }
 
 .report-page *,
 .report-page *::before,
-.report-page *::after { box-sizing:border-box; }
+.report-page *::after {
+    box-sizing:border-box;
+}
 
-.report-page [hidden] { display:none!important; }
+.report-page [hidden] {
+    display:none!important;
+}
 
 .report-page button,
 .report-page input,
-.report-page select { font:inherit; }
+.report-page select {
+    font:inherit;
+}
 
 .report-page svg.i {
     width:1em;
@@ -63,7 +62,10 @@
     border-radius:6px;
 }
 
-.rp-shell { width:min(100%,1500px); margin:0 auto; }
+.rp-shell {
+    width:min(100%,1500px);
+    margin:0 auto;
+}
 
 .rp-sr {
     position:absolute;
@@ -74,7 +76,6 @@
     white-space:nowrap;
 }
 
-/* Progress */
 .rp-progress {
     position:fixed;
     z-index:1000;
@@ -88,7 +89,6 @@
     pointer-events:none;
 }
 
-/* Reveal */
 .rp-js .rp-reveal {
     opacity:0;
     transform:translate3d(0,22px,0);
@@ -100,7 +100,7 @@
     transform:none;
 }
 
-/* Hero */
+/* HERO */
 .rp-hero {
     position:relative;
     isolation:isolate;
@@ -166,7 +166,7 @@
 
 .rp-hero h1 {
     margin:0 0 18px;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-weight:800;
     font-size:clamp(2.5rem,6.6vw,5.2rem);
     line-height:1.03;
@@ -212,14 +212,18 @@
 
 .rp-hero-stats {
     display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
     border-left:1px solid rgba(255,255,255,.2);
     padding-left:clamp(20px,3vw,40px);
 }
 
-.rp-hero-stat { padding:16px 0; }
+.rp-hero-stat {
+    padding:16px 0;
+}
 
 .rp-hero-stat + .rp-hero-stat {
-    border-top:1px solid rgba(255,255,255,.16);
+    border-left:1px solid rgba(255,255,255,.16);
+    padding-left:20px;
 }
 
 .rp-hero-stat small {
@@ -239,7 +243,7 @@
 .rp-hero-stat strong {
     display:block;
     margin:4px 0 2px;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-weight:800;
     font-size:clamp(2.3rem,4.6vw,3.6rem);
     line-height:1;
@@ -252,7 +256,7 @@
     color:rgba(255,255,255,.7);
 }
 
-/* Navigation */
+/* NAVIGASI */
 .rp-nav-wrap {
     position:sticky;
     top:12px;
@@ -278,7 +282,9 @@
     scrollbar-width:none;
 }
 
-.rp-nav::-webkit-scrollbar { display:none; }
+.rp-nav::-webkit-scrollbar {
+    display:none;
+}
 
 .rp-nav a {
     padding:8px 16px;
@@ -301,17 +307,19 @@
     background:var(--royal);
 }
 
-/* Sections */
+/* SECTION */
 .rp-section {
     padding-top:clamp(36px,5vw,64px);
     scroll-margin-top:80px;
 }
 
-.rp-section-head { margin-bottom:22px; }
+.rp-section-head {
+    margin-bottom:22px;
+}
 
 .rp-section-head h2 {
     margin:0 0 8px;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-weight:700;
     font-size:clamp(1.6rem,3.6vw,2.5rem);
     line-height:1.15;
@@ -326,7 +334,7 @@
     color:var(--slate);
 }
 
-/* Filter */
+/* FILTER */
 .rp-filter {
     padding:clamp(18px,2.6vw,28px);
     border:1px solid var(--border);
@@ -337,9 +345,13 @@
 
 .rp-filter-grid {
     display:grid;
-    grid-template-columns:.8fr .8fr 1.6fr auto;
+    grid-template-columns:.8fr 1fr 1fr 1fr 1.3fr auto;
     gap:14px;
     align-items:end;
+}
+
+.rp-field {
+    min-width:0;
 }
 
 .rp-field label {
@@ -365,10 +377,14 @@
     transition:border-color .2s,box-shadow .2s,background .2s;
 }
 
-.rp-field input::placeholder { color:#7a8aa0; }
+.rp-field input::placeholder {
+    color:#7a8aa0;
+}
 
 .rp-field input:hover,
-.rp-field select:hover { border-color:#c5d3e4; }
+.rp-field select:hover {
+    border-color:#c5d3e4;
+}
 
 .rp-field input:focus,
 .rp-field select:focus {
@@ -383,7 +399,7 @@
     gap:8px;
 }
 
-/* Buttons */
+/* TOMBOL */
 .rp-btn {
     display:inline-flex;
     align-items:center;
@@ -393,7 +409,7 @@
     padding:0 20px;
     border:1.5px solid transparent;
     border-radius:12px;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-size:14px;
     font-weight:600;
     text-decoration:none;
@@ -402,8 +418,13 @@
     transition:transform .2s var(--ease),box-shadow .2s,background .2s,color .2s;
 }
 
-.rp-btn .i { font-size:17px; }
-.rp-btn:active { transform:scale(.97); }
+.rp-btn .i {
+    font-size:17px;
+}
+
+.rp-btn:active {
+    transform:scale(.97);
+}
 
 .rp-btn-primary {
     color:#fff;
@@ -445,7 +466,7 @@
     transform:none;
 }
 
-/* Panels */
+/* PANEL */
 .rp-grid-2 {
     display:grid;
     grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);
@@ -474,19 +495,23 @@
 
 .rp-panel-top h3 {
     margin:0;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-size:17px;
     font-weight:600;
     color:var(--navy);
 }
 
-.rp-panel-top form { margin:0; }
+.rp-panel-top form {
+    margin:0;
+}
 
-.rp-panel-body { padding:clamp(18px,2.6vw,28px); }
+.rp-panel-body {
+    padding:clamp(18px,2.6vw,28px);
+}
 
 .rp-panel-body h3 {
     margin:0 0 4px;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-size:18px;
     font-weight:600;
     color:var(--navy);
@@ -515,7 +540,7 @@
     text-align:center;
 }
 
-/* Sorting */
+/* SORTING PROFESI */
 .rp-seg {
     display:inline-flex;
     gap:4px;
@@ -537,13 +562,15 @@
     background:transparent;
     color:var(--slate);
     cursor:pointer;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-size:13px;
     font-weight:600;
     white-space:nowrap;
 }
 
-.rp-seg button .i { font-size:15px; }
+.rp-seg button .i {
+    font-size:15px;
+}
 
 .rp-seg button:hover {
     color:var(--navy);
@@ -565,9 +592,11 @@
     color:var(--slate);
 }
 
-.rp-sort-note strong { color:var(--navy); }
+.rp-sort-note strong {
+    color:var(--navy);
+}
 
-/* Gender */
+/* GRAFIK JENIS KELAMIN */
 .rp-chart-box {
     position:relative;
     width:100%;
@@ -615,13 +644,13 @@
 .rp-gender-list em {
     margin-left:auto;
     font-style:normal;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-weight:700;
     font-size:1.35rem;
     color:var(--navy);
 }
 
-/* Tables */
+/* TABEL */
 .rp-table-wrap {
     width:100%;
     overflow-x:auto;
@@ -654,11 +683,17 @@
     vertical-align:middle;
 }
 
-.rp-table tbody tr { transition:background .2s; }
+.rp-table tbody tr {
+    transition:background .2s;
+}
 
-.rp-table tbody tr:hover { background:#F5F9FF; }
+.rp-table tbody tr:hover {
+    background:#F5F9FF;
+}
 
-.rp-table tbody tr:last-child td { border-bottom:0; }
+.rp-table tbody tr:last-child td {
+    border-bottom:0;
+}
 
 .rp-number {
     width:64px;
@@ -672,9 +707,10 @@
     color:var(--navy)!important;
 }
 
-.rp-nip {
+.rp-nik {
     color:var(--slate)!important;
     font-variant-numeric:tabular-nums;
+    white-space:nowrap;
 }
 
 .rp-count {
@@ -686,32 +722,9 @@
     border-radius:10px;
     background:var(--soft);
     color:var(--royal);
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-weight:700;
     font-variant-numeric:tabular-nums;
-}
-
-.rp-status {
-    display:inline-flex;
-    align-items:center;
-    gap:7px;
-    padding:6px 12px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:700;
-    white-space:nowrap;
-}
-
-.rp-status .i { font-size:14px; }
-
-.rp-status-review {
-    color:var(--warn);
-    background:var(--warn-bg);
-}
-
-.rp-status-eligible {
-    color:var(--ok);
-    background:var(--ok-bg);
 }
 
 .rp-empty {
@@ -723,7 +736,7 @@
 .rp-empty strong {
     display:block;
     margin-bottom:4px;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-size:16px;
     color:var(--navy);
 }
@@ -734,10 +747,16 @@
     overflow-x:auto;
 }
 
-.rp-pagination:empty { display:none; }
-.rp-pagination svg { width:17px; height:17px; }
+.rp-pagination:empty {
+    display:none;
+}
 
-/* Custom pager */
+.rp-pagination svg {
+    width:17px;
+    height:17px;
+}
+
+/* PAGINATION LOKAL */
 .rp-pager {
     display:flex;
     align-items:center;
@@ -768,7 +787,7 @@
     margin-top:8px;
 }
 
-/* District bars */
+/* REKAP WILAYAH */
 .rp-bars {
     display:flex;
     flex-direction:column;
@@ -805,7 +824,7 @@
 
 .rp-bar-total {
     flex:none;
-    font-family:var(--font-display);
+    font-family:"Sora","Segoe UI",Arial,sans-serif;
     font-weight:700;
     color:var(--navy);
     font-variant-numeric:tabular-nums;
@@ -827,20 +846,43 @@
 }
 
 @keyframes rp-rise {
-    from { opacity:0; transform:translate3d(0,18px,0); }
-    to { opacity:1; transform:none; }
+    from {
+        opacity:0;
+        transform:translate3d(0,18px,0);
+    }
+    to {
+        opacity:1;
+        transform:none;
+    }
 }
 
 @keyframes rp-drift {
-    to { transform:translate3d(-40px,40px,0); }
+    to {
+        transform:translate3d(-40px,40px,0);
+    }
 }
 
 @keyframes rp-grow {
-    from { transform:scaleX(0); }
-    to { transform:scaleX(1); }
+    from {
+        transform:scaleX(0);
+    }
+    to {
+        transform:scaleX(1);
+    }
 }
 
-/* Responsive */
+/* RESPONSIVE */
+@media (max-width:1200px) {
+    .rp-filter-grid {
+        grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+
+    .rp-field-search,
+    .rp-filter-actions {
+        grid-column:auto;
+    }
+}
+
 @media (max-width:1100px) {
     .rp-hero {
         grid-template-columns:1fr;
@@ -848,33 +890,25 @@
     }
 
     .rp-hero-stats {
-        grid-template-columns:repeat(3,minmax(0,1fr));
         border-left:0;
         padding-left:0;
         border-top:1px solid rgba(255,255,255,.2);
         padding-top:8px;
     }
 
-    .rp-hero-stat + .rp-hero-stat {
-        border-top:0;
-        padding-left:20px;
-        border-left:1px solid rgba(255,255,255,.16);
+    .rp-grid-2 {
+        grid-template-columns:1fr;
     }
 
-    .rp-filter-grid {
-        grid-template-columns:repeat(2,minmax(0,1fr));
+    .rp-bars.cols {
+        grid-template-columns:1fr;
     }
-
-    .rp-field-search,
-    .rp-filter-actions { grid-column:1/-1; }
-
-    .rp-grid-2 { grid-template-columns:1fr; }
-
-    .rp-bars.cols { grid-template-columns:1fr; }
 }
 
 @media (max-width:700px) {
-    .rp-hero-stats { grid-template-columns:1fr; }
+    .rp-hero-stats {
+        grid-template-columns:1fr;
+    }
 
     .rp-hero-stat + .rp-hero-stat {
         padding-left:0;
@@ -882,34 +916,49 @@
         border-top:1px solid rgba(255,255,255,.16);
     }
 
-    .rp-filter-grid { grid-template-columns:1fr; }
+    .rp-filter-grid {
+        grid-template-columns:1fr;
+    }
 
     .rp-filter-actions {
         display:grid;
         grid-template-columns:1fr;
+        grid-column:auto;
     }
 
-    .rp-btn { width:100%; }
+    .rp-btn {
+        width:100%;
+    }
 
-    .rp-pager .rp-btn { width:auto; }
+    .rp-pager .rp-btn {
+        width:auto;
+    }
 
-    .rp-nav-wrap { justify-content:flex-start; }
+    .rp-nav-wrap {
+        justify-content:flex-start;
+    }
 
-    .rp-seg { width:100%; }
+    .rp-seg {
+        width:100%;
+    }
 
     .rp-seg button {
         flex:1;
         padding:0 8px;
     }
 
-    .rp-table-wrap.cards { overflow:visible; }
+    .rp-table-wrap.cards {
+        overflow:visible;
+    }
 
     .rp-table-wrap.cards .rp-table {
         display:block;
         min-width:0;
     }
 
-    .rp-table-wrap.cards thead { display:none; }
+    .rp-table-wrap.cards thead {
+        display:none;
+    }
 
     .rp-table-wrap.cards tbody {
         display:grid;
@@ -940,11 +989,17 @@
         color:var(--slate);
     }
 
-    .rp-table-wrap.cards tbody tr td:last-child { border-bottom:0; }
+    .rp-table-wrap.cards tbody tr td:last-child {
+        border-bottom:0;
+    }
 
-    .rp-table-wrap.cards .rp-number { width:auto; }
+    .rp-table-wrap.cards .rp-number {
+        width:auto;
+    }
 
-    .rp-table-wrap.cards td.rp-empty { display:block; }
+    .rp-table-wrap.cards td.rp-empty {
+        display:block;
+    }
 }
 
 @media (prefers-reduced-motion:reduce) {
@@ -965,6 +1020,12 @@
 
 @php
     $districtMax = max(1, (int) collect($districtRecap)->max('total'));
+
+    $districts = $districts ?? collect();
+    $institutions = $institutions ?? collect();
+
+    $districtFilter = (string) ($districtFilter ?? request('district', ''));
+    $institutionFilter = (string) ($institutionFilter ?? request('institution', ''));
 @endphp
 
 <div class="rp-progress" id="rpProgress" aria-hidden="true"></div>
@@ -975,7 +1036,7 @@
         {{-- HERO --}}
         <section class="rp-hero" aria-labelledby="rp-title">
             <div>
-                <div class="rp-eyebrow">Laporan Tahunan</div>
+                <div class="rp-eyebrow">Laporan Pelatihan</div>
 
                 <h1 id="rp-title">
                     Laporan riwayat
@@ -998,11 +1059,10 @@
 
                     <span class="rp-chip">
                         <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 9v4"/>
-                            <path d="M12 17h.01"/>
-                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                            <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/>
+                            <path d="m9 12 2 2 4-4"/>
                         </svg>
-                        Batas peninjauan {{ $minimum }}
+                        Minimal {{ $minimum }} pelatihan per peserta
                     </span>
                 </div>
             </div>
@@ -1023,23 +1083,6 @@
                     </strong>
 
                     <span>Jumlah peserta unik yang mengikuti pelatihan</span>
-                </div>
-
-                <div class="rp-hero-stat">
-                    <small>
-                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 9v4"/>
-                            <path d="M12 17h.01"/>
-                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                        </svg>
-                        Peserta perlu ditinjau
-                    </small>
-
-                    <strong class="rp-counter" data-target="{{ (int) $participantsToReview }}">
-                        {{ number_format((int) $participantsToReview,0,',','.') }}
-                    </strong>
-
-                    <span>Batas indikator: {{ $minimum }} pelatihan per tahun</span>
                 </div>
 
                 <div class="rp-hero-stat">
@@ -1074,9 +1117,10 @@
         <section class="rp-section rp-reveal" id="filter" aria-labelledby="rp-filter-title">
             <div class="rp-section-head">
                 <h2 id="rp-filter-title">Filter laporan</h2>
+
                 <p>
-                    Pilih tahun pelatihan, batas peninjauan, atau kata kunci
-                    untuk menampilkan data yang dibutuhkan.
+                    Pilih tahun pelatihan, jumlah keikutsertaan,
+                    kabupaten/kota, instansi, atau kata kunci peserta.
                 </p>
             </div>
 
@@ -1102,17 +1146,33 @@
                         </div>
 
                         <div class="rp-field">
-                            <label for="minimum">Batas Peninjauan</label>
+                            <label for="district">Kabupaten/Kota</label>
 
-                            <input
-                                id="minimum"
-                                type="number"
-                                name="minimum"
-                                min="1"
-                                max="100"
-                                value="{{ $minimum }}"
-                                required
-                            >
+                            <select id="district" name="district">
+                                <option value="">Semua Kabupaten/Kota</option>
+
+                                @foreach ($districts as $district)
+                                    <option value="{{ $district }}"
+                                        @selected($districtFilter === (string) $district)>
+                                        {{ $district }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="rp-field">
+                            <label for="institution">Instansi</label>
+
+                            <select id="institution" name="institution">
+                                <option value="">Semua Instansi</option>
+
+                                @foreach ($institutions as $institution)
+                                    <option value="{{ $institution }}"
+                                        @selected($institutionFilter === (string) $institution)>
+                                        {{ $institution }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="rp-field rp-field-search">
@@ -1123,7 +1183,7 @@
                                 type="search"
                                 name="search"
                                 value="{{ $search }}"
-                                placeholder="Cari nama, NIP, atau NIK"
+                                placeholder="Cari nama atau NIK"
                             >
                         </div>
 
@@ -1153,6 +1213,7 @@
         <section class="rp-section rp-reveal" id="ringkasan" aria-labelledby="rp-sum-title">
             <div class="rp-section-head">
                 <h2 id="rp-sum-title">Ringkasan peserta</h2>
+
                 <p>
                     Komposisi peserta berdasarkan jenis kelamin dan profesi
                     pada tahun {{ $year }}.
@@ -1304,8 +1365,8 @@
                 <h2 id="rp-dist-title">Distribusi wilayah peserta</h2>
 
                 <p>
-                    Sebaran peserta unik berdasarkan Kabupaten/Kota/Mitra/Mandiri
-                    sesuai data wilayah terkini peserta.
+                    Sebaran peserta unik berdasarkan Kabupaten/Kota
+                    sesuai data wilayah peserta.
                 </p>
             </div>
 
@@ -1315,7 +1376,10 @@
 
                     <form method="GET" action="{{ route('pdf.district-recap') }}">
                         <input type="hidden" name="year" value="{{ $year }}">
+                        <input type="hidden" name="minimum" value="{{ $minimum }}">
                         <input type="hidden" name="search" value="{{ $search }}">
+                        <input type="hidden" name="district" value="{{ $districtFilter }}">
+                        <input type="hidden" name="institution" value="{{ $institutionFilter }}">
 
                         <button type="submit" class="rp-btn rp-btn-secondary">
                             <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
@@ -1329,12 +1393,11 @@
                 </div>
 
                 <div class="rp-panel-body">
-                    <h3>Jumlah peserta unik per Kabupaten/Kota/Mitra/Mandiri</h3>
+                    <h3>Jumlah peserta unik per Kabupaten/Kota</h3>
 
                     <p>
                         Jumlah peserta unik berdasarkan wilayah asal atau wilayah
-                        kerja peserta pada tahun {{ $year }}. Data wilayah mengacu
-                        pada kolom kabupaten/kota peserta.
+                        kerja peserta pada tahun {{ $year }}.
                     </p>
 
                     @if (collect($districtRecap)->isEmpty())
@@ -1375,10 +1438,11 @@
         {{-- DAFTAR PESERTA --}}
         <section class="rp-section rp-reveal" id="peserta" aria-labelledby="rp-freq-title">
             <div class="rp-section-head">
-                <h2 id="rp-freq-title">Frekuensi pelatihan per peserta</h2>
+                <h2 id="rp-freq-title">Jumlah pelatihan per peserta</h2>
 
                 <p>
-                    Jumlah keikutsertaan setiap peserta pada tahun {{ $year }}.
+                    Jumlah keikutsertaan setiap peserta pada tahun {{ $year }}
+                    sesuai filter yang dipilih.
                 </p>
             </div>
 
@@ -1388,11 +1452,13 @@
 
                     <div style="display:flex;flex-wrap:wrap;gap:8px;">
 
-                        {{-- EXCEL --}}
+                        {{-- EKSPOR EXCEL --}}
                         <form method="GET" action="{{ route('reports.export') }}">
                             <input type="hidden" name="year" value="{{ $year }}">
                             <input type="hidden" name="minimum" value="{{ $minimum }}">
                             <input type="hidden" name="search" value="{{ $search }}">
+                            <input type="hidden" name="district" value="{{ $districtFilter }}">
+                            <input type="hidden" name="institution" value="{{ $institutionFilter }}">
 
                             <button type="submit" class="rp-btn rp-btn-secondary">
                                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
@@ -1404,11 +1470,13 @@
                             </button>
                         </form>
 
-                        {{-- PDF LAPORAN --}}
+                        {{-- EKSPOR PDF --}}
                         <form method="GET" action="{{ route('pdf.report') }}">
                             <input type="hidden" name="year" value="{{ $year }}">
                             <input type="hidden" name="minimum" value="{{ $minimum }}">
                             <input type="hidden" name="search" value="{{ $search }}">
+                            <input type="hidden" name="district" value="{{ $districtFilter }}">
+                            <input type="hidden" name="institution" value="{{ $institutionFilter }}">
 
                             <button type="submit" class="rp-btn rp-btn-primary">
                                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
@@ -1424,25 +1492,24 @@
                 </div>
 
                 <p class="rp-note">
-                    Hanya peserta yang memiliki riwayat pelatihan pada tahun
-                    terpilih yang ditampilkan. Peserta dengan jumlah
-                    keikutsertaan nol tidak dimasukkan ke dalam tabel.
-                    Wilayah peserta mengikuti data terkini pada profil peserta.
+                    Daftar peserta menampilkan nama, NIK, instansi, Kabupaten/Kota,
+                    dan jumlah keikutsertaan. Data mengikuti tahun dan filter yang dipilih.
                 </p>
 
                 <div class="rp-table-wrap cards">
-                    <table class="rp-table" style="min-width:680px">
+                    <table class="rp-table" style="min-width:950px">
                         <caption class="rp-sr">
-                            Frekuensi keikutsertaan pelatihan per peserta
+                            Data peserta dan jumlah keikutsertaan pelatihan tahun {{ $year }}
                         </caption>
 
                         <thead>
                             <tr>
                                 <th scope="col">No.</th>
                                 <th scope="col">Nama Peserta</th>
-                                <th scope="col">NIP</th>
+                                <th scope="col">NIK</th>
+                                <th scope="col">Instansi</th>
+                                <th scope="col">Kabupaten/Kota</th>
                                 <th scope="col">Jumlah Keikutsertaan</th>
-                                <th scope="col">Status Peninjauan</th>
                             </tr>
                         </thead>
 
@@ -1457,48 +1524,33 @@
                                         {{ $participant->name ?: '-' }}
                                     </td>
 
-                                    <td class="rp-nip" data-label="NIP">
-                                        {{ $participant->nip ?: '-' }}
+                                    <td class="rp-nik" data-label="NIK">
+                                        {{ $participant->nik ?: '-' }}
                                     </td>
 
-                                    <td data-label="Keikutsertaan">
+                                    <td data-label="Instansi">
+                                        {{ $participant->institution ?: '-' }}
+                                    </td>
+
+                                    <td data-label="Kabupaten/Kota">
+                                        {{ $participant->district ?: '-' }}
+                                    </td>
+
+                                    <td data-label="Jumlah Keikutsertaan">
                                         <span class="rp-count">
                                             {{ (int) $participant->participations_count }}
                                         </span>
                                     </td>
-
-                                    <td data-label="Status">
-                                        @if ($participant->participations_count >= $minimum)
-                                            <span class="rp-status rp-status-review">
-                                                <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
-                                                    <path d="M12 9v4"/>
-                                                    <path d="M12 17h.01"/>
-                                                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                                                </svg>
-                                                Perlu Ditinjau
-                                            </span>
-                                        @else
-                                            <span class="rp-status rp-status-eligible">
-                                                <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
-                                                    <circle cx="12" cy="12" r="10"/>
-                                                    <path d="m9 12 2 2 4-4"/>
-                                                </svg>
-                                                Eligible
-                                            </span>
-                                        @endif
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="rp-empty">
+                                    <td colspan="6" class="rp-empty">
                                         <strong>Tidak ada data peserta</strong>
-
-                                        Belum ada peserta yang mengikuti pelatihan
-                                        pada tahun {{ $year }}
+                                        Belum ada peserta yang memenuhi filter pada tahun {{ $year }}.
 
                                         @if ($search !== '')
                                             dengan kata kunci "{{ $search }}"
-                                        @endif.
+                                        @endif
                                     </td>
                                 </tr>
                             @endforelse
@@ -1524,7 +1576,7 @@
 
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* Pagination lokal */
+    /* PAGINATION LOKAL */
     document.querySelectorAll('[data-paginate]').forEach(function (box) {
         var per = parseInt(box.getAttribute('data-paginate'), 10) || 8;
         var selector = box.getAttribute('data-items');
@@ -1541,7 +1593,6 @@
         var current = 1;
 
         var nav = document.createElement('div');
-
         nav.className = 'rp-pager';
 
         nav.innerHTML =
@@ -1609,7 +1660,7 @@
         show();
     });
 
-    /* Urutan profesi */
+    /* PENGURUTAN PROFESI */
     var sortBox = document.getElementById('rpProfSort');
     var profBody = document.getElementById('rpProfBody');
     var profNote = document.getElementById('rpProfNote');
@@ -1624,9 +1675,9 @@
         });
 
         var labels = {
-            'default': 'urutan awal',
-            'high': 'jumlah peserta tertinggi ke terendah',
-            'low': 'jumlah peserta terendah ke tertinggi'
+            'default':'urutan awal',
+            'high':'jumlah peserta tertinggi ke terendah',
+            'low':'jumlah peserta terendah ke tertinggi'
         };
 
         var buttons = Array.prototype.slice.call(
@@ -1685,7 +1736,7 @@
         });
     }
 
-    /* Counter angka */
+    /* ANIMASI ANGKA */
     if (!reduce) {
         var formatter = new Intl.NumberFormat('id-ID');
 
@@ -1719,7 +1770,7 @@
         });
     }
 
-    /* Scroll reveal */
+    /* ANIMASI SECTION */
     if (!reduce && 'IntersectionObserver' in window) {
         page.classList.add('rp-js');
 
@@ -1737,7 +1788,7 @@
         });
     }
 
-    /* Progress bar */
+    /* PROGRESS BAR */
     var bar = document.getElementById('rpProgress');
     var ticking = false;
 
@@ -1761,7 +1812,7 @@
 
     updateBar();
 
-    /* Navigasi section aktif */
+    /* NAVIGASI SECTION AKTIF */
     var links = Array.prototype.slice.call(
         document.querySelectorAll('#rpNav a')
     );
@@ -1785,7 +1836,9 @@
         links.forEach(function (link) {
             var section = document.querySelector(link.getAttribute('href'));
 
-            if (section) spy.observe(section);
+            if (section) {
+                spy.observe(section);
+            }
         });
     }
 })();
@@ -1861,7 +1914,9 @@ document.addEventListener('DOMContentLoaded', function () {
             maintainAspectRatio:false,
 
             plugins:{
-                legend:{ display:false },
+                legend:{
+                    display:false
+                },
 
                 tooltip:{
                     callbacks:{

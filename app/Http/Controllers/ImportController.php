@@ -12,6 +12,7 @@ use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use Throwable;
 
 class ImportController extends Controller
 {
@@ -90,52 +91,70 @@ class ImportController extends Controller
                 'min:0',
             ],
         ], [
-            'file.required' => 'Silakan pilih file Excel.',
-            'file.mimes' => 'File harus berformat XLSX, XLS, atau CSV.',
-            'file.max' => 'Ukuran file maksimal 10 MB.',
+            'file.required' =>
+                'Silakan pilih file Excel.',
+
+            'file.mimes' =>
+                'File harus berformat XLSX, XLS, atau CSV.',
+
+            'file.max' =>
+                'Ukuran file maksimal 10 MB.',
 
             'kabupaten_kota_mitra.required' =>
                 'Kabupaten/Kota/Mitra wajib dipilih.',
+
             'kabupaten_kota_mitra.exists' =>
                 'Kabupaten/Kota/Mitra tidak valid atau tidak aktif.',
 
             'sumber_dana.required' =>
                 'Sumber dana wajib dipilih.',
+
             'sumber_dana.exists' =>
                 'Sumber dana tidak valid atau tidak aktif.',
 
             'training_category_id.exists' =>
                 'Kategori pelatihan tidak valid atau tidak aktif.',
+
             'jpl.integer' =>
                 'JPL harus berupa angka.',
+
             'jpl.min' =>
                 'JPL tidak boleh kurang dari 0.',
         ]);
 
+        $spreadsheet = null;
+
         try {
             /*
-             * Ambil wilayah dari master data.
-             *
-             * Nilai yang dikirim ke importer berasal dari
-             * record District yang aktif, bukan teks bebas.
+             * 1. Ambil wilayah dari master data aktif.
              */
             $district = District::query()
-                ->where('name', $validated['kabupaten_kota_mitra'])
+                ->where(
+                    'name',
+                    $validated['kabupaten_kota_mitra']
+                )
                 ->where('is_active', true)
                 ->firstOrFail();
 
             $districtName = trim($district->name);
 
             /*
-             * Baca metadata Excel.
+             * 2. Baca metadata Excel.
              */
             $filePath = $request->file('file')->getRealPath();
 
+            if (!$filePath) {
+                throw new \RuntimeException(
+                    'File Excel tidak dapat dibaca.'
+                );
+            }
+
             $spreadsheet = IOFactory::load($filePath);
+
             $sheet = $spreadsheet->getActiveSheet();
 
             /*
-             * BARIS 2: NAMA PELATIHAN
+             * BARIS 2: NAMA PELATIHAN.
              */
             $trainingName = $this->getRowValue(
                 $sheet,
@@ -148,16 +167,14 @@ class ImportController extends Controller
             );
 
             if ($trainingName === '') {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'file' =>
-                            'Nama pelatihan tidak ditemukan pada baris 2 Excel.',
-                    ]);
+                throw new \RuntimeException(
+                    'Nama pelatihan tidak ditemukan pada baris 2 Excel. ' .
+                    'Periksa kolom nama pelatihan.'
+                );
             }
 
             /*
-             * BARIS 3: KERJA SAMA
+             * BARIS 3: KERJA SAMA.
              */
             $cooperation = $this->getRowValue(
                 $sheet,
@@ -171,7 +188,7 @@ class ImportController extends Controller
             );
 
             /*
-             * BARIS 5: RENTANG TANGGAL PELATIHAN
+             * BARIS 5: RENTANG TANGGAL PELATIHAN.
              */
             $dateText = $this->getRowValue(
                 $sheet,
@@ -189,13 +206,13 @@ class ImportController extends Controller
             );
 
             /*
-             * Data tambahan dari form import.
+             * 3. Data tambahan dari form.
              */
             $batchNumber = trim(
                 (string) ($validated['angkatan'] ?? '')
             );
 
-            $trainingCategoryId = isset(
+            $trainingCategoryId = !empty(
                 $validated['training_category_id']
             )
                 ? (int) $validated['training_category_id']
@@ -206,11 +223,7 @@ class ImportController extends Controller
                 : null;
 
             /*
-             * Kirim seluruh metadata ke TrainingImport.
-             *
-             * districtName akan digunakan untuk:
-             * 1. participants.district
-             * 2. trainings.district
+             * 4. Buat importer.
              */
             $import = new TrainingImport(
                 batchNumber: $batchNumber,
@@ -225,50 +238,330 @@ class ImportController extends Controller
                 jpl: $jpl,
             );
 
+            /*
+             * 5. Jalankan import.
+             *
+             * TrainingImport harus menangani error per baris
+             * agar baris valid tetap bisa diproses.
+             */
             Excel::import(
                 $import,
                 $request->file('file')
             );
 
+            /*
+             * 6. Ambil dan seragamkan error.
+             */
+            $errors = $this->normalizeImportErrors(
+                $import->errors ?? []
+            );
+
+            /*
+             * 7. Ambil jumlah peserta baru dan diperbarui.
+             */
+            $createdParticipants = (int) (
+                $import->createdParticipants ?? 0
+            );
+
+            $updatedParticipants = (int) (
+                $import->updatedParticipants ?? 0
+            );
+
+            $createdTrainings = (int) (
+                $import->createdTrainings ?? 0
+            );
+
+            $createdHistories = (int) (
+                $import->createdHistories ?? 0
+            );
+
+            /*
+             * 8. Hitung jumlah seluruh baris peserta yang diproses.
+             *
+             * PENTING:
+             * Jangan hanya menjumlahkan peserta baru dan diperbarui.
+             * Baris yang gagal juga harus masuk dalam jumlah diproses.
+             */
+            if (isset($import->processedParticipants)) {
+                $processedParticipants = (int) (
+                    $import->processedParticipants
+                );
+            } else {
+                /*
+                 * Fallback jika importer belum memiliki
+                 * properti processedParticipants.
+                 */
+                $processedParticipants =
+                    $createdParticipants + $updatedParticipants;
+            }
+
+            /*
+             * 9. Hitung baris peserta yang gagal.
+             *
+             * Error metadata/file tidak dihitung sebagai
+             * kegagalan peserta.
+             *
+             * Nomor baris Excel harus berupa angka dan
+             * dimulai dari baris data peserta (baris 8).
+             */
+            $failedRows = (int) (
+    $import->failedParticipants
+    ?? $this->countFailedParticipantRows($errors)
+);
+
+            /*
+             * 10. Hitung peserta yang berhasil.
+             */
+           $successfulRows = (int) (
+    $import->successfulParticipants
+    ?? max(0, $processedParticipants - $failedRows)
+);
+
+            /*
+             * 11. Tentukan status import.
+             */
+            if ($failedRows > 0 && $successfulRows > 0) {
+                $status = 'partial';
+            } elseif ($failedRows > 0 && $successfulRows === 0) {
+                $status = 'failed';
+            } else {
+                $status = 'success';
+            }
+
+            /*
+             * 12. Simpan log hasil import.
+             */
             Log::info('Import Excel SIRAPIK selesai', [
                 'training_name' => $trainingName,
                 'district' => $districtName,
-                'created_participants' => $import->createdParticipants,
-                'updated_participants' => $import->updatedParticipants,
-                'created_trainings' => $import->createdTrainings,
-                'created_histories' => $import->createdHistories,
-                'error_count' => count($import->errors),
+
+                'created_participants' =>
+                    $createdParticipants,
+
+                'updated_participants' =>
+                    $updatedParticipants,
+
+                'processed_participants' =>
+                    $processedParticipants,
+
+                'successful_rows' =>
+                    $successfulRows,
+
+                'failed_rows' =>
+                    $failedRows,
+
+                'created_trainings' =>
+                    $createdTrainings,
+
+                'created_histories' =>
+                    $createdHistories,
+
+                'errors' => $errors,
             ]);
 
+            /*
+             * 13. Kirim hasil ke halaman import.
+             */
             return redirect()
                 ->route('imports.index')
                 ->with('import_result', [
+                    'status' => $status,
+
                     'created_participants' =>
-                        $import->createdParticipants,
+                        $createdParticipants,
+
                     'updated_participants' =>
-                        $import->updatedParticipants,
+                        $updatedParticipants,
+
+                    'processed_participants' =>
+                        $processedParticipants,
+
+                    'successful_rows' =>
+                        $successfulRows,
+
+                    'failed_rows' =>
+                        $failedRows,
+
                     'created_trainings' =>
-                        $import->createdTrainings,
+                        $createdTrainings,
+
                     'created_histories' =>
-                        $import->createdHistories,
-                    'errors' => $import->errors,
+                        $createdHistories,
+
+                    'errors' =>
+                        $errors,
+
+                    'training_name' =>
+                        $trainingName,
+
+                    'file_name' =>
+                        $request->file('file')
+                            ->getClientOriginalName(),
                 ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
+            /*
+             * Kegagalan proses utama atau metadata.
+             * Bukan kegagalan satu peserta.
+             */
             Log::error('Import Excel SIRAPIK gagal', [
                 'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return back()
+            return redirect()
+                ->route('imports.index')
                 ->withInput()
-                ->withErrors([
-                    'file' => 'Import gagal: ' . $e->getMessage(),
+                ->with('import_result', [
+                    'status' => 'failed',
+
+                    'created_participants' => 0,
+                    'updated_participants' => 0,
+                    'processed_participants' => 0,
+                    'successful_rows' => 0,
+
+                    /*
+                     * Error file/metadata bukan baris peserta.
+                     */
+                    'failed_rows' => 0,
+
+                    'created_trainings' => 0,
+                    'created_histories' => 0,
+
+                    'errors' => [
+                        [
+                            'row' => '-',
+                            'name' => '-',
+                            'column' => 'File / Metadata Pelatihan',
+                            'message' => $e->getMessage(),
+                            'value' => '',
+                        ],
+                    ],
+
+                    'training_name' => null,
+
+                    'file_name' => $request->file('file')
+                        ? $request->file('file')->getClientOriginalName()
+                        : null,
                 ]);
+        } finally {
+            /*
+             * Lepaskan memori PhpSpreadsheet.
+             */
+            if ($spreadsheet !== null) {
+                $spreadsheet->disconnectWorksheets();
+
+                unset($spreadsheet);
+            }
         }
+    }
+
+    /**
+     * Menyeragamkan format error dari TrainingImport.
+     *
+     * Format hasil:
+     * [
+     *     'row' => 8,
+     *     'name' => 'Nama peserta',
+     *     'column' => 'NIK',
+     *     'message' => 'NIK wajib diisi.',
+     *     'value' => '',
+     * ]
+     */
+    private function normalizeImportErrors(array $errors): array
+    {
+        $normalized = [];
+
+        foreach ($errors as $error) {
+            /*
+             * Format error lama berupa string.
+             */
+            if (is_string($error)) {
+                $normalized[] = [
+                    'row' => '-',
+                    'name' => '-',
+                    'column' => 'Data peserta',
+                    'message' => $error,
+                    'value' => '',
+                ];
+
+                continue;
+            }
+
+            /*
+             * Jika error berupa object, ubah menjadi array.
+             */
+            if (is_object($error)) {
+                $error = method_exists($error, 'toArray')
+                    ? $error->toArray()
+                    : (array) $error;
+            }
+
+            if (!is_array($error)) {
+                continue;
+            }
+
+            $normalized[] = [
+                'row' => $error['row']
+                    ?? $error['excel_row']
+                    ?? '-',
+
+                'name' => $error['name']
+                    ?? $error['participant_name']
+                    ?? '-',
+
+                'column' => $error['column']
+                    ?? $error['attribute']
+                    ?? 'Data peserta',
+
+                'message' => $error['message']
+                    ?? $error['error']
+                    ?? 'Data tidak dapat diproses.',
+
+                'value' => $error['value']
+                    ?? '',
+            ];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Menghitung jumlah baris peserta yang gagal.
+     *
+     * Setiap nomor baris hanya dihitung satu kali.
+     * Error file atau metadata tidak dihitung.
+     */
+    private function countFailedParticipantRows(
+        array $errors
+    ): int {
+        $failedRows = [];
+
+        foreach ($errors as $error) {
+            $row = $error['row'] ?? '-';
+
+            /*
+             * Hanya nomor baris Excel numerik yang dihitung.
+             * Data peserta dimulai dari baris 8.
+             */
+            if (
+                !is_numeric($row) ||
+                (int) $row < 8
+            ) {
+                continue;
+            }
+
+            $failedRows[] = (int) $row;
+        }
+
+        return count(
+            array_unique($failedRows)
+        );
     }
 
     /**
@@ -298,32 +591,55 @@ class ImportController extends Controller
             $labels
         );
 
+        /*
+         * Cari label metadata pada baris.
+         */
         foreach ($cells as $col => $value) {
             if ($value === '') {
                 continue;
             }
 
-            $normalizedValue = $this->normalizeText($value);
+            $normalizedValue = $this->normalizeText(
+                $value
+            );
 
-            foreach ($normalizedLabels as $label) {
+            foreach ($normalizedLabels as $index => $label) {
                 if (
                     $normalizedValue === $label ||
-                    str_starts_with($normalizedValue, $label . ' ')
+                    str_starts_with(
+                        $normalizedValue,
+                        $label . ' '
+                    )
                 ) {
-                    foreach ($labels as $originalLabel) {
-                        $pattern = '/^' .
-                            preg_quote($originalLabel, '/') .
-                            '\s*[:\-]\s*(.+)$/iu';
+                    $originalLabel = $labels[$index];
 
-                        if (preg_match($pattern, $value, $matches)) {
-                            $inlineValue = trim($matches[1]);
+                    /*
+                     * Format satu sel:
+                     * Nama Pelatihan: Pelatihan Laravel
+                     */
+                    $pattern = '/^' .
+                        preg_quote($originalLabel, '/') .
+                        '\s*[:\-]\s*(.+)$/iu';
 
-                            if ($inlineValue !== '') {
-                                return $inlineValue;
-                            }
+                    if (
+                        preg_match(
+                            $pattern,
+                            $value,
+                            $matches
+                        )
+                    ) {
+                        $inlineValue = trim($matches[1]);
+
+                        if ($inlineValue !== '') {
+                            return $inlineValue;
                         }
                     }
 
+                    /*
+                     * Format dua sel:
+                     * Sel pertama = label
+                     * Sel berikutnya = nilai
+                     */
                     for (
                         $nextCol = $col + 1;
                         $nextCol <= $lastColumn;
@@ -337,20 +653,30 @@ class ImportController extends Controller
             }
         }
 
+        /*
+         * Fallback: ambil nilai pertama yang bukan label.
+         */
         foreach ($cells as $value) {
             if ($value === '') {
                 continue;
             }
 
-            $normalizedValue = $this->normalizeText($value);
+            $normalizedValue = $this->normalizeText(
+                $value
+            );
+
             $isLabel = false;
 
             foreach ($normalizedLabels as $label) {
                 if (
                     $normalizedValue === $label ||
-                    str_starts_with($normalizedValue, $label . ' ')
+                    str_starts_with(
+                        $normalizedValue,
+                        $label . ' '
+                    )
                 ) {
                     $isLabel = true;
+
                     break;
                 }
             }
@@ -376,18 +702,27 @@ class ImportController extends Controller
             $text
         );
 
-        return preg_replace('/\s+/', ' ', $text) ?? $text;
+        return preg_replace(
+            '/\s+/u',
+            ' ',
+            $text
+        ) ?? $text;
     }
 
     /**
      * Membaca rentang tanggal pelatihan.
+     *
+     * Contoh:
+     * 18 MEI 2026 - 23 MEI 2026
      */
     private function parseDateRange(string $text): array
     {
         $text = trim($text);
 
         if ($text === '') {
-            return [null, null];
+            throw new \RuntimeException(
+                'Tanggal pelaksanaan tidak ditemukan pada baris 5 Excel.'
+            );
         }
 
         $months = [
@@ -416,13 +751,16 @@ class ImportController extends Controller
         }
 
         $normalized = preg_replace(
-            '/\s+/',
+            '/\s+/u',
             ' ',
             $normalized
         ) ?? $normalized;
 
+        /*
+         * Pisahkan tanggal mulai dan tanggal selesai.
+         */
         $parts = preg_split(
-            '/\s*[-–—]\s*/',
+            '/\s*[-–—]\s*/u',
             $normalized
         );
 
@@ -434,6 +772,7 @@ class ImportController extends Controller
         }
 
         $start = strtotime(trim($parts[0]));
+
         $end = strtotime(trim($parts[1]));
 
         if ($start === false || $end === false) {

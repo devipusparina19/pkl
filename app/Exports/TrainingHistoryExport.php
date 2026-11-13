@@ -7,50 +7,83 @@ use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class TrainingHistoryExport implements FromQuery, WithHeadings, WithMapping
+class TrainingHistoryExport implements
+    FromQuery,
+    WithHeadings,
+    WithMapping,
+    ShouldAutoSize
 {
-    protected int $year;
+    private int $rowNumber = 0;
 
-    protected ?string $search;
+    public function __construct(
+        private int $year,
+        private string $search = '',
+        private int $minimum = 1,
+        private string $district = '',
+        private string $institution = ''
+    ) {
+        $this->search = trim($this->search);
+        $this->district = trim($this->district);
+        $this->institution = trim($this->institution);
 
-    protected int $number = 0;
-
-    public function __construct(int $year, ?string $search = null)
-    {
-        $this->year = $year;
-        $this->search = $search;
+        $this->minimum = max(1, min(100, $this->minimum));
     }
 
     /**
-     * Query data peserta yang mengikuti pelatihan pada tahun terpilih.
+     * Query peserta untuk Excel.
      */
     public function query(): Builder
     {
-        $search = trim($this->search ?? '');
+        $historyInYear = function ($query) {
+            $query->whereHas('training', function ($trainingQuery) {
+                $trainingQuery->whereYear('start_date', $this->year);
+            });
+        };
 
-        return Participant::query()
-            ->whereHas('histories', function ($query) {
-                $query->whereHas('training', function ($trainingQuery) {
-                    $trainingQuery->whereYear('start_date', $this->year);
-                });
-            })
+        $query = Participant::query()
+            ->whereHas(
+                'histories',
+                $historyInYear,
+                '>=',
+                $this->minimum
+            )
             ->withCount([
-                'histories as participations_count' => function ($query) {
-                    $query->whereHas('training', function ($trainingQuery) {
-                        $trainingQuery->whereYear('start_date', $this->year);
-                    });
-                },
-            ])
-            ->when($search !== '', function (Builder $query) use ($search) {
-                $query->where(function (Builder $subQuery) use ($search) {
-                    $subQuery->where('name', 'like', "%{$search}%")
-                        ->orWhere('nip', 'like', "%{$search}%")
-                        ->orWhere('nik', 'like', "%{$search}%");
-                });
-            })
+                'histories as participations_count' => $historyInYear,
+            ]);
+
+        // Filter kabupaten/kota.
+        if ($this->district !== '') {
+            $query->whereRaw(
+                'TRIM(participants.district) = ?',
+                [$this->district]
+            );
+        }
+
+        // Filter instansi.
+        if ($this->institution !== '') {
+            $query->whereRaw(
+                'TRIM(participants.institution) = ?',
+                [$this->institution]
+            );
+        }
+
+        // Filter pencarian nama, NIK, atau NIP.
+        if ($this->search !== '') {
+            $search = $this->search;
+
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery
+                    ->where('participants.name', 'like', "%{$search}%")
+                    ->orWhere('participants.nik', 'like', "%{$search}%")
+                    ->orWhere('participants.nip', 'like', "%{$search}%");
+            });
+        }
+
+        return $query
             ->orderByDesc('participations_count')
-            ->orderBy('name');
+            ->orderBy('participants.name');
     }
 
     /**
@@ -61,12 +94,10 @@ class TrainingHistoryExport implements FromQuery, WithHeadings, WithMapping
         return [
             'No.',
             'Nama Peserta',
-            'NIP',
             'NIK',
-            'Profesi',
+            'Instansi',
             'Kabupaten/Kota',
             'Jumlah Keikutsertaan',
-            'Tahun Laporan',
         ];
     }
 
@@ -75,17 +106,15 @@ class TrainingHistoryExport implements FromQuery, WithHeadings, WithMapping
      */
     public function map($participant): array
     {
-        $this->number++;
+        $this->rowNumber++;
 
         return [
-            $this->number,
-            $participant->name ?? '-',
-            $participant->nip ?? '-',
-            $participant->nik ?? '-',
-            $participant->profession ?? '-',
-            $participant->district ?? '-',
+            $this->rowNumber,
+            $participant->name ?: '-',
+            $participant->nik ?: '-',
+            $participant->institution ?: '-',
+            $participant->district ?: '-',
             (int) $participant->participations_count,
-            $this->year,
         ];
     }
 }

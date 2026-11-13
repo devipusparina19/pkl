@@ -54,9 +54,7 @@
     }
     .im.is-js [data-reveal].is-in { opacity: 1; transform: none; }
 
-    /* =====================================================
-       HERO
-    ===================================================== */
+    /* HERO */
     .im-hero {
         position: relative; isolation: isolate; overflow: hidden;
         margin-bottom: 28px; padding: clamp(28px, 5vw, 52px);
@@ -121,9 +119,7 @@
     }
     .im-flow-title { margin: 0 0 4px; color: #bcd8ff; font-size: 13px; font-weight: 700; }
 
-    /* =====================================================
-       ALERT
-    ===================================================== */
+    /* ALERT */
     .im-alert {
         display: flex; align-items: flex-start; gap: 14px;
         margin-bottom: 24px; padding: 18px 20px;
@@ -138,22 +134,32 @@
     .im-alert-danger { color: var(--red); background: var(--red-soft); border-color: var(--red-line); }
     .im-alert-success { color: var(--green); background: var(--green-soft); border-color: var(--green-line); }
 
-    /* Hasil import: angka besar */
-    .im-result { display: grid; gap: 0; margin-top: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .im-result-item { padding: 4px 18px; border-left: 1px solid var(--green-line); }
-    .im-result-item:first-child { padding-left: 0; border-left: 0; }
+    /* HASIL IMPORT */
+    .im-result { display: grid; gap: 18px 0; margin-top: 18px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .im-result-item { min-width: 0; padding: 4px 18px; border-left: 1px solid var(--line); }
+    .im-result-item:nth-child(3n + 1) { padding-left: 0; border-left: 0; }
     .im-result-num {
         font-family: var(--f-display); font-size: clamp(28px, 3.4vw, 42px);
         font-weight: 800; letter-spacing: -.04em; line-height: 1;
         font-variant-numeric: tabular-nums; color: var(--navy);
     }
-    .im-result-label { margin-top: 6px; font-size: 13px; font-weight: 600; line-height: 1.4; }
+    .im-result-label { margin-top: 6px; color: #40536a; font-size: 13px; font-weight: 600; line-height: 1.4; }
+    .im-notes { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .im-error-wrap { margin-top: 14px; overflow-x: auto; border: 1px solid var(--red-line); border-radius: 12px; background: #fff; }
+    .im-error-table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 13px; line-height: 1.55; }
+    .im-error-table th { padding: 12px 14px; background: #fff1f1; color: #7f1d1d; text-align: left; font-weight: 800; white-space: nowrap; }
+    .im-error-table td { padding: 12px 14px; border-top: 1px solid #fee2e2; color: #334155; vertical-align: top; overflow-wrap: anywhere; }
+    .im-error-table tr:nth-child(even) td { background: #fffafa; }
+    .im-error-row { font-weight: 800; white-space: nowrap; }
+    .im-error-value { color: #991b1b; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .im-error-help { display: block; margin-top: 4px; color: #166534; }
+    .im-status { display: inline-flex; align-items: center; gap: 7px; margin-top: 8px; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+    .im-status-success { color: #166534; background: #dcfce7; }
+    .im-status-partial { color: #92400e; background: #fef3c7; }
+    .im-status-failed { color: #991b1b; background: #fee2e2; }
+    .im-result-meta { margin-top: 10px; color: #64748b; font-size: 13px; }
 
-    .im-notes { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--green-line); }
-
-    /* =====================================================
-       FORM — SECTION SPLIT
-    ===================================================== */
+    /* FORM */
     .im-section {
         display: grid; gap: 28px 56px;
         grid-template-columns: minmax(0, .5fr) minmax(0, 1.5fr);
@@ -192,7 +198,7 @@
 
     .im-help { display: block; margin-top: 8px; color: var(--slate); font-size: 13px; line-height: 1.6; }
 
-    /* Dropzone */
+    /* DROPZONE */
     .im-drop {
         position: relative; display: flex; align-items: center; gap: 18px;
         padding: 28px; border: 2px dashed #a6bddb; border-radius: 18px;
@@ -225,7 +231,7 @@
     .im-selected[hidden] { display: none; }
     .im-selected svg { width: 20px; height: 20px; }
 
-    /* Aksi */
+    /* AKSI */
     .im-footer {
         display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px;
         padding: 26px 0 0; border-top: 2px solid var(--navy);
@@ -252,7 +258,7 @@
     @keyframes im-spin { to { transform: rotate(360deg); } }
     .im .is-spin { animation: im-spin 1s linear infinite; }
 
-    /* Informasi penting */
+    /* INFORMASI */
     .im-warn {
         display: flex; align-items: flex-start; gap: 14px; margin-top: 30px;
         padding: 18px 20px; border: 1px solid var(--amber-line); border-left: 4px solid #d9a441;
@@ -262,15 +268,15 @@
     .im-warn strong { display: block; color: var(--amber); font-size: 15px; }
     .im-warn p { margin: 4px 0 0; color: #6f5a34; font-size: 14px; line-height: 1.7; }
 
-    /* =====================================================
-       RESPONSIVE
-    ===================================================== */
+    /* RESPONSIVE */
     @media (max-width: 1000px) {
         .im-hero-grid { grid-template-columns: 1fr; }
         .im-section { grid-template-columns: 1fr; gap: 22px; padding: 30px 0; }
         .im-section-head { position: static; }
         .im-result { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 0; }
-        .im-result-item:nth-child(3) { padding-left: 0; border-left: 0; }
+        .im-result-item:nth-child(3n + 1) { padding-left: 0; border-left: 0; }
+        .im-result-item:nth-child(2n) { padding-left: 18px; border-left: 1px solid var(--line); }
+        .im-result-item:nth-child(2n + 1) { padding-left: 0; border-left: 0; }
     }
 
     @media (max-width: 640px) {
@@ -297,19 +303,15 @@
 
     <div class="im-progress" id="imProgress" aria-hidden="true"></div>
 
-    {{-- =================================================
-         HERO
-    ================================================== --}}
+    {{-- HERO --}}
     <header class="im-hero" data-reveal>
         <div class="im-orbit" aria-hidden="true"></div>
 
         <span class="im-eyebrow">Import Excel SIRAPIK</span>
 
         <div class="im-hero-grid">
-
             <div>
                 <h1>Import data peserta <span>dalam satu proses.</span></h1>
-
                 <p>
                     Unggah file Excel, lengkapi informasi pelatihan, lalu mulai
                     import data peserta dan riwayat pelatihan ke SIRAPIK.
@@ -318,20 +320,16 @@
 
             <div>
                 <p class="im-flow-title">Alur import</p>
-
                 <ol class="im-flow">
                     <li>Unggah file XLSX, XLS, atau CSV</li>
                     <li>Lengkapi informasi penyelenggaraan</li>
                     <li>Tentukan kategori dan durasi</li>
                 </ol>
             </div>
-
         </div>
     </header>
 
-    {{-- =================================================
-         VALIDATION ERROR
-    ================================================== --}}
+    {{-- VALIDATION ERROR --}}
     @if ($errors->any())
         <div class="im-alert im-alert-danger" role="alert">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -344,7 +342,6 @@
             <div class="im-alert-body">
                 <strong class="h">Import belum dapat diproses.</strong>
                 <span>Periksa kembali informasi berikut:</span>
-
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -354,59 +351,180 @@
         </div>
     @endif
 
-    {{-- =================================================
-         HASIL IMPORT
-    ================================================== --}}
+    {{-- HASIL IMPORT --}}
     @if (session('import_result'))
-        @php($result = session('import_result'))
+        @php
+            $result = session('import_result');
 
-        <div class="im-alert im-alert-success" role="status">
+            $importErrors = $result['errors'] ?? [];
+            $importErrors = is_array($importErrors) ? $importErrors : [];
+
+            $createdParticipants = (int) ($result['created_participants'] ?? 0);
+            $updatedParticipants = (int) ($result['updated_participants'] ?? 0);
+            $processedParticipants = (int) ($result['processed_participants'] ?? 0);
+            $failedRows = (int) ($result['failed_rows'] ?? 0);
+
+            // Mengikuti angka sukses yang dikirim controller.
+            $successfulRows = (int) (
+                $result['successful_rows']
+                ?? max(0, $processedParticipants - $failedRows)
+            );
+
+            $resultStatus = $result['status'] ?? ($failedRows > 0 ? 'partial' : 'success');
+
+            $resultTitle = $resultStatus === 'failed'
+                ? 'Import tidak berhasil.'
+                : ($failedRows > 0
+                    ? 'Import selesai dengan beberapa data gagal.'
+                    : 'Import berhasil.');
+        @endphp
+
+        <div class="im-alert {{ $resultStatus === 'failed' ? 'im-alert-danger' : 'im-alert-success' }}" role="status">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="m9 12 2 2 4-4"/>
+                @if ($resultStatus === 'failed')
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4M12 16h.01"/>
+                @else
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="m9 12 2 2 4-4"/>
+                @endif
             </svg>
 
             <div class="im-alert-body">
-                <strong class="h">Import selesai diproses.</strong>
+                <strong class="h">{{ $resultTitle }}</strong>
+
+                @if (!empty($result['training_name']))
+                    <div class="im-result-meta">
+                        Pelatihan: {{ $result['training_name'] }}
+                    </div>
+                @endif
+
+                @if (!empty($result['file_name']))
+                    <div class="im-result-meta">
+                        File: {{ $result['file_name'] }}
+                    </div>
+                @endif
+
+                <span class="im-status {{ $resultStatus === 'failed' ? 'im-status-failed' : ($failedRows > 0 ? 'im-status-partial' : 'im-status-success') }}">
+                    {{ $resultStatus === 'failed' ? 'Gagal diproses' : ($failedRows > 0 ? 'Berhasil sebagian' : 'Semua data berhasil') }}
+                </span>
 
                 <div class="im-result">
                     <div class="im-result-item">
-                        <div class="im-result-num" data-count="{{ $result['created_participants'] ?? 0 }}">{{ $result['created_participants'] ?? 0 }}</div>
+                        <div class="im-result-num" data-count="{{ $successfulRows }}">{{ $successfulRows }}</div>
+                        <div class="im-result-label">Baris peserta berhasil</div>
+                    </div>
+
+                    <div class="im-result-item">
+                        <div class="im-result-num" data-count="{{ $failedRows }}">{{ $failedRows }}</div>
+                        <div class="im-result-label">Baris peserta gagal</div>
+                    </div>
+
+                    <div class="im-result-item">
+                        <div class="im-result-num" data-count="{{ $processedParticipants }}">{{ $processedParticipants }}</div>
+                        <div class="im-result-label">Total baris peserta diproses</div>
+                    </div>
+
+                    <div class="im-result-item">
+                        <div class="im-result-num" data-count="{{ $createdParticipants }}">{{ $createdParticipants }}</div>
                         <div class="im-result-label">Peserta baru</div>
                     </div>
+
                     <div class="im-result-item">
-                        <div class="im-result-num" data-count="{{ $result['updated_participants'] ?? 0 }}">{{ $result['updated_participants'] ?? 0 }}</div>
+                        <div class="im-result-num" data-count="{{ $updatedParticipants }}">{{ $updatedParticipants }}</div>
                         <div class="im-result-label">Peserta diperbarui</div>
                     </div>
-                    <div class="im-result-item">
-                        <div class="im-result-num" data-count="{{ $result['created_trainings'] ?? 0 }}">{{ $result['created_trainings'] ?? 0 }}</div>
-                        <div class="im-result-label">Pelatihan baru</div>
-                    </div>
+
                     <div class="im-result-item">
                         <div class="im-result-num" data-count="{{ $result['created_histories'] ?? 0 }}">{{ $result['created_histories'] ?? 0 }}</div>
                         <div class="im-result-label">Riwayat pelatihan baru</div>
                     </div>
+
+                    <div class="im-result-item">
+                        <div class="im-result-num" data-count="{{ $result['created_trainings'] ?? 0 }}">{{ $result['created_trainings'] ?? 0 }}</div>
+                        <div class="im-result-label">Pelatihan baru</div>
+                    </div>
                 </div>
 
-                @if (!empty($result['errors']))
+                @if (count($importErrors) > 0)
                     <div class="im-notes">
-                        <strong>Catatan baris yang perlu diperiksa:</strong>
+                        <strong>Detail data yang gagal diimpor</strong>
 
-                        <ul>
-                            @foreach ($result['errors'] as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                        <p style="margin: 5px 0 0; color: #64748b; font-size: 13px;">
+                            Periksa nomor baris, kolom, dan nilai berikut. Perbaiki file Excel,
+                            lalu unggah kembali baris yang bermasalah.
+                        </p>
+
+                        <div class="im-error-wrap">
+                            <table class="im-error-table">
+                                <thead>
+                                    <tr>
+                                        <th>Baris Excel</th>
+                                        <th>Nama peserta</th>
+                                        <th>Kolom bermasalah</th>
+                                        <th>Nilai</th>
+                                        <th>Penyebab dan cara memperbaiki</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach ($importErrors as $error)
+                                        @php
+                                            if (is_string($error)) {
+                                                $error = [
+                                                    'row' => '-',
+                                                    'name' => '-',
+                                                    'column' => 'Data peserta',
+                                                    'value' => '-',
+                                                    'message' => $error,
+                                                ];
+                                            }
+
+                                            $error = is_array($error) ? $error : [];
+                                        @endphp
+
+                                        <tr>
+                                            <td class="im-error-row">
+                                                {{ $error['row'] ?? '-' }}
+                                            </td>
+
+                                            <td>
+                                                {{ $error['name'] ?? '-' }}
+                                            </td>
+
+                                            <td>
+                                                {{ $error['column'] ?? 'Data peserta' }}
+                                            </td>
+
+                                            <td class="im-error-value">
+                                                {{ ($error['value'] ?? '') !== '' ? $error['value'] : '-' }}
+                                            </td>
+
+                                            <td>
+                                                {{ $error['message'] ?? 'Data tidak dapat diproses.' }}
+
+                                                <span class="im-error-help">
+                                                    Saran: periksa dan perbaiki nilai pada kolom tersebut,
+                                                    kemudian unggah kembali file Excel.
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @elseif ($resultStatus !== 'failed')
+                    <div class="im-notes">
+                        Tidak ada baris peserta yang gagal. Seluruh baris data yang diperiksa berhasil diproses.
                     </div>
                 @endif
             </div>
         </div>
     @endif
 
-    {{-- =================================================
-         FORM
-    ================================================== --}}
+    {{-- FORM IMPORT --}}
     <form
         id="importForm"
         action="{{ route('imports.store') }}"
@@ -472,11 +590,12 @@
                     </div>
                 </div>
             </div>
+
             <a href="{{ route('training.download-template') }}"
-   class="btn btn-success">
-    <i class="fas fa-download"></i>
-    Download Template Excel
-</a>
+               class="btn btn-success">
+                <i class="fas fa-download"></i>
+                Download Template Excel
+            </a>
         </section>
 
         {{-- 02 PENYELENGGARAAN --}}
@@ -719,7 +838,7 @@
 
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        /* Scroll reveal */
+        /* SCROLL REVEAL */
         if ('IntersectionObserver' in window && !reduce) {
             page.classList.add('is-js');
 
@@ -730,25 +849,36 @@
                         io.unobserve(entry.target);
                     }
                 });
-            }, { threshold: .1, rootMargin: '0px 0px -40px 0px' });
+            }, {
+                threshold: .1,
+                rootMargin: '0px 0px -40px 0px'
+            });
 
             page.querySelectorAll('[data-reveal]').forEach(function (el) {
                 io.observe(el);
             });
         }
 
-        /* Counter hasil import */
+        /* ANIMASI ANGKA */
         if (!reduce) {
             page.querySelectorAll('[data-count]').forEach(function (el) {
                 const target = parseInt(el.dataset.count, 10) || 0;
+
                 if (target === 0) return;
 
                 const start = performance.now();
 
                 function tick(now) {
-                    const p = Math.min((now - start) / 900, 1);
-                    el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
-                    if (p < 1) requestAnimationFrame(tick);
+                    const progress = Math.min((now - start) / 900, 1);
+                    const value = Math.round(
+                        target * (1 - Math.pow(1 - progress, 3))
+                    );
+
+                    el.textContent = value;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(tick);
+                    }
                 }
 
                 el.textContent = '0';
@@ -756,27 +886,32 @@
             });
         }
 
-        /* Progress bar scroll */
+        /* PROGRESS BAR */
         const bar = document.getElementById('imProgress');
         let ticking = false;
 
-        function update() {
+        function updateProgress() {
             const max = document.documentElement.scrollHeight - window.innerHeight;
             const ratio = max > 0 ? window.scrollY / max : 0;
-            bar.style.transform = 'scaleX(' + Math.min(Math.max(ratio, 0), 1) + ')';
+
+            if (bar) {
+                bar.style.transform =
+                    'scaleX(' + Math.min(Math.max(ratio, 0), 1) + ')';
+            }
+
             ticking = false;
         }
 
         window.addEventListener('scroll', function () {
             if (!ticking) {
                 ticking = true;
-                requestAnimationFrame(update);
+                requestAnimationFrame(updateProgress);
             }
         }, { passive: true });
 
-        update();
+        updateProgress();
 
-        /* Form */
+        /* ELEMEN FORM */
         const fileInput = page.querySelector('#file');
         const dropZone = page.querySelector('#dropZone');
         const selectedFile = page.querySelector('#selectedFile');
@@ -785,12 +920,16 @@
         const submitButton = page.querySelector('#submitButton');
         const resetButton = page.querySelector('#resetButton');
 
-        const defaultButtonContent = submitButton ? submitButton.innerHTML : '';
+        const defaultButtonContent = submitButton
+            ? submitButton.innerHTML
+            : '';
 
-        /* Nama file yang dipilih */
+        /* NAMA FILE */
         if (fileInput && selectedFile && selectedFileName) {
             fileInput.addEventListener('change', function () {
-                const file = this.files && this.files.length ? this.files[0] : null;
+                const file = this.files && this.files.length
+                    ? this.files[0]
+                    : null;
 
                 if (!file) {
                     selectedFileName.textContent = '';
@@ -800,12 +939,14 @@
 
                 const fileSize = (file.size / 1024 / 1024).toFixed(2);
 
-                selectedFileName.textContent = file.name + ' · ' + fileSize + ' MB';
+                selectedFileName.textContent =
+                    file.name + ' · ' + fileSize + ' MB';
+
                 selectedFile.hidden = false;
             });
         }
 
-        /* Efek saat file diseret ke area unggah */
+        /* DRAG AND DROP VISUAL */
         if (dropZone) {
             ['dragenter', 'dragover'].forEach(function (name) {
                 dropZone.addEventListener(name, function () {
@@ -820,7 +961,7 @@
             });
         }
 
-        /* Cegah pengiriman berulang */
+        /* CEGAH SUBMIT BERULANG */
         if (importForm && submitButton) {
             importForm.addEventListener('submit', function (event) {
                 if (!importForm.checkValidity()) {
@@ -846,7 +987,7 @@
             });
         }
 
-        /* Reset tampilan setelah form direset */
+        /* RESET TAMPILAN */
         if (resetButton) {
             resetButton.addEventListener('click', function () {
                 window.setTimeout(function () {
@@ -866,7 +1007,7 @@
             });
         }
 
-        /* Pulihkan tombol jika kembali lewat riwayat browser */
+        /* PULIHKAN TOMBOL SAAT KEMBALI KE HALAMAN */
         window.addEventListener('pageshow', function () {
             if (submitButton) {
                 submitButton.disabled = false;
