@@ -216,7 +216,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/export', [ReportController::class, 'export'])
             ->name('reports.export');
 
+        Route::get('/reports/detail', [ReportController::class, 'detail'])->name('reports.detail');
 
+        Route::get('/reports/pdf', [ReportController::class, 'pdf'])->name('reports.pdf');
         /*
         |--------------------------------------------------------------------------
         | Ekspor PDF
