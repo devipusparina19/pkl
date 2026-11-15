@@ -492,7 +492,7 @@
 
             <td>
                 <span class="angka">{{ $n($totalParticipantCount) }}</span>
-                <span class="label">Peserta Unik Terlatih</span>
+                <span class="label">Peserta Terlatih</span>
             </td>
 
             <td>
@@ -619,7 +619,7 @@
                 <th style="width: 7%">No.</th>
                 <th>Sumber Dana</th>
                 <th style="width: 17%">Jumlah Kegiatan</th>
-                <th style="width: 17%">Peserta Unik</th>
+                <th style="width: 17%">Peserta</th>
                 <th style="width: 17%">Keikutsertaan</th>
             </tr>
         </thead>
@@ -651,7 +651,7 @@
                 <th style="width: 7%">No.</th>
                 <th>Kategori Pelatihan</th>
                 <th style="width: 17%">Jumlah Kegiatan</th>
-                <th style="width: 17%">Peserta Unik</th>
+                <th style="width: 17%">Peserta</th>
                 <th style="width: 17%">Keikutsertaan</th>
             </tr>
         </thead>
@@ -770,7 +770,7 @@
     <div class="catatan">
         <strong>Catatan:</strong><br>
         Laporan ini merupakan ringkasan eksekutif riwayat pelatihan tenaga kesehatan
-        pada periode {{ $year }}. Jumlah peserta unik menunjukkan individu yang
+        pada periode {{ $year }}. Jumlah peserta menunjukkan individu yang
         mengikuti pelatihan, sedangkan jumlah keikutsertaan menunjukkan total
         partisipasi peserta dalam seluruh kegiatan. Daftar kegiatan utama
         ditampilkan berdasarkan jumlah peserta terbanyak.

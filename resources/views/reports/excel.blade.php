@@ -59,7 +59,7 @@
         <tr>
             <td style="{{ $th }}">No</td>
             <td colspan="{{ $labelSpan }}" style="{{ $th }}">Jenis Kelamin</td>
-            <td style="{{ $th }}">Peserta Unik</td>
+            <td style="{{ $th }}">Peserta</td>
             <td style="{{ $th }}">Persentase</td>
         </tr>
         @foreach ($genderRecap as $i => $g)

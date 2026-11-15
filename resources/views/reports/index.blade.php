@@ -521,7 +521,7 @@ html.rp-lock{overflow:hidden}
 
                     <span class="rp-chip">
                         <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg>
-                        Minimal {{ $minimum }} pelatihan per peserta
+                        {{ $minimum }} pelatihan per peserta
                     </span>
                 </div>
             </div>
@@ -533,7 +533,7 @@ html.rp-lock{overflow:hidden}
                         Peserta sudah dilatih
                     </small>
                     <strong class="rp-counter" data-target="{{ $totalTrainedParticipants }}">{{ $formatNumber($totalTrainedParticipants) }}</strong>
-                    <span>Jumlah peserta unik</span>
+                    <span>Jumlah peserta </span>
                 </div>
 
                 <div class="rp-hero-stat">
@@ -595,7 +595,7 @@ html.rp-lock{overflow:hidden}
                             <label for="minimum">Keikutsertaan</label>
                             <select id="minimum" name="minimum">
                                 @foreach ([1, 2, 3, 4, 5, 10] as $value)
-                                    <option value="{{ $value }}" @selected((int) $minimum === $value)>Minimal {{ $value }} kali</option>
+                                    <option value="{{ $value }}" @selected((int) $minimum === $value)>{{ $value }} kali</option>
                                 @endforeach
                             </select>
                         </div>
@@ -714,7 +714,7 @@ html.rp-lock{overflow:hidden}
 
                     <div class="rp-table-wrap cards">
                         <table class="rp-table" style="min-width:380px">
-                            <caption class="rp-sr">Jumlah peserta unik per profesi tahun {{ $year }}</caption>
+                            <caption class="rp-sr">Jumlah peserta per profesi tahun {{ $year }}</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">No.</th>
@@ -747,7 +747,7 @@ html.rp-lock{overflow:hidden}
             <div class="rp-section-head">
                 <h2 id="rp-fund-title">Rincian sumber dana</h2>
                 <p>
-                    Jumlah kegiatan, peserta unik, dan keikutsertaan untuk setiap sumber pembiayaan
+                    Jumlah kegiatan, peserta, dan keikutsertaan untuk setiap sumber pembiayaan
                     (APBD, APBN, mitra, dan lainnya) tahun {{ $year }}.
                 </p>
                 @if ($hasDetailRoute)
@@ -782,7 +782,7 @@ html.rp-lock{overflow:hidden}
                                     {{ $count($funding->total_trainings, '', 'lg') }}
                                 </div>
                                 <div class="rp-stat">
-                                    <span>Peserta unik</span>
+                                    <span>Peserta</span>
                                     {{ $count($funding->total_participants, '', 'lg') }}
                                 </div>
                                 <div class="rp-stat">
@@ -833,7 +833,7 @@ html.rp-lock{overflow:hidden}
                                 <th scope="col">Nama Pelatihan</th>
                                 <th scope="col" class="c">Kegiatan</th>
                                 <th scope="col">Sumber Dana</th>
-                                <th scope="col" class="c">Peserta Unik</th>
+                                <th scope="col" class="c">Peserta</th>
                                 <th scope="col" class="c">Keikutsertaan</th>
                                 <th scope="col" class="c">Rincian</th>
                             </tr>
@@ -852,7 +852,7 @@ html.rp-lock{overflow:hidden}
                                             @endforeach
                                         </div>
                                     </td>
-                                    <td class="c" data-label="Peserta Unik">{{ $count($training->total_participants) }}</td>
+                                    <td class="c" data-label="Peserta">{{ $count($training->total_participants) }}</td>
                                     <td class="c" data-label="Keikutsertaan">{{ $count($training->total_participations) }}</td>
                                     <td class="c" data-label="Rincian">
                                         {{ $detailBtn(['tabs' => 1, 'view' => 'trainings', 'training_name' => $training->name, 'label' => $trainLabel]) }}
@@ -873,7 +873,7 @@ html.rp-lock{overflow:hidden}
         <section class="rp-section rp-reveal" id="kategori">
             <div class="rp-section-head">
                 <h2>Rekap kategori pelatihan</h2>
-                <p>Jumlah kegiatan, peserta unik, dan keikutsertaan berdasarkan kategori pelatihan.</p>
+                <p>Jumlah kegiatan, peserta, dan keikutsertaan berdasarkan kategori pelatihan.</p>
             </div>
 
             <div class="rp-panel">
@@ -886,7 +886,7 @@ html.rp-lock{overflow:hidden}
                                 <th>No.</th>
                                 <th>Kategori Pelatihan</th>
                                 <th class="c">Jumlah Kegiatan</th>
-                                <th class="c">Peserta Unik</th>
+                                <th class="c">Peserta</th>
                                 <th class="c">Keikutsertaan</th>
                                 <th class="c">Rincian</th>
                             </tr>
@@ -901,7 +901,7 @@ html.rp-lock{overflow:hidden}
                                     <td class="rp-number" data-label="No.">{{ $index + 1 }}</td>
                                     <td class="rp-participant" data-label="Kategori">{{ $category->category_name }}</td>
                                     <td class="c" data-label="Jumlah Kegiatan">{{ $count($category->total_trainings) }}</td>
-                                    <td class="c" data-label="Peserta Unik">{{ $count($category->total_participants) }}</td>
+                                    <td class="c" data-label="Peserta">{{ $count($category->total_participants) }}</td>
                                     <td class="c" data-label="Keikutsertaan">{{ $count($category->total_participations) }}</td>
                                     <td class="c" data-label="Rincian">
                                         @if ($hasDetailRoute)
@@ -1007,7 +1007,7 @@ html.rp-lock{overflow:hidden}
                 </div>
 
                 <p class="rp-note">
-                    Satu peserta dapat mengikuti beberapa kegiatan dan dihitung satu kali pada peserta unik.
+                    Satu peserta dapat mengikuti beberapa kegiatan dan dihitung satu kali pada peserta.
                 </p>
 
                 <div class="rp-table-wrap cards">
