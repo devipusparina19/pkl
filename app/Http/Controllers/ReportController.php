@@ -117,7 +117,7 @@ class ReportController extends Controller
         );
     }
 
-    /* ============================================================
+        /* ============================================================
      | EKSPOR PDF
      * ============================================================ */
 
@@ -127,8 +127,8 @@ class ReportController extends Controller
             abort(501, 'Paket barryvdh/laravel-dompdf belum terpasang.');
         }
 
-        @ini_set('memory_limit', '512M');
-        @set_time_limit(180);
+        @ini_set('memory_limit', '1024M');
+        @set_time_limit(300);
 
         $years = $this->getAvailableTrainingYears();
         $year = $this->resolveYear($request, $years);
@@ -139,6 +139,20 @@ class ReportController extends Controller
 
         $data = $this->exportData($filters, $minimum);
 
+        // Daftar peserta (sama dengan tabel "Jumlah pelatihan per peserta" di halaman)
+        $participantList = $data['participantsAll']
+            ->values()
+            ->map(fn ($p) => [
+                'name'           => (string) ($p->name ?? ''),
+                'nik'            => (string) ($p->nik ?? ''),
+                'nip'            => (string) ($p->nip ?? ''),
+                'profession'     => (string) ($p->profession ?? ''),
+                'institution'    => (string) ($p->institution ?? ''),
+                'district'       => (string) ($p->district ?? ''),
+                'participations' => (int) ($p->participations_count ?? 0),
+            ])
+            ->all();
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
             'reports.pdf',
             array_merge($data, [
@@ -147,8 +161,9 @@ class ReportController extends Controller
                 'search'            => $filters['search'],
                 'districtFilter'    => $filters['district'],
                 'institutionFilter' => $filters['institution'],
+                'participantList'   => $participantList,
             ])
-        )->setPaper('a4', 'landscape');
+        )->setPaper('a4', 'portrait');
 
         return $pdf->download(
             'laporan-riwayat-pelatihan-' . $year . '.pdf'

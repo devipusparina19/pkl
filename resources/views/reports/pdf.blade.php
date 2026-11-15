@@ -200,8 +200,8 @@
 
     .data-table.small th,
     .data-table.small td {
-        padding: 3px 3px;
-        font-size: 7.5px;
+        padding: 3px 4px;
+        font-size: 8px;
     }
 
     .center { text-align: center; }
@@ -287,6 +287,10 @@
     tr {
         page-break-inside: avoid;
     }
+
+    .page-break {
+        page-break-before: always;
+    }
 </style>
 </head>
 
@@ -342,12 +346,16 @@
         ->take(10)
         ->values();
 
-    /* Data peserta (opsional, kirim dari controller sebagai $participantList) */
+    /* Data peserta (dikirim dari ReportController@pdf sebagai $participantList) */
     $participantRows = collect($participantList ?? [])
         ->map(fn ($p) => (array) (is_object($p) && method_exists($p, 'toArray') ? $p->toArray() : $p))
         ->values();
 
     $hasParticipants = $participantRows->isNotEmpty();
+
+    $participantParticipationSum = (int) $participantRows->sum(
+        fn ($p) => (int) ($p['participations'] ?? 0)
+    );
 
     $totalTrainingCount = (int) $totalTrainings;
     $totalParticipantCount = (int) $totalTrainedParticipants;
@@ -473,6 +481,15 @@
         <td class="info-label">Instansi</td>
         <td class="info-separator">:</td>
         <td>{{ $institutionFilter ?: 'Seluruh instansi' }}</td>
+    </tr>
+    <tr>
+        <td class="info-label">Min. Keikutsertaan</td>
+        <td class="info-separator">:</td>
+        <td>{{ $minimum ?? 1 }} kali</td>
+
+        <td class="info-label">Kata Kunci</td>
+        <td class="info-separator">:</td>
+        <td>{{ ($search ?? '') !== '' ? $search : '-' }}</td>
     </tr>
 </table>
 
@@ -716,27 +733,30 @@
 @endif
 
 <!-- =====================================================
-     VI. DATA PESERTA (opsional)
+     VI. JUMLAH PELATIHAN PER PESERTA
 ===================================================== -->
 
 @if ($hasParticipants)
-    <h2>VI. Data Peserta Pelatihan</h2>
+    <div class="page-break"></div>
+
+    <h2>VI. Jumlah Pelatihan per Peserta</h2>
 
     <div class="muted">
-        Total {{ $n($participantRows->count()) }} data keikutsertaan peserta sesuai filter laporan.
+        Jumlah keikutsertaan setiap peserta pada tahun {{ $year }} sesuai filter laporan.
+        Total {{ $n($participantRows->count()) }} peserta dengan {{ $n($participantParticipationSum) }} keikutsertaan.
+        Satu peserta dapat mengikuti beberapa kegiatan dan dihitung satu kali sebagai peserta.
     </div>
 
     <table class="data-table small">
         <thead>
             <tr>
-                <th style="width: 4%">No.</th>
-                <th style="width: 17%">Nama Peserta</th>
-                <th style="width: 15%">NIK</th>
-                <th style="width: 8%">Jenis Kelamin</th>
-                <th style="width: 12%">Profesi</th>
-                <th style="width: 14%">Instansi</th>
-                <th style="width: 10%">Kab./Kota</th>
-                <th style="width: 20%">Nama Pelatihan</th>
+                <th style="width: 5%">No.</th>
+                <th style="width: 22%">Nama Peserta</th>
+                <th style="width: 16%">NIK</th>
+                <th style="width: 15%">Profesi</th>
+                <th style="width: 18%">Instansi</th>
+                <th style="width: 14%">Kabupaten/Kota</th>
+                <th style="width: 10%">Keikutsertaan</th>
             </tr>
         </thead>
 
@@ -744,15 +764,19 @@
             @foreach ($participantRows as $i => $p)
                 <tr>
                     <td class="center">{{ $i + 1 }}</td>
-                    <td>{{ $p['name'] ?? '-' }}</td>
-                    <td class="center">{{ $p['nik'] ?? '-' }}</td>
-                    <td class="center">{{ $p['gender'] ?? '-' }}</td>
-                    <td>{{ $p['profession'] ?? '-' }}</td>
-                    <td>{{ $p['institution'] ?? '-' }}</td>
-                    <td>{{ $p['district'] ?? '-' }}</td>
-                    <td>{{ $p['training_name'] ?? '-' }}</td>
+                    <td>{{ ($p['name'] ?? '') !== '' ? $p['name'] : '-' }}</td>
+                    <td class="center">{{ ($p['nik'] ?? '') !== '' ? $p['nik'] : '-' }}</td>
+                    <td>{{ ($p['profession'] ?? '') !== '' ? $p['profession'] : '-' }}</td>
+                    <td>{{ ($p['institution'] ?? '') !== '' ? $p['institution'] : '-' }}</td>
+                    <td>{{ ($p['district'] ?? '') !== '' ? $p['district'] : '-' }}</td>
+                    <td class="center">{{ $n($p['participations'] ?? 0) }} kali</td>
                 </tr>
             @endforeach
+
+            <tr class="total-row">
+                <td colspan="6" class="center">Total Keikutsertaan</td>
+                <td class="center">{{ $n($participantParticipationSum) }}</td>
+            </tr>
         </tbody>
     </table>
 @endif
@@ -761,7 +785,7 @@
      CATATAN
 ===================================================== -->
 
-@if (!$hasSummary && !$hasGender && !$hasProfession && !$hasFunding && !$hasCategory && !$hasTrainingList)
+@if (!$hasSummary && !$hasGender && !$hasProfession && !$hasFunding && !$hasCategory && !$hasTrainingList && !$hasParticipants)
     <div class="catatan">
         <strong>Keterangan:</strong><br>
         Belum terdapat data pelatihan yang memenuhi filter laporan pada periode {{ $year }}.
@@ -773,7 +797,8 @@
         pada periode {{ $year }}. Jumlah peserta menunjukkan individu yang
         mengikuti pelatihan, sedangkan jumlah keikutsertaan menunjukkan total
         partisipasi peserta dalam seluruh kegiatan. Daftar kegiatan utama
-        ditampilkan berdasarkan jumlah peserta terbanyak.
+        ditampilkan berdasarkan jumlah peserta terbanyak, dan daftar peserta
+        ditampilkan lengkap sesuai filter yang aktif.
     </div>
 @endif
 
