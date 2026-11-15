@@ -12,10 +12,11 @@ use App\Http\Controllers\PdfExportController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\MasterDataController;
 use App\Http\Controllers\PublicTrainingHistoryController;
+use App\Http\Controllers\TrainingHistoryExportController;
 
 /*
 |--------------------------------------------------------------------------
-| Halaman Publik
+| HALAMAN PUBLIK
 |--------------------------------------------------------------------------
 */
 
@@ -24,6 +25,12 @@ Route::get('/', [DashboardController::class, 'publicIndex'])
 
 Route::get('/dashboard-publik', [DashboardController::class, 'publicIndex'])
     ->name('public.dashboard.alternate');
+
+/*
+|--------------------------------------------------------------------------
+| Riwayat Pelatihan Publik
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/riwayat-pelatihan', [
     PublicTrainingHistoryController::class,
@@ -42,6 +49,41 @@ Route::get('/riwayat-pelatihan/hasil', [
     'result',
 ])->name('public.training-history.result');
 
+/*
+|--------------------------------------------------------------------------
+| Halaman Pengaturan Ekspor Riwayat Pelatihan
+|--------------------------------------------------------------------------
+| Memakai signed URL agar ID peserta tidak dapat dipakai sembarangan.
+*/
+
+Route::get(
+    '/riwayat-pelatihan/{participant}/export',
+    [TrainingHistoryExportController::class, 'preview']
+)
+    ->whereNumber('participant')
+    ->middleware('signed')
+    ->name('public.training-history.export.preview');
+
+/*
+|--------------------------------------------------------------------------
+| Proses Unduh PDF Riwayat Pelatihan
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/riwayat-pelatihan/{participant}/export/download',
+    TrainingHistoryExportController::class
+)
+    ->whereNumber('participant')
+    ->middleware('signed')
+    ->name('public.training-history.export');
+
+/*
+|--------------------------------------------------------------------------
+| Download Template Pelatihan
+|--------------------------------------------------------------------------
+*/
+
 Route::get(
     '/training/download-template',
     [TrainingController::class, 'downloadTemplate']
@@ -50,7 +92,7 @@ Route::get(
 
 /*
 |--------------------------------------------------------------------------
-| Login
+| LOGIN
 |--------------------------------------------------------------------------
 */
 
@@ -72,17 +114,11 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Halaman Internal
+| HALAMAN INTERNAL
 |--------------------------------------------------------------------------
 */
 
 Route::middleware('auth')->group(function () {
-
-    /*
-    |--------------------------------------------------------------------------
-    | Logout dan Dashboard
-    |--------------------------------------------------------------------------
-    */
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
@@ -92,9 +128,7 @@ Route::middleware('auth')->group(function () {
 
 
     /*
-    |--------------------------------------------------------------------------
-    | Data Peserta: Admin
-    |--------------------------------------------------------------------------
+    | DATA PESERTA: ADMIN
     */
 
     Route::middleware('role:admin')->group(function () {
@@ -102,47 +136,30 @@ Route::middleware('auth')->group(function () {
         Route::get('/participants', [ParticipantController::class, 'index'])
             ->name('participants.index');
 
-        Route::get('/participants/{participant}/edit', [
-            ParticipantController::class,
-            'edit',
-        ])
+        Route::get('/participants/{participant}/edit', [ParticipantController::class, 'edit'])
             ->whereNumber('participant')
             ->name('participants.edit');
 
-        Route::get('/participants/{participant}', [
-            ParticipantController::class,
-            'show',
-        ])
+        Route::get('/participants/{participant}', [ParticipantController::class, 'show'])
             ->whereNumber('participant')
             ->name('participants.show');
 
-        Route::put('/participants/{participant}', [
-            ParticipantController::class,
-            'update',
-        ])
+        Route::put('/participants/{participant}', [ParticipantController::class, 'update'])
             ->whereNumber('participant')
             ->name('participants.update');
 
-        Route::patch('/participants/{participant}', [
-            ParticipantController::class,
-            'update',
-        ])
+        Route::patch('/participants/{participant}', [ParticipantController::class, 'update'])
             ->whereNumber('participant')
             ->name('participants.update.patch');
 
-        Route::delete('/participants/{participant}', [
-            ParticipantController::class,
-            'destroy',
-        ])
+        Route::delete('/participants/{participant}', [ParticipantController::class, 'destroy'])
             ->whereNumber('participant')
             ->name('participants.destroy');
     });
 
 
     /*
-    |--------------------------------------------------------------------------
-    | Data Pelatihan: Admin
-    |--------------------------------------------------------------------------
+    | DATA PELATIHAN: ADMIN
     */
 
     Route::middleware('role:admin')->group(function () {
@@ -150,40 +167,30 @@ Route::middleware('auth')->group(function () {
         Route::get('/trainings', [TrainingController::class, 'index'])
             ->name('trainings.index');
 
-        Route::get('/trainings/{training}/edit', [
-            TrainingController::class,
-            'edit',
-        ])
+        Route::get('/trainings/{training}', [TrainingController::class, 'show'])
+            ->whereNumber('training')
+            ->name('trainings.show');
+
+        Route::get('/trainings/{training}/edit', [TrainingController::class, 'edit'])
             ->whereNumber('training')
             ->name('trainings.edit');
 
-        Route::put('/trainings/{training}', [
-            TrainingController::class,
-            'update',
-        ])
+        Route::put('/trainings/{training}', [TrainingController::class, 'update'])
             ->whereNumber('training')
             ->name('trainings.update');
 
-        Route::patch('/trainings/{training}', [
-            TrainingController::class,
-            'update',
-        ])
+        Route::patch('/trainings/{training}', [TrainingController::class, 'update'])
             ->whereNumber('training')
             ->name('trainings.update.patch');
 
-        Route::delete('/trainings/{training}', [
-            TrainingController::class,
-            'destroy',
-        ])
+        Route::delete('/trainings/{training}', [TrainingController::class, 'destroy'])
             ->whereNumber('training')
             ->name('trainings.destroy');
     });
 
 
     /*
-    |--------------------------------------------------------------------------
-    | Import Excel: Admin
-    |--------------------------------------------------------------------------
+    | IMPORT EXCEL: ADMIN
     */
 
     Route::middleware('role:admin')->group(function () {
@@ -197,68 +204,47 @@ Route::middleware('auth')->group(function () {
 
 
     /*
-    |--------------------------------------------------------------------------
-    | Laporan dan Ekspor: Admin dan Pimpinan
-    |--------------------------------------------------------------------------
+    | LAPORAN DAN EKSPOR: ADMIN DAN PIMPINAN
     */
 
     Route::middleware('role:admin,pimpinan')->group(function () {
 
-        /*
-         * Halaman laporan
-         */
+        // Halaman laporan.
         Route::get('/reports', [ReportController::class, 'index'])
             ->name('reports.index');
 
-        /*
-         * Ekspor laporan Excel
-         */
+        // Ekspor laporan Excel (pakai ReportViewExport di dalam controller).
         Route::get('/reports/export', [ReportController::class, 'export'])
             ->name('reports.export');
 
-        Route::get('/reports/detail', [ReportController::class, 'detail'])->name('reports.detail');
+        // Detail laporan.
+        Route::get('/reports/detail', [ReportController::class, 'detail'])
+            ->name('reports.detail');
 
-        Route::get('/reports/pdf', [ReportController::class, 'pdf'])->name('reports.pdf');
-        /*
-        |--------------------------------------------------------------------------
-        | Ekspor PDF
-        |--------------------------------------------------------------------------
-        */
+        // Laporan PDF.
+        Route::get('/reports/pdf', [ReportController::class, 'pdf'])
+            ->name('reports.pdf');
 
-        // PDF daftar seluruh peserta
-        Route::get('/export/pdf/participants', [
-            PdfExportController::class,
-            'participants',
-        ])->name('pdf.participants');
+        // PDF daftar seluruh peserta.
+        Route::get('/export/pdf/participants', [PdfExportController::class, 'participants'])
+            ->name('pdf.participants');
 
+        // PDF riwayat pelatihan peserta.
+        Route::get('/export/pdf/training-history', [PdfExportController::class, 'trainingHistory'])
+            ->name('pdf.training-history');
 
-        // PDF riwayat pelatihan peserta
-        Route::get('/export/pdf/training-history', [
-            PdfExportController::class,
-            'trainingHistory',
-        ])->name('pdf.training-history');
+        // PDF laporan tahunan.
+        Route::get('/export/pdf/report', [PdfExportController::class, 'report'])
+            ->name('pdf.report');
 
-
-        // PDF laporan tahunan
-        Route::get('/export/pdf/report', [
-            PdfExportController::class,
-            'report',
-        ])->name('pdf.report');
-
-
-        // PDF rekap peserta berdasarkan wilayah
-        Route::get('/export/pdf/district-recap', [
-            PdfExportController::class,
-            'districtRecap',
-        ])->name('pdf.district-recap');
-
+        // PDF rekap peserta berdasarkan wilayah.
+        Route::get('/export/pdf/district-recap', [PdfExportController::class, 'districtRecap'])
+            ->name('pdf.district-recap');
     });
 
 
     /*
-    |--------------------------------------------------------------------------
-    | Super Admin: Dashboard dan Pengelolaan Akun
-    |--------------------------------------------------------------------------
+    | SUPER ADMIN: DASHBOARD DAN PENGELOLAAN AKUN
     */
 
     Route::middleware('role:super_admin')
@@ -272,50 +258,32 @@ Route::middleware('auth')->group(function () {
             Route::get('/users', [SuperAdminController::class, 'users'])
                 ->name('users.index');
 
-            Route::get('/users/create', [
-                SuperAdminController::class,
-                'createUser',
-            ])->name('users.create');
+            Route::get('/users/create', [SuperAdminController::class, 'createUser'])
+                ->name('users.create');
 
-            Route::post('/users', [
-                SuperAdminController::class,
-                'storeUser',
-            ])->name('users.store');
+            Route::post('/users', [SuperAdminController::class, 'storeUser'])
+                ->name('users.store');
 
-            Route::get('/users/{user}/edit', [
-                SuperAdminController::class,
-                'editUser',
-            ])
+            Route::get('/users/{user}/edit', [SuperAdminController::class, 'editUser'])
                 ->whereNumber('user')
                 ->name('users.edit');
 
-            Route::patch('/users/{user}/status', [
-                SuperAdminController::class,
-                'toggleUserStatus',
-            ])
+            Route::patch('/users/{user}/status', [SuperAdminController::class, 'toggleUserStatus'])
                 ->whereNumber('user')
                 ->name('users.status');
 
-            Route::put('/users/{user}', [
-                SuperAdminController::class,
-                'updateUser',
-            ])
+            Route::put('/users/{user}', [SuperAdminController::class, 'updateUser'])
                 ->whereNumber('user')
                 ->name('users.update');
 
-            Route::delete('/users/{user}', [
-                SuperAdminController::class,
-                'destroyUser',
-            ])
+            Route::delete('/users/{user}', [SuperAdminController::class, 'destroyUser'])
                 ->whereNumber('user')
                 ->name('users.destroy');
         });
 
 
     /*
-    |--------------------------------------------------------------------------
-    | Master Data: Super Admin
-    |--------------------------------------------------------------------------
+    | MASTER DATA: SUPER ADMIN
     */
 
     Route::middleware('role:super_admin')
@@ -332,58 +300,35 @@ Route::middleware('auth')->group(function () {
                 'training-categories',
             ];
 
-            Route::get('/{category}', [
-                MasterDataController::class,
-                'index',
-            ])
+            Route::get('/{category}', [MasterDataController::class, 'index'])
                 ->whereIn('category', $categories)
                 ->name('index');
 
-            Route::get('/{category}/create', [
-                MasterDataController::class,
-                'create',
-            ])
+            Route::get('/{category}/create', [MasterDataController::class, 'create'])
                 ->whereIn('category', $categories)
                 ->name('create');
 
-            Route::post('/{category}', [
-                MasterDataController::class,
-                'store',
-            ])
+            Route::post('/{category}', [MasterDataController::class, 'store'])
                 ->whereIn('category', $categories)
                 ->name('store');
 
-            Route::get('/{category}/{id}/edit', [
-                MasterDataController::class,
-                'edit',
-            ])
+            Route::get('/{category}/{id}/edit', [MasterDataController::class, 'edit'])
                 ->whereIn('category', $categories)
                 ->whereNumber('id')
                 ->name('edit');
 
-            Route::put('/{category}/{id}', [
-                MasterDataController::class,
-                'update',
-            ])
+            Route::put('/{category}/{id}', [MasterDataController::class, 'update'])
                 ->whereIn('category', $categories)
                 ->whereNumber('id')
                 ->name('update');
 
-            Route::patch('/{category}/{id}/status', [
-                MasterDataController::class,
-                'toggleStatus',
-            ])
+            Route::patch('/{category}/{id}/status', [MasterDataController::class, 'toggleStatus'])
                 ->whereIn('category', $categories)
                 ->whereNumber('id')
                 ->name('status');
 
-            Route::delete('/{category}/{id}', [
-                MasterDataController::class,
-                'destroy',
-            ])
+            Route::delete('/{category}/{id}', [MasterDataController::class, 'destroy'])
                 ->whereIn('category', $categories)
-                ->whereNumber('id')
                 ->name('destroy');
         });
-
 });

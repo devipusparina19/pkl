@@ -1171,14 +1171,21 @@
         </p>
 
         <div class="btn-row">
-            <button type="button" class="btn btn-print" onclick="window.print()">
-                <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M6 9V2h12v7"/>
-                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                    <path d="M6 14h12v8H6z"/>
-                </svg>
-                Ekspor PDF
-            </button>
+            <a
+    class="btn btn-print"
+    href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute(
+        'public.training-history.export',
+        now()->addMinutes(30),
+        ['participant' => $participant->id]
+    ) }}"
+>
+    <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 9V2h12v7"/>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+        <path d="M6 14h12v8H6z"/>
+    </svg>
+    Ekspor PDF
+</a>
 
             <a class="btn btn-secondary" href="{{ route('public.training-history') }}">
                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true">

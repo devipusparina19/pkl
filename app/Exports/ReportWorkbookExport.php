@@ -24,28 +24,23 @@ use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 /**
- * Laporan Eksekutif Riwayat Pelatihan: SATU worksheet.
+ * Laporan Eksekutif Riwayat Pelatihan (portrait, satu worksheet).
+ * Sistem: ARTA - Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan.
  *
- * Bagian I  : kop, informasi filter, KPI, diagram pie, tabel rekap, analisis pimpinan.
- * Bagian II : detail peserta (lampiran).
+ * Bagian I  : kop surat, judul, informasi, KPI, diagram pie, tabel rekap, analisis.
+ * Bagian II : detail data peserta.
  *
- * Semua angka (KPI, tabel, diagram, analisis) dihitung dari SATU sumber yang sama,
- * yaitu $participations, sehingga ringkasan selalu sama dengan daftar peserta.
+ * $participations = baris keikutsertaan (satu baris = satu peserta pada satu kegiatan).
+ * Kunci: participant_id, name, nik, gender, profession, institution, district,
+ *        training_id, training_name, category, funding_source, start_date, end_date
  *
- * $participations = daftar BARIS KEIKUTSERTAAN (satu baris = satu peserta pada satu kegiatan).
- * Kunci yang dibaca (semua opsional, yang kosong dianggap "tidak tercatat"):
- *   participant_id, name, nik, gender, profession, institution, district,
- *   training_id, training_name, category, funding_source, start_date, end_date
- *
- * $meta (opsional):
- *   year, minimum, search, district, institution, funding_sources (array),
- *   exported_at (string), logo_path (path file png/jpg)
+ * $meta (opsional): year, minimum, search, district, institution,
+ *        funding_sources (array), exported_at (string), logo_path (string)
  */
 class ReportWorkbookExport extends DefaultValueBinder implements
     FromArray,
@@ -57,15 +52,11 @@ class ReportWorkbookExport extends DefaultValueBinder implements
 {
     private const SHEET = 'Laporan';
     private const COLS = 12;
-    private const CHART_ROWS = 18;
+    private const CHART_ROWS = 19;
     private const EMPTY = 'Tidak tercatat';
+    private const BLACK = '000000';
+    private const SYSTEM = 'ARTA - Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan';
 
-    private const NAVY = '1F3864';
-    private const GREY = '595959';
-    private const LINE = 'BFBFBF';
-    private const TONES = ['1F3864', '2F5597', '1F6B75', '44546A', '6B5B45', '3B4A8F'];
-
-    /** @var array<int, array<int, mixed>> */
     private array $grid = [];
     private array $merges = [];
     private array $styles = [];
@@ -102,7 +93,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         return $this->out;
     }
 
-    /** NIK 16 digit harus tetap teks (jangan jadi angka ilmiah). */
+    /** NIK 16 digit harus tetap teks. */
     public function bindValue(Cell $cell, mixed $value = null): bool
     {
         if (is_string($value) && ($value !== '') && (ctype_digit($value) && strlen($value) >= 10 || $value[0] === '=')) {
@@ -116,7 +107,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
 
     public function drawings(): array
     {
-        $path = $this->meta['logo_path'] ?? public_path('images/logo-kalsel.png');
+        $path = $this->meta['logo_path'] ?? public_path('images/LOGO PROVINSI KALIMANTAN SELATAN.png');
 
         if (!$path || !is_file($path)) {
             return [];
@@ -125,9 +116,9 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $logo = new Drawing();
         $logo->setName('Logo');
         $logo->setPath($path);
-        $logo->setHeight(74);
+        $logo->setHeight(88);
         $logo->setCoordinates('A1');
-        $logo->setOffsetX(10);
+        $logo->setOffsetX(14);
         $logo->setOffsetY(4);
 
         return [$logo];
@@ -309,19 +300,27 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->formats[] = [$this->col($c1) . $r1 . ':' . $this->col($c2) . $r2, $code];
     }
 
-    private function font(int $size = 10, bool $bold = false, string $color = '000000', bool $italic = false): array
+    /** Semua font selalu hitam. */
+    private function font(int $size = 10, bool $bold = false, bool $italic = false, bool $underline = false): array
     {
-        return ['name' => 'Arial', 'size' => $size, 'bold' => $bold, 'italic' => $italic, 'color' => ['rgb' => $color]];
+        $font = [
+            'name' => 'Arial',
+            'size' => $size,
+            'bold' => $bold,
+            'italic' => $italic,
+            'color' => ['rgb' => self::BLACK],
+        ];
+
+        if ($underline) {
+            $font['underline'] = 'single';
+        }
+
+        return $font;
     }
 
-    private function fill(string $rgb): array
+    private function box(string $style = Border::BORDER_THIN): array
     {
-        return ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => $rgb]];
-    }
-
-    private function box(string $color = self::LINE, string $style = Border::BORDER_THIN): array
-    {
-        return ['allBorders' => ['borderStyle' => $style, 'color' => ['rgb' => $color]]];
+        return ['allBorders' => ['borderStyle' => $style, 'color' => ['rgb' => self::BLACK]]];
     }
 
     private function align(string $h, bool $wrap = true, int $indent = 0): array
@@ -335,9 +334,9 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->cell($r, 1, $text);
         $this->merge($r, 1, self::COLS);
         $this->style($r, 1, $r, self::COLS, [
-            'font' => $this->font(12, true, 'FFFFFF'),
-            'fill' => $this->fill(self::NAVY),
-            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false, 1),
+            'font' => $this->font(12, true),
+            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false),
+            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::BLACK]]],
         ]);
         $this->heights[$r] = 24;
         $this->cursor++;
@@ -360,12 +359,13 @@ class ReportWorkbookExport extends DefaultValueBinder implements
             $this->cell($r, 1, 'Tidak terdapat data pelatihan yang sesuai dengan filter yang dipilih.');
             $this->merge($r, 1, self::COLS);
             $this->style($r, 1, $r, self::COLS, [
-                'font' => $this->font(11, true, self::GREY),
+                'font' => $this->font(11, true),
                 'alignment' => $this->align(Alignment::HORIZONTAL_CENTER),
                 'borders' => $this->box(),
             ]);
             $this->heights[$r] = 40;
             $this->cursor++;
+            $this->closing();
             $this->finish();
 
             return;
@@ -392,7 +392,6 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->band('BAGIAN I — LAPORAN EKSEKUTIF');
         $this->cursor++;
 
-        /* KPI */
         $this->kpis([
             ['Total Pelatihan', $total['trainings']],
             ['Peserta Unik', $total['participants']],
@@ -403,7 +402,6 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         ]);
         $this->cursor++;
 
-        /* Area diagram */
         $wantGender = $this->hasReal($gen);
         $wantFund = $this->hasReal($fund);
 
@@ -413,38 +411,35 @@ class ReportWorkbookExport extends DefaultValueBinder implements
             $this->cursor += self::CHART_ROWS;
         }
 
-        /* Tabel rekap */
         $this->subhead('REKAPITULASI EKSEKUTIF');
         $this->cursor++;
 
         $tables = [];
-        $k = 0;
-        $tone = fn () => self::TONES[$k++ % count(self::TONES)];
         $all = ['trainings', 'participants', 'participations'];
 
         if ($wantFund) {
-            $tables['fund'] = $this->table('A. REKAPITULASI SUMBER DANA', 'Persentase dihitung dari total keikutsertaan.', 'Sumber Dana', $all, $fund, $total, 'participations', $tone());
+            $tables['fund'] = $this->table('A. REKAPITULASI SUMBER DANA', 'Persentase dihitung dari total keikutsertaan.', 'Sumber Dana', $all, $fund, $total, 'participations');
         }
         if ($this->hasReal($cat)) {
-            $this->table('B. REKAPITULASI KATEGORI PELATIHAN', 'Persentase dihitung dari total keikutsertaan.', 'Kategori Pelatihan', $all, $cat, $total, 'participations', $tone());
+            $this->table('B. REKAPITULASI KATEGORI PELATIHAN', 'Persentase dihitung dari total keikutsertaan.', 'Kategori Pelatihan', $all, $cat, $total, 'participations');
         }
         if ($this->hasReal($prof)) {
-            $this->table('C. REKAPITULASI JENIS PROFESI PESERTA', 'Persentase dihitung dari total peserta unik.', 'Jenis Profesi', ['participants'], $prof, $total, 'participants', $tone());
+            $this->table('C. REKAPITULASI JENIS PROFESI PESERTA', 'Persentase dihitung dari total peserta unik.', 'Jenis Profesi', ['participants'], $prof, $total, 'participants');
         }
         if ($wantGender) {
-            $tables['gender'] = $this->table('D. REKAPITULASI JENIS KELAMIN PESERTA', 'Persentase dihitung dari total peserta unik.', 'Jenis Kelamin', ['participants'], $gen, $total, 'participants', $tone());
+            $tables['gender'] = $this->table('D. REKAPITULASI JENIS KELAMIN PESERTA', 'Persentase dihitung dari total peserta unik.', 'Jenis Kelamin', ['participants'], $gen, $total, 'participants');
         }
 
         $trainShown = array_slice($train, 0, 15);
         $trainNote = 'Persentase dihitung dari total keikutsertaan.'
             . (count($train) > 15 ? ' Menampilkan 15 dari ' . $this->n(count($train)) . ' pelatihan dengan peserta terbanyak.' : '');
-        $this->table('E. REKAPITULASI PELATIHAN BERDASARKAN JUMLAH PESERTA', $trainNote, 'Nama Pelatihan', $all, $trainShown, $total, 'participations', $tone());
+        $this->table('E. REKAPITULASI PELATIHAN BERDASARKAN JUMLAH PESERTA', $trainNote, 'Nama Pelatihan', $all, $trainShown, $total, 'participations');
 
         if ($this->hasReal($dist)) {
-            $this->table('F. REKAPITULASI WILAYAH (KABUPATEN/KOTA)', 'Persentase dihitung dari total keikutsertaan.', 'Kabupaten/Kota', $all, $dist, $total, 'participations', $tone());
+            $this->table('F. REKAPITULASI WILAYAH (KABUPATEN/KOTA)', 'Persentase dihitung dari total keikutsertaan.', 'Kabupaten/Kota', $all, $dist, $total, 'participations');
         }
 
-        /* Spesifikasi diagram (sesudah posisi tabel diketahui) */
+        /* Diagram: jenis kelamin lebih dulu (kiri) */
         if ($wantGender) {
             $t = $tables['gender'];
             $this->chartSpecs[] = [
@@ -456,49 +451,59 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         if ($wantFund) {
             $t = $tables['fund'];
             $this->chartSpecs[] = [
-                'name' => 'chartFunding', 'title' => 'Distribusi Keikutsertaan Berdasarkan Sumber Dana',
+                'name' => 'chartFunding', 'title' => 'Keikutsertaan Berdasarkan Sumber Dana',
                 'labelCol' => 'B', 'valueCol' => $t['cols']['participations'],
                 'first' => $t['first'], 'last' => $t['last'], 'header' => $t['header'],
             ];
         }
 
-        /* Analisis */
         $this->insights($year, $total, $fund, $cat, $prof, $gen, $train, $dist);
 
-        /* Bagian II */
         $this->cursor++;
         $this->detailBand = $this->cursor;
         $this->band('BAGIAN II — DETAIL DATA PESERTA');
         $this->detail($rows);
 
+        $this->closing();
         $this->finish();
     }
 
+    /** Kop surat: logo kiri, teks tengah, satu garis hitam, tanggal, judul. */
     private function kop(): void
     {
         $lines = [
-            ['PEMERINTAH PROVINSI KALIMANTAN SELATAN', 12, 20],
-            ['DINAS KESEHATAN', 14, 22],
-            ['UPTD BALAI PELATIHAN KESEHATAN', 16, 26],
+            ['PEMERINTAH PROVINSI KALIMANTAN SELATAN', 12, true, 19],
+            ['DINAS KESEHATAN', 12, true, 19],
+            ['UPTD BALAI PELATIHAN KESEHATAN', 15, true, 23],
+            ['Jalan H. Mistar Tjokrokusumo No. 5A Banjarbaru Kode Pos 70714', 8, false, 13],
+            ['Telepon : (0511) 477201', 8, false, 13],
+            ['Email : info@bapelkes.kalselprov.go.id     Website : www.bapelkes.kalselprov.go.id', 8, false, 13],
         ];
 
-        foreach ($lines as [$text, $size, $height]) {
+        foreach ($lines as [$text, $size, $bold, $height]) {
             $r = $this->cursor;
-            $this->cell($r, 1, $text);
-            $this->merge($r, 1, self::COLS);
-            $this->style($r, 1, $r, self::COLS, [
-                'font' => $this->font($size, true, self::NAVY),
+            $this->cell($r, 3, $text);
+            $this->merge($r, 3, self::COLS);
+            $this->style($r, 3, $r, self::COLS, [
+                'font' => $this->font($size, $bold),
                 'alignment' => $this->align(Alignment::HORIZONTAL_CENTER, false),
             ]);
             $this->heights[$r] = $height;
             $this->cursor++;
         }
 
-        // garis kop
         $this->style($this->cursor - 1, 1, $this->cursor - 1, self::COLS, [
-            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THICK, 'color' => ['rgb' => self::NAVY]]],
+            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::BLACK]]],
         ]);
-        $this->heights[$this->cursor] = 6;
+
+        $r = $this->cursor;
+        $this->cell($r, 1, 'Banjarbaru, ' . Carbon::now('Asia/Makassar')->locale('id')->translatedFormat('d F Y'));
+        $this->merge($r, 1, self::COLS);
+        $this->style($r, 1, $r, self::COLS, [
+            'font' => $this->font(10),
+            'alignment' => $this->align(Alignment::HORIZONTAL_RIGHT, false, 1),
+        ]);
+        $this->heights[$r] = 22;
         $this->cursor++;
 
         $year = (string) ($this->meta['year'] ?? '');
@@ -507,20 +512,20 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->cell($r, 1, 'LAPORAN EKSEKUTIF RIWAYAT PELATIHAN');
         $this->merge($r, 1, self::COLS);
         $this->style($r, 1, $r, self::COLS, [
-            'font' => $this->font(16, true, self::NAVY),
+            'font' => $this->font(13, true, false, true),
             'alignment' => $this->align(Alignment::HORIZONTAL_CENTER, false),
         ]);
-        $this->heights[$r] = 30;
+        $this->heights[$r] = 26;
         $this->cursor++;
 
         $r = $this->cursor;
-        $this->cell($r, 1, $year !== '' ? 'TAHUN ' . $year : '');
+        $this->cell($r, 1, $year !== '' ? 'TAHUN ANGGARAN ' . $year : '');
         $this->merge($r, 1, self::COLS);
         $this->style($r, 1, $r, self::COLS, [
-            'font' => $this->font(12, true, self::GREY),
+            'font' => $this->font(11, true),
             'alignment' => $this->align(Alignment::HORIZONTAL_CENTER, false),
         ]);
-        $this->heights[$r] = 20;
+        $this->heights[$r] = 19;
         $this->cursor++;
         $this->cursor++;
     }
@@ -531,6 +536,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $exported = $this->meta['exported_at'] ?? Carbon::now('Asia/Makassar')->format('d/m/Y H:i') . ' WITA';
 
         $items = [
+            ['Sumber Data', self::SYSTEM],
             ['Tahun Pelatihan', (string) ($this->meta['year'] ?? '-')],
             ['Tanggal dan Waktu Ekspor', $exported],
             ['Sumber Dana', $sources ? implode(', ', $sources) : 'Semua sumber dana'],
@@ -548,17 +554,14 @@ class ReportWorkbookExport extends DefaultValueBinder implements
             $this->merge($r, 1, 3);
             $this->cell($r, 4, ': ' . $value);
             $this->merge($r, 4, self::COLS);
+            $this->heights[$r] = 17;
             $this->cursor++;
         }
 
-        $last = $this->cursor - 1;
-        $this->style($first, 1, $last, self::COLS, [
+        $this->style($first, 1, $this->cursor - 1, self::COLS, [
             'font' => $this->font(10),
             'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false, 1),
-            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_HAIR, 'color' => ['rgb' => self::LINE]]],
         ]);
-        $this->style($first, 1, $last, 3, ['font' => $this->font(10, true, self::NAVY)]);
-        $this->style($first - 1, 1, $first - 1, 1, []);
     }
 
     private function subhead(string $text): void
@@ -567,10 +570,9 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->cell($r, 1, $text);
         $this->merge($r, 1, self::COLS);
         $this->style($r, 1, $r, self::COLS, [
-            'font' => $this->font(11, true, self::NAVY),
-            'fill' => $this->fill('E7ECF5'),
-            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false, 1),
-            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::NAVY]]],
+            'font' => $this->font(11, true),
+            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false),
+            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => self::BLACK]]],
         ]);
         $this->heights[$r] = 22;
         $this->cursor++;
@@ -591,30 +593,24 @@ class ReportWorkbookExport extends DefaultValueBinder implements
             $this->merge($value, $c1, $c2);
 
             $this->style($label, $c1, $label, $c2, [
-                'font' => $this->font(9, true, 'FFFFFF'),
-                'fill' => $this->fill(self::NAVY),
+                'font' => $this->font(9, true),
                 'alignment' => $this->align(Alignment::HORIZONTAL_CENTER),
-                'borders' => $this->box('FFFFFF', Border::BORDER_MEDIUM),
+                'borders' => $this->box(),
             ]);
             $this->style($value, $c1, $value, $c2, [
-                'font' => $this->font(20, true, self::NAVY),
-                'fill' => $this->fill('F2F5FA'),
+                'font' => $this->font(18, true),
                 'alignment' => $this->align(Alignment::HORIZONTAL_CENTER, false),
-                'borders' => $this->box('FFFFFF', Border::BORDER_MEDIUM),
+                'borders' => $this->box(),
             ]);
             $this->format($value, $c1, $value, $c2, '#,##0');
         }
 
-        $this->heights[$label] = 26;
-        $this->heights[$value] = 40;
+        $this->heights[$label] = 28;
+        $this->heights[$value] = 38;
         $this->cursor += 2;
     }
 
-    /**
-     * Tabel rekap. Label di kolom B..label-end, setiap metrik memakai 2 kolom,
-     * persentase selalu di dua kolom terakhir (K:L).
-     */
-    private function table(string $title, string $note, string $labelHeader, array $metrics, array $recap, array $total, string $basis, string $tone): array
+    private function table(string $title, string $note, string $labelHeader, array $metrics, array $recap, array $total, string $basis): array
     {
         $heads = ['trainings' => 'Jumlah Kegiatan', 'participants' => 'Peserta Unik', 'participations' => 'Keikutsertaan'];
         $labelEnd = self::COLS - 2 * (count($metrics) + 1);
@@ -626,18 +622,17 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->cell($r, 1, $title);
         $this->merge($r, 1, self::COLS);
         $this->style($r, 1, $r, self::COLS, [
-            'font' => $this->font(11, true, $tone),
-            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false, 1),
-            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => $tone]]],
+            'font' => $this->font(10, true),
+            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false),
         ]);
-        $this->heights[$r] = 22;
+        $this->heights[$r] = 20;
         $r++;
 
         $this->cell($r, 1, $note);
         $this->merge($r, 1, self::COLS);
         $this->style($r, 1, $r, self::COLS, [
-            'font' => $this->font(9, false, self::GREY, true),
-            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false, 1),
+            'font' => $this->font(9, false, true),
+            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false),
         ]);
         $r++;
 
@@ -654,12 +649,11 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->cell($r, $pc, 'Persentase');
         $this->merge($r, $pc, $pc + 1);
         $this->style($r, 1, $r, self::COLS, [
-            'font' => $this->font(10, true, 'FFFFFF'),
-            'fill' => $this->fill($tone),
+            'font' => $this->font(10, true),
             'alignment' => $this->align(Alignment::HORIZONTAL_CENTER),
-            'borders' => $this->box('FFFFFF'),
+            'borders' => $this->box(),
         ]);
-        $this->heights[$r] = 26;
+        $this->heights[$r] = 24;
         $r++;
 
         $first = $r;
@@ -676,6 +670,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
             }
             $this->cell($r, $pc, $row[$basis] / $denominator);
             $this->merge($r, $pc, $pc + 1);
+            $this->heights[$r] = mb_strlen($row['label']) > 45 ? 28 : 18;
             $r++;
         }
 
@@ -701,15 +696,15 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->cell($r, $pc, 1);
         $this->merge($r, $pc, $pc + 1);
         $this->style($r, 1, $r, self::COLS, [
-            'font' => $this->font(10, true, self::NAVY),
-            'fill' => $this->fill('E7ECF5'),
+            'font' => $this->font(10, true),
             'alignment' => $this->align(Alignment::HORIZONTAL_CENTER),
             'borders' => [
-                'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => self::LINE]],
-                'top' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => $tone]],
+                'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => self::BLACK]],
+                'top' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::BLACK]],
             ],
         ]);
         $this->style($r, 2, $r, $labelEnd, ['alignment' => $this->align(Alignment::HORIZONTAL_LEFT, true, 1)]);
+        $this->heights[$r] = 19;
 
         $this->cursor = $r + 2;
 
@@ -784,7 +779,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
             $this->cell($r, 1, $i + 1);
             $this->cell($r, 2, $text);
             $this->merge($r, 2, self::COLS);
-            $this->heights[$r] = max(22, (int) ceil(mb_strlen($text) / 140) * 15 + 8);
+            $this->heights[$r] = max(22, (int) ceil(mb_strlen($text) / 110) * 14 + 8);
             $this->cursor++;
         }
 
@@ -792,9 +787,12 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->style($first, 1, $last, self::COLS, [
             'font' => $this->font(10),
             'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, true, 1),
-            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_HAIR, 'color' => ['rgb' => self::LINE]]],
+            'borders' => $this->box(),
         ]);
-        $this->style($first, 1, $last, 1, ['font' => $this->font(10, true, self::NAVY), 'alignment' => $this->align(Alignment::HORIZONTAL_CENTER)]);
+        $this->style($first, 1, $last, 1, [
+            'font' => $this->font(10, true),
+            'alignment' => $this->align(Alignment::HORIZONTAL_CENTER),
+        ]);
     }
 
     private function detail(Collection $rows): void
@@ -803,24 +801,23 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->cell($r, 1, 'Data pendukung: ' . $this->n($rows->count()) . ' baris keikutsertaan peserta, sesuai filter yang sama dengan ringkasan di atas.');
         $this->merge($r, 1, self::COLS);
         $this->style($r, 1, $r, self::COLS, [
-            'font' => $this->font(9, false, self::GREY, true),
-            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false, 1),
+            'font' => $this->font(9, false, true),
+            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, false),
         ]);
         $this->cursor++;
 
-        $heads = ['No', 'Nama Peserta', 'NIK', 'Jenis Kelamin', 'Profesi', 'Instansi', 'Kabupaten/Kota', 'Nama Pelatihan', 'Kategori', 'Sumber Dana', 'Tanggal Mulai', 'Tanggal Selesai'];
+        $heads = ['No', 'Nama Peserta', 'NIK', 'Jenis Kelamin', 'Profesi', 'Instansi', 'Kabupaten/ Kota', 'Nama Pelatihan', 'Kategori', 'Sumber Dana', 'Tanggal Mulai', 'Tanggal Selesai'];
         $this->detailHeader = $this->cursor;
 
         foreach ($heads as $i => $h) {
             $this->cell($this->cursor, $i + 1, $h);
         }
         $this->style($this->cursor, 1, $this->cursor, self::COLS, [
-            'font' => $this->font(10, true, 'FFFFFF'),
-            'fill' => $this->fill(self::NAVY),
+            'font' => $this->font(8, true),
             'alignment' => $this->align(Alignment::HORIZONTAL_CENTER),
-            'borders' => $this->box('FFFFFF'),
+            'borders' => $this->box(),
         ]);
-        $this->heights[$this->cursor] = 28;
+        $this->heights[$this->cursor] = 30;
         $this->cursor++;
 
         $first = $this->cursor;
@@ -848,7 +845,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->detailLast = $this->cursor - 1;
 
         $this->style($first, 1, $this->detailLast, self::COLS, [
-            'font' => $this->font(9),
+            'font' => $this->font(8),
             'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, true, 0),
             'borders' => $this->box(),
         ]);
@@ -856,6 +853,22 @@ class ReportWorkbookExport extends DefaultValueBinder implements
             $this->style($first, $c, $this->detailLast, $c, ['alignment' => $this->align(Alignment::HORIZONTAL_CENTER)]);
         }
         $this->format($first, 3, $this->detailLast, 3, '@');
+    }
+
+    /** Catatan penutup dokumen. */
+    private function closing(): void
+    {
+        $this->cursor++;
+        $r = $this->cursor;
+        $this->cell($r, 1, 'Dokumen ini dihasilkan oleh ' . self::SYSTEM . ' (ARTA), UPTD Balai Pelatihan Kesehatan Provinsi Kalimantan Selatan, berdasarkan data yang tersimpan pada saat dokumen diekspor.');
+        $this->merge($r, 1, self::COLS);
+        $this->style($r, 1, $r, self::COLS, [
+            'font' => $this->font(9, false, true),
+            'alignment' => $this->align(Alignment::HORIZONTAL_LEFT, true),
+            'borders' => ['top' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => self::BLACK]]],
+        ]);
+        $this->heights[$r] = 28;
+        $this->cursor++;
     }
 
     private function finish(): void
@@ -872,7 +885,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
     }
 
     /* ------------------------------------------------------------------ */
-    /* Diagram pie asli (bisa diedit di Excel)                             */
+    /* Diagram pie penuh (bisa diedit di Excel)                            */
     /* ------------------------------------------------------------------ */
 
     private function pie(array $s): Chart
@@ -889,6 +902,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $categories = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, $ref($s['labelCol'], $s['first'], $s['last']), null, $n)];
         $values = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, $ref($s['valueCol'], $s['first'], $s['last']), null, $n)];
 
+        // TYPE_PIECHART = pie penuh (bukan donat)
         $series = new DataSeries(DataSeries::TYPE_PIECHART, null, range(0, count($values) - 1), $label, $categories, $values);
 
         $layout = new Layout();
@@ -902,7 +916,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         return new Chart(
             $s['name'],
             new Title($s['title']),
-            new Legend(Legend::POSITION_RIGHT, null, false),
+            new Legend(Legend::POSITION_BOTTOM, null, false),
             new PlotArea($layout, [$series]),
             true,
             'gap'
@@ -910,12 +924,13 @@ class ReportWorkbookExport extends DefaultValueBinder implements
     }
 
     /* ------------------------------------------------------------------ */
-    /* Format, tata letak, dan pengaturan cetak                            */
+    /* Format, tata letak, dan pengaturan cetak (PORTRAIT)                 */
     /* ------------------------------------------------------------------ */
 
     private function decorate(Worksheet $ws): void
     {
-        $widths = [1 => 8, 2 => 26, 3 => 20, 4 => 16, 5 => 20, 6 => 24, 7 => 20, 8 => 28, 9 => 20, 10 => 18, 11 => 14, 12 => 14];
+        // Lebar kolom dipadatkan agar muat satu halaman lebar A4 portrait.
+        $widths = [1 => 5, 2 => 18, 3 => 17, 4 => 9, 5 => 13, 6 => 14, 7 => 11, 8 => 18, 9 => 11, 10 => 10, 11 => 10, 12 => 10];
         foreach ($widths as $c => $w) {
             $ws->getColumnDimension($this->col($c))->setWidth($w);
         }
@@ -946,10 +961,10 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         }
 
         $ws->setShowGridlines(false);
-        $ws->getSheetView()->setZoomScale(90);
+        $ws->getSheetView()->setZoomScale(100);
 
         $page = $ws->getPageSetup();
-        $page->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
+        $page->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
         $page->setPaperSize(PageSetup::PAPERSIZE_A4);
         $page->setFitToPage(true);
         $page->setFitToWidth(1);
@@ -957,7 +972,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $page->setHorizontalCentered(true);
         $page->setPrintArea('A1:' . $this->col(self::COLS) . $this->lastRow);
 
-        $ws->getPageMargins()->setTop(0.6)->setBottom(0.7)->setLeft(0.4)->setRight(0.4)->setHeader(0.3)->setFooter(0.3);
-        $ws->getHeaderFooter()->setOddFooter('&L&8UPTD Balai Pelatihan Kesehatan - Dinas Kesehatan Provinsi Kalimantan Selatan&C&8Halaman &P dari &N&R&8Dicetak &D &T');
+        $ws->getPageMargins()->setTop(0.5)->setBottom(0.7)->setLeft(0.3)->setRight(0.3)->setHeader(0.3)->setFooter(0.3);
+        $ws->getHeaderFooter()->setOddFooter('&L&"Arial,Regular"&8ARTA - UPTD Balai Pelatihan Kesehatan Prov. Kalimantan Selatan&C&"Arial,Regular"&8Halaman &P dari &N&R&"Arial,Regular"&8Dicetak &D &T');
     }
 }

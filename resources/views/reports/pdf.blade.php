@@ -6,8 +6,8 @@
 
 <style>
     @page {
-        size: A4 landscape;
-        margin: 22px 30px 25px 30px;
+        size: A4 portrait;
+        margin: 28px 40px 40px 40px;
     }
 
     * {
@@ -15,9 +15,9 @@
     }
 
     body {
-        font-family: "Times New Roman", Times, serif;
+        font-family: Helvetica, Arial, sans-serif;
         font-size: 10px;
-        color: #172033;
+        color: #000;
         line-height: 1.35;
     }
 
@@ -30,93 +30,81 @@
        KOP SURAT
     ========================= */
 
-    .kop {
-        margin-bottom: 5px;
-    }
-
     .kop td {
         border: none;
         padding: 0;
         vertical-align: middle;
-        background: transparent !important;
     }
 
     .kop-logo {
-        width: 100px;
-        text-align: center;
+        width: 80px;
+        text-align: left;
     }
 
     .kop-logo img {
-        width: 76px;
+        width: 66px;
         height: auto;
     }
 
     .kop-text {
         text-align: center;
-        padding-right: 100px !important;
+        padding-right: 80px !important;
     }
 
-    .kop-text .pemerintah {
-        font-size: 15px;
-        font-weight: bold;
-        text-transform: uppercase;
-        color: #000;
-    }
-
+    .kop-text .pemerintah,
     .kop-text .dinas {
-        font-size: 17px;
+        font-size: 13px;
         font-weight: bold;
         text-transform: uppercase;
-        color: #000;
+        line-height: 1.25;
     }
 
     .kop-text .balai {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: bold;
         text-transform: uppercase;
-        color: #000;
+        line-height: 1.25;
     }
 
     .kop-text .alamat {
-        font-size: 10px;
-        color: #000;
+        margin-top: 2px;
+        font-size: 8px;
         line-height: 1.35;
     }
 
     .kop-garis {
-        border-top: 3px solid #000;
-        border-bottom: 1px solid #000;
-        height: 5px;
-        margin-top: 7px;
-        margin-bottom: 15px;
+        margin-top: 6px;
+        border-top: 1.5px solid #000;
+        height: 0;
     }
 
     /* =========================
-       JUDUL LAPORAN
+       TANGGAL & JUDUL
     ========================= */
+
+    .tanggal {
+        margin: 5px 0 8px;
+        text-align: right;
+        font-size: 10px;
+    }
 
     .judul {
         text-align: center;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
 
     .judul h1 {
-        font-size: 16px;
-        text-transform: uppercase;
         margin: 0 0 3px;
-        color: #000;
+        font-size: 13px;
         font-weight: bold;
+        text-transform: uppercase;
+        text-decoration: underline;
     }
 
     .judul .subjudul {
-        font-size: 11px;
+        font-size: 10.5px;
         font-weight: bold;
-    }
-
-    .judul .nomor {
-        font-size: 9px;
-        margin-top: 3px;
-        color: #444;
+        text-transform: uppercase;
     }
 
     /* =========================
@@ -124,23 +112,23 @@
     ========================= */
 
     .info {
-        margin-bottom: 10px;
+        margin-bottom: 6px;
         font-size: 10px;
     }
 
     .info td {
         border: none;
-        padding: 2px 4px;
+        padding: 1.5px 3px;
         vertical-align: top;
     }
 
     .info-label {
-        width: 105px;
-        font-weight: bold;
+        width: 95px;
+        white-space: nowrap;
     }
 
     .info-separator {
-        width: 10px;
+        width: 8px;
     }
 
     /* =========================
@@ -148,12 +136,12 @@
     ========================= */
 
     h2 {
-        font-size: 11px;
-        text-transform: uppercase;
         margin: 12px 0 5px;
-        padding-bottom: 3px;
-        border-bottom: 1px solid #263B59;
-        color: #172B4D;
+        padding-bottom: 2px;
+        border-bottom: 1px solid #000;
+        font-size: 10.5px;
+        font-weight: bold;
+        text-transform: uppercase;
     }
 
     /* =========================
@@ -161,28 +149,25 @@
     ========================= */
 
     .stats {
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
     .stats td {
         width: 25%;
-        border: 1px solid #B8C4D3;
-        padding: 8px 5px;
+        border: 1px solid #000;
+        padding: 7px 4px;
         text-align: center;
-        background: #F7F9FC;
     }
 
     .stats .angka {
         display: block;
-        font-size: 20px;
-        font-weight: bold;
-        color: #142D4E;
         margin-bottom: 2px;
+        font-size: 17px;
+        font-weight: bold;
     }
 
     .stats .label {
-        font-size: 10px;
-        color: #333;
+        font-size: 9px;
     }
 
     /* =========================
@@ -190,7 +175,7 @@
     ========================= */
 
     .data-table {
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
     .data-table thead {
@@ -198,94 +183,105 @@
     }
 
     .data-table th {
-        background: #DCE5F0;
-        color: #172033;
-        font-size: 10px;
+        padding: 4px 5px;
+        border: 1px solid #000;
+        font-size: 9.5px;
         font-weight: bold;
         text-align: center;
-        padding: 5px 6px;
-        border: 1px solid #AAB8C9;
+        vertical-align: middle;
     }
 
     .data-table td {
-        padding: 4px 6px;
-        border: 1px solid #D4DCE6;
-        font-size: 10px;
+        padding: 3.5px 5px;
+        border: 1px solid #000;
+        font-size: 9.5px;
+        vertical-align: middle;
+    }
+
+    .data-table.small th,
+    .data-table.small td {
+        padding: 3px 3px;
+        font-size: 7.5px;
+    }
+
+    .center { text-align: center; }
+    .right  { text-align: right; }
+    .bold   { font-weight: bold; }
+
+    .total-row td {
+        font-weight: bold;
+    }
+
+    /* =========================
+       PIE + TABEL JENIS KELAMIN
+    ========================= */
+
+    .layout {
+        width: 100%;
+    }
+
+    .layout > tbody > tr > td {
+        border: none;
         vertical-align: top;
+        padding: 0;
     }
 
-    .data-table tbody tr:nth-child(even) td {
-        background: #F8FAFC;
-    }
-
-    .center {
+    .pie-cell {
+        width: 46%;
         text-align: center;
     }
 
-    .right {
-        text-align: right;
+    .pie-cell img {
+        width: 165px;
+        height: 165px;
     }
 
-    .bold {
-        font-weight: bold;
-    }
-
-    .total-row td {
-        background: #EAF0F7 !important;
-        font-weight: bold;
-    }
-
-    /* =========================
-       LAYOUT DUA KOLOM
-    ========================= */
-
-    .two-column {
-        width: 100%;
-        margin-top: 2px;
-    }
-
-    .two-column td {
-        width: 50%;
-        vertical-align: top;
-        border: none;
-        padding: 0 8px 0 0;
-    }
-
-    .two-column td:last-child {
-        padding: 0 0 0 8px;
-    }
-
-    /* =========================
-       CATATAN
-    ========================= */
-
-    .catatan {
-        margin-top: 9px;
-        padding: 7px 9px;
-        border: 1px solid #CBD5E1;
-        background: #F8FAFC;
+    .legend {
+        margin-top: 4px;
         font-size: 9px;
     }
 
-    .catatan strong {
-        font-size: 10px;
+    .legend td {
+        border: none;
+        padding: 1px 3px;
+        text-align: left;
+    }
+
+    .swatch {
+        width: 10px;
+        height: 10px;
+        border: 1px solid #000;
+    }
+
+    .chart-title {
+        margin-bottom: 3px;
+        font-size: 9.5px;
+        font-weight: bold;
+        text-align: center;
     }
 
     /* =========================
-       FOOTER
+       CATATAN & FOOTER
     ========================= */
 
+    .catatan {
+        margin-top: 10px;
+        font-size: 9px;
+        text-align: justify;
+    }
+
     .footer {
-        margin-top: 12px;
+        margin-top: 14px;
         padding-top: 5px;
-        border-top: 1px solid #AAB8C9;
+        border-top: 1px solid #000;
         text-align: center;
-        font-size: 8px;
-        color: #555;
+        font-size: 7.5px;
+        line-height: 1.4;
     }
 
     .muted {
-        color: #666;
+        margin-bottom: 4px;
+        font-size: 8.5px;
     }
 
     tr {
@@ -297,24 +293,20 @@
 <body>
 
 @php
-    /*
-    |--------------------------------------------------------------------------
-    | Helper Format
-    |--------------------------------------------------------------------------
-    */
+    $sistem = 'ARTA - Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan';
 
+    /* Helper format */
     $n = fn ($v) => number_format((int) $v, 0, ',', '.');
 
     $d = fn ($v) => $v
         ? \Illuminate\Support\Carbon::parse($v)->format('d/m/Y')
         : '-';
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pemeriksaan Data
-    |--------------------------------------------------------------------------
-    */
+    $tanggalCetak = \Illuminate\Support\Carbon::now('Asia/Makassar')
+        ->locale('id')
+        ->translatedFormat('d F Y');
 
+    /* Pemeriksaan data */
     $hasValue = fn ($v) => (float) $v > 0;
 
     $hasGender = $hasValue($maleCount) || $hasValue($femaleCount);
@@ -325,21 +317,13 @@
     $hasFunding = collect($fundingRecap ?? [])
         ->contains(fn ($row) => (int) ($row->total_trainings ?? 0) > 0);
 
-    $hasTraining = collect($trainingRecap ?? [])
-        ->contains(fn ($row) => (int) ($row->total_trainings ?? 0) > 0);
-
     $hasCategory = collect($categoryRecap ?? [])
         ->contains(fn ($row) => (int) ($row->total_trainings ?? 0) > 0);
 
     $hasTrainingList = collect($trainingList ?? [])
         ->contains(fn ($row) => (int) ($row['participants'] ?? 0) > 0);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Filter Data Nol
-    |--------------------------------------------------------------------------
-    */
-
+    /* Filter data nol */
     $professionRows = collect($nakesByType ?? [])
         ->filter(fn ($row) => (int) ($row->total ?? 0) > 0)
         ->values();
@@ -358,6 +342,13 @@
         ->take(10)
         ->values();
 
+    /* Data peserta (opsional, kirim dari controller sebagai $participantList) */
+    $participantRows = collect($participantList ?? [])
+        ->map(fn ($p) => (array) (is_object($p) && method_exists($p, 'toArray') ? $p->toArray() : $p))
+        ->values();
+
+    $hasParticipants = $participantRows->isNotEmpty();
+
     $totalTrainingCount = (int) $totalTrainings;
     $totalParticipantCount = (int) $totalTrainedParticipants;
     $totalParticipationCount = (int) $totalParticipations;
@@ -366,10 +357,56 @@
         || $totalParticipantCount > 0
         || $totalParticipationCount > 0;
 
+    /* Pie chart jenis kelamin (pie penuh, SVG) */
+    $genderTotal = (int) $maleCount + (int) $femaleCount;
+    $pieImage = null;
+    $pieSlices = [];
+
+    if ($genderTotal > 0) {
+        $slices = [];
+        if ($hasValue($maleCount)) {
+            $slices[] = ['label' => 'Laki-laki', 'value' => (int) $maleCount, 'fill' => '#3A3A3A'];
+        }
+        if ($hasValue($femaleCount)) {
+            $slices[] = ['label' => 'Perempuan', 'value' => (int) $femaleCount, 'fill' => '#C8C8C8'];
+        }
+
+        $cx = 100; $cy = 100; $r = 96;
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">';
+
+        if (count($slices) === 1) {
+            $svg .= '<circle cx="'.$cx.'" cy="'.$cy.'" r="'.$r.'" fill="'.$slices[0]['fill'].'" stroke="#000000" stroke-width="1.5"/>';
+        } else {
+            $angle = -M_PI / 2;
+            foreach ($slices as $s) {
+                $sweep = ($s['value'] / $genderTotal) * 2 * M_PI;
+                $end = $angle + $sweep;
+                $x1 = $cx + $r * cos($angle);
+                $y1 = $cy + $r * sin($angle);
+                $x2 = $cx + $r * cos($end);
+                $y2 = $cy + $r * sin($end);
+                $large = $sweep > M_PI ? 1 : 0;
+
+                $svg .= sprintf(
+                    '<path d="M%s,%s L%.3f,%.3f A%s,%s 0 %d,1 %.3f,%.3f Z" fill="%s" stroke="#000000" stroke-width="1.5"/>',
+                    $cx, $cy, $x1, $y1, $r, $r, $large, $x2, $y2, $s['fill']
+                );
+                $angle = $end;
+            }
+        }
+
+        $svg .= '</svg>';
+        $pieImage = 'data:image/svg+xml;base64,' . base64_encode($svg);
+
+        foreach ($slices as $s) {
+            $s['percent'] = number_format($s['value'] / $genderTotal * 100, 1, ',', '.') . '%';
+            $pieSlices[] = $s;
+        }
+    }
 @endphp
 
 <!-- =====================================================
-     KOP SURAT RESMI
+     KOP SURAT
 ===================================================== -->
 
 <table class="kop">
@@ -382,21 +419,15 @@
         </td>
 
         <td class="kop-text">
-            <div class="pemerintah">
-                PEMERINTAH PROVINSI KALIMANTAN SELATAN
-            </div>
-
-            <div class="dinas">
-                DINAS KESEHATAN
-            </div>
-
-            <div class="balai">
-                UPTD BALAI PELATIHAN KESEHATAN
-            </div>
+            <div class="pemerintah">PEMERINTAH PROVINSI KALIMANTAN SELATAN</div>
+            <div class="dinas">DINAS KESEHATAN</div>
+            <div class="balai">UPTD BALAI PELATIHAN KESEHATAN</div>
 
             <div class="alamat">
                 Jalan H. Mistar Tjokrokusumo No. 5A Banjarbaru Kode Pos 70714<br>
-                Telepon: (0511) 477201
+                Telepon : (0511) 477201<br>
+                Email : info@bapelkes.kalselprov.go.id
+                &nbsp; Website : www.bapelkes.kalselprov.go.id
             </div>
         </td>
     </tr>
@@ -404,20 +435,15 @@
 
 <div class="kop-garis"></div>
 
+<div class="tanggal">Banjarbaru, {{ $tanggalCetak }}</div>
+
 <!-- =====================================================
      JUDUL
 ===================================================== -->
 
 <div class="judul">
-    <h1>LAPORAN EKSEKUTIF RIWAYAT PELATIHAN</h1>
-
-    <div class="subjudul">
-        TAHUN ANGGARAN {{ $year }}
-    </div>
-
-    <div class="nomor">
-        UPTD Balai Pelatihan Kesehatan Provinsi Kalimantan Selatan
-    </div>
+    <h1>Laporan Eksekutif Riwayat Pelatihan</h1>
+    <div class="subjudul">Tahun Anggaran {{ $year }}</div>
 </div>
 
 <!-- =====================================================
@@ -426,15 +452,19 @@
 
 <table class="info">
     <tr>
+        <td class="info-label">Sumber Data</td>
+        <td class="info-separator">:</td>
+        <td colspan="4">{{ $sistem }}</td>
+    </tr>
+    <tr>
         <td class="info-label">Periode Laporan</td>
         <td class="info-separator">:</td>
         <td>Tahun {{ $year }}</td>
 
         <td class="info-label">Tanggal Cetak</td>
         <td class="info-separator">:</td>
-        <td>{{ now()->format('d F Y') }}</td>
+        <td>{{ $tanggalCetak }}</td>
     </tr>
-
     <tr>
         <td class="info-label">Kabupaten/Kota</td>
         <td class="info-separator">:</td>
@@ -447,7 +477,7 @@
 </table>
 
 <!-- =====================================================
-     RINGKASAN EKSEKUTIF
+     I. RINGKASAN CAPAIAN
 ===================================================== -->
 
 @if ($hasSummary)
@@ -472,7 +502,7 @@
 
             @if ($hasGender)
                 <td>
-                    <span class="angka">{{ $n($maleCount + $femaleCount) }}</span>
+                    <span class="angka">{{ $n($genderTotal) }}</span>
                     <span class="label">Peserta dengan Data Gender</span>
                 </td>
             @else
@@ -486,86 +516,98 @@
 @endif
 
 <!-- =====================================================
-     KOMPOSISI PESERTA
+     II. KOMPOSISI PESERTA
 ===================================================== -->
 
 @if ($hasGender || $hasProfession)
     <h2>II. Komposisi Peserta Terlatih</h2>
 
-    <table class="two-column">
-        <tr>
-            @if ($hasGender)
-                <td>
-                    <table class="data-table">
-                        <thead>
+    @if ($hasGender)
+        <table class="layout">
+            <tr>
+                <td class="pie-cell">
+                    <div class="chart-title">Diagram Jenis Kelamin Peserta</div>
+
+                    <img src="{{ $pieImage }}" alt="Diagram pie jenis kelamin">
+
+                    <table class="legend" style="width: 150px; margin: 4px auto 0;">
+                        @foreach ($pieSlices as $s)
                             <tr>
-                                <th colspan="3">Berdasarkan Jenis Kelamin</th>
+                                <td style="width: 14px;">
+                                    <div class="swatch" style="background: {{ $s['fill'] }};"></div>
+                                </td>
+                                <td>{{ $s['label'] }} : {{ $n($s['value']) }} ({{ $s['percent'] }})</td>
                             </tr>
-                            <tr>
-                                <th style="width: 10%">No.</th>
-                                <th>Jenis Kelamin</th>
-                                <th style="width: 25%">Jumlah</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @if ($hasValue($maleCount))
-                                <tr>
-                                    <td class="center">1</td>
-                                    <td>Laki-laki</td>
-                                    <td class="right">{{ $n($maleCount) }}</td>
-                                </tr>
-                            @endif
-
-                            @if ($hasValue($femaleCount))
-                                <tr>
-                                    <td class="center">{{ $hasValue($maleCount) ? 2 : 1 }}</td>
-                                    <td>Perempuan</td>
-                                    <td class="right">{{ $n($femaleCount) }}</td>
-                                </tr>
-                            @endif
-
-                            <tr class="total-row">
-                                <td colspan="2">Total</td>
-                                <td class="right">{{ $n($maleCount + $femaleCount) }}</td>
-                            </tr>
-                        </tbody>
+                        @endforeach
                     </table>
                 </td>
-            @endif
 
-            @if ($hasProfession)
-                <td>
+                <td style="padding-left: 10px;">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th colspan="3">Berdasarkan Profesi</th>
+                                <th colspan="4">Berdasarkan Jenis Kelamin</th>
                             </tr>
                             <tr>
-                                <th style="width: 10%">No.</th>
-                                <th>Jenis Profesi</th>
-                                <th style="width: 25%">Jumlah</th>
+                                <th style="width: 12%">No.</th>
+                                <th>Jenis Kelamin</th>
+                                <th style="width: 22%">Jumlah</th>
+                                <th style="width: 24%">Persentase</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            @foreach ($professionRows as $i => $row)
+                            @foreach ($pieSlices as $i => $s)
                                 <tr>
                                     <td class="center">{{ $i + 1 }}</td>
-                                    <td>{{ $row->name }}</td>
-                                    <td class="right">{{ $n($row->total) }}</td>
+                                    <td>{{ $s['label'] }}</td>
+                                    <td class="right">{{ $n($s['value']) }}</td>
+                                    <td class="right">{{ $s['percent'] }}</td>
                                 </tr>
                             @endforeach
+
+                            <tr class="total-row">
+                                <td colspan="2" class="center">Total</td>
+                                <td class="right">{{ $n($genderTotal) }}</td>
+                                <td class="right">100,0%</td>
+                            </tr>
                         </tbody>
                     </table>
                 </td>
-            @endif
-        </tr>
-    </table>
+            </tr>
+        </table>
+    @endif
+
+    @if ($hasProfession)
+        <div style="margin-top: 8px;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th colspan="3">Berdasarkan Profesi</th>
+                    </tr>
+                    <tr>
+                        <th style="width: 8%">No.</th>
+                        <th>Jenis Profesi</th>
+                        <th style="width: 18%">Jumlah</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach ($professionRows as $i => $row)
+                        <tr>
+                            <td class="center">{{ $i + 1 }}</td>
+                            <td>{{ $row->name }}</td>
+                            <td class="right">{{ $n($row->total) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 @endif
 
 <!-- =====================================================
-     SUMBER DANA
+     III. SUMBER DANA
 ===================================================== -->
 
 @if ($hasFunding)
@@ -576,9 +618,9 @@
             <tr>
                 <th style="width: 7%">No.</th>
                 <th>Sumber Dana</th>
-                <th style="width: 18%">Jumlah Kegiatan</th>
-                <th style="width: 18%">Peserta Unik</th>
-                <th style="width: 18%">Keikutsertaan</th>
+                <th style="width: 17%">Jumlah Kegiatan</th>
+                <th style="width: 17%">Peserta Unik</th>
+                <th style="width: 17%">Keikutsertaan</th>
             </tr>
         </thead>
 
@@ -597,7 +639,7 @@
 @endif
 
 <!-- =====================================================
-     KATEGORI PELATIHAN
+     IV. KATEGORI PELATIHAN
 ===================================================== -->
 
 @if ($hasCategory)
@@ -608,9 +650,9 @@
             <tr>
                 <th style="width: 7%">No.</th>
                 <th>Kategori Pelatihan</th>
-                <th style="width: 18%">Jumlah Kegiatan</th>
-                <th style="width: 18%">Peserta Unik</th>
-                <th style="width: 18%">Keikutsertaan</th>
+                <th style="width: 17%">Jumlah Kegiatan</th>
+                <th style="width: 17%">Peserta Unik</th>
+                <th style="width: 17%">Keikutsertaan</th>
             </tr>
         </thead>
 
@@ -629,13 +671,13 @@
 @endif
 
 <!-- =====================================================
-     KEGIATAN UTAMA
+     V. KEGIATAN UTAMA
 ===================================================== -->
 
 @if ($hasTrainingList)
     <h2>V. Daftar Kegiatan Pelatihan Utama</h2>
 
-    <div class="muted" style="font-size: 9px; margin-bottom: 5px;">
+    <div class="muted">
         Menampilkan paling banyak 10 kegiatan berdasarkan jumlah peserta.
     </div>
 
@@ -643,10 +685,10 @@
         <thead>
             <tr>
                 <th style="width: 5%">No.</th>
-                <th style="width: 31%">Nama Pelatihan</th>
-                <th style="width: 19%">Waktu Pelaksanaan</th>
-                <th style="width: 19%">Sumber Dana</th>
-                <th style="width: 16%">Kategori</th>
+                <th style="width: 30%">Nama Pelatihan</th>
+                <th style="width: 20%">Waktu Pelaksanaan</th>
+                <th style="width: 18%">Sumber Dana</th>
+                <th style="width: 17%">Kategori</th>
                 <th style="width: 10%">Peserta</th>
             </tr>
         </thead>
@@ -655,27 +697,18 @@
             @foreach ($trainingRows as $i => $row)
                 <tr>
                     <td class="center">{{ $i + 1 }}</td>
-
                     <td>{{ $row['name'] }}</td>
 
-                    <td>
+                    <td class="center">
                         {{ $d($row['start_date']) }}
-
-                        @if (
-                            !empty($row['end_date']) &&
-                            $row['end_date'] !== $row['start_date']
-                        )
-                            s.d. {{ $d($row['end_date']) }}
+                        @if (!empty($row['end_date']) && $row['end_date'] !== $row['start_date'])
+                            <br>s.d. {{ $d($row['end_date']) }}
                         @endif
                     </td>
 
                     <td>{{ $row['funding_source'] ?: '-' }}</td>
-
                     <td>{{ $row['category'] ?: '-' }}</td>
-
-                    <td class="right">
-                        {{ $n($row['participants']) }}
-                    </td>
+                    <td class="right">{{ $n($row['participants']) }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -683,7 +716,49 @@
 @endif
 
 <!-- =====================================================
-     KETERANGAN
+     VI. DATA PESERTA (opsional)
+===================================================== -->
+
+@if ($hasParticipants)
+    <h2>VI. Data Peserta Pelatihan</h2>
+
+    <div class="muted">
+        Total {{ $n($participantRows->count()) }} data keikutsertaan peserta sesuai filter laporan.
+    </div>
+
+    <table class="data-table small">
+        <thead>
+            <tr>
+                <th style="width: 4%">No.</th>
+                <th style="width: 17%">Nama Peserta</th>
+                <th style="width: 15%">NIK</th>
+                <th style="width: 8%">Jenis Kelamin</th>
+                <th style="width: 12%">Profesi</th>
+                <th style="width: 14%">Instansi</th>
+                <th style="width: 10%">Kab./Kota</th>
+                <th style="width: 20%">Nama Pelatihan</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach ($participantRows as $i => $p)
+                <tr>
+                    <td class="center">{{ $i + 1 }}</td>
+                    <td>{{ $p['name'] ?? '-' }}</td>
+                    <td class="center">{{ $p['nik'] ?? '-' }}</td>
+                    <td class="center">{{ $p['gender'] ?? '-' }}</td>
+                    <td>{{ $p['profession'] ?? '-' }}</td>
+                    <td>{{ $p['institution'] ?? '-' }}</td>
+                    <td>{{ $p['district'] ?? '-' }}</td>
+                    <td>{{ $p['training_name'] ?? '-' }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+@endif
+
+<!-- =====================================================
+     CATATAN
 ===================================================== -->
 
 @if (!$hasSummary && !$hasGender && !$hasProfession && !$hasFunding && !$hasCategory && !$hasTrainingList)
@@ -707,8 +782,10 @@
 ===================================================== -->
 
 <div class="footer">
+    Dokumen ini dihasilkan oleh {{ $sistem }}
+    <br>
     UPTD Balai Pelatihan Kesehatan Provinsi Kalimantan Selatan
-    &nbsp; | &nbsp;
+    &nbsp;|&nbsp;
     Laporan Eksekutif Riwayat Pelatihan Tahun {{ $year }}
 </div>
 

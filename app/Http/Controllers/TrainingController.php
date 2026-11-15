@@ -8,7 +8,7 @@ use App\Models\TrainingCategory;
 use App\Models\FundingSource;
 use App\Models\District;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class TrainingController extends Controller
@@ -21,13 +21,13 @@ class TrainingController extends Controller
         $search = trim((string) $request->input('search', ''));
         $year = $request->input('year', '');
 
-        // Mengambil tahun aktif dari Master Data Super Admin.
+        // Mengambil tahun aktif dari Master Data.
         $years = TrainingYear::query()
             ->where('is_active', true)
             ->orderByDesc('year')
             ->pluck('year');
 
-        // Query data pelatihan.
+        // Mengambil data pelatihan.
         $trainings = Training::query()
             ->with('category')
             ->when($search !== '', function ($query) use ($search) {
@@ -62,6 +62,77 @@ class TrainingController extends Controller
             'search',
             'year',
             'years'
+        ));
+    }
+
+    /**
+     * Menampilkan detail pelatihan dan daftar peserta.
+     */
+    public function show(Request $request, Training $training)
+    {
+        // Memuat kategori pelatihan.
+        $training->load('category');
+
+        $search = trim((string) $request->input('search', ''));
+
+        // Mengambil daftar peserta berdasarkan training_histories.
+        // Relasi:
+        // training_histories.training_id -> trainings.id
+        // training_histories.participant_id -> participants.id
+        $participantQuery = DB::table('training_histories as th')
+            ->join('participants as p', 'p.id', '=', 'th.participant_id')
+            ->where('th.training_id', $training->id)
+            ->select([
+                'th.id as history_id',
+                'th.certificate_number',
+                'th.status as participation_status',
+                'th.notes as history_notes',
+                'p.id as participant_id',
+                'p.nip',
+                'p.nik',
+                'p.name as participant_name',
+                'p.gender',
+                'p.institution',
+                'p.unit',
+                'p.district as participant_district',
+                'p.province',
+                'p.position',
+                'p.profession',
+                'p.email',
+                'p.phone',
+                'p.rank',
+            ])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('p.name', 'like', "%{$search}%")
+                        ->orWhere('p.nip', 'like', "%{$search}%")
+                        ->orWhere('p.nik', 'like', "%{$search}%")
+                        ->orWhere('p.institution', 'like', "%{$search}%")
+                        ->orWhere('p.unit', 'like', "%{$search}%")
+                        ->orWhere('p.profession', 'like', "%{$search}%")
+                        ->orWhere('p.position', 'like', "%{$search}%")
+                        ->orWhere('p.district', 'like', "%{$search}%")
+                        ->orWhere('p.province', 'like', "%{$search}%")
+                        ->orWhere('th.certificate_number', 'like', "%{$search}%");
+                });
+            });
+
+        // Jumlah seluruh peserta pada pelatihan ini.
+        $totalParticipants = DB::table('training_histories')
+            ->where('training_id', $training->id)
+            ->count();
+
+        // Daftar peserta dengan pagination.
+        $participants = $participantQuery
+            ->orderBy('p.name')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('trainings.show', compact(
+            'training',
+            'participants',
+            'totalParticipants',
+            'search'
         ));
     }
 
@@ -174,8 +245,7 @@ class TrainingController extends Controller
      */
     public function edit(Training $training)
     {
-        // Mengambil kategori aktif dan tetap menyertakan
-        // kategori yang sedang digunakan meskipun sudah nonaktif.
+        // Kategori aktif dan kategori yang sedang digunakan.
         $categories = TrainingCategory::query()
             ->where(function ($query) use ($training) {
                 $query->where('is_active', true);
@@ -325,22 +395,25 @@ class TrainingController extends Controller
     }
 
     /**
- * Mengunduh template Excel resmi SIRAPIK.
- */
-public function downloadTemplate()
-{
-    $path = storage_path('app/templates/Template_sirapik.xlsx');
+     * Mengunduh template Excel resmi SIRAPIK.
+     */
+    public function downloadTemplate()
+    {
+        $path = storage_path('app/templates/Template_sirapik.xlsx');
 
-    if (!file_exists($path)) {
-        abort(404, 'File template Excel tidak ditemukan. Periksa folder storage/app/templates.');
+        if (!file_exists($path)) {
+            abort(
+                404,
+                'File template Excel tidak ditemukan. Periksa folder storage/app/templates.'
+            );
+        }
+
+        return response()->download(
+            $path,
+            'Template_SIRAPIK.xlsx',
+            [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );
     }
-
-    return response()->download(
-        $path,
-        'Template_SIRAPIK.xlsx',
-        [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]
-    );
-}
 }
