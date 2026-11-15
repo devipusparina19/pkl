@@ -45,7 +45,7 @@ html.rp-lock{overflow:hidden}
 /* HERO */
 .rp-hero{
     position:relative;isolation:isolate;overflow:hidden;display:grid;
-    grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);align-items:end;
+    grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);align-items:center;
     gap:clamp(24px,4vw,64px);padding:clamp(30px,5vw,64px);border-radius:28px;color:#fff;
     background:linear-gradient(120deg,var(--navy) 0%,var(--midnight) 60%,#173d86 100%);
     animation:rp-rise .8s var(--ease) both;
@@ -61,12 +61,12 @@ html.rp-lock{overflow:hidden}
 .rp-chips{display:flex;flex-wrap:wrap;gap:10px}
 .rp-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 15px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.08);font-size:13.5px;font-weight:600;color:#E3EEFB}
 .rp-chip .i{font-size:15px;color:var(--cyan)}
-.rp-hero-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-left:1px solid rgba(255,255,255,.2);padding-left:clamp(20px,3vw,40px)}
-.rp-hero-stat{padding:16px 12px 16px 0;min-width:0}
-.rp-hero-stat:nth-child(even){border-left:1px solid rgba(255,255,255,.16);padding-left:20px}
+.rp-hero-stats{display:grid;grid-template-columns:1fr;border-left:1px solid rgba(255,255,255,.2);padding-left:clamp(20px,3vw,40px)}
+.rp-hero-stat{padding:14px 0;min-width:0;border-top:1px solid rgba(255,255,255,.16)}
+.rp-hero-stat:first-child{border-top:0}
 .rp-hero-stat small{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:rgba(255,255,255,.8)}
 .rp-hero-stat small .i{font-size:17px;color:var(--cyan)}
-.rp-hero-stat strong{display:block;margin:4px 0 2px;font-family:"Sora","Segoe UI",Arial,sans-serif;font-weight:800;font-size:clamp(2rem,3.8vw,3.2rem);line-height:1.15;letter-spacing:-.04em;font-variant-numeric:tabular-nums;min-width:2ch}
+.rp-hero-stat strong{display:block;margin:2px 0;font-family:"Sora","Segoe UI",Arial,sans-serif;font-weight:800;font-size:clamp(2rem,3.6vw,2.9rem);line-height:1.15;letter-spacing:-.04em;font-variant-numeric:tabular-nums;min-width:2ch}
 .rp-hero-stat span{font-size:13px;color:rgba(255,255,255,.7)}
 
 /* NAV */
@@ -84,7 +84,7 @@ html.rp-lock{overflow:hidden}
 .rp-section-head p{margin:0;max-width:720px;font-size:16px;color:var(--slate)}
 .rp-hint{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:7px 14px;border-radius:999px;background:var(--soft);color:var(--royal);font-size:13.5px;font-weight:600}
 .rp-hint .i{font-size:16px}
-.rp-stack{display:grid;gap:20px}
+.rp-split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:20px;align-items:stretch}
 
 /* FILTER */
 .rp-filter{padding:clamp(18px,2.6vw,28px);border:1px solid var(--border);border-radius:22px;background:#fff;box-shadow:0 14px 36px rgba(8,27,51,.05)}
@@ -95,7 +95,7 @@ html.rp-lock{overflow:hidden}
 .rp-field input::placeholder{color:#7a8aa0}
 .rp-field input:hover,.rp-field select:hover{border-color:#c5d3e4}
 .rp-field input:focus,.rp-field select:focus{outline:none;background:#fff;border-color:var(--electric);box-shadow:0 0 0 4px rgba(52,120,246,.16)}
-.rp-filter-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rp-filter-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;height:50px}
 
 /* BUTTON */
 .rp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 15px;border:1.5px solid transparent;border-radius:12px;font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s,background .2s,color .2s}
@@ -116,17 +116,18 @@ html.rp-lock{overflow:hidden}
 .rp-btn.is-loading::after{content:"";width:15px;height:15px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:rp-spin .7s linear infinite}
 @keyframes rp-spin{to{transform:rotate(360deg)}}
 
-/* ANGKA YANG BISA DIKLIK */
-.rp-count,.rp-num{display:inline-flex;align-items:baseline;gap:6px;min-height:32px;padding:3px 11px;border-radius:10px;background:var(--soft);color:var(--royal);font-family:"Sora","Segoe UI",Arial,sans-serif;font-variant-numeric:tabular-nums;line-height:1.4}
-.rp-count b,.rp-num b{font-weight:700}
-.rp-count small,.rp-num small{font-family:"Plus Jakarta Sans",sans-serif;font-size:11.5px;font-weight:600;color:var(--slate)}
-.rp-num{align-items:center;border:1px solid #CFE0FB;cursor:pointer;transition:transform .2s var(--ease),background .2s,color .2s,box-shadow .2s}
-.rp-num .rp-go{font-size:13px;opacity:.6;transition:transform .2s var(--ease)}
-.rp-num:hover{color:#fff;background:var(--royal);border-color:var(--royal);transform:translateY(-2px);box-shadow:0 8px 18px rgba(36,87,214,.28)}
-.rp-num:hover small{color:rgba(255,255,255,.85)}
-.rp-num:hover .rp-go{opacity:1;transform:translate(2px,-2px)}
-.rp-num:active{transform:scale(.97)}
-.rp-num.lg b,.rp-count.lg b{font-size:1.6rem;line-height:1.2}
+/* ANGKA (hanya tampilan, tidak bisa diklik) */
+.rp-count{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap;font-family:"Sora","Segoe UI",Arial,sans-serif;font-variant-numeric:tabular-nums;line-height:1.4;color:var(--navy)}
+.rp-count b{font-weight:700}
+.rp-count small{font-family:"Plus Jakarta Sans",sans-serif;font-size:12px;font-weight:600;color:var(--slate)}
+.rp-count.lg b{font-size:1.7rem;line-height:1.2}
+.rp-count.pill{padding:3px 12px;border-radius:10px;background:var(--soft);color:var(--royal)}
+
+/* SATU-SATUNYA TOMBOL MASUK KE RINCIAN */
+.rp-detail-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 14px;border:1px solid #C5D6F5;border-radius:10px;color:var(--royal);background:#fff;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s,transform .2s}
+.rp-detail-link .i{font-size:15px;transition:transform .2s var(--ease)}
+.rp-detail-link:hover{color:#fff;background:var(--royal);border-color:var(--royal);transform:translateY(-1px)}
+.rp-detail-link:hover .i{transform:translate(2px,-2px)}
 
 /* PANEL */
 .rp-panel{min-width:0;overflow:hidden;border:1px solid var(--border);border-radius:22px;background:#fff;box-shadow:0 18px 44px rgba(8,27,51,.07)}
@@ -140,7 +141,7 @@ html.rp-lock{overflow:hidden}
 .rp-mini-search{display:block;width:min(100%,280px);height:42px;padding:0 14px;color:var(--text);background:var(--ice);border:1.5px solid var(--border);border-radius:12px;font-size:14px;transition:border-color .2s,box-shadow .2s,background .2s}
 .rp-mini-search:focus{outline:none;background:#fff;border-color:var(--electric);box-shadow:0 0 0 4px rgba(52,120,246,.16)}
 
-/* SORT */
+/* SORT / TAB */
 .rp-seg{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--border);border-radius:12px;background:var(--ice)}
 .rp-seg button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:0 14px;border:0;border-radius:9px;background:transparent;color:var(--slate);cursor:pointer;font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:13px;font-weight:600;white-space:nowrap}
 .rp-seg button:hover{color:var(--navy);background:#fff}
@@ -148,9 +149,10 @@ html.rp-lock{overflow:hidden}
 .rp-sort-note{margin:0;padding:12px clamp(18px,2.6vw,26px);border-bottom:1px solid var(--border);background:var(--ice);font-size:13.5px;color:var(--slate)}
 .rp-sort-note strong{color:var(--navy)}
 
-/* GENDER (selebar panel, tanpa ruang kosong) */
-.rp-gender-wrap{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:clamp(20px,4vw,48px);align-items:center}
-.rp-chart-box{position:relative;width:100%;max-width:300px;height:300px;margin:0 auto}
+/* GENDER */
+.rp-gender-wrap{display:grid;grid-template-columns:1fr;gap:22px;justify-items:center}
+.rp-chart-box{position:relative;width:100%;max-width:260px;height:260px}
+.rp-gender-info{width:100%}
 .rp-gender-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
 .rp-gender-list li{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--ice)}
 .rp-dot{width:12px;height:12px;border-radius:50%;flex:none}
@@ -166,21 +168,18 @@ html.rp-lock{overflow:hidden}
 .rp-table tbody tr{transition:background .2s}
 .rp-table tbody tr:hover{background:#F5F9FF}
 .rp-table tbody tr:last-child td{border-bottom:0}
+.rp-table th.c,.rp-table td.c{text-align:center}
+.rp-table th.r,.rp-table td.r{text-align:right}
 .rp-number{width:64px;font-weight:700;color:#5F7088!important;font-variant-numeric:tabular-nums}
 .rp-participant{font-weight:700;color:var(--navy)!important}
 .rp-nik{color:var(--slate)!important;font-variant-numeric:tabular-nums;white-space:nowrap}
 .rp-empty{padding:44px 18px!important;text-align:center;color:var(--slate)!important}
 .rp-empty strong{display:block;margin-bottom:4px;font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:16px;color:var(--navy)}
-.rp-detail-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 12px;border:1px solid #C5D6F5;border-radius:9px;color:var(--royal);background:#fff;font-size:12.5px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background .2s,transform .2s}
-.rp-detail-link:hover{color:var(--royal);background:var(--soft);transform:translateY(-1px)}
 
-/* chip sumber dana */
+/* chip sumber dana (hanya label) */
 .rp-fchips{display:flex;flex-wrap:wrap;gap:6px}
-.rp-fchip{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:2px 11px;border:1px solid transparent;border-radius:999px;font-size:12.5px;font-weight:700;cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s;font-family:inherit}
+.rp-fchip{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:2px 11px;border:1px solid transparent;border-radius:999px;font-size:12.5px;font-weight:700}
 .rp-fchip b{font-family:"Sora","Segoe UI",Arial,sans-serif;font-variant-numeric:tabular-nums}
-.rp-fchip:hover{transform:translateY(-2px);box-shadow:0 8px 16px rgba(8,27,51,.14)}
-span.rp-fchip{cursor:default}
-span.rp-fchip:hover{transform:none;box-shadow:none}
 .rp-fchip.t0{background:#E6F7FC;color:#0A6C86;border-color:#BFE8F4}
 .rp-fchip.t1{background:var(--soft);color:var(--royal);border-color:#CFE0FB}
 .rp-fchip.t2{background:#E9EEFF;color:#2B3FB3;border-color:#CBD5FF}
@@ -203,7 +202,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
 .rp-pager .rp-btn{min-height:42px;padding:0 16px}
 .rp-pager-info{font-size:13.5px;font-weight:600;color:var(--slate);text-align:center;font-variant-numeric:tabular-nums}
 
-/* BENTO SUMBER DANA (selalu mengisi baris penuh) */
+/* BENTO SUMBER DANA */
 .rp-bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .rp-fund{position:relative;display:flex;flex-direction:column;gap:18px;min-width:0;padding:24px;border:1px solid var(--border);border-radius:22px;background:#fff;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s}
 .rp-fund.span-1{grid-column:span 1}
@@ -215,38 +214,37 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
 .rp-fund-ico{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:var(--soft);color:var(--royal);font-size:20px;flex:none}
 .rp-fund h3{margin:0;font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:1.05rem;font-weight:700;line-height:1.3;color:var(--navy);overflow-wrap:anywhere}
 .rp-fund-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.rp-stat{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.rp-stat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
 .rp-stat>span{font-size:12.5px;font-weight:600;color:var(--slate)}
-.rp-fund-foot{margin-top:auto;display:grid;gap:8px}
+.rp-fund-foot{margin-top:auto;display:grid;gap:12px}
 .rp-fund-bar{height:6px;border-radius:999px;background:var(--soft);overflow:hidden}
 .rp-fund-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--royal),var(--cyan));transform-origin:left;animation:rp-grow .9s var(--ease) both}
+.rp-fund-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .rp-fund-share{margin:0;font-size:12.5px;color:var(--slate)}
 .rp-fund.lead{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--navy),var(--midnight) 70%,#173d86)}
 .rp-fund.lead::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:var(--electric);opacity:.35;filter:blur(50px);pointer-events:none}
 .rp-fund.lead h3{color:#fff;font-size:1.35rem}
 .rp-fund.lead .rp-fund-ico{background:rgba(255,255,255,.12);color:var(--cyan)}
 .rp-fund.lead .rp-stat>span,.rp-fund.lead .rp-fund-share{color:rgba(255,255,255,.75)}
+.rp-fund.lead .rp-count{color:#fff}
 .rp-fund.lead .rp-fund-bar{background:rgba(255,255,255,.16)}
-.rp-fund.lead .rp-num,.rp-fund.lead .rp-count{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.24);color:#fff}
-.rp-fund.lead .rp-num:hover{background:var(--cyan);border-color:var(--cyan);color:var(--navy)}
-.rp-fund.lead .rp-num small,.rp-fund.lead .rp-count small{color:rgba(255,255,255,.75)}
+.rp-fund.lead .rp-detail-link{color:#fff;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3)}
+.rp-fund.lead .rp-detail-link:hover{color:var(--navy);background:var(--cyan);border-color:var(--cyan)}
 
 /* WILAYAH x SUMBER DANA */
 .rp-dist-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(18px,2.6vw,26px);border-bottom:1px solid var(--border);background:var(--ice)}
 .rp-dist-tools h3{margin:0;font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:17px;font-weight:600;color:var(--navy)}
 .rp-dist-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:clamp(14px,2vw,22px)}
 .rp-dist-list .rp-wide{grid-column:1/-1}
-.rp-dist{min-width:0;border:1px solid var(--border);border-radius:18px;background:#fff;overflow:hidden;transition:box-shadow .3s,transform .3s var(--ease)}
-.rp-dist:hover{box-shadow:0 14px 32px rgba(8,27,51,.08);transform:translateY(-2px)}
+.rp-dist{min-width:0;border:1px solid var(--border);border-radius:18px;background:#fff;overflow:hidden}
 .rp-dist-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 18px;background:var(--ice);border-bottom:1px solid var(--border)}
 .rp-dist-head h4{margin:0;display:flex;align-items:center;gap:8px;font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:1rem;font-weight:700;color:var(--navy)}
 .rp-dist-head h4 .i{color:var(--royal);font-size:18px}
-.rp-dist-totals{display:flex;flex-wrap:wrap;gap:6px}
+.rp-dist-sum{display:flex;flex-wrap:wrap;gap:6px 16px;padding:12px 18px;border-bottom:1px solid #EDF1F5;font-size:13.5px}
 .rp-lines{margin:0;padding:0;list-style:none}
 .rp-line{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 12px;padding:12px 18px;border-top:1px solid #EDF1F5}
 .rp-line:first-child{border-top:0}
-.rp-line-name{min-width:0}
-.rp-line-nums{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}
+.rp-line-nums{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;font-size:13.5px}
 
 /* DRAWER RINCIAN */
 .rp-drawer{position:fixed;inset:0;z-index:9999}
@@ -262,6 +260,9 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
 .rp-drawer-sub{margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.78);overflow-wrap:anywhere}
 .rp-icon-btn{display:grid;place-items:center;width:42px;height:42px;flex:none;border:1px solid rgba(255,255,255,.25);border-radius:12px;background:rgba(255,255,255,.08);color:#fff;font-size:20px;cursor:pointer;transition:background .2s,transform .2s var(--ease)}
 .rp-icon-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.05)}
+.rp-drawer-tabs{padding:12px clamp(16px,3vw,28px);border-bottom:1px solid var(--border);flex:none}
+.rp-drawer-tabs .rp-seg{display:flex;width:100%}
+.rp-drawer-tabs .rp-seg button{flex:1}
 .rp-drawer-summary{display:flex;flex-wrap:wrap;gap:10px;padding:14px clamp(16px,3vw,28px);border-bottom:1px solid var(--border);background:var(--ice);flex:none}
 .rp-sum-item{display:flex;align-items:baseline;gap:8px;padding:6px 14px;border:1px solid var(--border);border-radius:12px;background:#fff}
 .rp-sum-item b{font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:1.25rem;font-weight:700;color:var(--royal);font-variant-numeric:tabular-nums}
@@ -316,19 +317,21 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
 }
 @media (max-width:1100px){
     .rp-hero{grid-template-columns:1fr;align-items:start}
-    .rp-hero-stats{border-left:0;padding-left:0;border-top:1px solid rgba(255,255,255,.2);padding-top:8px}
+    .rp-hero-stats{border-left:0;padding-left:0;border-top:1px solid rgba(255,255,255,.2);padding-top:8px;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .rp-hero-stat{border-top:0}
     .rp-dist-list{grid-template-columns:1fr}
+    .rp-split{grid-template-columns:1fr}
+    .rp-gender-wrap{grid-template-columns:minmax(0,260px) minmax(0,1fr);align-items:center}
 }
 @media (max-width:700px){
-    .rp-hero-stats{grid-template-columns:1fr}
-    .rp-hero-stat:nth-child(even){padding-left:0;border-left:0;border-top:1px solid rgba(255,255,255,.16)}
+    .rp-hero-stats{grid-template-columns:1fr;gap:0}
+    .rp-hero-stat{border-top:1px solid rgba(255,255,255,.16)}
     .rp-filter-grid{grid-template-columns:1fr}
-    .rp-filter-actions{display:grid;grid-template-columns:1fr}
-    .rp-filter-actions .rp-btn,.rp-hero-cta .rp-btn,.rp-detail-link{width:100%}
+    .rp-filter-actions{display:grid;grid-template-columns:1fr;height:auto}
+    .rp-filter-actions .rp-btn,.rp-hero-cta .rp-btn{width:100%}
     .rp-pager .rp-btn{width:auto}
     .rp-bento{grid-template-columns:1fr}
     .rp-fund.span-1,.rp-fund.span-2,.rp-fund.span-3,.rp-fund.span-4,.rp-fund.lead,.rp-fund:last-child:nth-child(even){grid-column:auto}
-    .rp-fund-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
     .rp-gender-wrap{grid-template-columns:1fr}
     .rp-seg{width:100%}
     .rp-seg button{flex:1;padding:0 8px}
@@ -345,11 +348,12 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
     .rp-table-wrap.cards thead{display:none}
     .rp-table-wrap.cards tbody{display:grid;gap:12px;padding:12px}
     .rp-table-wrap.cards tbody tr{display:block;overflow:hidden;border:1px solid var(--border);border-radius:14px}
-    .rp-table-wrap.cards tbody td{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:center;padding:11px 14px;font-size:14.5px;border-bottom:1px solid #EDF1F5}
+    .rp-table-wrap.cards tbody td{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:center;padding:11px 14px;font-size:14.5px;border-bottom:1px solid #EDF1F5;text-align:left!important}
     .rp-table-wrap.cards tbody td[data-label]::before{content:attr(data-label);font-size:13px;font-weight:600;color:var(--slate)}
     .rp-table-wrap.cards tbody tr td:last-child{border-bottom:0}
     .rp-table-wrap.cards .rp-number{width:auto}
     .rp-table-wrap.cards td.rp-empty{display:block}
+    .rp-table-wrap.cards .rp-detail-link{width:100%}
 }
 @media (prefers-reduced-motion:reduce){
     .report-page *,.report-page *::before,.report-page *::after,.rp-drawer *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
@@ -439,38 +443,30 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
         }
     }
 
-    $numBtn = function ($value, string $unit, array $payload, bool $showUnit = false, string $extra = '') use ($hasDetailRoute, $formatNumber) {
-        $text = $formatNumber($value);
-        $unitHtml = $showUnit ? '<small>' . e($unit) . '</small>' : '';
+    // Angka: hanya tampilan. Tidak ada lagi tombol di tiap angka.
+    $count = function ($value, string $unit = '', string $extra = '') use ($formatNumber) {
+        $unitHtml = $unit !== '' ? '<small>' . e($unit) . '</small>' : '';
 
-        if (!$hasDetailRoute || (int) $value < 1) {
-            return new \Illuminate\Support\HtmlString(
-                '<span class="rp-count ' . e($extra) . '"><b>' . e($text) . '</b>' . $unitHtml . '</span>'
-            );
+        return new \Illuminate\Support\HtmlString(
+            '<span class="rp-count ' . e($extra) . '"><b>' . e($formatNumber($value)) . '</b>' . $unitHtml . '</span>'
+        );
+    };
+
+    // Satu tombol masuk ke panel rincian per baris/kartu.
+    $detailBtn = function (array $payload, string $text = 'Rincian') use ($hasDetailRoute) {
+        if (!$hasDetailRoute) {
+            return new \Illuminate\Support\HtmlString('');
         }
 
         return new \Illuminate\Support\HtmlString(
-            '<button type="button" class="rp-num ' . e($extra) . '" data-detail="'
+            '<button type="button" class="rp-detail-link" data-detail="'
             . e(json_encode($payload, JSON_UNESCAPED_UNICODE)) . '" aria-haspopup="dialog" aria-label="'
-            . e($text . ' ' . $unit . ', buka rincian') . '"><b>' . e($text) . '</b>' . $unitHtml
-            . '<svg class="i rp-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></button>'
+            . e($text . ': ' . ($payload['label'] ?? '')) . '">' . e($text)
+            . '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></button>'
         );
     };
 
     $tone = fn ($label) => 't' . (abs(crc32((string) $label)) % 4);
-    $chipBtn = function (string $label, $count, array $payload) use ($hasDetailRoute, $formatNumber, $tone) {
-        $inner = e($label) . ' <b>' . e($formatNumber($count)) . '</b>';
-
-        if (!$hasDetailRoute) {
-            return new \Illuminate\Support\HtmlString('<span class="rp-fchip ' . $tone($label) . '">' . $inner . '</span>');
-        }
-
-        return new \Illuminate\Support\HtmlString(
-            '<button type="button" class="rp-fchip ' . $tone($label) . '" data-detail="'
-            . e(json_encode($payload, JSON_UNESCAPED_UNICODE)) . '" aria-haspopup="dialog" aria-label="'
-            . e($label . ': ' . $formatNumber($count) . ' kegiatan, buka rincian') . '">' . $inner . '</button>'
-        );
-    };
 
     $districtGroups = $districtFundingRecap->groupBy('district');
     $districtBlocks = $districtFundingTotals
@@ -498,7 +494,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
 
                 <p>
                     Pantau frekuensi keikutsertaan, rincian sumber dana, kegiatan per pelatihan,
-                    dan rekap wilayah. Klik angka mana saja untuk melihat siapa saja pesertanya.
+                    dan rekap wilayah. Tekan tombol Rincian untuk melihat daftar kegiatan dan pesertanya.
                 </p>
 
                 <div class="rp-hero-cta">
@@ -526,11 +522,6 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                     <span class="rp-chip">
                         <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg>
                         Minimal {{ $minimum }} pelatihan per peserta
-                    </span>
-
-                    <span class="rp-chip">
-                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-                        Ekspor memuat seluruh isi laporan
                     </span>
                 </div>
             </div>
@@ -604,7 +595,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                             <label for="minimum">Keikutsertaan</label>
                             <select id="minimum" name="minimum">
                                 @foreach ([1, 2, 3, 4, 5, 10] as $value)
-                                    <option value="{{ $value }}" @selected((int) $minimum === $value)> {{ $value }}  kali</option>
+                                    <option value="{{ $value }}" @selected((int) $minimum === $value)>Minimal {{ $value }} kali</option>
                                 @endforeach
                             </select>
                         </div>
@@ -637,12 +628,12 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                         <div class="rp-filter-actions">
                             <button type="submit" class="rp-btn rp-btn-primary">
                                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>
-                                Terapkan Filter
+                                Terapkan
                             </button>
 
                             <a href="{{ route('reports.index') }}" class="rp-btn rp-btn-ghost" data-keep-scroll>
                                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-                                Reset Filter
+                                Reset
                             </a>
                         </div>
 
@@ -651,14 +642,14 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
             </div>
         </section>
 
-        {{-- RINGKASAN --}}
+        {{-- RINGKASAN: jenis kelamin (kiri) + profesi (kanan) --}}
         <section class="rp-section rp-reveal" id="ringkasan" aria-labelledby="rp-sum-title">
             <div class="rp-section-head">
                 <h2 id="rp-sum-title">Ringkasan peserta</h2>
                 <p>Komposisi peserta berdasarkan jenis kelamin dan profesi pada tahun {{ $year }}.</p>
             </div>
 
-            <div class="rp-stack">
+            <div class="rp-split">
 
                 <div class="rp-panel">
                     <div class="rp-panel-body">
@@ -710,7 +701,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
 
                         @if ($nakesByType->isNotEmpty())
                             <div class="rp-seg" role="group" aria-label="Urutkan profesi" id="rpProfSort">
-                                <button type="button" data-sort="default" aria-pressed="true">Urutan awal</button>
+                                <button type="button" data-sort="default" aria-pressed="true">Awal</button>
                                 <button type="button" data-sort="high" aria-pressed="false">Tertinggi</button>
                                 <button type="button" data-sort="low" aria-pressed="false">Terendah</button>
                             </div>
@@ -722,13 +713,13 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                     @endif
 
                     <div class="rp-table-wrap cards">
-                        <table class="rp-table">
+                        <table class="rp-table" style="min-width:380px">
                             <caption class="rp-sr">Jumlah peserta unik per profesi tahun {{ $year }}</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">No.</th>
                                     <th scope="col">Jenis Profesi</th>
-                                    <th scope="col">Peserta Terlatih</th>
+                                    <th scope="col" class="r">Peserta Terlatih</th>
                                 </tr>
                             </thead>
                             <tbody id="rpProfBody" data-paginate="8" data-items="tr[data-row]" data-pager-after="closest:.rp-table-wrap">
@@ -736,9 +727,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                                     <tr data-row data-total="{{ (int) $profession->total }}">
                                         <td class="rp-number" data-label="No.">{{ $index + 1 }}</td>
                                         <td class="rp-participant" data-label="Profesi">{{ $profession->name }}</td>
-                                        <td data-label="Peserta">
-                                            <span class="rp-count"><b>{{ $formatNumber($profession->total) }}</b></span>
-                                        </td>
+                                        <td class="r" data-label="Peserta">{{ $count($profession->total, '', 'pill') }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -764,7 +753,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                 @if ($hasDetailRoute)
                     <span class="rp-hint">
                         <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                        Klik angka untuk melihat daftar kegiatan dan pesertanya
+                        Tombol Rincian menampilkan daftar kegiatan dan pesertanya
                     </span>
                 @endif
             </div>
@@ -790,15 +779,15 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                             <div class="rp-fund-stats">
                                 <div class="rp-stat">
                                     <span>Kegiatan</span>
-                                    {{ $numBtn($funding->total_trainings, 'kegiatan', ['view' => 'trainings', 'funding_source' => $funding->funding_source, 'label' => $fundingLabel], false, 'lg') }}
+                                    {{ $count($funding->total_trainings, '', 'lg') }}
                                 </div>
                                 <div class="rp-stat">
                                     <span>Peserta unik</span>
-                                    {{ $numBtn($funding->total_participants, 'peserta unik', ['view' => 'participants', 'funding_source' => $funding->funding_source, 'label' => $fundingLabel], false, 'lg') }}
+                                    {{ $count($funding->total_participants, '', 'lg') }}
                                 </div>
                                 <div class="rp-stat">
                                     <span>Keikutsertaan</span>
-                                    {{ $numBtn($funding->total_participations, 'keikutsertaan', ['view' => 'participants', 'funding_source' => $funding->funding_source, 'label' => $fundingLabel], false, 'lg') }}
+                                    {{ $count($funding->total_participations, '', 'lg') }}
                                 </div>
                             </div>
 
@@ -806,7 +795,10 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                                 <div class="rp-fund-bar" aria-hidden="true">
                                     <i style="width:{{ max(3, round(((int) $funding->total_trainings / $fundingMax) * 100)) }}%"></i>
                                 </div>
-                                <p class="rp-fund-share">{{ $share }}% dari seluruh kegiatan pada rekap ini</p>
+                                <div class="rp-fund-meta">
+                                    <p class="rp-fund-share">{{ $share }}% dari seluruh kegiatan</p>
+                                    {{ $detailBtn(['tabs' => 1, 'view' => 'trainings', 'funding_source' => $funding->funding_source, 'label' => $fundingLabel]) }}
+                                </div>
                             </div>
                         </article>
                     @endforeach
@@ -820,7 +812,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                 <h2 id="rp-train-title">Rekap per pelatihan</h2>
                 <p>
                     Satu jenis pelatihan bisa punya banyak kegiatan dengan sumber dana berbeda.
-                    Klik jumlah kegiatan untuk melihat tanggal, sumber dana, dan pesertanya.
+                    Tekan Rincian untuk melihat tanggal, sumber dana, dan pesertanya.
                 </p>
             </div>
 
@@ -833,16 +825,17 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                 </div>
 
                 <div class="rp-table-wrap cards">
-                    <table class="rp-table" style="min-width:900px">
+                    <table class="rp-table" style="min-width:960px">
                         <caption class="rp-sr">Rekap kegiatan per nama pelatihan tahun {{ $year }}</caption>
                         <thead>
                             <tr>
                                 <th scope="col">No.</th>
                                 <th scope="col">Nama Pelatihan</th>
-                                <th scope="col">Kegiatan</th>
+                                <th scope="col" class="c">Kegiatan</th>
                                 <th scope="col">Sumber Dana</th>
-                                <th scope="col">Peserta Unik</th>
-                                <th scope="col">Keikutsertaan</th>
+                                <th scope="col" class="c">Peserta Unik</th>
+                                <th scope="col" class="c">Keikutsertaan</th>
+                                <th scope="col" class="c">Rincian</th>
                             </tr>
                         </thead>
                         <tbody id="rpTrainBody" data-paginate="10" data-items="tr[data-row]" data-pager-after="closest:.rp-table-wrap">
@@ -850,37 +843,24 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                                 @php $trainLabel = 'Pelatihan: ' . $training->name; @endphp
                                 <tr data-row data-search="{{ mb_strtolower($training->name) }}">
                                     <td class="rp-number" data-label="No.">{{ $index + 1 }}</td>
-
                                     <td class="rp-participant" data-label="Nama Pelatihan">{{ $training->name }}</td>
-
-                                    <td data-label="Kegiatan">
-                                        {{ $numBtn($training->total_trainings, 'kegiatan', ['view' => 'trainings', 'training_name' => $training->name, 'label' => $trainLabel], true) }}
-                                    </td>
-
+                                    <td class="c" data-label="Kegiatan">{{ $count($training->total_trainings) }}</td>
                                     <td data-label="Sumber Dana">
                                         <div class="rp-fchips">
                                             @foreach ($training->funding as $fund)
-                                                {{ $chipBtn($fund->funding_source, $fund->total_trainings, [
-                                                    'view' => 'trainings',
-                                                    'training_name' => $training->name,
-                                                    'funding_source' => $fund->funding_source,
-                                                    'label' => $trainLabel . ' · ' . $fund->funding_source,
-                                                ]) }}
+                                                <span class="rp-fchip {{ $tone($fund->funding_source) }}">{{ $fund->funding_source }} <b>{{ $formatNumber($fund->total_trainings) }}</b></span>
                                             @endforeach
                                         </div>
                                     </td>
-
-                                    <td data-label="Peserta Unik">
-                                        {{ $numBtn($training->total_participants, 'peserta unik', ['view' => 'participants', 'training_name' => $training->name, 'label' => $trainLabel]) }}
-                                    </td>
-
-                                    <td data-label="Keikutsertaan">
-                                        {{ $numBtn($training->total_participations, 'keikutsertaan', ['view' => 'participants', 'training_name' => $training->name, 'label' => $trainLabel]) }}
+                                    <td class="c" data-label="Peserta Unik">{{ $count($training->total_participants) }}</td>
+                                    <td class="c" data-label="Keikutsertaan">{{ $count($training->total_participations) }}</td>
+                                    <td class="c" data-label="Rincian">
+                                        {{ $detailBtn(['tabs' => 1, 'view' => 'trainings', 'training_name' => $training->name, 'label' => $trainLabel]) }}
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="rp-empty">Belum ada data pelatihan pada tahun {{ $year }}.</td>
+                                    <td colspan="7" class="rp-empty">Belum ada data pelatihan pada tahun {{ $year }}.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -905,10 +885,10 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                             <tr>
                                 <th>No.</th>
                                 <th>Kategori Pelatihan</th>
-                                <th>Jumlah Kegiatan</th>
-                                <th>Peserta Unik</th>
-                                <th>Keikutsertaan</th>
-                                <th>Rincian</th>
+                                <th class="c">Jumlah Kegiatan</th>
+                                <th class="c">Peserta Unik</th>
+                                <th class="c">Keikutsertaan</th>
+                                <th class="c">Rincian</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -920,22 +900,14 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                                 <tr>
                                     <td class="rp-number" data-label="No.">{{ $index + 1 }}</td>
                                     <td class="rp-participant" data-label="Kategori">{{ $category->category_name }}</td>
-                                    <td data-label="Jumlah Kegiatan">
-                                        {{ $numBtn($category->total_trainings, 'kegiatan', ['view' => 'trainings', 'category_id' => $catId, 'label' => $catLabel]) }}
-                                    </td>
-                                    <td data-label="Peserta Unik">
-                                        {{ $numBtn($category->total_participants, 'peserta unik', ['view' => 'participants', 'category_id' => $catId, 'label' => $catLabel]) }}
-                                    </td>
-                                    <td data-label="Keikutsertaan">
-                                        {{ $numBtn($category->total_participations, 'keikutsertaan', ['view' => 'participants', 'category_id' => $catId, 'label' => $catLabel]) }}
-                                    </td>
-                                    <td data-label="Rincian">
+                                    <td class="c" data-label="Jumlah Kegiatan">{{ $count($category->total_trainings) }}</td>
+                                    <td class="c" data-label="Peserta Unik">{{ $count($category->total_participants) }}</td>
+                                    <td class="c" data-label="Keikutsertaan">{{ $count($category->total_participations) }}</td>
+                                    <td class="c" data-label="Rincian">
                                         @if ($hasDetailRoute)
-                                            <button type="button" class="rp-detail-link"
-                                                data-detail="{{ json_encode(['view' => 'trainings', 'category_id' => $catId, 'label' => $catLabel], JSON_UNESCAPED_UNICODE) }}"
-                                                aria-haspopup="dialog">Lihat kegiatan</button>
+                                            {{ $detailBtn(['tabs' => 1, 'view' => 'trainings', 'category_id' => $catId, 'label' => $catLabel]) }}
                                         @elseif ($hasCategoryDetailRoute && $category->category_id)
-                                            <a class="rp-detail-link" href="{{ route('reports.category-details', ['categoryId' => $category->category_id, 'year' => $year]) }}">Lihat kegiatan</a>
+                                            <a class="rp-detail-link" href="{{ route('reports.category-details', ['categoryId' => $category->category_id, 'year' => $year]) }}">Rincian</a>
                                         @else
                                             <span>-</span>
                                         @endif
@@ -987,23 +959,22 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                                         <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-5h6v5"/></svg>
                                         {{ $distName }}
                                     </h4>
-                                    <div class="rp-dist-totals">
-                                        {{ $numBtn($block->total_trainings, 'kegiatan', ['view' => 'trainings', 'scope_district' => $distName, 'label' => $distLabel], true) }}
-                                        {{ $numBtn($block->total_participations, 'ikut', ['view' => 'participants', 'scope_district' => $distName, 'label' => $distLabel], true) }}
-                                    </div>
+                                    {{ $detailBtn(['tabs' => 1, 'view' => 'trainings', 'scope_district' => $distName, 'label' => $distLabel]) }}
                                 </header>
+
+                                <div class="rp-dist-sum">
+                                    {{ $count($block->total_trainings, 'kegiatan') }}
+                                    {{ $count($block->total_participations, 'keikutsertaan') }}
+                                </div>
 
                                 <ul class="rp-lines">
                                     @foreach ($lines as $line)
-                                        @php $lineLabel = $distLabel . ' · ' . $line->funding_source; @endphp
                                         <li class="rp-line">
-                                            <div class="rp-line-name">
-                                                <span class="rp-fchip {{ $tone($line->funding_source) }}">{{ $line->funding_source }}</span>
-                                            </div>
+                                            <span class="rp-fchip {{ $tone($line->funding_source) }}">{{ $line->funding_source }}</span>
                                             <div class="rp-line-nums">
-                                                {{ $numBtn($line->total_trainings, 'kegiatan', ['view' => 'trainings', 'scope_district' => $distName, 'funding_source' => $line->funding_source, 'label' => $lineLabel], true) }}
-                                                {{ $numBtn($line->total_participants, 'peserta', ['view' => 'participants', 'scope_district' => $distName, 'funding_source' => $line->funding_source, 'label' => $lineLabel], true) }}
-                                                {{ $numBtn($line->total_participations, 'ikut', ['view' => 'participants', 'scope_district' => $distName, 'funding_source' => $line->funding_source, 'label' => $lineLabel], true) }}
+                                                {{ $count($line->total_trainings, 'kegiatan') }}
+                                                {{ $count($line->total_participants, 'peserta') }}
+                                                {{ $count($line->total_participations, 'ikut') }}
                                             </div>
                                         </li>
                                     @endforeach
@@ -1021,7 +992,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                 <h2 id="rp-freq-title">Jumlah pelatihan per peserta</h2>
                 <p>
                     Jumlah keikutsertaan setiap peserta pada tahun {{ $year }} sesuai filter.
-                    Klik angka keikutsertaan untuk melihat pelatihan apa saja yang diikuti.
+                    Tekan Rincian untuk melihat pelatihan apa saja yang diikuti.
                 </p>
             </div>
 
@@ -1029,19 +1000,18 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                 <div class="rp-panel-top">
                     <h3>Daftar peserta</h3>
 
-                    <span class="rp-count">
+                    <span class="rp-count pill">
                         <b>{{ $formatNumber(method_exists($participants, 'total') ? $participants->total() : $participants->count()) }}</b>
                         <small>peserta</small>
                     </span>
                 </div>
 
                 <p class="rp-note">
-                    Daftar peserta menampilkan nama, NIK, instansi, Kabupaten/Kota, dan jumlah keikutsertaan.
                     Satu peserta dapat mengikuti beberapa kegiatan dan dihitung satu kali pada peserta unik.
                 </p>
 
                 <div class="rp-table-wrap cards">
-                    <table class="rp-table" style="min-width:950px">
+                    <table class="rp-table" style="min-width:1000px">
                         <caption class="rp-sr">Data peserta dan jumlah keikutsertaan pelatihan tahun {{ $year }}</caption>
 
                         <thead>
@@ -1051,7 +1021,8 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                                 <th scope="col">NIK</th>
                                 <th scope="col">Instansi</th>
                                 <th scope="col">Kabupaten/Kota</th>
-                                <th scope="col">Jumlah Keikutsertaan</th>
+                                <th scope="col" class="c">Keikutsertaan</th>
+                                <th scope="col" class="c">Rincian</th>
                             </tr>
                         </thead>
 
@@ -1063,13 +1034,14 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                                     <td class="rp-nik" data-label="NIK">{{ $participant->nik ?: '-' }}</td>
                                     <td data-label="Instansi">{{ $participant->institution ?: '-' }}</td>
                                     <td data-label="Kabupaten/Kota">{{ $participant->district ?: '-' }}</td>
-                                    <td data-label="Jumlah Keikutsertaan">
-                                        {{ $numBtn($participant->participations_count, 'keikutsertaan', ['view' => 'participant', 'participant_id' => $participant->id, 'label' => $participant->name ?: 'Peserta'], true) }}
+                                    <td class="c" data-label="Keikutsertaan">{{ $count($participant->participations_count, 'kali') }}</td>
+                                    <td class="c" data-label="Rincian">
+                                        {{ $detailBtn(['view' => 'participant', 'participant_id' => $participant->id, 'label' => $participant->name ?: 'Peserta'], 'Lihat') }}
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="rp-empty">
+                                    <td colspan="7" class="rp-empty">
                                         <strong>Tidak ada data peserta</strong>
                                         Belum ada peserta yang memenuhi filter pada tahun {{ $year }}.
 
@@ -1111,6 +1083,14 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
                     <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 </button>
             </header>
+
+            {{-- Tab pindah antara daftar kegiatan dan daftar peserta untuk cakupan yang sama --}}
+            <div class="rp-drawer-tabs" id="rpDrawerTabs" hidden>
+                <div class="rp-seg" role="group" aria-label="Jenis rincian">
+                    <button type="button" data-tab="trainings" aria-pressed="true">Kegiatan</button>
+                    <button type="button" data-tab="participants" aria-pressed="false">Peserta</button>
+                </div>
+            </div>
 
             <div class="rp-drawer-summary" id="rpDrawerSummary" hidden></div>
             <p class="rp-drawer-note" id="rpDrawerNote" hidden>Rincian ini mengikuti filter laporan yang sedang aktif.</p>
@@ -1384,7 +1364,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
 })();
 
 /* ======================================================================
-   PANEL RINCIAN (klik angka -> daftar kegiatan / peserta / info)
+   PANEL RINCIAN (tombol Rincian -> tab Kegiatan / Peserta / info)
    ====================================================================== */
 (function () {
     var root = document.getElementById('reportPage');
@@ -1404,12 +1384,14 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
     var elKicker = document.getElementById('rpDrawerKicker');
     var elTitle = document.getElementById('rpDrawerTitle');
     var elSub = document.getElementById('rpDrawerSub');
+    var elTabs = document.getElementById('rpDrawerTabs');
     var elSummary = document.getElementById('rpDrawerSummary');
     var elNote = document.getElementById('rpDrawerNote');
     var elTools = document.getElementById('rpDrawerTools');
     var elSearch = document.getElementById('rpDrawerSearch');
     var elBody = document.getElementById('rpDrawerBody');
     var btnBack = document.getElementById('rpDrawerBack');
+    var tabButtons = Array.prototype.slice.call(elTabs.querySelectorAll('button[data-tab]'));
 
     var filtersActive = !!(base.search || base.district || base.institution);
     var stack = [];
@@ -1491,6 +1473,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
         var params = Object.assign({}, base, payload);
         var qs = new URLSearchParams();
         Object.keys(params).forEach(function (key) {
+            if (key === 'tabs') return;
             var value = params[key];
             if (value !== null && value !== undefined && value !== '') qs.set(key, value);
         });
@@ -1537,15 +1520,24 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
     }
 
     /* ----- tampilan ----- */
-    function setHeader(kicker, title, sub) {
+    function setHeader(kicker, title, sub, entry) {
         elKicker.textContent = kicker;
         elTitle.textContent = title;
         elSub.textContent = sub || '';
         btnBack.hidden = stack.length < 2;
+
+        // Tab hanya muncul untuk rincian bercakupan (sumber dana, pelatihan, kategori, wilayah).
+        var hasTabs = !!(entry && entry.payload.tabs);
+        elTabs.hidden = !hasTabs;
+        if (hasTabs) {
+            tabButtons.forEach(function (b) {
+                b.setAttribute('aria-pressed', b.getAttribute('data-tab') === entry.payload.view ? 'true' : 'false');
+            });
+        }
     }
 
     function renderLoading(entry) {
-        setHeader(KICKERS[entry.payload.view] || 'Rincian', 'Memuat rincian…', entry.payload.label || '');
+        setHeader(KICKERS[entry.payload.view] || 'Rincian', 'Memuat rincian…', entry.payload.label || '', entry);
         elSummary.hidden = true;
         elNote.hidden = true;
         elTools.hidden = true;
@@ -1656,7 +1648,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
         if (!entry || !entry.data) return;
 
         var data = entry.data;
-        setHeader(KICKERS[data.view] || 'Rincian', data.title, data.subtitle);
+        setHeader(KICKERS[data.view] || 'Rincian', data.title, data.subtitle, entry);
 
         elSummary.textContent = '';
         (data.summary || []).forEach(function (item) {
@@ -1691,7 +1683,7 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
         if (!rows.length) {
             var empty = el('div', 'rp-state');
             empty.appendChild(el('strong', '', 'Belum ada data'));
-            empty.appendChild(el('p', '', 'Tidak ada data yang cocok dengan angka ini.'));
+            empty.appendChild(el('p', '', 'Tidak ada data yang cocok dengan pilihan ini.'));
             elBody.appendChild(empty);
             elTools.hidden = true;
             return;
@@ -1724,6 +1716,19 @@ span.rp-fchip:hover{transform:none;box-shadow:none}
         var q = elSearch.value.trim().toLowerCase();
         elBody.querySelectorAll('.rp-li').forEach(function (item) {
             item.hidden = !!q && (item.getAttribute('data-q') || '').indexOf(q) === -1;
+        });
+    });
+
+    /* ----- pindah tab Kegiatan <-> Peserta ----- */
+    tabButtons.forEach(function (b) {
+        b.addEventListener('click', function () {
+            var entry = stack[stack.length - 1];
+            var view = b.getAttribute('data-tab');
+            if (!entry || !entry.payload.tabs || entry.payload.view === view) return;
+
+            entry.payload = Object.assign({}, entry.payload, { view: view });
+            entry.data = null;
+            load();
         });
     });
 
