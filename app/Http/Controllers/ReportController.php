@@ -121,7 +121,7 @@ class ReportController extends Controller
      | EKSPOR PDF
      * ============================================================ */
 
-    public function pdf(Request $request)
+        public function pdf(Request $request)
     {
         if (!class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
             abort(501, 'Paket barryvdh/laravel-dompdf belum terpasang.');
@@ -139,18 +139,43 @@ class ReportController extends Controller
 
         $data = $this->exportData($filters, $minimum);
 
-        // Daftar peserta (sama dengan tabel "Jumlah pelatihan per peserta" di halaman)
-        $participantList = $data['participantsAll']
+        // Peserta yang lolos filter + minimum keikutsertaan
+        $participantMap = $data['participantsAll']->keyBy('id');
+
+        // Peserta dikelompokkan per kegiatan pelatihan
+        $participantGroups = $this->historyRows($filters)
+            ->filter(fn ($r) => $participantMap->has($r->participant_id))
+            ->groupBy('training_id')
+            ->map(function ($rows) use ($participantMap) {
+                $first = $rows->first();
+
+                return [
+                    'name'           => (string) $first->training_name,
+                    'start_date'     => $first->start_date,
+                    'end_date'       => $first->end_date,
+                    'funding_source' => (string) $first->funding_source,
+                    'category'       => (string) $first->category_name,
+                    'participants'   => $rows
+                        ->unique('participant_id')
+                        ->map(function ($r) use ($participantMap) {
+                            $p = $participantMap->get($r->participant_id);
+
+                            return [
+                                'name'           => (string) ($p->name ?? ''),
+                                'nik'            => (string) ($p->nik ?? ''),
+                                'profession'     => (string) ($p->profession ?? ''),
+                                'institution'    => (string) ($p->institution ?? ''),
+                                'district'       => (string) ($p->district ?? ''),
+                                'participations' => (int) ($p->participations_count ?? 0),
+                            ];
+                        })
+                        ->sortBy(fn ($x) => mb_strtolower($x['name']))
+                        ->values()
+                        ->all(),
+                ];
+            })
+            ->sortBy(fn ($g) => ($g['start_date'] ?? '') . '|' . mb_strtolower($g['name']))
             ->values()
-            ->map(fn ($p) => [
-                'name'           => (string) ($p->name ?? ''),
-                'nik'            => (string) ($p->nik ?? ''),
-                'nip'            => (string) ($p->nip ?? ''),
-                'profession'     => (string) ($p->profession ?? ''),
-                'institution'    => (string) ($p->institution ?? ''),
-                'district'       => (string) ($p->district ?? ''),
-                'participations' => (int) ($p->participations_count ?? 0),
-            ])
             ->all();
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
@@ -161,7 +186,8 @@ class ReportController extends Controller
                 'search'            => $filters['search'],
                 'districtFilter'    => $filters['district'],
                 'institutionFilter' => $filters['institution'],
-                'participantList'   => $participantList,
+                'participantGroups' => $participantGroups,
+                'participantCount'  => $participantMap->count(),
             ])
         )->setPaper('a4', 'portrait');
 
@@ -568,7 +594,9 @@ class ReportController extends Controller
                 '=',
                 'trainings.training_category_id'
             )
-            ->select([
+             ->select([
+                'trainings.id AS training_id',
+                'training_histories.participant_id',
                 'trainings.start_date',
                 'participants.name AS participant_name',
                 'participants.nik',

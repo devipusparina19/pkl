@@ -10,9 +10,7 @@
         margin: 28px 40px 40px 40px;
     }
 
-    * {
-        box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
         font-family: Helvetica, Arial, sans-serif;
@@ -26,271 +24,118 @@
         border-collapse: collapse;
     }
 
-    /* =========================
-       KOP SURAT
-    ========================= */
-
-    .kop td {
-        border: none;
-        padding: 0;
-        vertical-align: middle;
-    }
-
-    .kop-logo {
-        width: 80px;
-        text-align: left;
-    }
-
-    .kop-logo img {
-        width: 66px;
-        height: auto;
-    }
-
-    .kop-text {
-        text-align: center;
-        padding-right: 80px !important;
-    }
-
+    /* KOP SURAT */
+    .kop td { border: none; padding: 0; vertical-align: middle; }
+    .kop-logo { width: 80px; text-align: left; }
+    .kop-logo img { width: 66px; height: auto; }
+    .kop-text { text-align: center; padding-right: 80px !important; }
     .kop-text .pemerintah,
     .kop-text .dinas {
-        font-size: 13px;
-        font-weight: bold;
-        text-transform: uppercase;
-        line-height: 1.25;
+        font-size: 13px; font-weight: bold;
+        text-transform: uppercase; line-height: 1.25;
     }
-
     .kop-text .balai {
-        font-size: 15px;
-        font-weight: bold;
-        text-transform: uppercase;
-        line-height: 1.25;
+        font-size: 15px; font-weight: bold;
+        text-transform: uppercase; line-height: 1.25;
     }
+    .kop-text .alamat { margin-top: 2px; font-size: 8px; line-height: 1.35; }
+    .kop-garis { margin-top: 6px; border-top: 1.5px solid #000; height: 0; }
 
-    .kop-text .alamat {
-        margin-top: 2px;
-        font-size: 8px;
-        line-height: 1.35;
-    }
-
-    .kop-garis {
-        margin-top: 6px;
-        border-top: 1.5px solid #000;
-        height: 0;
-    }
-
-    /* =========================
-       TANGGAL & JUDUL
-    ========================= */
-
-    .tanggal {
-        margin: 5px 0 8px;
-        text-align: right;
-        font-size: 10px;
-    }
-
-    .judul {
-        text-align: center;
-        margin-bottom: 10px;
-    }
-
+    /* TANGGAL & JUDUL */
+    .tanggal { margin: 5px 0 8px; text-align: right; font-size: 10px; }
+    .judul { text-align: center; margin-bottom: 10px; }
     .judul h1 {
-        margin: 0 0 3px;
-        font-size: 13px;
-        font-weight: bold;
-        text-transform: uppercase;
-        text-decoration: underline;
+        margin: 0 0 3px; font-size: 13px; font-weight: bold;
+        text-transform: uppercase; text-decoration: underline;
     }
+    .judul .subjudul { font-size: 10.5px; font-weight: bold; text-transform: uppercase; }
 
-    .judul .subjudul {
-        font-size: 10.5px;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
+    /* INFORMASI LAPORAN */
+    .info { margin-bottom: 6px; font-size: 10px; }
+    .info td { border: none; padding: 1.5px 3px; vertical-align: top; }
+    .info-label { width: 95px; white-space: nowrap; }
+    .info-separator { width: 8px; }
 
-    /* =========================
-       INFORMASI LAPORAN
-    ========================= */
-
-    .info {
-        margin-bottom: 6px;
-        font-size: 10px;
-    }
-
-    .info td {
-        border: none;
-        padding: 1.5px 3px;
-        vertical-align: top;
-    }
-
-    .info-label {
-        width: 95px;
-        white-space: nowrap;
-    }
-
-    .info-separator {
-        width: 8px;
-    }
-
-    /* =========================
-       JUDUL BAGIAN
-    ========================= */
-
+    /* JUDUL BAGIAN */
     h2 {
-        margin: 12px 0 5px;
+        margin: 10px 0 5px;
         padding-bottom: 2px;
         border-bottom: 1px solid #000;
         font-size: 10.5px;
         font-weight: bold;
         text-transform: uppercase;
+        page-break-after: avoid;
     }
 
-    /* =========================
-       RINGKASAN STATISTIK
-    ========================= */
-
-    .stats {
-        margin-bottom: 6px;
-    }
-
+    /* RINGKASAN */
+    .stats { margin-bottom: 4px; }
     .stats td {
-        width: 25%;
-        border: 1px solid #000;
-        padding: 7px 4px;
-        text-align: center;
+        width: 50%; border: 1px solid #000;
+        padding: 6px 4px; text-align: center;
     }
+    .stats .angka { display: block; margin-bottom: 2px; font-size: 16px; font-weight: bold; }
+    .stats .label { font-size: 9px; }
 
-    .stats .angka {
-        display: block;
-        margin-bottom: 2px;
-        font-size: 17px;
-        font-weight: bold;
-    }
-
-    .stats .label {
-        font-size: 9px;
-    }
-
-    /* =========================
-       TABEL DATA
-    ========================= */
-
-    .data-table {
-        margin-bottom: 6px;
-    }
-
-    .data-table thead {
-        display: table-header-group;
-    }
-
+    /* TABEL DATA */
+    .data-table { margin-bottom: 6px; }
+    .data-table thead { display: table-header-group; }
     .data-table th {
-        padding: 4px 5px;
-        border: 1px solid #000;
-        font-size: 9.5px;
-        font-weight: bold;
-        text-align: center;
-        vertical-align: middle;
+        padding: 3.5px 5px; border: 1px solid #000;
+        font-size: 9.5px; font-weight: bold;
+        text-align: center; vertical-align: middle;
     }
-
     .data-table td {
-        padding: 3.5px 5px;
-        border: 1px solid #000;
-        font-size: 9.5px;
-        vertical-align: middle;
+        padding: 3px 5px; border: 1px solid #000;
+        font-size: 9.5px; vertical-align: middle;
     }
-
     .data-table.small th,
-    .data-table.small td {
-        padding: 3px 4px;
-        font-size: 8px;
-    }
+    .data-table.small td { padding: 3px 4px; font-size: 8px; }
 
     .center { text-align: center; }
     .right  { text-align: right; }
     .bold   { font-weight: bold; }
+    .total-row td { font-weight: bold; }
 
-    .total-row td {
-        font-weight: bold;
-    }
-
-    /* =========================
-       PIE + TABEL JENIS KELAMIN
-    ========================= */
-
-    .layout {
-        width: 100%;
-    }
-
+    /* PIE (kiri) + TABEL (kanan) */
+    .layout { width: 100%; }
     .layout > tbody > tr > td {
-        border: none;
-        vertical-align: top;
-        padding: 0;
+        border: none; vertical-align: top; padding: 0;
     }
+    .pie-cell { width: 36%; text-align: center; }
+    .pie-cell img { width: 130px; height: 130px; }
+    .legend { margin-top: 4px; font-size: 9px; }
+    .legend td { border: none; padding: 1px 3px; text-align: left; }
+    .swatch { width: 10px; height: 10px; border: 1px solid #000; }
+    .chart-title { margin-bottom: 3px; font-size: 9.5px; font-weight: bold; text-align: center; }
 
-    .pie-cell {
-        width: 46%;
-        text-align: center;
-    }
-
-    .pie-cell img {
-        width: 165px;
-        height: 165px;
-    }
-
-    .legend {
-        margin-top: 4px;
-        font-size: 9px;
-    }
-
-    .legend td {
-        border: none;
-        padding: 1px 3px;
-        text-align: left;
-    }
-
-    .swatch {
-        width: 10px;
-        height: 10px;
+    /* KELOMPOK PESERTA PER PELATIHAN */
+    .group-table { margin-bottom: 10px; }
+    .group-table thead { display: table-header-group; }
+    .group-head th {
+        padding: 5px 7px;
         border: 1px solid #000;
-    }
-
-    .chart-title {
-        margin-bottom: 3px;
-        font-size: 9.5px;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    /* =========================
-       CATATAN & FOOTER
-    ========================= */
-
-    .catatan {
-        margin-top: 10px;
+        border-bottom: 2px solid #000;
+        background: #D9D9D9;
+        text-align: left;
         font-size: 9px;
-        text-align: justify;
+        font-weight: bold;
+        line-height: 1.45;
     }
+    .group-head .gname { display: block; font-size: 9.5px; text-transform: uppercase; }
+    .group-head .gmeta { display: block; font-size: 8.5px; font-weight: normal; }
+    .group-head .grange { font-weight: bold; }
+    .col-head th { background: #F0F0F0; }
 
+    /* CATATAN & FOOTER */
+    .catatan { margin-top: 10px; font-size: 9px; text-align: justify; }
     .footer {
-        margin-top: 14px;
-        padding-top: 5px;
+        margin-top: 14px; padding-top: 5px;
         border-top: 1px solid #000;
-        text-align: center;
-        font-size: 7.5px;
-        line-height: 1.4;
+        text-align: center; font-size: 7.5px; line-height: 1.4;
     }
+    .muted { margin-bottom: 4px; font-size: 8.5px; page-break-after: avoid; }
 
-    .muted {
-        margin-bottom: 4px;
-        font-size: 8.5px;
-    }
-
-    tr {
-        page-break-inside: avoid;
-    }
-
-    .page-break {
-        page-break-before: always;
-    }
+    tr { page-break-inside: avoid; }
 </style>
 </head>
 
@@ -346,24 +191,18 @@
         ->take(10)
         ->values();
 
-    /* Data peserta (dikirim dari ReportController@pdf sebagai $participantList) */
-    $participantRows = collect($participantList ?? [])
-        ->map(fn ($p) => (array) (is_object($p) && method_exists($p, 'toArray') ? $p->toArray() : $p))
-        ->values();
+    /* Peserta per pelatihan (dikirim dari ReportController@pdf) */
+    $groups = collect($participantGroups ?? [])->values();
+    $hasParticipants = $groups->isNotEmpty();
 
-    $hasParticipants = $participantRows->isNotEmpty();
-
-    $participantParticipationSum = (int) $participantRows->sum(
-        fn ($p) => (int) ($p['participations'] ?? 0)
-    );
+    $groupedTotal = (int) $groups->sum(fn ($g) => count($g['participants']));
+    $uniqueParticipants = (int) ($participantCount ?? $groupedTotal);
 
     $totalTrainingCount = (int) $totalTrainings;
     $totalParticipantCount = (int) $totalTrainedParticipants;
-    $totalParticipationCount = (int) $totalParticipations;
 
     $hasSummary = $totalTrainingCount > 0
-        || $totalParticipantCount > 0
-        || $totalParticipationCount > 0;
+        || $totalParticipantCount > 0;
 
     /* Pie chart jenis kelamin (pie penuh, SVG) */
     $genderTotal = (int) $maleCount + (int) $femaleCount;
@@ -413,17 +252,12 @@
     }
 @endphp
 
-<!-- =====================================================
-     KOP SURAT
-===================================================== -->
-
+<!-- KOP SURAT -->
 <table class="kop">
     <tr>
         <td class="kop-logo">
-            <img
-                src="{{ public_path('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
-                alt="Logo Provinsi Kalimantan Selatan"
-            >
+            <img src="{{ public_path('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+                 alt="Logo Provinsi Kalimantan Selatan">
         </td>
 
         <td class="kop-text">
@@ -445,19 +279,13 @@
 
 <div class="tanggal">Banjarbaru, {{ $tanggalCetak }}</div>
 
-<!-- =====================================================
-     JUDUL
-===================================================== -->
-
+<!-- JUDUL -->
 <div class="judul">
     <h1>Laporan Eksekutif Riwayat Pelatihan</h1>
     <div class="subjudul">Tahun Anggaran {{ $year }}</div>
 </div>
 
-<!-- =====================================================
-     IDENTITAS LAPORAN
-===================================================== -->
-
+<!-- IDENTITAS LAPORAN -->
 <table class="info">
     <tr>
         <td class="info-label">Sumber Data</td>
@@ -482,21 +310,9 @@
         <td class="info-separator">:</td>
         <td>{{ $institutionFilter ?: 'Seluruh instansi' }}</td>
     </tr>
-    <tr>
-        <td class="info-label">Min. Keikutsertaan</td>
-        <td class="info-separator">:</td>
-        <td>{{ $minimum ?? 1 }} kali</td>
-
-        <td class="info-label">Kata Kunci</td>
-        <td class="info-separator">:</td>
-        <td>{{ ($search ?? '') !== '' ? $search : '-' }}</td>
-    </tr>
 </table>
 
-<!-- =====================================================
-     I. RINGKASAN CAPAIAN
-===================================================== -->
-
+<!-- I. RINGKASAN CAPAIAN -->
 @if ($hasSummary)
     <h2>I. Ringkasan Capaian Pelatihan</h2>
 
@@ -506,36 +322,15 @@
                 <span class="angka">{{ $n($totalTrainingCount) }}</span>
                 <span class="label">Jumlah Kegiatan Pelatihan</span>
             </td>
-
             <td>
                 <span class="angka">{{ $n($totalParticipantCount) }}</span>
                 <span class="label">Peserta Terlatih</span>
             </td>
-
-            <td>
-                <span class="angka">{{ $n($totalParticipationCount) }}</span>
-                <span class="label">Total Keikutsertaan</span>
-            </td>
-
-            @if ($hasGender)
-                <td>
-                    <span class="angka">{{ $n($genderTotal) }}</span>
-                    <span class="label">Peserta dengan Data Gender</span>
-                </td>
-            @else
-                <td>
-                    <span class="angka">{{ $n($totalParticipantCount) }}</span>
-                    <span class="label">Total Peserta Terlatih</span>
-                </td>
-            @endif
         </tr>
     </table>
 @endif
 
-<!-- =====================================================
-     II. KOMPOSISI PESERTA
-===================================================== -->
-
+<!-- II. KOMPOSISI PESERTA: pie (kiri), gender + profesi (kanan) -->
 @if ($hasGender || $hasProfession)
     <h2>II. Komposisi Peserta Terlatih</h2>
 
@@ -547,7 +342,7 @@
 
                     <img src="{{ $pieImage }}" alt="Diagram pie jenis kelamin">
 
-                    <table class="legend" style="width: 150px; margin: 4px auto 0;">
+                    <table class="legend" style="width: 130px; margin: 4px auto 0;">
                         @foreach ($pieSlices as $s)
                             <tr>
                                 <td style="width: 14px;">
@@ -562,9 +357,7 @@
                 <td style="padding-left: 10px;">
                     <table class="data-table">
                         <thead>
-                            <tr>
-                                <th colspan="4">Berdasarkan Jenis Kelamin</th>
-                            </tr>
+                            <tr><th colspan="4">Berdasarkan Jenis Kelamin</th></tr>
                             <tr>
                                 <th style="width: 12%">No.</th>
                                 <th>Jenis Kelamin</th>
@@ -590,43 +383,57 @@
                             </tr>
                         </tbody>
                     </table>
+
+                    @if ($hasProfession)
+                        <table class="data-table">
+                            <thead>
+                                <tr><th colspan="3">Berdasarkan Profesi</th></tr>
+                                <tr>
+                                    <th style="width: 12%">No.</th>
+                                    <th>Jenis Profesi</th>
+                                    <th style="width: 22%">Jumlah</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach ($professionRows as $i => $row)
+                                    <tr>
+                                        <td class="center">{{ $i + 1 }}</td>
+                                        <td>{{ $row->name }}</td>
+                                        <td class="right">{{ $n($row->total) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
                 </td>
             </tr>
         </table>
-    @endif
+    @elseif ($hasProfession)
+        <table class="data-table">
+            <thead>
+                <tr><th colspan="3">Berdasarkan Profesi</th></tr>
+                <tr>
+                    <th style="width: 8%">No.</th>
+                    <th>Jenis Profesi</th>
+                    <th style="width: 18%">Jumlah</th>
+                </tr>
+            </thead>
 
-    @if ($hasProfession)
-        <div style="margin-top: 8px;">
-            <table class="data-table">
-                <thead>
+            <tbody>
+                @foreach ($professionRows as $i => $row)
                     <tr>
-                        <th colspan="3">Berdasarkan Profesi</th>
+                        <td class="center">{{ $i + 1 }}</td>
+                        <td>{{ $row->name }}</td>
+                        <td class="right">{{ $n($row->total) }}</td>
                     </tr>
-                    <tr>
-                        <th style="width: 8%">No.</th>
-                        <th>Jenis Profesi</th>
-                        <th style="width: 18%">Jumlah</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach ($professionRows as $i => $row)
-                        <tr>
-                            <td class="center">{{ $i + 1 }}</td>
-                            <td>{{ $row->name }}</td>
-                            <td class="right">{{ $n($row->total) }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                @endforeach
+            </tbody>
+        </table>
     @endif
 @endif
 
-<!-- =====================================================
-     III. SUMBER DANA
-===================================================== -->
-
+<!-- III. SUMBER DANA -->
 @if ($hasFunding)
     <h2>III. Rekapitulasi Sumber Dana</h2>
 
@@ -655,10 +462,7 @@
     </table>
 @endif
 
-<!-- =====================================================
-     IV. KATEGORI PELATIHAN
-===================================================== -->
-
+<!-- IV. KATEGORI PELATIHAN -->
 @if ($hasCategory)
     <h2>IV. Rekapitulasi Kategori Pelatihan</h2>
 
@@ -687,10 +491,7 @@
     </table>
 @endif
 
-<!-- =====================================================
-     V. KEGIATAN UTAMA
-===================================================== -->
-
+<!-- V. KEGIATAN UTAMA -->
 @if ($hasTrainingList)
     <h2>V. Daftar Kegiatan Pelatihan Utama</h2>
 
@@ -732,59 +533,76 @@
     </table>
 @endif
 
-<!-- =====================================================
-     VI. JUMLAH PELATIHAN PER PESERTA
-===================================================== -->
-
+<!-- VI. JUMLAH PELATIHAN PER PESERTA (dikelompokkan per pelatihan) -->
 @if ($hasParticipants)
-    <div class="page-break"></div>
-
     <h2>VI. Jumlah Pelatihan per Peserta</h2>
 
     <div class="muted">
-        Jumlah keikutsertaan setiap peserta pada tahun {{ $year }} sesuai filter laporan.
-        Total {{ $n($participantRows->count()) }} peserta dengan {{ $n($participantParticipationSum) }} keikutsertaan.
-        Satu peserta dapat mengikuti beberapa kegiatan dan dihitung satu kali sebagai peserta.
+        Peserta dikelompokkan berdasarkan kegiatan pelatihan yang diikuti pada tahun {{ $year }}
+        (sesuai filter laporan). Total {{ $n($uniqueParticipants) }} peserta. Kolom "Total Ikut"
+        menunjukkan jumlah seluruh pelatihan yang diikuti peserta pada tahun tersebut.
     </div>
 
-    <table class="data-table small">
-        <thead>
-            <tr>
-                <th style="width: 5%">No.</th>
-                <th style="width: 22%">Nama Peserta</th>
-                <th style="width: 16%">NIK</th>
-                <th style="width: 15%">Profesi</th>
-                <th style="width: 18%">Instansi</th>
-                <th style="width: 14%">Kabupaten/Kota</th>
-                <th style="width: 10%">Keikutsertaan</th>
-            </tr>
-        </thead>
+    @php $no = 0; @endphp
 
-        <tbody>
-            @foreach ($participantRows as $i => $p)
-                <tr>
-                    <td class="center">{{ $i + 1 }}</td>
-                    <td>{{ ($p['name'] ?? '') !== '' ? $p['name'] : '-' }}</td>
-                    <td class="center">{{ ($p['nik'] ?? '') !== '' ? $p['nik'] : '-' }}</td>
-                    <td>{{ ($p['profession'] ?? '') !== '' ? $p['profession'] : '-' }}</td>
-                    <td>{{ ($p['institution'] ?? '') !== '' ? $p['institution'] : '-' }}</td>
-                    <td>{{ ($p['district'] ?? '') !== '' ? $p['district'] : '-' }}</td>
-                    <td class="center">{{ $n($p['participations'] ?? 0) }} kali</td>
+    @foreach ($groups as $g)
+        @php
+            $count = count($g['participants']);
+            $from = $no + 1;
+            $to = $no + $count;
+
+            $waktu = $d($g['start_date']);
+            if (!empty($g['end_date']) && $g['end_date'] !== $g['start_date']) {
+                $waktu .= ' s.d. ' . $d($g['end_date']);
+            }
+        @endphp
+
+        <table class="data-table small group-table">
+            <thead>
+                <tr class="group-head">
+                    <th colspan="7">
+                        <span class="gname">Pelatihan: {{ $g['name'] }}</span>
+                        <span class="gmeta">
+                            Waktu: {{ $waktu }}
+                            &nbsp;|&nbsp; Sumber Dana: {{ $g['funding_source'] ?: '-' }}
+                            &nbsp;|&nbsp; Kategori: {{ $g['category'] ?: '-' }}
+                        </span>
+                        <span class="gmeta grange">
+                            Peserta No. {{ $from }}{{ $count > 1 ? ' - ' . $to : '' }}
+                            ({{ $n($count) }} orang)
+                        </span>
+                    </th>
                 </tr>
-            @endforeach
+                <tr class="col-head">
+                    <th style="width: 5%">No.</th>
+                    <th style="width: 22%">Nama Peserta</th>
+                    <th style="width: 16%">NIK</th>
+                    <th style="width: 14%">Profesi</th>
+                    <th style="width: 19%">Instansi</th>
+                    <th style="width: 14%">Kabupaten/Kota</th>
+                    <th style="width: 10%">Total Ikut</th>
+                </tr>
+            </thead>
 
-            <tr class="total-row">
-                <td colspan="6" class="center">Total Keikutsertaan</td>
-                <td class="center">{{ $n($participantParticipationSum) }}</td>
-            </tr>
-        </tbody>
-    </table>
+            <tbody>
+                @foreach ($g['participants'] as $p)
+                    @php $no++; @endphp
+                    <tr>
+                        <td class="center">{{ $no }}</td>
+                        <td>{{ ($p['name'] ?? '') !== '' ? $p['name'] : '-' }}</td>
+                        <td class="center">{{ ($p['nik'] ?? '') !== '' ? $p['nik'] : '-' }}</td>
+                        <td>{{ ($p['profession'] ?? '') !== '' ? $p['profession'] : '-' }}</td>
+                        <td>{{ ($p['institution'] ?? '') !== '' ? $p['institution'] : '-' }}</td>
+                        <td>{{ ($p['district'] ?? '') !== '' ? $p['district'] : '-' }}</td>
+                        <td class="center">{{ $n($p['participations'] ?? 0) }} kali</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endforeach
 @endif
 
-<!-- =====================================================
-     CATATAN
-===================================================== -->
-
+<!-- CATATAN -->
 @if (!$hasSummary && !$hasGender && !$hasProfession && !$hasFunding && !$hasCategory && !$hasTrainingList && !$hasParticipants)
     <div class="catatan">
         <strong>Keterangan:</strong><br>
@@ -796,16 +614,13 @@
         Laporan ini merupakan ringkasan eksekutif riwayat pelatihan tenaga kesehatan
         pada periode {{ $year }}. Jumlah peserta menunjukkan individu yang
         mengikuti pelatihan, sedangkan jumlah keikutsertaan menunjukkan total
-        partisipasi peserta dalam seluruh kegiatan. Daftar kegiatan utama
-        ditampilkan berdasarkan jumlah peserta terbanyak, dan daftar peserta
-        ditampilkan lengkap sesuai filter yang aktif.
+        partisipasi peserta dalam seluruh kegiatan. Daftar peserta dikelompokkan
+        per kegiatan pelatihan; peserta yang mengikuti lebih dari satu kegiatan
+        akan tercantum pada masing-masing kelompok.
     </div>
 @endif
 
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
+<!-- FOOTER -->
 <div class="footer">
     Dokumen ini dihasilkan oleh {{ $sistem }}
     <br>
