@@ -381,7 +381,7 @@
             <p class="reveal" style="--i:3">
                 Periksa pelatihan yang tercatat atas nama Anda di <b>ARTA</b>
                 (Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan).
-                Masukkan NIK dan nama lengkap sesuai KTP, lalu lihat hasilnya.
+                Masukkan NIK lalu lihat hasilnya.
             </p>
 
             <div class="ecg reveal" style="--i:4" aria-hidden="true">
@@ -399,7 +399,7 @@
                     </span>
                     <div>
                         <strong>Siapkan KTP</strong>
-                        <span class="d">NIK dan nama harus sama persis dengan yang tertera di KTP.</span>
+                        <span class="d">NIK sama persis dengan yang tertera di KTP.</span>
                     </div>
                 </li>
                 <li>
@@ -428,7 +428,7 @@
                 <svg class="i" viewBox="0 0 24 24"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/><path d="m9 12 2 2 4-4"/></svg>
             </span>
             <p>
-                Data hanya ditampilkan jika NIK dan nama cocok dengan data peserta
+                Data hanya ditampilkan jika NIK cocok dengan data peserta
                 yang terdaftar. Jaga kerahasiaan identitas Anda.
             </p>
         </div>
@@ -442,7 +442,7 @@
                 <span class="eyebrow">Untuk Peserta Pelatihan</span>
                 <h2 id="form-title">Cari riwayat <em>pelatihan</em></h2>
                 <p>
-                    Isi kedua kolom sesuai identitas pada KTP. NIK dan nama harus
+                    Isi kedua kolom sesuai identitas pada KTP. NIK harus
                     cocok dengan data peserta yang terdaftar.
                 </p>
             </div>
@@ -514,7 +514,7 @@
                     <h3>Dari mana data ini berasal?</h3>
                     <p>
                         Informasi ditampilkan berdasarkan data peserta yang tercatat di ARTA.
-                        Pastikan NIK dan nama yang dimasukkan benar agar data dapat ditemukan.
+                        Pastikan NIK yang dimasukkan benar agar data dapat ditemukan.
                     </p>
                 </div>
             </div>

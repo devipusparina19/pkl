@@ -20,6 +20,16 @@ class ParticipantController extends Controller
         $search = trim((string) $request->query('search', ''));
 
         /*
+         * Urutan nama: asc = A-Z, desc = Z-A.
+         * Nilai selain asc/desc dikembalikan ke asc.
+         */
+        $sort = strtolower((string) $request->query('sort', 'asc'));
+
+        if (!in_array($sort, ['asc', 'desc'], true)) {
+            $sort = 'asc';
+        }
+
+        /*
          * Mengambil tahun pelatihan yang memiliki riwayat peserta.
          * Mendukung MySQL dan SQLite.
          */
@@ -167,8 +177,13 @@ class ParticipantController extends Controller
             }
         );
 
+        /*
+         * Urutkan berdasarkan nama (A-Z / Z-A),
+         * lalu id sebagai pembeda agar pagination stabil.
+         */
         $participants = $participantsQuery
-            ->orderBy('name')
+            ->orderBy('name', $sort)
+            ->orderBy('id', $sort)
             ->paginate(15)
             ->withQueryString();
 
@@ -179,7 +194,8 @@ class ParticipantController extends Controller
             'selectedYear',
             'yearFilter',
             'districts',
-            'districtFilter'
+            'districtFilter',
+            'sort'
         ));
     }
 

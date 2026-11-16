@@ -112,9 +112,8 @@
     $footerLinks = collect($sections)
         ->flatMap(fn ($s) => $s['items'])
         ->filter(fn ($i) => $i['type'] === 'link' && Route::has($i['route']))
-        ->take(5);
+        ->take(4);
 
-    $marqueeWords = ['Aplikasi', 'Rekam', 'Riwayat', 'Pelatihan', 'Tenaga', 'Kesehatan'];
     $navIndex = 0;
 @endphp
 <!DOCTYPE html>
@@ -764,98 +763,56 @@
         }
 
         /* =====================================================
-           FOOTER (editorial)
+           FOOTER (ringkas & polos)
         ===================================================== */
         .app-footer {
-            position: relative; isolation: isolate; overflow: hidden;
-            margin: 8px var(--pad-x) 20px;
-            color: #fff; border-radius: 30px;
-            background:
-                radial-gradient(700px 320px at 100% 0%, rgba(52,120,246,.42), transparent 62%),
-                radial-gradient(520px 280px at 0% 100%, rgba(56,198,232,.16), transparent 62%),
-                linear-gradient(135deg, var(--navy-deep), var(--navy) 55%, #0d2f5e);
-            box-shadow: 0 30px 70px -30px rgba(8,27,51,.6);
+            margin: 0 var(--pad-x) 20px;
+            padding: 16px 22px;
+            color: var(--muted);
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 13.5px;
+            line-height: 1.5;
         }
 
-        .app-footer::before {
-            content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; z-index: 2;
-            background: linear-gradient(90deg, transparent, var(--cyan), var(--electric), transparent);
+        .footer-row {
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+            gap: 12px 28px;
         }
 
-        .footer-marquee {
-            overflow: hidden; padding: 18px 0;
-            border-bottom: 1px solid rgba(255,255,255,.1);
-            -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-            mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-        }
-        .footer-track { display: flex; width: max-content; animation: marquee 38s linear infinite; }
-        .footer-track span {
-            font-family: var(--font-display); font-size: clamp(20px, 2.4vw, 30px); font-weight: 700; letter-spacing: -.02em;
-            color: rgba(255,255,255,.88); white-space: nowrap;
-        }
-        .footer-track i {
-            display: inline-block; width: 9px; height: 9px; margin: 0 clamp(18px, 2.6vw, 34px);
-            align-self: center; background: var(--cyan); border-radius: 3px; transform: rotate(45deg);
-        }
-        @keyframes marquee { to { transform: translate3d(-50%, 0, 0); } }
+        .footer-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
 
-        .footer-grid {
-            display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
-            gap: clamp(24px, 4vw, 56px);
-            padding: clamp(28px, 4vw, 52px) clamp(22px, 4vw, 52px) clamp(20px, 3vw, 32px);
-        }
+        .footer-logo { width: 38px; height: 38px; flex: 0 0 38px; object-fit: contain; }
 
-        .footer-brand { display: flex; align-items: flex-start; gap: 18px; min-width: 0; }
-        .footer-logo {
-            width: 76px; height: 76px; flex: 0 0 76px; padding: 7px; object-fit: contain;
-            background: #fff; border-radius: 22px; box-shadow: 0 14px 34px rgba(0,0,0,.35);
+        .footer-brand-text strong {
+            display: block; color: var(--navy);
+            font-family: var(--font-display); font-size: 15px; font-weight: 700; line-height: 1.3;
         }
-        .footer-title {
-            display: block; font-family: var(--font-display);
-            font-size: clamp(34px, 4vw, 48px); font-weight: 800; line-height: 1; letter-spacing: -.05em;
-        }
-        .footer-description { display: block; max-width: 420px; margin-top: 12px; color: #bcd0e8; font-size: 14.5px; line-height: 1.8; }
+        .footer-brand-text span { display: block; font-size: 12.5px; }
 
-        .footer-col h3 {
-            margin: 0 0 16px; color: var(--cyan); font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+        .footer-links { display: flex; flex-wrap: wrap; gap: 4px 20px; margin: 0; padding: 0; list-style: none; }
+        .footer-links a {
+            color: var(--muted); font-size: 13.5px; font-weight: 600;
+            transition: color var(--transition);
         }
-        .footer-col ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-        .footer-col a {
-            display: inline-flex; align-items: center; gap: 10px; padding: 6px 0;
-            color: #dbe7f6; font-size: 15px; font-weight: 600;
-            transition: color var(--transition), transform var(--transition);
-        }
-        .footer-col a .icon { color: var(--cyan); transition: transform var(--transition); }
-        .footer-col a:hover { color: #fff; transform: translateX(4px); }
-        .footer-col a:hover .icon { transform: translateX(3px); }
-
-        .footer-info p { margin: 0 0 10px; color: #bcd0e8; font-size: 14.5px; line-height: 1.8; }
-        .footer-info strong { color: #fff; }
+        .footer-links a:hover { color: var(--blue); }
 
         .footer-bottom {
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;
-            margin: 0 clamp(22px, 4vw, 52px); padding: 20px 0;
-            border-top: 1px solid rgba(255,255,255,.12);
-            color: #a9c0dc; font-size: 13.5px;
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px;
+            margin-top: 12px; padding-top: 12px;
+            border-top: 1px solid var(--border);
+            font-size: 12.5px;
         }
-        .footer-bottom strong { color: #fff; }
 
         .to-top {
-            display: inline-flex; align-items: center; gap: 10px; min-height: 46px; padding: 8px 18px;
-            color: #fff; background: rgba(255,255,255,.08);
-            border: 1px solid rgba(255,255,255,.2); border-radius: 999px;
-            font-size: 14px; font-weight: 700;
-            transition: background var(--transition), transform var(--transition), border-color var(--transition);
+            display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px;
+            color: var(--muted); background: transparent;
+            border: 0; border-radius: 8px;
+            font-size: 12.5px; font-weight: 600;
+            transition: color var(--transition), background var(--transition);
         }
-        .to-top:hover { background: linear-gradient(135deg, var(--blue), var(--electric)); border-color: transparent; transform: translateY(-3px); }
-        .to-top:focus-visible { outline-color: var(--cyan); }
-
-        .footer-giant {
-            display: block; margin: 8px 0 -.15em; padding: 0 clamp(14px, 3vw, 40px);
-            font-family: var(--font-display); font-size: clamp(96px, 22vw, 320px); font-weight: 800;
-            line-height: .8; letter-spacing: -.06em; white-space: nowrap; user-select: none;
-            color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,.13);
-        }
+        .to-top:hover { color: var(--blue); background: var(--blue-soft); }
 
         /* =====================================================
            RESPONSIVE
@@ -894,8 +851,6 @@
         @media (max-width: 900px) {
             .filter-grid { grid-template-columns: 1fr 1fr; }
             .filter-grid .filter-actions { grid-column: 1 / -1; }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-            .footer-brand-block { grid-column: 1 / -1; }
         }
 
         @media (max-width: 760px) {
@@ -912,8 +867,8 @@
             .breadcrumb > span:first-child { display: none; }
             .breadcrumb-separator { display: none; }
 
-            .app-footer { border-radius: 24px; margin-bottom: 14px; }
-            .footer-bottom { flex-direction: column; align-items: flex-start; }
+            .app-footer { padding: 14px 16px; margin-bottom: 14px; }
+            .footer-row { flex-direction: column; align-items: flex-start; }
         }
 
         @media (max-width: 560px) {
@@ -926,9 +881,6 @@
             .brand-name { font-size: 46px; }
             .brand-logo-wrap { width: 84px; height: 84px; flex-basis: 84px; }
             .brand-logo { width: 72px; height: 72px; }
-
-            .footer-grid { grid-template-columns: 1fr; }
-            .footer-brand { flex-direction: column; }
         }
 
         /* =====================================================
@@ -941,7 +893,6 @@
                 animation-duration: .01ms !important;
                 animation-iteration-count: 1 !important;
             }
-            .footer-track { animation: none; }
         }
     </style>
 
@@ -1184,64 +1135,35 @@
         {{-- ===================== FOOTER ===================== --}}
         <footer class="app-footer">
 
-            <div class="footer-marquee" aria-hidden="true">
-                <div class="footer-track">
-                    @foreach ([1, 2] as $round)
-                        @foreach ($marqueeWords as $word)
-                            <span>{{ $word }}</span><i></i>
-                        @endforeach
-                    @endforeach
-                </div>
-            </div>
+            <div class="footer-row">
+                <div class="footer-brand">
+                    <img
+                        src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
+                        alt="Logo Provinsi Kalimantan Selatan"
+                        class="footer-logo"
+                        width="38" height="38"
+                        loading="lazy"
+                        decoding="async"
+                    >
 
-            <div class="footer-grid">
-
-                <div class="footer-brand-block">
-                    <div class="footer-brand">
-                        <img
-                            src="{{ asset('images/LOGO PROVINSI KALIMANTAN SELATAN.png') }}"
-                            alt="Logo Provinsi Kalimantan Selatan"
-                            class="footer-logo"
-                            width="76" height="76"
-                            loading="lazy"
-                            decoding="async"
-                        >
-
-                        <div>
-                            <span class="footer-title">ARTA</span>
-                            <span class="footer-description">
-                                Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan,
-                                untuk mencatat dan memantau riwayat pelatihan secara rapi dan terpusat.
-                            </span>
-                        </div>
+                    <div class="footer-brand-text">
+                        <strong>ARTA</strong>
+                        <span>Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan</span>
                     </div>
                 </div>
 
-                <nav class="footer-col" aria-label="Pintasan">
-                    <h3>Pintasan</h3>
-                    <ul>
+                @if ($footerLinks->isNotEmpty())
+                    <ul class="footer-links" aria-label="Pintasan">
                         @foreach ($footerLinks as $link)
-                            <li>
-                                <a href="{{ route($link['route']) }}">
-                                    <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-arrow-right"/></svg>
-                                    {{ $link['label'] }}
-                                </a>
-                            </li>
+                            <li><a href="{{ route($link['route']) }}">{{ $link['label'] }}</a></li>
                         @endforeach
                     </ul>
-                </nav>
-
-                <div class="footer-col footer-info">
-                    <h3>Instansi</h3>
-                    <p><strong>Bapelkes Kalimantan Selatan</strong></p>
-                    <p>Sistem pencatatan dan pemantauan riwayat pelatihan tenaga kesehatan.</p>
-                </div>
-
+                @endif
             </div>
 
             <div class="footer-bottom">
                 <div>
-                    &copy; {{ date('Y') }} <strong>Bapelkes Kalimantan Selatan</strong>. Seluruh hak dilindungi.
+                    &copy; {{ date('Y') }} Bapelkes Kalimantan Selatan. Seluruh hak dilindungi.
                 </div>
 
                 <button type="button" class="to-top" id="backToTop">
@@ -1249,8 +1171,6 @@
                     Kembali ke atas
                 </button>
             </div>
-
-            <span class="footer-giant" aria-hidden="true">ARTA</span>
 
         </footer>
 

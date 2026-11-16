@@ -84,10 +84,8 @@ Route::get(
 |--------------------------------------------------------------------------
 */
 
-Route::get(
-    '/training/download-template',
-    [TrainingController::class, 'downloadTemplate']
-)->name('training.download-template');
+Route::get('/trainings/template', [TrainingController::class, 'downloadTemplate'])
+    ->name('training.download-template');
 
 
 /*

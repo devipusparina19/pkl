@@ -14,6 +14,13 @@ use Carbon\Carbon;
 class TrainingController extends Controller
 {
     /**
+     * Nama file template Excel resmi ARTA.
+     * File fisiknya harus ada di: storage/app/templates/Template_Arta.xlsx
+     * (huruf besar/kecil harus sama persis di server Linux).
+     */
+    private const TEMPLATE_FILE = 'Template_Arta.xlsx';
+
+    /**
      * Menampilkan daftar pelatihan, pencarian, dan filter tahun.
      */
     public function index(Request $request)
@@ -395,22 +402,24 @@ class TrainingController extends Controller
     }
 
     /**
-     * Mengunduh template Excel resmi SIRAPIK.
+     * Mengunduh template Excel resmi ARTA (Template_Arta.xlsx).
+     * Route: training.download-template
      */
     public function downloadTemplate()
     {
-        $path = storage_path('app/templates/Template_sirapik.xlsx');
+        $path = storage_path('app/templates/' . self::TEMPLATE_FILE);
 
-        if (!file_exists($path)) {
+        if (!is_file($path)) {
             abort(
                 404,
-                'File template Excel tidak ditemukan. Periksa folder storage/app/templates.'
+                'File ' . self::TEMPLATE_FILE . ' tidak ditemukan. '
+                . 'Letakkan file di folder storage/app/templates.'
             );
         }
 
         return response()->download(
             $path,
-            'Template_SIRAPIK.xlsx',
+            self::TEMPLATE_FILE,
             [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ]

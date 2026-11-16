@@ -129,6 +129,7 @@
   gap:16px;margin-bottom:18px
 }
 .pp-filter-item{min-width:0}
+.pp-filter-item.full{grid-column:1 / -1}
 .pp-filter-item label{display:block;margin-bottom:8px;font-size:13px;font-weight:700;color:#506176}
 .pp-filter-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .pp-filter-actions .pp-btn{min-width:130px}
@@ -330,6 +331,10 @@
     $districts = $districts ?? collect();
     $districtFilter = $districtFilter ?? '';
 
+    // Urutan nama: asc (A-Z) atau desc (Z-A)
+    $sort = in_array(($sort ?? 'asc'), ['asc', 'desc'], true) ? $sort : 'asc';
+    $sortLabel = $sort === 'desc' ? 'Z–A' : 'A–Z';
+
     $participantTotal = method_exists($participants, 'total')
         ? $participants->total()
         : $participants->count();
@@ -394,7 +399,7 @@
     {{-- FILTER DAN PENCARIAN --}}
     <div class="pp-tools pp-rv">
 
-        {{-- FILTER TAHUN + WILAYAH --}}
+        {{-- FILTER TAHUN + WILAYAH + URUTAN NAMA --}}
         <section class="pp-box" aria-labelledby="pp-filter-title">
             <h2 id="pp-filter-title">
                 <span class="pp-ico" aria-hidden="true">
@@ -407,7 +412,7 @@
                 Filter Data Peserta
             </h2>
 
-            <p>Pilih tahun pelatihan dan wilayah untuk menyaring daftar peserta.</p>
+            <p>Pilih tahun pelatihan, wilayah, dan urutan nama untuk menyaring daftar peserta.</p>
 
             <form method="GET" action="{{ route('participants.index') }}" data-keep-scroll>
 
@@ -447,6 +452,20 @@
                         </select>
                     </div>
 
+                    {{-- URUTAN NAMA A-Z / Z-A --}}
+                    <div class="pp-filter-item full">
+                        <label for="sort">Urutkan Nama</label>
+
+                        <select name="sort" id="sort" class="pp-select">
+                            <option value="asc" {{ $sort === 'asc' ? 'selected' : '' }}>
+                                A – Z
+                            </option>
+                            <option value="desc" {{ $sort === 'desc' ? 'selected' : '' }}>
+                                Z – A
+                            </option>
+                        </select>
+                    </div>
+
                 </div>
 
                 {{-- Pencarian tetap dipertahankan saat filter diterapkan --}}
@@ -464,6 +483,7 @@
                     <a
                         href="{{ route('participants.index', [
                             'year' => 'all',
+                            'sort' => 'asc',
                             'search' => $search ?: null
                         ]) }}"
                         class="pp-btn pp-ghost"
@@ -498,6 +518,7 @@
 
                 <input type="hidden" name="year" value="{{ $yearFilter }}">
                 <input type="hidden" name="district" value="{{ $districtFilter }}">
+                <input type="hidden" name="sort" value="{{ $sort }}">
 
                 <div class="pp-search">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -520,7 +541,8 @@
                     class="pp-btn pp-ghost"
                     href="{{ route('participants.index', [
                         'year' => $yearFilter,
-                        'district' => $districtFilter ?: null
+                        'district' => $districtFilter ?: null,
+                        'sort' => $sort
                     ]) }}"
                     data-keep-scroll>
                     Reset
@@ -569,6 +591,15 @@
                         {{ $districtFilter }}
                     </span>
                 @endif
+
+                {{-- Chip urutan nama --}}
+                <span class="pp-chip">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 6h10M3 12h7M3 18h4"/>
+                        <path d="M17 5v14M13.5 15.5 17 19l3.5-3.5"/>
+                    </svg>
+                    Urutan: {{ $sortLabel }}
+                </span>
 
             </div>
         </div>
