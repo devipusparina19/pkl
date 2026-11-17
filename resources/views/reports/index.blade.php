@@ -318,6 +318,30 @@ html.rp-lock{overflow:hidden}
 .rp-state{padding:36px 10px;text-align:center;color:var(--slate)}
 .rp-state strong{display:block;margin-bottom:6px;font-family:"Sora","Segoe UI",Arial,sans-serif;color:var(--navy)}
 
+/* DIALOG PILIHAN EKSPOR (memakai variabel & dasar .rp-drawer) */
+.rp-modal-panel{position:absolute;left:50%;top:50%;display:flex;flex-direction:column;width:min(580px,calc(100% - 28px));max-height:calc(100% - 28px);overflow:hidden;border-radius:24px;background:#fff;box-shadow:0 30px 80px rgba(8,27,51,.35);opacity:0;transform:translate(-50%,-46%) scale(.97);transition:opacity .25s var(--ease),transform .3s var(--ease);outline:none}
+.rp-modal.is-open .rp-modal-panel{opacity:1;transform:translate(-50%,-50%)}
+.rp-modal-head{position:relative;display:flex;align-items:flex-start;gap:12px;padding:20px clamp(18px,3vw,26px);color:#fff;background:linear-gradient(120deg,var(--navy),var(--midnight) 65%,#173d86);flex:none}
+.rp-modal-head::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:3px;background:linear-gradient(90deg,var(--royal) 0 30%,var(--electric) 30% 75%,var(--cyan) 75%)}
+.rp-modal-body{display:grid;gap:12px;padding:clamp(16px,3vw,24px);overflow-y:auto}
+.rp-modal-filter{margin:0;padding:10px 14px;border-radius:12px;background:var(--ice);font-size:13px;line-height:1.6;color:var(--slate)}
+.rp-modal-filter strong{color:var(--navy)}
+.rp-opt{position:relative;display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border:1.5px solid var(--border);border-radius:16px;background:#fff;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s,transform .2s var(--ease)}
+.rp-opt:hover{border-color:#b9cfec;background:#F7FAFF;transform:translateY(-2px)}
+.rp-opt input{position:absolute;opacity:0;pointer-events:none}
+.rp-opt-radio{display:grid;place-items:center;width:22px;height:22px;margin-top:2px;flex:none;border:2px solid #b9cfec;border-radius:50%;background:#fff;transition:border-color .2s,background .2s}
+.rp-opt-radio::after{content:"";width:10px;height:10px;border-radius:50%;background:#fff;transform:scale(0);transition:transform .2s var(--ease)}
+.rp-opt.is-selected{border-color:var(--royal);background:var(--soft);box-shadow:0 0 0 4px rgba(52,120,246,.14)}
+.rp-opt.is-selected .rp-opt-radio{border-color:var(--royal);background:var(--royal)}
+.rp-opt.is-selected .rp-opt-radio::after{transform:scale(1)}
+.rp-opt:focus-within{outline:3px solid var(--cyan);outline-offset:3px}
+.rp-opt-text{display:grid;gap:4px;min-width:0}
+.rp-opt-text strong{font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:1rem;font-weight:700;color:var(--navy)}
+.rp-opt-text span{font-size:13.5px;line-height:1.6;color:var(--slate)}
+.rp-opt-tag{display:inline-flex;width:fit-content;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#E4EBF3;color:var(--navy)}
+.rp-opt-tag.safe{background:#E6F7FC;color:#0A6C86}
+.rp-modal-foot{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;padding:14px clamp(16px,3vw,24px);border-top:1px solid var(--border);background:var(--ice);flex:none}
+
 @keyframes rp-rise{from{opacity:0;transform:translate3d(0,18px,0)}to{opacity:1;transform:none}}
 @keyframes rp-drift{to{transform:translate3d(-40px,40px,0)}}
 @keyframes rp-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -358,6 +382,8 @@ html.rp-lock{overflow:hidden}
     .rp-times{grid-template-columns:repeat(2,minmax(0,1fr))}
 
     .rp-drawer-panel{width:100%;transform:translate3d(0,100%,0)}
+
+    .rp-modal-foot .rp-btn{flex:1}
 
     .rp-table-wrap.cards{overflow:visible}
     .rp-table-wrap.cards .rp-table{display:block;min-width:0!important}
@@ -445,7 +471,8 @@ html.rp-lock{overflow:hidden}
         'institution' => $institutionFilter,
     ];
 
-    // Ekspor mengikuti filter aktif.
+    // Ekspor mengikuti filter aktif. Parameter "type" (summary | full)
+    // ditambahkan oleh dialog pilihan ekspor saat tombol unduh ditekan.
     $exportParams = array_filter([
         'year' => $year,
         'minimum' => $minimum,
@@ -458,6 +485,9 @@ html.rp-lock{overflow:hidden}
     $pdfUrl = \Illuminate\Support\Facades\Route::has('reports.pdf')
         ? route('reports.pdf', $exportParams)
         : (\Illuminate\Support\Facades\Route::has('pdf.report') ? route('pdf.report', $exportParams) : null);
+
+    // Hanya route reports.pdf yang mengenal parameter "type".
+    $pdfSupportsType = \Illuminate\Support\Facades\Route::has('reports.pdf');
 
     // Bagian sebaran hanya tampil saat "Semua keikutsertaan" dipilih.
     $showFrequency = $isAll && $frequencyRecap->isNotEmpty();
@@ -508,9 +538,20 @@ html.rp-lock{overflow:hidden}
     $tone = fn ($label) => 't' . (abs(crc32((string) $label)) % 4);
 
     $districtGroups = $districtFundingRecap->groupBy('district');
+
+    // Urutan wilayah: berdasarkan jumlah peserta (sama dengan Excel).
     $districtBlocks = $districtFundingTotals
-        ->sortByDesc(fn ($row) => (int) $row->total_participations)
+        ->sortByDesc(fn ($row) => (int) $row->total_participants)
         ->values();
+
+    // Ringkasan filter aktif untuk dialog ekspor.
+    $exportFilterText = collect([
+        'Tahun ' . $year,
+        $minimumLabel,
+        $districtFilter !== '' ? $districtFilter : null,
+        $institutionFilter !== '' ? $institutionFilter : null,
+        $search !== '' ? 'Kata kunci "' . $search . '"' : null,
+    ])->filter()->implode(' · ');
 @endphp
 
 <div class="rp-progress" id="rpProgress" aria-hidden="true"></div>
@@ -537,15 +578,21 @@ html.rp-lock{overflow:hidden}
                 </p>
 
                 <div class="rp-hero-cta">
+                    {{-- Tautan tetap berfungsi tanpa JavaScript (mengunduh ekspor lengkap).
+                         Dengan JavaScript, klik membuka dialog pilihan jenis ekspor. --}}
                     @if ($excelUrl)
-                        <a href="{{ $excelUrl }}" class="rp-btn rp-btn-light">
+                        <a href="{{ $excelUrl }}" class="rp-btn rp-btn-light"
+                           data-export="excel" data-export-label="Excel" data-export-type-support="1"
+                           aria-haspopup="dialog">
                             <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
                             Ekspor Excel
                         </a>
                     @endif
 
                     @if ($pdfUrl)
-                        <a href="{{ $pdfUrl }}" class="rp-btn rp-btn-outline-light">
+                        <a href="{{ $pdfUrl }}" class="rp-btn rp-btn-outline-light"
+                           data-export="pdf" data-export-label="PDF" data-export-type-support="{{ $pdfSupportsType ? '1' : '0' }}"
+                           aria-haspopup="dialog">
                             <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8"/></svg>
                             Ekspor PDF
                         </a>
@@ -582,15 +629,6 @@ html.rp-lock{overflow:hidden}
                     </small>
                     <strong class="rp-counter" data-target="{{ $totalTrainings }}">{{ $formatNumber($totalTrainings) }}</strong>
                     <span>Jumlah kegiatan tahun {{ $year }}</span>
-                </div>
-
-                <div class="rp-hero-stat">
-                    <small>
-                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v16H3z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
-                        Total keikutsertaan
-                    </small>
-                    <strong class="rp-counter" data-target="{{ $totalParticipations }}">{{ $formatNumber($totalParticipations) }}</strong>
-                    <span>Total riwayat peserta tahun {{ $year }}</span>
                 </div>
             </div>
         </section>
@@ -921,7 +959,7 @@ html.rp-lock{overflow:hidden}
                 </div>
 
                 <div class="rp-table-wrap cards">
-                    <table class="rp-table" style="min-width:960px">
+                    <table class="rp-table" style="min-width:860px">
                         <caption class="rp-sr">Rekap kegiatan per nama pelatihan tahun {{ $year }}</caption>
                         <thead>
                             <tr>
@@ -930,7 +968,6 @@ html.rp-lock{overflow:hidden}
                                 <th scope="col" class="c">Kegiatan</th>
                                 <th scope="col">Sumber Dana</th>
                                 <th scope="col" class="c">Peserta</th>
-                                <th scope="col" class="c">Keikutsertaan</th>
                                 <th scope="col" class="c">Rincian</th>
                             </tr>
                         </thead>
@@ -949,14 +986,13 @@ html.rp-lock{overflow:hidden}
                                         </div>
                                     </td>
                                     <td class="c" data-label="Peserta">{{ $count($training->total_participants) }}</td>
-                                    <td class="c" data-label="Keikutsertaan">{{ $count($training->total_participations) }}</td>
                                     <td class="c" data-label="Rincian">
                                         {{ $detailBtn(['tabs' => 1, 'view' => 'trainings', 'training_name' => $training->name, 'label' => $trainLabel]) }}
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="rp-empty">Belum ada data pelatihan pada tahun {{ $year }}.</td>
+                                    <td colspan="6" class="rp-empty">Belum ada data pelatihan pada tahun {{ $year }}.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -969,7 +1005,7 @@ html.rp-lock{overflow:hidden}
         <section class="rp-section rp-reveal" id="kategori">
             <div class="rp-section-head">
                 <h2>Rekap kategori pelatihan</h2>
-                <p>Jumlah kegiatan, peserta, dan keikutsertaan berdasarkan kategori pelatihan.</p>
+                <p>Jumlah kegiatan dan peserta berdasarkan kategori pelatihan.</p>
             </div>
 
             <div class="rp-panel">
@@ -983,7 +1019,6 @@ html.rp-lock{overflow:hidden}
                                 <th>Kategori Pelatihan</th>
                                 <th class="c">Jumlah Kegiatan</th>
                                 <th class="c">Peserta</th>
-                                <th class="c">Keikutsertaan</th>
                                 <th class="c">Rincian</th>
                             </tr>
                         </thead>
@@ -998,7 +1033,6 @@ html.rp-lock{overflow:hidden}
                                     <td class="rp-participant" data-label="Kategori">{{ $category->category_name }}</td>
                                     <td class="c" data-label="Jumlah Kegiatan">{{ $count($category->total_trainings) }}</td>
                                     <td class="c" data-label="Peserta">{{ $count($category->total_participants) }}</td>
-                                    <td class="c" data-label="Keikutsertaan">{{ $count($category->total_participations) }}</td>
                                     <td class="c" data-label="Rincian">
                                         @if ($hasDetailRoute)
                                             {{ $detailBtn(['tabs' => 1, 'view' => 'trainings', 'category_id' => $catId, 'label' => $catLabel]) }}
@@ -1011,7 +1045,7 @@ html.rp-lock{overflow:hidden}
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="rp-empty">Belum ada data kategori pelatihan pada tahun {{ $year }}.</td>
+                                    <td colspan="5" class="rp-empty">Belum ada data kategori pelatihan pada tahun {{ $year }}.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -1032,7 +1066,7 @@ html.rp-lock{overflow:hidden}
 
             <div class="rp-panel">
                 <div class="rp-dist-tools">
-                    <h3>Keikutsertaan per kabupaten/kota</h3>
+                    <h3>Peserta per kabupaten/kota</h3>
                     <input type="search" class="rp-mini-search" placeholder="Cari kabupaten/kota"
                            aria-label="Cari kabupaten/kota"
                            data-filter-target="#rpDistList" data-filter-items=".rp-dist">
@@ -1060,7 +1094,7 @@ html.rp-lock{overflow:hidden}
 
                                 <div class="rp-dist-sum">
                                     {{ $count($block->total_trainings, 'kegiatan') }}
-                                    {{ $count($block->total_participations, 'keikutsertaan') }}
+                                    {{ $count($block->total_participants, 'peserta') }}
                                 </div>
 
                                 <ul class="rp-lines">
@@ -1070,7 +1104,6 @@ html.rp-lock{overflow:hidden}
                                             <div class="rp-line-nums">
                                                 {{ $count($line->total_trainings, 'kegiatan') }}
                                                 {{ $count($line->total_participants, 'peserta') }}
-                                                {{ $count($line->total_participations, 'ikut') }}
                                             </div>
                                         </li>
                                     @endforeach
@@ -1198,6 +1231,63 @@ html.rp-lock{overflow:hidden}
             <div class="rp-drawer-body" id="rpDrawerBody" aria-live="polite"></div>
         </aside>
     </div>
+
+    {{-- DIALOG PILIHAN JENIS EKSPOR (dipindah ke <body> oleh script) --}}
+    @if ($excelUrl || $pdfUrl)
+        <div class="rp-drawer rp-modal" id="rpExport" hidden>
+            <div class="rp-drawer-backdrop" data-export-close></div>
+
+            <div class="rp-modal-panel" role="dialog" aria-modal="true" aria-labelledby="rpExportTitle" tabindex="-1">
+                <header class="rp-modal-head">
+                    <div class="rp-drawer-titles">
+                        <p class="rp-drawer-kicker" id="rpExportKicker">Ekspor</p>
+                        <h2 class="rp-drawer-title" id="rpExportTitle">Ekspor Laporan</h2>
+                        <p class="rp-drawer-sub">Pilih jenis ekspor sebelum mengunduh file.</p>
+                    </div>
+
+                    <button type="button" class="rp-icon-btn" data-export-close aria-label="Tutup pilihan ekspor">
+                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    </button>
+                </header>
+
+                <div class="rp-modal-body">
+                    <p class="rp-modal-filter">
+                        <strong>Mengikuti filter aktif:</strong> {{ $exportFilterText }}
+                    </p>
+
+                    <div role="radiogroup" aria-label="Jenis ekspor" style="display:grid;gap:12px">
+                        <label class="rp-opt is-selected" data-opt="summary">
+                            <input type="radio" name="rpExportType" value="summary" checked>
+                            <span class="rp-opt-radio" aria-hidden="true"></span>
+                            <span class="rp-opt-text">
+                                <strong>Ekspor Ringkasan</strong>
+                                <span>Hanya berisi statistik dan rekapitulasi, termasuk jumlah peserta berdasarkan frekuensi keikutsertaan.</span>
+                                <span class="rp-opt-tag safe">Tidak menampilkan identitas peserta satu per satu</span>
+                            </span>
+                        </label>
+
+                        <label class="rp-opt" data-opt="full">
+                            <input type="radio" name="rpExportType" value="full">
+                            <span class="rp-opt-radio" aria-hidden="true"></span>
+                            <span class="rp-opt-text">
+                                <strong>Ekspor Lengkap</strong>
+                                <span>Berisi seluruh informasi laporan, termasuk daftar kegiatan dan rincian data setiap peserta (nama, NIK, instansi, jumlah keikutsertaan).</span>
+                                <span class="rp-opt-tag">Memuat data pribadi peserta</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <footer class="rp-modal-foot">
+                    <button type="button" class="rp-btn rp-btn-ghost" data-export-close>Batal</button>
+                    <a href="#" class="rp-btn rp-btn-primary" id="rpExportGo">
+                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
+                        <span id="rpExportGoText">Unduh</span>
+                    </a>
+                </footer>
+            </div>
+        </div>
+    @endif
 </div>
 
 <script>
@@ -1657,7 +1747,7 @@ html.rp-lock{overflow:hidden}
     function trainingItem(r, showCount) {
         var b = el('button', 'rp-li');
         b.type = 'button';
-        b.setAttribute('data-q', [r.name, r.funding_source, r.category, r.location].join(' ').toLowerCase());
+        b.setAttribute('data-q', [r.name, r.funding_source, r.category].join(' ').toLowerCase());
 
         var d = toDate(r.start_date);
         var dateBox = el('span', 'rp-li-date');
@@ -1676,7 +1766,6 @@ html.rp-lock{overflow:hidden}
         if (r.category) meta.appendChild(el('span', 'rp-tag alt', r.category));
         var range = dateRange(r.start_date, r.end_date);
         if (range) meta.appendChild(el('span', '', range));
-        if (r.location) meta.appendChild(el('span', '', r.location));
         main.appendChild(meta);
 
         b.appendChild(dateBox);
@@ -1862,6 +1951,146 @@ html.rp-lock{overflow:hidden}
             var focusable = Array.prototype.slice.call(
                 panel.querySelectorAll('button:not([hidden]):not([disabled]), input:not([hidden])')
             ).filter(function (n) { return n.offsetParent !== null; });
+
+            if (!focusable.length) return;
+
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+
+            if (ev.shiftKey && (document.activeElement === first || document.activeElement === panel)) {
+                ev.preventDefault();
+                last.focus();
+            } else if (!ev.shiftKey && document.activeElement === last) {
+                ev.preventDefault();
+                first.focus();
+            }
+        }
+    });
+})();
+
+/* ======================================================================
+   DIALOG PILIHAN JENIS EKSPOR
+   Tombol "Ekspor Excel" / "Ekspor PDF" membuka dialog; tautan unduhan
+   dibangun dari URL ekspor (yang sudah memuat filter aktif) + type=...
+   ====================================================================== */
+(function () {
+    var root = document.getElementById('reportPage');
+    var modal = document.getElementById('rpExport');
+    if (!root || !modal) return;
+
+    document.body.appendChild(modal);
+
+    var panel = modal.querySelector('.rp-modal-panel');
+    var kicker = document.getElementById('rpExportKicker');
+    var go = document.getElementById('rpExportGo');
+    var goText = document.getElementById('rpExportGoText');
+    var options = Array.prototype.slice.call(modal.querySelectorAll('.rp-opt'));
+    var triggers = Array.prototype.slice.call(root.querySelectorAll('[data-export]'));
+
+    var baseUrl = '';
+    var format = '';
+    var supportsType = true;
+    var lastTrigger = null;
+    var closeTimer = null;
+
+    function selectedType() {
+        var checked = modal.querySelector('input[name="rpExportType"]:checked');
+        return checked ? checked.value : 'summary';
+    }
+
+    function buildUrl() {
+        if (!supportsType) return baseUrl;
+        return baseUrl + (baseUrl.indexOf('?') === -1 ? '?' : '&') + 'type=' + encodeURIComponent(selectedType());
+    }
+
+    function sync() {
+        var type = selectedType();
+
+        options.forEach(function (opt) {
+            opt.classList.toggle('is-selected', opt.getAttribute('data-opt') === type);
+        });
+
+        go.setAttribute('href', buildUrl());
+        goText.textContent = 'Unduh ' + (type === 'summary' ? 'Ringkasan' : 'Lengkap') + ' (' + format + ')';
+    }
+
+    function openModal(trigger) {
+        clearTimeout(closeTimer);
+
+        lastTrigger = trigger;
+        baseUrl = trigger.getAttribute('href') || '';
+        format = trigger.getAttribute('data-export-label') || '';
+        supportsType = trigger.getAttribute('data-export-type-support') !== '0';
+        kicker.textContent = 'Ekspor ' + format;
+
+        // Jika route PDF lama tidak mengenal "type", paksa pilihan lengkap
+        // agar hasil unduhan tidak menyesatkan.
+        var inputs = modal.querySelectorAll('input[name="rpExportType"]');
+        Array.prototype.forEach.call(inputs, function (input) {
+            input.disabled = !supportsType && input.value === 'summary';
+            if (!supportsType) input.checked = input.value === 'full';
+        });
+        if (supportsType) inputs[0].checked = true;
+
+        sync();
+
+        if (modal.hidden) {
+            modal.hidden = false;
+            var sbw = window.innerWidth - document.documentElement.clientWidth;
+            document.documentElement.classList.add('rp-lock');
+            if (sbw > 0) document.body.style.paddingRight = sbw + 'px';
+        }
+
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                modal.classList.add('is-open');
+                panel.focus({ preventScroll: true });
+            });
+        });
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        closeTimer = setTimeout(function () {
+            modal.hidden = true;
+            document.documentElement.classList.remove('rp-lock');
+            document.body.style.paddingRight = '';
+            if (lastTrigger && lastTrigger.focus) lastTrigger.focus({ preventScroll: true });
+        }, 300);
+    }
+
+    triggers.forEach(function (trigger) {
+        trigger.addEventListener('click', function (ev) {
+            if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
+            ev.preventDefault();
+            openModal(trigger);
+        });
+    });
+
+    modal.addEventListener('change', sync);
+
+    modal.addEventListener('click', function (ev) {
+        if (ev.target.closest('[data-export-close]')) closeModal();
+    });
+
+    // Setelah unduhan dimulai, tutup dialog (halaman tidak berpindah karena file diunduh).
+    go.addEventListener('click', function () {
+        setTimeout(closeModal, 400);
+    });
+
+    document.addEventListener('keydown', function (ev) {
+        if (modal.hidden) return;
+
+        if (ev.key === 'Escape') {
+            ev.preventDefault();
+            closeModal();
+            return;
+        }
+
+        if (ev.key === 'Tab') {
+            var focusable = Array.prototype.slice.call(
+                panel.querySelectorAll('button:not([disabled]), a[href], input:not([disabled])')
+            ).filter(function (n) { return n.type !== 'radio' || n.checked; });
 
             if (!focusable.length) return;
 

@@ -21,6 +21,10 @@ class ReportController extends Controller
 
     private const MAX_DETAIL_ROWS = 500;
 
+    /** Jenis ekspor yang didukung. */
+    public const EXPORT_SUMMARY = 'summary';
+    public const EXPORT_FULL = 'full';
+
     private const TRAINING_EXTRA_FIELDS = [
         'organizer'     => 'Penyelenggara',
         'penyelenggara' => 'Penyelenggara',
@@ -91,6 +95,7 @@ class ReportController extends Controller
 
     /* ============================================================
      | EKSPOR EXCEL
+     | Parameter ?type=summary | full (default: full, perilaku lama).
      * ============================================================ */
 
     public function export(Request $request)
@@ -102,20 +107,32 @@ class ReportController extends Controller
         $year = $this->resolveYear($request, $years);
 
         $filters = $this->filtersFrom($request, $year);
+        $type = $this->resolveType($request);
 
-        $data = $this->exportData($filters);
-        $data['historyRows'] = $this->historyRows($filters);
+        if ($type === self::EXPORT_SUMMARY) {
+            // Ringkasan: tanpa identitas peserta, tidak memuat data peserta sama sekali.
+            $data = $this->summaryData($filters);
+            $data['trainingList'] = collect();
+            $data['participantsAll'] = collect();
+            $data['historyRows'] = collect();
+        } else {
+            $data = $this->exportData($filters);
+            $data['historyRows'] = $this->historyRows($filters);
+        }
+
+        $data['frequencyRows'] = $this->frequencyRows($filters);
 
         return Excel::download(
             new ReportWorkbookExport(
-                $this->workbookPayload($data, $filters)
+                $this->workbookPayload($data, $filters, $type)
             ),
-            'laporan-riwayat-pelatihan-' . $year . '.xlsx'
+            $this->exportFilename($type, $year, 'xlsx')
         );
     }
 
     /* ============================================================
      | EKSPOR PDF
+     | Parameter ?type=summary | full (default: full, perilaku lama).
      * ============================================================ */
 
     public function pdf(Request $request)
@@ -131,62 +148,39 @@ class ReportController extends Controller
         $year = $this->resolveYear($request, $years);
 
         $filters = $this->filtersFrom($request, $year);
+        $type = $this->resolveType($request);
 
-        $data = $this->exportData($filters);
+        $frequencyRows = $this->frequencyRows($filters);
 
-        $participantMap = $data['participantsAll']->keyBy('id');
+        /* ---------- RINGKASAN & LENGKAP ----------
+         * Isi PDF mengikuti payload Excel yang sama, sehingga:
+         *  - Ringkasan : statistik + rekap, tanpa identitas peserta
+         *  - Lengkap   : semua isi ringkasan + daftar peserta + rincian
+         * Keduanya memakai satu view: reports.pdf
+         */
 
-        $participantGroups = $this->historyRows($filters)
-            ->filter(fn ($r) => $participantMap->has($r->participant_id))
-            ->groupBy('training_id')
-            ->map(function ($rows) use ($participantMap) {
-                $first = $rows->first();
+        if ($type === self::EXPORT_SUMMARY) {
+            // Ringkasan: tidak memuat data peserta sama sekali.
+            $data = $this->summaryData($filters);
+            $data['trainingList'] = collect();
+            $data['participantsAll'] = collect();
+            $data['historyRows'] = collect();
+        } else {
+            $data = $this->exportData($filters);
+            $data['historyRows'] = $this->historyRows($filters);
+        }
 
-                return [
-                    'name'           => (string) $first->training_name,
-                    'start_date'     => $first->start_date,
-                    'end_date'       => $first->end_date,
-                    'funding_source' => (string) $first->funding_source,
-                    'category'       => (string) $first->category_name,
-                    'participants'   => $rows
-                        ->unique('participant_id')
-                        ->map(function ($r) use ($participantMap) {
-                            $p = $participantMap->get($r->participant_id);
+        $data['frequencyRows'] = $frequencyRows;
 
-                            return [
-                                'name'           => (string) ($p->name ?? ''),
-                                'nik'            => (string) ($p->nik ?? ''),
-                                'profession'     => (string) ($p->profession ?? ''),
-                                'institution'    => (string) ($p->institution ?? ''),
-                                'district'       => (string) ($p->district ?? ''),
-                                'participations' => (int) ($p->participations_count ?? 0),
-                            ];
-                        })
-                        ->sortBy(fn ($x) => mb_strtolower($x['name']))
-                        ->values()
-                        ->all(),
-                ];
-            })
-            ->sortBy(fn ($g) => ($g['start_date'] ?? '') . '|' . mb_strtolower($g['name']))
-            ->values()
-            ->all();
+        $report = $this->workbookPayload($data, $filters, $type);
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
-            'reports.pdf',
-            array_merge($data, [
-                'year'              => $year,
-                'minimum'           => $filters['minimum'] ?? 1,
-                'search'            => $filters['search'],
-                'districtFilter'    => $filters['district'],
-                'institutionFilter' => $filters['institution'],
-                'participantGroups' => $participantGroups,
-                'participantCount'  => $participantMap->count(),
-            ])
-        )->setPaper('a4', 'portrait');
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.pdf', [
+            'year'        => $year,
+            'report'      => $report,
+            'generatedAt' => Carbon::now('Asia/Makassar')->format('d/m/Y H:i') . ' WITA',
+        ])->setPaper('a4', 'portrait');
 
-        return $pdf->download(
-            'laporan-riwayat-pelatihan-' . $year . '.pdf'
-        );
+        return $pdf->download($this->exportFilename($type, $year, 'pdf'));
     }
 
     /* ============================================================
@@ -416,7 +410,6 @@ class ReportController extends Controller
         $trainingFundingBase = $this->historyQuery($filters, true)
             ->selectRaw("
                 trainings.id AS training_id,
-                training_histories.id AS history_id,
                 training_histories.participant_id AS participant_id,
                 {$nameExpr} AS training_name,
                 " . self::FUNDING_EXPR . " AS funding_source
@@ -428,7 +421,6 @@ class ReportController extends Controller
                 training_name,
                 funding_source,
                 COUNT(DISTINCT training_id) AS total_trainings,
-                COUNT(DISTINCT history_id) AS total_participations,
                 COUNT(DISTINCT participant_id) AS total_participants
             ")
             ->groupBy('training_name', 'funding_source')
@@ -447,20 +439,18 @@ class ReportController extends Controller
                     ) ?? collect()
                 )
                     ->map(fn ($item) => (object) [
-                        'funding_source'       => $item->funding_source,
-                        'total_trainings'      => (int) $item->total_trainings,
-                        'total_participants'   => (int) $item->total_participants,
-                        'total_participations' => (int) $item->total_participations,
+                        'funding_source'     => $item->funding_source,
+                        'total_trainings'    => (int) $item->total_trainings,
+                        'total_participants' => (int) $item->total_participants,
                     ])
                     ->sortByDesc('total_trainings')
                     ->values();
 
                 return (object) [
-                    'name'                 => $row->training_name,
-                    'total_trainings'      => (int) $row->total_trainings,
-                    'total_participants'   => (int) $row->total_participants,
-                    'total_participations' => (int) $row->total_participations,
-                    'funding'              => $funding,
+                    'name'               => $row->training_name,
+                    'total_trainings'    => (int) $row->total_trainings,
+                    'total_participants' => (int) $row->total_participants,
+                    'funding'            => $funding,
                 ];
             })
             ->values();
@@ -559,6 +549,25 @@ class ReportController extends Controller
             ]);
     }
 
+    /**
+     * Sebaran keikutsertaan untuk EKSPOR.
+     * Bila filter "tepat N kali" aktif, hanya baris N yang dimuat sehingga
+     * total peserta di ekspor sama dengan total peserta di halaman laporan.
+     * Bila "Semua keikutsertaan", seluruh kategori dimuat secara dinamis.
+     */
+    private function frequencyRows(array $filters)
+    {
+        $rows = $this->frequencyRecap($filters);
+
+        if ($filters['minimum'] !== null) {
+            $rows = $rows
+                ->filter(fn ($row) => (int) $row->times === (int) $filters['minimum'])
+                ->values();
+        }
+
+        return $rows;
+    }
+
     /* ============================================================
      | DATA EKSPOR
      * ============================================================ */
@@ -628,10 +637,22 @@ class ReportController extends Controller
 
     /* ============================================================
      | ISI EXCEL (satu sheet "Laporan")
+     | $type = summary : statistik + rekap frekuensi, TANPA identitas peserta
+     | $type = full    : semua isi ringkasan + daftar peserta + rincian
+     |
+     | Catatan penyesuaian:
+     |  - KPI "Total Keikutsertaan" dihapus.
+     |  - Kolom Keikutsertaan dihapus dari: Rekap Per Nama Pelatihan,
+     |    Rekap Kategori Pelatihan, Rekap Wilayah Berdasarkan Sumber Dana.
+     |  - Daftar Kegiatan Pelatihan: kolom Lokasi dan Keikutsertaan dihapus.
+     |  - Detail Peserta Per Kegiatan: kolom Lokasi dihapus.
+     |  Data di database dan query tidak diubah.
      * ============================================================ */
 
-    private function workbookPayload(array $data, array $filters): array
+    private function workbookPayload(array $data, array $filters, string $type = self::EXPORT_FULL): array
     {
+        $isSummary = $type === self::EXPORT_SUMMARY;
+
         // Kelas ekspor lama mengharapkan angka. null (semua) = minimal 1 kali.
         $minimum = $filters['minimum'] ?? 1;
 
@@ -660,6 +681,7 @@ class ReportController extends Controller
 
         $int = '#,##0';
         $pct = '0.0%';
+        $orang = '#,##0" Orang"';
 
         $totalTr = (int) $data['totalTrainings'];
         $totalPe = (int) $data['totalTrainedParticipants'];
@@ -755,17 +777,16 @@ class ReportController extends Controller
             ],
         ];
 
-        /* ---------- D. Rekap per nama pelatihan ---------- */
+        /* ---------- D. Rekap per nama pelatihan (tanpa Keikutsertaan) ---------- */
 
         $tables[] = [
             'title'   => 'REKAP PER NAMA PELATIHAN',
             'columns' => [
                 $col('No', 1),
-                $col('Nama Pelatihan', 4, 'l'),
+                $col('Nama Pelatihan', 5, 'l'),
                 $col('Kegiatan', 1, 'c', $int),
-                $col('Sumber Dana (jumlah kegiatan)', 3, 'l'),
+                $col('Sumber Dana (jumlah kegiatan)', 4, 'l'),
                 $col('Peserta', 1, 'c', $int),
-                $col('Keikutsertaan', 1, 'c', $int),
             ],
             'rows'    => $data['trainingRecap']
                 ->values()
@@ -777,22 +798,20 @@ class ReportController extends Controller
                         ->map(fn ($f) => $f->funding_source . ': ' . $f->total_trainings)
                         ->implode('; '),
                     (int) $r->total_participants,
-                    (int) $r->total_participations,
                 ]))
                 ->all(),
             'empty'   => 'Belum ada data pelatihan.',
         ];
 
-        /* ---------- E. Kategori ---------- */
+        /* ---------- E. Kategori (tanpa Keikutsertaan) ---------- */
 
         $tables[] = [
             'title'   => 'REKAP KATEGORI PELATIHAN',
             'columns' => [
                 $col('No', 1),
-                $col('Kategori Pelatihan', 5, 'l'),
-                $col('Jumlah Kegiatan', 1, 'c', $int),
-                $col('Peserta', 1, 'c', $int),
-                $col('Keikutsertaan', 1, 'c', $int),
+                $col('Kategori Pelatihan', 6, 'l'),
+                $col('Jumlah Kegiatan', 2, 'c', $int),
+                $col('Peserta', 2, 'c', $int),
             ],
             'rows'    => $data['categoryRecap']
                 ->values()
@@ -801,17 +820,16 @@ class ReportController extends Controller
                     (string) $r->category_name,
                     (int) $r->total_trainings,
                     (int) $r->total_participants,
-                    (int) $r->total_participations,
                 ]))
                 ->all(),
             'empty'   => 'Belum ada data kategori pelatihan.',
         ];
 
-        /* ---------- F. Wilayah x sumber dana ---------- */
+        /* ---------- F. Wilayah x sumber dana (tanpa Keikutsertaan) ---------- */
 
         $districtLines = $data['districtFundingRecap']->groupBy('district');
         $districtSorted = $data['districtFundingTotals']
-            ->sortByDesc(fn ($r) => (int) $r->total_participations)
+            ->sortByDesc(fn ($r) => (int) $r->total_participants)
             ->values();
         $districtRows = [];
 
@@ -821,7 +839,6 @@ class ReportController extends Controller
                 'SEMUA SUMBER DANA',
                 (int) $total->total_trainings,
                 (int) $total->total_participants,
-                (int) $total->total_participations,
             ], true);
 
             foreach ($districtLines->get($total->district, collect()) as $line) {
@@ -830,7 +847,6 @@ class ReportController extends Controller
                     (string) $line->funding_source,
                     (int) $line->total_trainings,
                     (int) $line->total_participants,
-                    (int) $line->total_participations,
                 ]);
             }
         }
@@ -840,46 +856,75 @@ class ReportController extends Controller
             'columns' => [
                 $col('Kabupaten/Kota', 3, 'l'),
                 $col('Sumber Dana', 3, 'l'),
-                $col('Kegiatan', 1, 'c', $int),
-                $col('Peserta', 1, 'c', $int),
-                $col('Keikutsertaan', 1, 'c', $int),
+                $col('Kegiatan', 2, 'c', $int),
+                $col('Peserta', 2, 'c', $int),
             ],
             'rows'    => $districtRows,
             'empty'   => 'Belum ada data wilayah berdasarkan sumber dana.',
         ];
 
-        /* ---------- G. Jumlah pelatihan per peserta ---------- */
+        /* ---------- G. Rekap peserta berdasarkan frekuensi keikutsertaan ---------- */
+        /* Ada di KEDUA jenis ekspor. Hanya angka, tanpa identitas peserta. */
+
+        $frequencyRows = $data['frequencyRows'] ?? collect();
+        $frequencyTotal = (int) $frequencyRows->sum('total_participants');
 
         $tables[] = [
-            'title'   => 'JUMLAH PELATIHAN PER PESERTA',
+            'title'   => 'REKAPITULASI PESERTA BERDASARKAN JUMLAH KEIKUTSERTAAN',
             'note'    => $filters['minimum'] === null
-                ? 'Seluruh peserta sesuai filter (semua jumlah keikutsertaan).'
-                : 'Peserta sesuai filter dengan tepat ' . $filters['minimum'] . ' kali keikutsertaan.',
+                ? 'Keikutsertaan = jumlah kegiatan berbeda yang diikuti peserta pada tahun ' . $filters['year'] . '. Seluruh kategori ditampilkan.'
+                : 'Keikutsertaan = jumlah kegiatan berbeda yang diikuti peserta pada tahun ' . $filters['year'] . '. Filter aktif: tepat ' . $filters['minimum'] . ' kali.',
             'columns' => [
-                $col('No', 1),
-                $col('Nama Peserta', 3, 'l'),
-                $col('NIK', 2),
-                $col('NIP', 2),
-                $col('Profesi', 2, 'l'),
-                $col('Instansi', 3, 'l'),
-                $col('Kabupaten/Kota', 2, 'l'),
-                $col('Keikutsertaan', 1, 'c', $int),
+                $col('Keikutsertaan', 4, 'c'),
+                $col('Jumlah Peserta', 3, 'c', $orang),
             ],
-            'rows'    => $data['participantsAll']
+            'rows'    => $frequencyRows
                 ->values()
-                ->map(fn ($p, $i) => $row([
-                    $i + 1,
-                    $dash($p->name),
-                    $dash($p->nik),
-                    $dash($p->nip),
-                    $dash($p->profession),
-                    $dash($p->institution),
-                    $dash($p->district),
-                    (int) $p->participations_count,
+                ->map(fn ($r) => $row([
+                    (int) $r->times . ' Kali',
+                    (int) $r->total_participants,
                 ]))
                 ->all(),
+            'total'   => $frequencyRows->isNotEmpty()
+                ? ['cells' => ['Total Peserta', $frequencyTotal]]
+                : null,
             'empty'   => 'Tidak ada peserta yang memenuhi filter.',
         ];
+
+        /* ---------- H. Daftar peserta (HANYA ekspor lengkap) ---------- */
+
+        if (!$isSummary) {
+            $tables[] = [
+                'title'   => 'JUMLAH PELATIHAN PER PESERTA',
+                'note'    => $filters['minimum'] === null
+                    ? 'Seluruh peserta sesuai filter (semua jumlah keikutsertaan).'
+                    : 'Peserta sesuai filter dengan tepat ' . $filters['minimum'] . ' kali keikutsertaan.',
+                'columns' => [
+                    $col('No', 1),
+                    $col('Nama Peserta', 3, 'l'),
+                    $col('NIK', 2),
+                    $col('NIP', 2),
+                    $col('Profesi', 2, 'l'),
+                    $col('Instansi', 3, 'l'),
+                    $col('Kabupaten/Kota', 2, 'l'),
+                    $col('Keikutsertaan', 1, 'c', $int),
+                ],
+                'rows'    => $data['participantsAll']
+                    ->values()
+                    ->map(fn ($p, $i) => $row([
+                        $i + 1,
+                        $dash($p->name),
+                        $dash($p->nik),
+                        $dash($p->nip),
+                        $dash($p->profession),
+                        $dash($p->institution),
+                        $dash($p->district),
+                        (int) $p->participations_count,
+                    ]))
+                    ->all(),
+                'empty'   => 'Tidak ada peserta yang memenuhi filter.',
+            ];
+        }
 
         /* ---------- Analisis singkat ---------- */
 
@@ -910,10 +955,10 @@ class ReportController extends Controller
 
         if ($topCategory) {
             $insights[] = sprintf(
-                'Kategori pelatihan yang paling banyak diselenggarakan adalah %s dengan %s kegiatan dan %s keikutsertaan.',
+                'Kategori pelatihan yang paling banyak diselenggarakan adalah %s dengan %s kegiatan dan %s peserta.',
                 $topCategory->category_name,
                 $num($topCategory->total_trainings),
-                $num($topCategory->total_participations)
+                $num($topCategory->total_participants)
             );
         }
 
@@ -953,94 +998,111 @@ class ReportController extends Controller
 
         if ($topDistrict) {
             $insights[] = sprintf(
-                'Wilayah dengan keikutsertaan tertinggi adalah %s sebanyak %s keikutsertaan dari %s peserta.',
+                'Wilayah dengan peserta terbanyak adalah %s sebanyak %s peserta dari %s kegiatan.',
                 $topDistrict->district,
-                $num($topDistrict->total_participations),
-                $num($topDistrict->total_participants)
+                $num($topDistrict->total_participants),
+                $num($topDistrict->total_trainings)
             );
         }
 
-        /* ---------- Bagian II: rincian ---------- */
+        if ($frequencyRows->isNotEmpty()) {
+            $topFrequency = $frequencyRows->sortByDesc('total_participants')->first();
+
+            $insights[] = sprintf(
+                'Peserta terbanyak mengikuti pelatihan sebanyak %s kali, yaitu %s orang dari total %s peserta.',
+                $num($topFrequency->times),
+                $num($topFrequency->total_participants),
+                $num($frequencyTotal)
+            );
+        }
+
+        /* ---------- Bagian II: rincian (HANYA ekspor lengkap) ---------- */
 
         $details = [];
 
-        $details[] = [
-            'title'   => 'DAFTAR KEGIATAN PELATIHAN',
-            'columns' => [
-                $col('No', 1),
-                $col('Nama Pelatihan', 4, 'l'),
-                $col('Mulai', 1),
-                $col('Selesai', 1),
-                $col('Sumber Dana', 2, 'l'),
-                $col('Kategori', 2, 'l'),
-                $col('Lokasi', 2, 'l'),
-                $col('Peserta', 1, 'c', $int),
-                $col('Keikutsertaan', 1, 'c', $int),
-            ],
-            'rows'    => $data['trainingList']
-                ->values()
-                ->map(fn ($r, $i) => $row([
-                    $i + 1,
-                    $dash($r['name']),
-                    $fmt($r['start_date']),
-                    $fmt($r['end_date']),
-                    $dash($r['funding_source']),
-                    $dash($r['category']),
-                    $dash($r['location'] ?? ''),
-                    (int) $r['participants'],
-                    (int) $r['participations'],
-                ]))
-                ->all(),
-            'empty'   => 'Belum ada kegiatan pelatihan.',
-        ];
+        if (!$isSummary) {
+            // Daftar Kegiatan Pelatihan: tanpa Lokasi dan Keikutsertaan.
+            $details[] = [
+                'title'   => 'DAFTAR KEGIATAN PELATIHAN',
+                'columns' => [
+                    $col('No', 1),
+                    $col('Nama Pelatihan', 4, 'l'),
+                    $col('Mulai', 1),
+                    $col('Selesai', 1),
+                    $col('Sumber Dana', 2, 'l'),
+                    $col('Kategori', 2, 'l'),
+                    $col('Peserta', 1, 'c', $int),
+                ],
+                'rows'    => $data['trainingList']
+                    ->values()
+                    ->map(fn ($r, $i) => $row([
+                        $i + 1,
+                        $dash($r['name']),
+                        $fmt($r['start_date']),
+                        $fmt($r['end_date']),
+                        $dash($r['funding_source']),
+                        $dash($r['category']),
+                        (int) $r['participants'],
+                    ]))
+                    ->all(),
+                'empty'   => 'Belum ada kegiatan pelatihan.',
+            ];
 
-        $details[] = [
-            'title'   => 'DETAIL PESERTA PER KEGIATAN',
-            'note'    => 'Satu baris untuk setiap keikutsertaan peserta pada satu kegiatan. Gunakan filter pada judul kolom untuk menyaring.',
-            'filter'  => true,
-            'columns' => [
-                $col('No', 1),
-                $col('Nama Peserta', 1, 'l'),
-                $col('NIK', 1),
-                $col('Profesi', 1, 'l'),
-                $col('Instansi', 1, 'l'),
-                $col('Kabupaten/ Kota', 1, 'l'),
-                $col('Nama Pelatihan', 1, 'l'),
-                $col('Mulai', 1),
-                $col('Selesai', 1),
-                $col('Sumber Dana', 1, 'l'),
-                $col('Kategori', 1, 'l'),
-                $col('Lokasi', 1, 'l'),
-            ],
-            'rows'    => $data['historyRows']
-                ->values()
-                ->map(fn ($r, $i) => $row([
-                    $i + 1,
-                    $dash($r->participant_name ?? ''),
-                    $dash($r->nik ?? ''),
-                    $dash($r->profession ?? ''),
-                    $dash($r->institution ?? ''),
-                    $dash($r->district ?? ''),
-                    $dash($r->training_name ?? ''),
-                    $fmt($r->start_date),
-                    $fmt($r->end_date ?? null),
-                    $dash($r->funding_source ?? ''),
-                    $dash($r->category_name ?? ''),
-                    $dash($r->location ?? ''),
-                ]))
-                ->all(),
-            'empty'   => 'Tidak terdapat data yang sesuai dengan filter yang dipilih.',
-        ];
+            // Detail Peserta Per Kegiatan: tanpa Lokasi.
+            // Bobot kolom berjumlah 12 agar seluruh kolom A..L terisi (tanpa kolom kosong).
+            $details[] = [
+                'title'   => 'DETAIL PESERTA PER KEGIATAN',
+                'note'    => 'Satu baris untuk setiap keikutsertaan peserta pada satu kegiatan. Gunakan filter pada judul kolom untuk menyaring.',
+                'filter'  => true,
+                'columns' => [
+                    $col('No', 1),
+                    $col('Nama Peserta', 1, 'l'),
+                    $col('NIK', 1),
+                    $col('Profesi', 1, 'l'),
+                    $col('Instansi', 1, 'l'),
+                    $col('Kabupaten/ Kota', 1, 'l'),
+                    $col('Nama Pelatihan', 2, 'l'),
+                    $col('Mulai', 1),
+                    $col('Selesai', 1),
+                    $col('Sumber Dana', 1, 'l'),
+                    $col('Kategori', 1, 'l'),
+                ],
+                'rows'    => $data['historyRows']
+                    ->values()
+                    ->map(fn ($r, $i) => $row([
+                        $i + 1,
+                        $dash($r->participant_name ?? ''),
+                        $dash($r->nik ?? ''),
+                        $dash($r->profession ?? ''),
+                        $dash($r->institution ?? ''),
+                        $dash($r->district ?? ''),
+                        $dash($r->training_name ?? ''),
+                        $fmt($r->start_date),
+                        $fmt($r->end_date ?? null),
+                        $dash($r->funding_source ?? ''),
+                        $dash($r->category_name ?? ''),
+                    ]))
+                    ->all(),
+                'empty'   => 'Tidak terdapat data yang sesuai dengan filter yang dipilih.',
+            ];
+        }
 
         return [
             'meta' => [
-                'year'        => $filters['year'],
-                'minimum'     => $minimum,
-                'district'    => $filters['district'],
-                'institution' => $filters['institution'],
-                'search'      => $filters['search'],
+                'year'          => $filters['year'],
+                'minimum'       => $minimum,
+                'minimum_label' => $this->minimumLabel($filters),
+                'district'      => $filters['district'],
+                'institution'   => $filters['institution'],
+                'search'        => $filters['search'],
+                'type'          => $type,
+                'type_label'    => $isSummary ? 'Ekspor Ringkasan' : 'Ekspor Lengkap',
+                'title'         => $isSummary
+                    ? 'LAPORAN RINGKASAN RIWAYAT PELATIHAN'
+                    : 'LAPORAN LENGKAP RIWAYAT PELATIHAN',
             ],
 
+            // KPI "Total Keikutsertaan" dihapus.
             'kpis' => [
                 ['Peserta Sudah Dilatih', $totalPe],
                 ['Total Kegiatan Pelatihan', $totalTr],
@@ -1102,7 +1164,6 @@ class ReportController extends Controller
             'summary' => [
                 ['label' => 'Kegiatan', 'value' => $total],
                 ['label' => 'Peserta', 'value' => $uniqueParticipants],
-                ['label' => 'Keikutsertaan', 'value' => (int) $rows->sum('total_participations')],
             ],
 
             'list_title' => 'Kegiatan (urut tanggal)',
@@ -1185,10 +1246,6 @@ class ReportController extends Controller
             ['label' => 'Sumber dana', 'value' => $mapped['funding_source']],
             ['label' => 'Kategori', 'value' => $mapped['category']],
         ];
-
-        if (!empty($mapped['location'])) {
-            $info[] = ['label' => 'Lokasi', 'value' => $mapped['location']];
-        }
 
         $rawTraining = DB::table('trainings')
             ->where('id', $trainingId)
@@ -1291,6 +1348,31 @@ class ReportController extends Controller
     /* ============================================================
      | FILTER DAN QUERY BERSAMA
      * ============================================================ */
+
+    /**
+     * Jenis ekspor. Nilai selain "summary" dianggap "full"
+     * agar tautan ekspor lama tetap berperilaku seperti sebelumnya.
+     */
+    private function resolveType(Request $request): string
+    {
+        return strtolower(trim((string) $request->input('type'))) === self::EXPORT_SUMMARY
+            ? self::EXPORT_SUMMARY
+            : self::EXPORT_FULL;
+    }
+
+    private function exportFilename(string $type, int $year, string $extension): string
+    {
+        $label = $type === self::EXPORT_SUMMARY ? 'ringkasan' : 'lengkap';
+
+        return 'laporan-' . $label . '-riwayat-pelatihan-' . $year . '.' . $extension;
+    }
+
+    private function minimumLabel(array $filters): string
+    {
+        return $filters['minimum'] === null
+            ? 'Semua keikutsertaan'
+            : $filters['minimum'] . ' kali keikutsertaan';
+    }
 
     /**
      * Membaca filter jumlah keikutsertaan.

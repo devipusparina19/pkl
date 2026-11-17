@@ -27,16 +27,19 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 /**
- * Laporan Eksekutif Riwayat Pelatihan (Excel, portrait, satu worksheet "Laporan").
- * Isi = semua yang tampil di halaman laporan + diagram pie + analisis pimpinan.
+ * Laporan Riwayat Pelatihan (Excel, portrait, satu worksheet "Laporan").
+ * Dipakai untuk dua jenis ekspor:
+ *  - Ringkasan : statistik + rekap frekuensi, tanpa identitas peserta (details kosong)
+ *  - Lengkap   : semua isi ringkasan + daftar peserta + rincian (details terisi)
  * Tanpa kop surat dan tanpa logo.
  *
  * Payload (disiapkan ReportController::workbookPayload):
- *  meta     : year, minimum, district, institution, search
+ *  meta     : year, minimum, minimum_label?, district, institution, search,
+ *             type?, type_label?, title?
  *  kpis     : [[label, value], ...]
  *  tables   : tabel Bagian I
  *  insights : [kalimat analisis, ...]
- *  details  : tabel Bagian II
+ *  details  : tabel Bagian II (kosong pada ekspor ringkasan)
  *
  * Tiap tabel: title, note?, columns[{label,w,align,format?}], rows[{cells,bold?}],
  *             empty, total?{cells}, pie?{label,value,title,name}, filter?
@@ -53,6 +56,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
     private const CHART_ROWS = 19;
     private const BLACK = '000000';
     private const SYSTEM = 'ARTA - Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan';
+    private const DEFAULT_TITLE = 'LAPORAN EKSEKUTIF RIWAYAT PELATIHAN';
 
     /** Lebar kolom A..L */
     private const WIDTHS = [5, 20, 18, 13, 17, 13, 24, 11, 11, 11, 14, 13];
@@ -283,7 +287,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $details = $this->report['details'] ?? [];
 
         $this->cursor++;
-        $this->band('BAGIAN I — LAPORAN EKSEKUTIF');
+        $this->band($details ? 'BAGIAN I — LAPORAN EKSEKUTIF' : 'LAPORAN RINGKASAN');
         $this->cursor++;
 
         $this->kpis($this->report['kpis'] ?? []);
@@ -332,9 +336,10 @@ class ReportWorkbookExport extends DefaultValueBinder implements
     private function heading(): void
     {
         $year = (string) ($this->report['meta']['year'] ?? '');
+        $title = (string) ($this->report['meta']['title'] ?? self::DEFAULT_TITLE);
 
         $r = $this->cursor;
-        $this->cell($r, 1, 'LAPORAN EKSEKUTIF RIWAYAT PELATIHAN');
+        $this->cell($r, 1, $title);
         $this->merge($r, 1, self::COLS);
         $this->style($r, 1, $r, self::COLS, [
             'font' => $this->font(13, true, false, true),
@@ -359,14 +364,26 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $m = $this->report['meta'] ?? [];
         $exported = $m['exported_at'] ?? Carbon::now('Asia/Makassar')->format('d/m/Y H:i') . ' WITA';
 
+        // "Semua keikutsertaan" / "N kali keikutsertaan" disiapkan controller.
+        $participation = $m['minimum_label'] ?? (($m['minimum'] ?? 1) . ' kali');
+
         $items = [
             ['Sumber Data', self::SYSTEM],
-            ['Tahun Pelatihan', (string) ($m['year'] ?? '-')],
-            ['Tanggal dan Waktu Ekspor', $exported],
-            ['Kabupaten/Kota', ($m['district'] ?? '') !== '' ? $m['district'] : 'Semua kabupaten/kota'],
-            ['Instansi', ($m['institution'] ?? '') !== '' ? $m['institution'] : 'Semua instansi'],
-            ['Keikutsertaan', ($m['minimum'] ?? 1) . ' kali'],
         ];
+
+        if (!empty($m['type_label'])) {
+            $items[] = ['Jenis Ekspor', $m['type_label']];
+        }
+
+        $items[] = ['Tahun Pelatihan', (string) ($m['year'] ?? '-')];
+        $items[] = ['Tanggal dan Waktu Ekspor', $exported];
+        $items[] = ['Kabupaten/Kota', ($m['district'] ?? '') !== '' ? $m['district'] : 'Semua kabupaten/kota'];
+        $items[] = ['Instansi', ($m['institution'] ?? '') !== '' ? $m['institution'] : 'Semua instansi'];
+        $items[] = ['Keikutsertaan', $participation];
+
+        if (($m['search'] ?? '') !== '') {
+            $items[] = ['Kata Kunci Pencarian', $m['search']];
+        }
 
         $first = $this->cursor;
 
