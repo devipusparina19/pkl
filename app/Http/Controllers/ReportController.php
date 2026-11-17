@@ -50,8 +50,6 @@ class ReportController extends Controller
         $years = $this->getAvailableTrainingYears();
         $year = $this->resolveYear($request, $years);
 
-        $minimum = max(1, min(100, (int) $request->input('minimum', 1)));
-
         $filters = $this->filtersFrom($request, $year);
 
         $districts = Participant::query()
@@ -70,7 +68,7 @@ class ReportController extends Controller
             ->orderBy('name')
             ->pluck('name');
 
-        $participants = $this->participantQuery($filters, $minimum)
+        $participants = $this->participantQuery($filters)
             ->paginate(15)
             ->withQueryString();
 
@@ -79,13 +77,14 @@ class ReportController extends Controller
             [
                 'year'              => $year,
                 'years'             => $years,
-                'minimum'           => $minimum,
+                'minimum'           => $filters['minimum'],   // null = semua
                 'search'            => $filters['search'],
                 'districtFilter'    => $filters['district'],
                 'institutionFilter' => $filters['institution'],
                 'districts'         => $districts,
                 'institutions'      => $institutions,
                 'participants'      => $participants,
+                'frequencyRecap'    => $this->frequencyRecap($filters),
             ]
         ));
     }
@@ -102,18 +101,14 @@ class ReportController extends Controller
         $years = $this->getAvailableTrainingYears();
         $year = $this->resolveYear($request, $years);
 
-        $minimum = max(1, min(100, (int) $request->input('minimum', 1)));
-
         $filters = $this->filtersFrom($request, $year);
 
-        $data = $this->exportData($filters, $minimum);
+        $data = $this->exportData($filters);
         $data['historyRows'] = $this->historyRows($filters);
 
-        // PERBAIKAN: sebelumnya memanggil workbookSheets() yang tidak ada.
-        // Method yang tersedia adalah workbookPayload().
         return Excel::download(
             new ReportWorkbookExport(
-                $this->workbookPayload($data, $filters, $minimum)
+                $this->workbookPayload($data, $filters)
             ),
             'laporan-riwayat-pelatihan-' . $year . '.xlsx'
         );
@@ -135,16 +130,12 @@ class ReportController extends Controller
         $years = $this->getAvailableTrainingYears();
         $year = $this->resolveYear($request, $years);
 
-        $minimum = max(1, min(100, (int) $request->input('minimum', 1)));
-
         $filters = $this->filtersFrom($request, $year);
 
-        $data = $this->exportData($filters, $minimum);
+        $data = $this->exportData($filters);
 
-        // Peserta yang lolos filter + minimum keikutsertaan
         $participantMap = $data['participantsAll']->keyBy('id');
 
-        // Peserta dikelompokkan per kegiatan pelatihan
         $participantGroups = $this->historyRows($filters)
             ->filter(fn ($r) => $participantMap->has($r->participant_id))
             ->groupBy('training_id')
@@ -184,7 +175,7 @@ class ReportController extends Controller
             'reports.pdf',
             array_merge($data, [
                 'year'              => $year,
-                'minimum'           => $minimum,
+                'minimum'           => $filters['minimum'] ?? 1,
                 'search'            => $filters['search'],
                 'districtFilter'    => $filters['district'],
                 'institutionFilter' => $filters['institution'],
@@ -200,26 +191,24 @@ class ReportController extends Controller
 
     /* ============================================================
      | DATA LAPORAN
-     | Digunakan halaman, Excel, dan PDF
+     | Digunakan halaman, Excel, dan PDF.
+     | Semua angka berasal dari historyQuery() sehingga ikut filter
+     | (termasuk filter jumlah keikutsertaan) dan selalu sinkron.
      * ============================================================ */
 
     private function summaryData(array $filters): array
     {
         $year = $filters['year'];
 
-        $totalTrainings = Training::query()
-            ->whereYear('start_date', $year)
-            ->count();
+        // Total kegiatan: bila filter jumlah keikutsertaan aktif,
+        // hitung hanya kegiatan yang diikuti peserta yang lolos filter.
+        $totalTrainings = $filters['minimum'] !== null
+            ? (int) $this->historyQuery($filters)->distinct()->count('trainings.id')
+            : Training::query()->whereYear('start_date', $year)->count();
 
-        $summaryQuery = Participant::query()
-            ->whereHas(
-                'histories',
-                $this->historyInYear($year)
-            );
-
-        $this->applyParticipantFilters($summaryQuery, $filters);
-
-        $totalTrainedParticipants = (clone $summaryQuery)->count();
+        $totalTrainedParticipants = (int) $this->historyQuery($filters)
+            ->distinct()
+            ->count('training_histories.participant_id');
 
         $totalParticipations = $this->historyQuery($filters)
             ->distinct()
@@ -551,10 +540,30 @@ class ReportController extends Controller
     }
 
     /* ============================================================
+     | SEBARAN JUMLAH KEIKUTSERTAAN (1 kali, 2 kali, 3 kali, ...)
+     | Dihitung dari subquery yang sama dengan daftar peserta dan
+     | panel rincian, sehingga angkanya pasti cocok.
+     * ============================================================ */
+
+    private function frequencyRecap(array $filters)
+    {
+        return DB::query()
+            ->fromSub($this->timesSubquery($filters), 'pt')
+            ->selectRaw('pt.times AS times, COUNT(*) AS total_participants')
+            ->groupBy('pt.times')
+            ->orderBy('pt.times')
+            ->get()
+            ->map(fn ($row) => (object) [
+                'times'              => (int) $row->times,
+                'total_participants' => (int) $row->total_participants,
+            ]);
+    }
+
+    /* ============================================================
      | DATA EKSPOR
      * ============================================================ */
 
-    private function exportData(array $filters, int $minimum): array
+    private function exportData(array $filters): array
     {
         $data = $this->summaryData($filters);
 
@@ -565,10 +574,7 @@ class ReportController extends Controller
             ->map(fn ($row) => $this->mapTrainingRow($row))
             ->values();
 
-        $data['participantsAll'] = $this->participantQuery(
-            $filters,
-            $minimum
-        )->get();
+        $data['participantsAll'] = $this->participantQuery($filters)->get();
 
         return $data;
     }
@@ -622,16 +628,13 @@ class ReportController extends Controller
 
     /* ============================================================
      | ISI EXCEL (satu sheet "Laporan")
-     |
-     | Bagian I  = semua isi halaman laporan + diagram pie + analisis.
-     | Bagian II = daftar kegiatan & detail peserta per kegiatan.
      * ============================================================ */
 
-    private function workbookPayload(
-        array $data,
-        array $filters,
-        int $minimum
-    ): array {
+    private function workbookPayload(array $data, array $filters): array
+    {
+        // Kelas ekspor lama mengharapkan angka. null (semua) = minimal 1 kali.
+        $minimum = $filters['minimum'] ?? 1;
+
         $fmt = fn ($date) => $date
             ? Carbon::parse($date)->format('d/m/Y')
             : '';
@@ -640,7 +643,6 @@ class ReportController extends Controller
             ? '-'
             : (string) $v;
 
-        // w = bobot lebar kolom, format = format angka Excel
         $col = fn (string $label, int $w, string $align = 'c', ?string $format = null) => [
             'label'  => $label,
             'w'      => $w,
@@ -664,7 +666,7 @@ class ReportController extends Controller
 
         $tables = [];
 
-        /* ---------- A. Jenis kelamin (sumber diagram pie 1) ---------- */
+        /* ---------- A. Jenis kelamin ---------- */
 
         $genderTotal = (int) $data['genderTotal'];
         $male = (int) $data['maleCount'];
@@ -718,7 +720,7 @@ class ReportController extends Controller
             'empty'   => 'Belum ada data profesi.',
         ];
 
-        /* ---------- C. Sumber dana (sumber diagram pie 2) ---------- */
+        /* ---------- C. Sumber dana ---------- */
 
         $fundingSum = max(1, (int) $data['fundingRecap']->sum('total_trainings'));
 
@@ -850,7 +852,9 @@ class ReportController extends Controller
 
         $tables[] = [
             'title'   => 'JUMLAH PELATIHAN PER PESERTA',
-            'note'    => 'Seluruh peserta sesuai filter dan minimal keikutsertaan.',
+            'note'    => $filters['minimum'] === null
+                ? 'Seluruh peserta sesuai filter (semua jumlah keikutsertaan).'
+                : 'Peserta sesuai filter dengan tepat ' . $filters['minimum'] . ' kali keikutsertaan.',
             'columns' => [
                 $col('No', 1),
                 $col('Nama Peserta', 3, 'l'),
@@ -877,7 +881,7 @@ class ReportController extends Controller
             'empty'   => 'Tidak ada peserta yang memenuhi filter.',
         ];
 
-        /* ---------- Analisis singkat untuk pimpinan ---------- */
+        /* ---------- Analisis singkat ---------- */
 
         $insights = [];
 
@@ -1064,27 +1068,10 @@ class ReportController extends Controller
         );
 
         return match ((string) $request->input('view')) {
-            'trainings' => $this->detailTrainings(
-                $request,
-                $filters,
-                $label
-            ),
-
-            'participants' => $this->detailParticipants(
-                $request,
-                $filters,
-                $label
-            ),
-
-            'training' => $this->detailTraining(
-                $request,
-                $filters
-            ),
-
-            'participant' => $this->detailParticipant(
-                $request,
-                $filters
-            ),
+            'trainings'    => $this->detailTrainings($request, $filters, $label),
+            'participants' => $this->detailParticipants($request, $filters, $label),
+            'training'     => $this->detailTraining($request, $filters),
+            'participant'  => $this->detailParticipant($request, $filters),
 
             default => response()->json([
                 'message' => 'Jenis rincian tidak dikenal.',
@@ -1101,10 +1088,7 @@ class ReportController extends Controller
             $this->scopedQuery($request, $filters, true)
         )->get();
 
-        $uniqueParticipants = $this->scopedQuery(
-            $request,
-            $filters
-        )
+        $uniqueParticipants = $this->scopedQuery($request, $filters)
             ->distinct()
             ->count('training_histories.participant_id');
 
@@ -1116,18 +1100,9 @@ class ReportController extends Controller
             'subtitle' => $label ?: 'Tahun ' . $filters['year'],
 
             'summary' => [
-                [
-                    'label' => 'Kegiatan',
-                    'value' => $total,
-                ],
-                [
-                    'label' => 'Peserta unik',
-                    'value' => $uniqueParticipants,
-                ],
-                [
-                    'label' => 'Keikutsertaan',
-                    'value' => (int) $rows->sum('total_participations'),
-                ],
+                ['label' => 'Kegiatan', 'value' => $total],
+                ['label' => 'Peserta', 'value' => $uniqueParticipants],
+                ['label' => 'Keikutsertaan', 'value' => (int) $rows->sum('total_participations')],
             ],
 
             'list_title' => 'Kegiatan (urut tanggal)',
@@ -1154,21 +1129,15 @@ class ReportController extends Controller
 
         return response()->json([
             'view' => 'participants',
-            'title' => 'Daftar peserta',
-            'subtitle' => $label ?: 'Tahun ' . $filters['year'],
+            'title' => $label !== '' ? $label : 'Daftar peserta',
+            'subtitle' => 'Tahun ' . $filters['year'],
 
             'summary' => [
-                [
-                    'label' => 'Peserta unik',
-                    'value' => $total,
-                ],
-                [
-                    'label' => 'Keikutsertaan',
-                    'value' => (int) $rows->sum('participations'),
-                ],
+                ['label' => 'Peserta', 'value' => $total],
+                ['label' => 'Keikutsertaan', 'value' => (int) $rows->sum('participations')],
             ],
 
-            'list_title' => 'Peserta (terbanyak ikut di atas)',
+            'list_title' => 'Nama peserta',
             'total' => $total,
             'truncated' => $total > self::MAX_DETAIL_ROWS,
 
@@ -1208,32 +1177,17 @@ class ReportController extends Controller
         $mapped = $this->mapTrainingRow($row);
 
         $info = [
-            [
-                'label' => 'Nama pelatihan',
-                'value' => $mapped['name'],
-            ],
+            ['label' => 'Nama pelatihan', 'value' => $mapped['name']],
             [
                 'label' => 'Tanggal',
-                'value' => $this->formatDateRange(
-                    $mapped['start_date'],
-                    $mapped['end_date']
-                ),
+                'value' => $this->formatDateRange($mapped['start_date'], $mapped['end_date']),
             ],
-            [
-                'label' => 'Sumber dana',
-                'value' => $mapped['funding_source'],
-            ],
-            [
-                'label' => 'Kategori',
-                'value' => $mapped['category'],
-            ],
+            ['label' => 'Sumber dana', 'value' => $mapped['funding_source']],
+            ['label' => 'Kategori', 'value' => $mapped['category']],
         ];
 
         if (!empty($mapped['location'])) {
-            $info[] = [
-                'label' => 'Lokasi',
-                'value' => $mapped['location'],
-            ];
+            $info[] = ['label' => 'Lokasi', 'value' => $mapped['location']];
         }
 
         $rawTraining = DB::table('trainings')
@@ -1257,32 +1211,20 @@ class ReportController extends Controller
 
             $usedLabels[] = $fieldLabel;
 
-            $info[] = [
-                'label' => $fieldLabel,
-                'value' => (string) $value,
-            ];
+            $info[] = ['label' => $fieldLabel, 'value' => (string) $value];
         }
 
         $total = $participantRows->count();
 
-        $info[] = [
-            'label' => 'Peserta unik',
-            'value' => (string) $total,
-        ];
+        $info[] = ['label' => 'Peserta', 'value' => (string) $total];
 
         return response()->json([
             'view' => 'training',
             'title' => $mapped['name'],
-            'subtitle' => $this->formatDateRange(
-                $mapped['start_date'],
-                $mapped['end_date']
-            ),
+            'subtitle' => $this->formatDateRange($mapped['start_date'], $mapped['end_date']),
 
             'summary' => [
-                [
-                    'label' => 'Peserta',
-                    'value' => $total,
-                ],
+                ['label' => 'Peserta', 'value' => $total],
             ],
 
             'info' => $info,
@@ -1322,41 +1264,17 @@ class ReportController extends Controller
             'subtitle' => 'Riwayat pelatihan tahun ' . $filters['year'],
 
             'summary' => [
-                [
-                    'label' => 'Keikutsertaan',
-                    'value' => (int) $rows->sum('total_participations'),
-                ],
-                [
-                    'label' => 'Kegiatan',
-                    'value' => $total,
-                ],
+                ['label' => 'Keikutsertaan', 'value' => (int) $rows->sum('total_participations')],
+                ['label' => 'Kegiatan', 'value' => $total],
             ],
 
             'info' => [
-                [
-                    'label' => 'Nama',
-                    'value' => $participant->name ?: '-',
-                ],
-                [
-                    'label' => 'NIK',
-                    'value' => $participant->nik ?: '-',
-                ],
-                [
-                    'label' => 'NIP',
-                    'value' => $participant->nip ?: '-',
-                ],
-                [
-                    'label' => 'Profesi',
-                    'value' => $participant->profession ?: '-',
-                ],
-                [
-                    'label' => 'Instansi',
-                    'value' => $participant->institution ?: '-',
-                ],
-                [
-                    'label' => 'Kabupaten/Kota',
-                    'value' => $participant->district ?: '-',
-                ],
+                ['label' => 'Nama', 'value' => $participant->name ?: '-'],
+                ['label' => 'NIK', 'value' => $participant->nik ?: '-'],
+                ['label' => 'NIP', 'value' => $participant->nip ?: '-'],
+                ['label' => 'Profesi', 'value' => $participant->profession ?: '-'],
+                ['label' => 'Instansi', 'value' => $participant->institution ?: '-'],
+                ['label' => 'Kabupaten/Kota', 'value' => $participant->district ?: '-'],
             ],
 
             'list_title' => 'Pelatihan yang diikuti',
@@ -1374,58 +1292,95 @@ class ReportController extends Controller
      | FILTER DAN QUERY BERSAMA
      * ============================================================ */
 
+    /**
+     * Membaca filter jumlah keikutsertaan.
+     * - kosong / "all" / bukan angka  => null (SEMUA keikutsertaan)
+     * - angka >= 1                    => tepat sejumlah itu
+     * TIDAK ADA default 1 lagi.
+     */
+    private function resolveMinimum(Request $request): ?int
+    {
+        $value = $request->input('minimum');
+
+        if (!is_numeric($value) || (int) $value < 1) {
+            return null;
+        }
+
+        return min(100, (int) $value);
+    }
+
     private function filtersFrom(
         Request $request,
         int $year
     ): array {
         return [
-            'year' => $year,
-            'search' => trim((string) $request->input('search', '')),
-            'district' => trim((string) $request->input('district', '')),
+            'year'        => $year,
+            'search'      => trim((string) $request->input('search', '')),
+            'district'    => trim((string) $request->input('district', '')),
             'institution' => trim((string) $request->input('institution', '')),
+            'minimum'     => $this->resolveMinimum($request),
         ];
     }
 
-    private function historyInYear(int $year): \Closure
+    /**
+     * Subquery dasar: tiap peserta + berapa KEGIATAN berbeda yang ia ikuti
+     * pada tahun terpilih (sesuai filter wilayah/instansi/pencarian).
+     * COUNT(DISTINCT trainings.id) mencegah hitung ganda pada kegiatan sama.
+     * Filter jumlah keikutsertaan sengaja DIABAIKAN di sini agar tidak melingkar.
+     */
+    private function timesSubquery(array $filters)
     {
-        return function ($query) use ($year) {
-            $query->whereHas(
-                'training',
-                function ($trainingQuery) use ($year) {
-                    $trainingQuery->whereYear('start_date', $year);
-                }
-            );
-        };
+        $base = $filters;
+        $base['minimum'] = null;
+
+        return $this->historyQuery($base)
+            ->groupBy('training_histories.participant_id')
+            ->select('training_histories.participant_id')
+            ->selectRaw('COUNT(DISTINCT trainings.id) AS times');
     }
 
-    private function participantQuery(
-        array $filters,
-        int $minimum
-    ) {
-        $scope = $this->historyInYear($filters['year']);
+    /** ID peserta yang jumlah keikutsertaannya tepat $times. */
+    private function participantIdsWithTimes(array $filters, int $times)
+    {
+        return DB::query()
+            ->fromSub($this->timesSubquery($filters), 'pt')
+            ->where('pt.times', '=', $times)
+            ->select('pt.participant_id');
+    }
 
+    private function participantQuery(array $filters)
+    {
         $query = Participant::query()
-            ->whereHas('histories', $scope)
-            ->withCount([
-                'histories as participations_count' => $scope,
-            ]);
+            ->joinSub(
+                $this->timesSubquery($filters),
+                'pt',
+                'pt.participant_id',
+                '=',
+                'participants.id'
+            )
+            ->select('participants.*')
+            ->addSelect('pt.times AS participations_count');
 
-        $this->applyParticipantFilters($query, $filters);
+        if ($filters['minimum'] !== null) {
+            $query->where('pt.times', '=', $filters['minimum']);   // tepat, bukan >=
+        }
 
         return $query
-            ->having('participations_count', '>=', $minimum)
-            ->orderByDesc('participations_count')
-            ->orderBy('name');
+            ->orderByDesc('pt.times')
+            ->orderBy('participants.name');
     }
 
     private function historyQuery(
         array $filters,
         bool $includeEmpty = false
     ) {
+        $minimum = $filters['minimum'] ?? null;
+
         $hasParticipantFilter =
             $filters['search'] !== ''
             || $filters['district'] !== ''
-            || $filters['institution'] !== '';
+            || $filters['institution'] !== ''
+            || $minimum !== null;
 
         $query = DB::table('trainings')
             ->whereYear('trainings.start_date', $filters['year']);
@@ -1478,22 +1433,18 @@ class ReportController extends Controller
             $search = $filters['search'];
 
             $query->where(function ($sub) use ($search) {
-                $sub->where(
-                    'participants.name',
-                    'like',
-                    "%{$search}%"
-                )
-                    ->orWhere(
-                        'participants.nik',
-                        'like',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'participants.nip',
-                        'like',
-                        "%{$search}%"
-                    );
+                $sub->where('participants.name', 'like', "%{$search}%")
+                    ->orWhere('participants.nik', 'like', "%{$search}%")
+                    ->orWhere('participants.nip', 'like', "%{$search}%");
             });
+        }
+
+        // Filter jumlah keikutsertaan: memengaruhi SEMUA komponen laporan.
+        if ($minimum !== null) {
+            $query->whereIn(
+                'training_histories.participant_id',
+                $this->participantIdsWithTimes($filters, $minimum)
+            );
         }
 
         return $query;
@@ -1506,7 +1457,8 @@ class ReportController extends Controller
     ) {
         $participantScoped =
             $request->filled('scope_district')
-            || $request->filled('participant_id');
+            || $request->filled('participant_id')
+            || $request->filled('times');
 
         $query = $this->historyQuery(
             $filters,
@@ -1548,16 +1500,24 @@ class ReportController extends Controller
         }
 
         if ($request->filled('training_id')) {
-            $query->where(
-                'trainings.id',
-                (int) $request->input('training_id')
-            );
+            $query->where('trainings.id', (int) $request->input('training_id'));
         }
 
         if ($request->filled('participant_id')) {
             $query->where(
                 'training_histories.participant_id',
                 (int) $request->input('participant_id')
+            );
+        }
+
+        // Klik kartu "N kali": hanya peserta yang tepat N kali ikut.
+        if ($request->filled('times')) {
+            $query->whereIn(
+                'training_histories.participant_id',
+                $this->participantIdsWithTimes(
+                    $filters,
+                    max(1, (int) $request->input('times'))
+                )
             );
         }
 
@@ -1629,6 +1589,8 @@ class ReportController extends Controller
 
     /* ============================================================
      | QUERY BARIS PESERTA
+     | "participations" = jumlah kegiatan berbeda (sama dengan
+     | definisi pada daftar peserta dan kartu sebaran).
      * ============================================================ */
 
     private function selectParticipantRows($query)
@@ -1645,18 +1607,14 @@ class ReportController extends Controller
 
         return $query
             ->select($plain)
-            ->selectRaw(
-                'COUNT(DISTINCT training_histories.id) AS participations'
-            )
+            ->selectRaw('COUNT(DISTINCT trainings.id) AS participations')
             ->groupBy($plain)
-            ->orderByRaw(
-                'COUNT(DISTINCT training_histories.id) DESC'
-            )
+            ->orderByRaw('COUNT(DISTINCT trainings.id) DESC')
             ->orderBy('participants.name');
     }
 
     /* ============================================================
-     | PEMETAAN DATA PELATIHAN
+     | PEMETAAN DATA
      * ============================================================ */
 
     private function mapTrainingRow(object $row): array
@@ -1675,10 +1633,6 @@ class ReportController extends Controller
         ];
     }
 
-    /* ============================================================
-     | PEMETAAN DATA PESERTA
-     * ============================================================ */
-
     private function mapParticipantRow(object $row): array
     {
         return [
@@ -1691,51 +1645,6 @@ class ReportController extends Controller
             'profession' => $row->profession,
             'participations' => (int) $row->participations,
         ];
-    }
-
-    /* ============================================================
-     | FILTER PESERTA
-     * ============================================================ */
-
-    private function applyParticipantFilters(
-        $query,
-        array $filters
-    ): void {
-        if ($filters['district'] !== '') {
-            $query->whereRaw(
-                'TRIM(participants.district) = ?',
-                [$filters['district']]
-            );
-        }
-
-        if ($filters['institution'] !== '') {
-            $query->whereRaw(
-                'TRIM(participants.institution) = ?',
-                [$filters['institution']]
-            );
-        }
-
-        if ($filters['search'] !== '') {
-            $search = $filters['search'];
-
-            $query->where(function ($sub) use ($search) {
-                $sub->where(
-                    'participants.name',
-                    'like',
-                    "%{$search}%"
-                )
-                    ->orWhere(
-                        'participants.nik',
-                        'like',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'participants.nip',
-                        'like',
-                        "%{$search}%"
-                    );
-            });
-        }
     }
 
     /* ============================================================
@@ -1767,9 +1676,7 @@ class ReportController extends Controller
                 'nama_pelatihan',
             ]),
 
-            'end' => $pick([
-                'end_date',
-            ]),
+            'end' => $pick(['end_date']),
 
             'location' => $pick([
                 'location',
@@ -1781,10 +1688,6 @@ class ReportController extends Controller
         ];
     }
 
-    /* ============================================================
-     | EKSPRESI NAMA PELATIHAN
-     * ============================================================ */
-
     private function nameExpr(): string
     {
         $column = $this->trainingColumns()['name'];
@@ -1792,15 +1695,6 @@ class ReportController extends Controller
         return $column
             ? "COALESCE(NULLIF(TRIM(trainings.{$column}), ''), 'Tanpa nama')"
             : "'Pelatihan'";
-    }
-
-    private function groupByName($query)
-    {
-        if ($this->trainingColumns()['name']) {
-            $query->groupByRaw($this->nameExpr());
-        }
-
-        return $query;
     }
 
     /* ============================================================
@@ -1847,9 +1741,7 @@ class ReportController extends Controller
                 "CAST(strftime('%Y', start_date) AS INTEGER) AS year"
             );
         } else {
-            $query->selectRaw(
-                'YEAR(start_date) AS year'
-            );
+            $query->selectRaw('YEAR(start_date) AS year');
         }
 
         return $query
@@ -1860,10 +1752,6 @@ class ReportController extends Controller
             ->map(fn ($year) => (int) $year)
             ->values();
     }
-
-    /* ============================================================
-     | RESOLUSI TAHUN
-     * ============================================================ */
 
     private function resolveYear(
         Request $request,
@@ -1877,10 +1765,7 @@ class ReportController extends Controller
                 : (int) now()->year;
         }
 
-        if (
-            $requestedYear > 0
-            && $years->contains($requestedYear)
-        ) {
+        if ($requestedYear > 0 && $years->contains($requestedYear)) {
             return $requestedYear;
         }
 

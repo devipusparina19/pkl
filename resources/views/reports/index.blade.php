@@ -116,18 +116,33 @@ html.rp-lock{overflow:hidden}
 .rp-btn.is-loading::after{content:"";width:15px;height:15px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:rp-spin .7s linear infinite}
 @keyframes rp-spin{to{transform:rotate(360deg)}}
 
-/* ANGKA (hanya tampilan, tidak bisa diklik) */
+/* ANGKA */
 .rp-count{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap;font-family:"Sora","Segoe UI",Arial,sans-serif;font-variant-numeric:tabular-nums;line-height:1.4;color:var(--navy)}
 .rp-count b{font-weight:700}
 .rp-count small{font-family:"Plus Jakarta Sans",sans-serif;font-size:12px;font-weight:600;color:var(--slate)}
 .rp-count.lg b{font-size:1.7rem;line-height:1.2}
 .rp-count.pill{padding:3px 12px;border-radius:10px;background:var(--soft);color:var(--royal)}
 
-/* SATU-SATUNYA TOMBOL MASUK KE RINCIAN */
+/* TOMBOL MASUK KE RINCIAN */
 .rp-detail-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 14px;border:1px solid #C5D6F5;border-radius:10px;color:var(--royal);background:#fff;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s,transform .2s}
 .rp-detail-link .i{font-size:15px;transition:transform .2s var(--ease)}
 .rp-detail-link:hover{color:#fff;background:var(--royal);border-color:var(--royal);transform:translateY(-1px)}
 .rp-detail-link:hover .i{transform:translate(2px,-2px)}
+
+/* KARTU SEBARAN KEIKUTSERTAAN (1 kali, 2 kali, ...) */
+.rp-times-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(18px,2.6vw,26px);border-bottom:1px solid var(--border);background:var(--ice)}
+.rp-times-top h3{margin:0;font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:17px;font-weight:600;color:var(--navy)}
+.rp-times{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;padding:clamp(16px,2.2vw,24px)}
+.rp-time{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:100%;padding:18px 18px 16px;border:1.5px solid var(--border);border-radius:18px;background:#fff;text-align:left;color:inherit;cursor:pointer;overflow:hidden;transition:transform .25s var(--ease),border-color .2s,box-shadow .25s,background .2s}
+.rp-time::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--royal),var(--cyan));opacity:.85}
+.rp-time:hover{transform:translateY(-4px);border-color:#b9cfec;background:#F7FAFF;box-shadow:0 18px 38px rgba(8,27,51,.12)}
+.rp-time-label{font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:1.25rem;font-weight:800;color:var(--navy);letter-spacing:-.02em}
+.rp-time-num{display:flex;align-items:baseline;gap:6px;font-family:"Sora","Segoe UI",Arial,sans-serif;font-variant-numeric:tabular-nums}
+.rp-time-num b{font-size:1.9rem;font-weight:800;color:var(--royal);line-height:1.1}
+.rp-time-num small{font-family:"Plus Jakarta Sans",sans-serif;font-size:13px;font-weight:600;color:var(--slate)}
+.rp-time-go{display:inline-flex;align-items:center;gap:6px;margin-top:4px;font-size:13px;font-weight:700;color:var(--royal)}
+.rp-time-go .i{font-size:15px;transition:transform .2s var(--ease)}
+.rp-time:hover .rp-time-go .i{transform:translate(2px,-2px)}
 
 /* PANEL */
 .rp-panel{min-width:0;overflow:hidden;border:1px solid var(--border);border-radius:22px;background:#fff;box-shadow:0 18px 44px rgba(8,27,51,.07)}
@@ -176,7 +191,7 @@ html.rp-lock{overflow:hidden}
 .rp-empty{padding:44px 18px!important;text-align:center;color:var(--slate)!important}
 .rp-empty strong{display:block;margin-bottom:4px;font-family:"Sora","Segoe UI",Arial,sans-serif;font-size:16px;color:var(--navy)}
 
-/* chip sumber dana (hanya label) */
+/* chip sumber dana */
 .rp-fchips{display:flex;flex-wrap:wrap;gap:6px}
 .rp-fchip{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:2px 11px;border:1px solid transparent;border-radius:999px;font-size:12.5px;font-weight:700}
 .rp-fchip b{font-family:"Sora","Segoe UI",Arial,sans-serif;font-variant-numeric:tabular-nums}
@@ -340,6 +355,7 @@ html.rp-lock{overflow:hidden}
     .rp-line{grid-template-columns:1fr}
     .rp-line-nums{justify-content:flex-start}
     .rp-info{grid-template-columns:1fr}
+    .rp-times{grid-template-columns:repeat(2,minmax(0,1fr))}
 
     .rp-drawer-panel{width:100%;transform:translate3d(0,100%,0)}
 
@@ -354,6 +370,9 @@ html.rp-lock{overflow:hidden}
     .rp-table-wrap.cards .rp-number{width:auto}
     .rp-table-wrap.cards td.rp-empty{display:block}
     .rp-table-wrap.cards .rp-detail-link{width:100%}
+}
+@media (max-width:420px){
+    .rp-times{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){
     .report-page *,.report-page *::before,.report-page *::after,.rp-drawer *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
@@ -370,13 +389,28 @@ html.rp-lock{overflow:hidden}
     $districtFundingTotals = collect($districtFundingTotals ?? []);
     $nakesByType = collect($nakesByType ?? []);
 
+    // Sebaran jumlah keikutsertaan dari controller.
+    // Tiap item: { times: int, total_participants: int }
+    $frequencyRecap = collect($frequencyRecap ?? []);
+
     $years = collect($years ?? []);
     $districts = collect($districts ?? []);
     $institutions = collect($institutions ?? []);
     $participants = $participants ?? collect();
 
     $year = $year ?? now()->year;
-    $minimum = $minimum ?? 1;
+
+    /*
+     * FILTER KEIKUTSERTAAN
+     * Dibaca LANGSUNG dari URL, bukan dari variabel controller, supaya pilihan
+     * "Semua keikutsertaan" tidak ikut berubah menjadi 1 kali.
+     *   - parameter tidak ada / "all" / bukan angka  => SEMUA
+     *   - angka >= 1                                 => tepat sejumlah itu
+     */
+    $rawMinimum = request()->has('minimum') ? request('minimum') : 'all';
+    $isAll = !is_numeric($rawMinimum) || (int) $rawMinimum < 1;
+    $minimum = $isAll ? 'all' : (int) $rawMinimum;
+    $minimumLabel = $isAll ? 'Semua keikutsertaan' : $minimum . ' kali keikutsertaan';
 
     $search = $search ?? request('search', '');
     $districtFilter = (string) ($districtFilter ?? request('district', ''));
@@ -401,14 +435,17 @@ html.rp-lock{overflow:hidden}
     $hasCategoryDetailRoute = \Illuminate\Support\Facades\Route::has('reports.category-details');
 
     $endpoint = $hasDetailRoute ? route('reports.detail') : '';
+
+    // Filter aktif ikut dikirim ke panel rincian agar angka selalu sinkron.
     $baseParams = [
         'year' => $year,
+        'minimum' => $minimum,
         'search' => $search,
         'district' => $districtFilter,
         'institution' => $institutionFilter,
     ];
 
-    // Ekspor mencakup seluruh isi laporan sesuai filter aktif.
+    // Ekspor mengikuti filter aktif.
     $exportParams = array_filter([
         'year' => $year,
         'minimum' => $minimum,
@@ -421,6 +458,10 @@ html.rp-lock{overflow:hidden}
     $pdfUrl = \Illuminate\Support\Facades\Route::has('reports.pdf')
         ? route('reports.pdf', $exportParams)
         : (\Illuminate\Support\Facades\Route::has('pdf.report') ? route('pdf.report', $exportParams) : null);
+
+    // Bagian sebaran hanya tampil saat "Semua keikutsertaan" dipilih.
+    $showFrequency = $isAll && $frequencyRecap->isNotEmpty();
+    $frequencyTotal = (int) $frequencyRecap->sum(fn ($r) => (int) data_get($r, 'total_participants', 0));
 
     // Lebar tiap kartu sumber dana agar setiap baris selalu penuh.
     $fundCount = $fundingRecap->count();
@@ -443,7 +484,6 @@ html.rp-lock{overflow:hidden}
         }
     }
 
-    // Angka: hanya tampilan. Tidak ada lagi tombol di tiap angka.
     $count = function ($value, string $unit = '', string $extra = '') use ($formatNumber) {
         $unitHtml = $unit !== '' ? '<small>' . e($unit) . '</small>' : '';
 
@@ -452,7 +492,6 @@ html.rp-lock{overflow:hidden}
         );
     };
 
-    // Satu tombol masuk ke panel rincian per baris/kartu.
     $detailBtn = function (array $payload, string $text = 'Rincian') use ($hasDetailRoute) {
         if (!$hasDetailRoute) {
             return new \Illuminate\Support\HtmlString('');
@@ -521,7 +560,7 @@ html.rp-lock{overflow:hidden}
 
                     <span class="rp-chip">
                         <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg>
-                        {{ $minimum }} pelatihan per peserta
+                        {{ $minimumLabel }}
                     </span>
                 </div>
             </div>
@@ -560,6 +599,9 @@ html.rp-lock{overflow:hidden}
         <div class="rp-nav-wrap">
             <nav class="rp-nav" aria-label="Navigasi laporan" id="rpNav">
                 <a href="#filter" class="active">Filter</a>
+                @if ($showFrequency)
+                    <a href="#keikutsertaan">Keikutsertaan</a>
+                @endif
                 <a href="#ringkasan">Ringkasan</a>
                 <a href="#sumber-dana">Sumber Dana</a>
                 <a href="#pelatihan">Pelatihan</a>
@@ -594,8 +636,9 @@ html.rp-lock{overflow:hidden}
                         <div class="rp-field">
                             <label for="minimum">Keikutsertaan</label>
                             <select id="minimum" name="minimum">
+                                <option value="all" @selected($isAll)>Semua keikutsertaan</option>
                                 @foreach ([1, 2, 3, 4, 5, 10] as $value)
-                                    <option value="{{ $value }}" @selected((int) $minimum === $value)>{{ $value }} kali</option>
+                                    <option value="{{ $value }}" @selected(!$isAll && (int) $minimum === $value)>{{ $value }} kali</option>
                                 @endforeach
                             </select>
                         </div>
@@ -641,6 +684,59 @@ html.rp-lock{overflow:hidden}
                 </form>
             </div>
         </section>
+
+        {{-- SEBARAN KEIKUTSERTAAN: hanya muncul saat filter = "Semua keikutsertaan" --}}
+        @if ($showFrequency)
+            <section class="rp-section rp-reveal" id="keikutsertaan" aria-labelledby="rp-times-title">
+                <div class="rp-section-head">
+                    <h2 id="rp-times-title">Keikutsertaan peserta</h2>
+                    <p>
+                        Pilih salah satu, misalnya 1 kali atau 2 kali, untuk melihat nama peserta
+                        yang mengikuti pelatihan sebanyak itu pada tahun {{ $year }}.
+                    </p>
+                    @if ($hasDetailRoute)
+                        <span class="rp-hint">
+                            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                            Klik kartu untuk melihat daftar nama pesertanya
+                        </span>
+                    @endif
+                </div>
+
+                <div class="rp-panel">
+                    <div class="rp-times-top">
+                        <h3>Peserta berdasarkan jumlah keikutsertaan</h3>
+                        <span class="rp-count pill">
+                            <b>{{ $formatNumber($frequencyTotal) }}</b>
+                            <small>peserta</small>
+                        </span>
+                    </div>
+
+                    <div class="rp-times">
+                        @foreach ($frequencyRecap as $row)
+                            @php
+                                $times = (int) data_get($row, 'times', 0);
+                                $timesTotal = (int) data_get($row, 'total_participants', 0);
+                                $timesPayload = ['view' => 'participants', 'times' => $times, 'label' => $times . ' kali keikutsertaan'];
+                            @endphp
+
+                            <button type="button" class="rp-time"
+                                    @if ($hasDetailRoute) data-detail="{{ json_encode($timesPayload, JSON_UNESCAPED_UNICODE) }}" aria-haspopup="dialog" @endif
+                                    aria-label="{{ $times }} kali keikutsertaan: {{ $formatNumber($timesTotal) }} peserta">
+                                <span class="rp-time-label">{{ $times }} kali</span>
+                                <span class="rp-time-num">
+                                    <b>{{ $formatNumber($timesTotal) }}</b>
+                                    <small>peserta</small>
+                                </span>
+                                <span class="rp-time-go">
+                                    Lihat nama
+                                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+                                </span>
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
 
         {{-- RINGKASAN: jenis kelamin (kiri) + profesi (kanan) --}}
         <section class="rp-section rp-reveal" id="ringkasan" aria-labelledby="rp-sum-title">
@@ -991,8 +1087,9 @@ html.rp-lock{overflow:hidden}
             <div class="rp-section-head">
                 <h2 id="rp-freq-title">Jumlah pelatihan per peserta</h2>
                 <p>
-                    Jumlah keikutsertaan setiap peserta pada tahun {{ $year }} sesuai filter.
-                    Tekan Rincian untuk melihat pelatihan apa saja yang diikuti.
+                    Jumlah keikutsertaan setiap peserta pada tahun {{ $year }} sesuai filter
+                    ({{ mb_strtolower($minimumLabel) }}).
+                    Tekan Lihat untuk melihat pelatihan apa saja yang diikuti.
                 </p>
             </div>
 
@@ -1084,7 +1181,6 @@ html.rp-lock{overflow:hidden}
                 </button>
             </header>
 
-            {{-- Tab pindah antara daftar kegiatan dan daftar peserta untuk cakupan yang sama --}}
             <div class="rp-drawer-tabs" id="rpDrawerTabs" hidden>
                 <div class="rp-seg" role="group" aria-label="Jenis rincian">
                     <button type="button" data-tab="trainings" aria-pressed="true">Kegiatan</button>
@@ -1364,7 +1460,7 @@ html.rp-lock{overflow:hidden}
 })();
 
 /* ======================================================================
-   PANEL RINCIAN (tombol Rincian -> tab Kegiatan / Peserta / info)
+   PANEL RINCIAN
    ====================================================================== */
 (function () {
     var root = document.getElementById('reportPage');
@@ -1374,7 +1470,6 @@ html.rp-lock{overflow:hidden}
     var endpoint = root.getAttribute('data-endpoint');
     if (!endpoint) return;
 
-    // Pindahkan ke <body>: position:fixed tidak lagi terpotong oleh area konten layout.
     document.body.appendChild(drawer);
 
     var base = {};
@@ -1393,7 +1488,9 @@ html.rp-lock{overflow:hidden}
     var btnBack = document.getElementById('rpDrawerBack');
     var tabButtons = Array.prototype.slice.call(elTabs.querySelectorAll('button[data-tab]'));
 
-    var filtersActive = !!(base.search || base.district || base.institution);
+    // "all" = tanpa pembatasan, jadi bukan filter aktif.
+    var hasMinimum = base.minimum !== undefined && base.minimum !== null && base.minimum !== '' && base.minimum !== 'all';
+    var filtersActive = !!(base.search || base.district || base.institution || hasMinimum);
     var stack = [];
     var cache = {};
     var token = 0;
@@ -1434,7 +1531,6 @@ html.rp-lock{overflow:hidden}
         return fmtLong.format(a) + ' – ' + fmtLong.format(b);
     }
 
-    /* ----- buka / tutup ----- */
     function openDrawer() {
         clearTimeout(closeTimer);
         if (drawer.hidden) {
@@ -1463,7 +1559,6 @@ html.rp-lock{overflow:hidden}
         }, 340);
     }
 
-    /* ----- ambil data ----- */
     function push(payload) {
         stack.push({ payload: payload, data: null });
         load();
@@ -1519,14 +1614,12 @@ html.rp-lock{overflow:hidden}
             });
     }
 
-    /* ----- tampilan ----- */
     function setHeader(kicker, title, sub, entry) {
         elKicker.textContent = kicker;
         elTitle.textContent = title;
         elSub.textContent = sub || '';
         btnBack.hidden = stack.length < 2;
 
-        // Tab hanya muncul untuk rincian bercakupan (sumber dana, pelatihan, kategori, wilayah).
         var hasTabs = !!(entry && entry.payload.tabs);
         elTabs.hidden = !hasTabs;
         if (hasTabs) {
@@ -1711,7 +1804,6 @@ html.rp-lock{overflow:hidden}
         elTools.hidden = rows.length < 8;
     }
 
-    /* ----- cari di dalam daftar rincian ----- */
     elSearch.addEventListener('input', function () {
         var q = elSearch.value.trim().toLowerCase();
         elBody.querySelectorAll('.rp-li').forEach(function (item) {
@@ -1719,7 +1811,6 @@ html.rp-lock{overflow:hidden}
         });
     });
 
-    /* ----- pindah tab Kegiatan <-> Peserta ----- */
     tabButtons.forEach(function (b) {
         b.addEventListener('click', function () {
             var entry = stack[stack.length - 1];
@@ -1732,7 +1823,6 @@ html.rp-lock{overflow:hidden}
         });
     });
 
-    /* ----- event ----- */
     root.addEventListener('click', function (ev) {
         var trigger = ev.target.closest('[data-detail]');
         if (!trigger) return;
