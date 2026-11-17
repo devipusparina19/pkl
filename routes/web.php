@@ -189,6 +189,10 @@ Route::middleware('auth')->group(function () {
 
     /*
     | IMPORT EXCEL: ADMIN
+    |
+    | Alur: form -> preview (baca & validasi, belum menyimpan)
+    |       -> store (simpan setelah konfirmasi) / cancel (batal).
+    | Kabupaten/Kota dibaca otomatis dari kolom pada file Excel.
     */
 
     Route::middleware('role:admin')->group(function () {
@@ -196,6 +200,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/imports', [ImportController::class, 'index'])
             ->name('imports.index');
 
+        // BARU: membaca file dan menampilkan pratinjau (tanpa menyimpan data).
+        Route::post('/imports/preview', [ImportController::class, 'preview'])
+            ->name('imports.preview');
+
+        // BARU: membatalkan pratinjau dan membuang file sementara.
+        Route::post('/imports/cancel', [ImportController::class, 'cancel'])
+            ->name('imports.cancel');
+
+        // Menyimpan data setelah pengguna mengonfirmasi pratinjau.
         Route::post('/imports', [ImportController::class, 'store'])
             ->name('imports.store');
     });

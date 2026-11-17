@@ -24,6 +24,8 @@
     <symbol id="i-loader" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
 </svg>
 
 <style>
@@ -36,7 +38,8 @@
        1. Warna & dasar     5. Form & input
        2. Hero              6. Tombol
        3. Hasil import      7. Loading
-       4. Tabel error       8. Responsif
+       4. Tabel error       8. Pratinjau
+                            9. Responsif
     ===================================================== */
 
     /* ---------- 1. WARNA & DASAR ---------- */
@@ -205,14 +208,17 @@
     }
     .arta-feedback.is-danger { border-left-color: #b91c1c; background: var(--red-soft); border-color: var(--red-line); }
     .arta-feedback.is-success { background: var(--green-soft); border-color: var(--green-line); border-left-color: var(--green); }
+    .arta-feedback.is-preview { background: var(--soft); border-color: #c7dafc; border-left-color: var(--royal); }
 
     .arta-fb-head { display: flex; align-items: flex-start; gap: 14px; }
     .arta-fb-head .ic { width: 26px; height: 26px; margin-top: 3px; }
     .is-danger .arta-fb-head .ic { color: var(--red); }
     .is-success .arta-fb-head .ic { color: var(--green); }
+    .is-preview .arta-fb-head .ic { color: var(--royal); }
     .arta-fb-title { margin: 0; font-family: var(--f-display); font-size: clamp(20px, 2.2vw, 26px); font-weight: 700; letter-spacing: -.02em; line-height: 1.25; }
     .is-danger .arta-fb-title { color: var(--red); }
     .is-success .arta-fb-title { color: var(--green); }
+    .is-preview .arta-fb-title { color: var(--navy); }
     .arta-fb-body { min-width: 0; flex: 1; }
     .arta-fb-list { margin: 10px 0 0; padding-left: 20px; color: var(--red); font-size: 15px; }
     .arta-fb-list li { overflow-wrap: anywhere; }
@@ -342,6 +348,20 @@
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; font-weight: 600;
     }
 
+    /* Kotak info: Kabupaten/Kota dibaca dari Excel */
+    .arta-auto {
+        display: flex; align-items: flex-start; gap: 14px;
+        padding: 18px 20px; border: 1px solid #c7dafc; border-radius: 12px;
+        background: var(--soft); color: #2f4259;
+    }
+    .arta-auto .ic { width: 22px; height: 22px; margin-top: 2px; color: var(--royal); }
+    .arta-auto strong { display: block; color: var(--navy); font-size: 15px; }
+    .arta-auto p { margin: 4px 0 0; font-size: 14px; line-height: 1.7; }
+    .arta-auto code {
+        padding: 1px 6px; border-radius: 4px; background: #fff; color: var(--royal);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; font-weight: 600;
+    }
+
     /* ---------- 6. TOMBOL ---------- */
     .arta .arta-btn {
         --bg: var(--royal); --fg: #fff; --bd: transparent; --hover: var(--navy);
@@ -406,7 +426,45 @@
     .arta-veil-box strong { display: block; color: var(--navy); font-family: var(--f-display); font-size: 18px; }
     .arta-veil-box span { display: block; margin-top: 4px; color: var(--slate); font-size: 14px; }
 
-    /* ---------- 8. RESPONSIF ---------- */
+    /* ---------- 8. PRATINJAU & RINGKASAN WILAYAH ---------- */
+    .arta-sub { margin: 26px 0 0; color: var(--navy); font-family: var(--f-display); font-size: 17px; font-weight: 700; }
+    .arta-subhelp { margin: 4px 0 0; color: var(--slate); font-size: 13px; }
+
+    .arta-dist-wrap { margin-top: 12px; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    .arta-dist-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .arta-dist-table th { padding: 11px 14px; background: var(--ice); color: #2f4259; text-align: left; font-weight: 800; }
+    .arta-dist-table td { padding: 10px 14px; border-top: 1px solid var(--line); color: #334155; }
+    .arta-dist-table th:last-child, .arta-dist-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; width: 1%; white-space: nowrap; }
+    .arta-dist-table tfoot td { background: var(--ice); color: var(--navy); font-weight: 800; }
+
+    .arta-ptable-wrap { margin-top: 12px; max-height: 440px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    .arta-ptable { width: 100%; min-width: 820px; border-collapse: collapse; font-size: 13px; line-height: 1.55; }
+    .arta-ptable th {
+        position: sticky; top: 0; z-index: 1;
+        padding: 11px 14px; background: var(--ice); color: #2f4259;
+        text-align: left; font-weight: 800; white-space: nowrap;
+    }
+    .arta-ptable td { padding: 10px 14px; border-top: 1px solid var(--line); color: #334155; vertical-align: top; overflow-wrap: anywhere; }
+    .arta-ptable tr.is-error td { background: #fffafa; }
+    .arta-ptable .n { font-weight: 800; white-space: nowrap; }
+    .arta-ptable .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .arta-ptable .raw { color: var(--red); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .arta-ptable .why { display: block; margin-top: 4px; color: var(--red); }
+
+    .arta-badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .arta-badge-new { color: #166534; background: #dcfce7; }
+    .arta-badge-upd { color: #1e40af; background: #dbeafe; }
+    .arta-badge-err { color: #991b1b; background: #fee2e2; }
+
+    .arta-confirm {
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 20px;
+        margin-top: 24px; padding-top: 20px; border-top: 1px solid #c7dafc;
+    }
+    .arta-confirm p { margin: 0; max-width: 60ch; color: #2f4259; font-size: 14px; line-height: 1.7; }
+    .arta-confirm-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .arta-confirm-actions form { margin: 0; }
+
+    /* ---------- 9. RESPONSIF ---------- */
     @media (max-width: 1000px) {
         .arta-hero-grid { grid-template-columns: 1fr; }
         .arta-section { grid-template-columns: 1fr; gap: 22px; }
@@ -428,6 +486,7 @@
         .arta-actions .arta-btn--ghost { flex: 0 0 auto; }
         .arta-actions .arta-btn--primary { flex: 1; }
         .arta-template .arta-btn { width: 100%; }
+        .arta-confirm-actions, .arta-confirm-actions form, .arta-confirm-actions .arta-btn { width: 100%; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -440,19 +499,19 @@
 </style>
 
 @php
-    // Apakah ada pesan (error / hasil import) yang harus ditampilkan?
-    $adaPesan = $errors->any() || session('import_result');
+    // Apakah ada pesan (error / pratinjau / hasil import) yang harus ditampilkan?
+    $adaPesan = $errors->any() || session('import_result') || isset($preview);
 @endphp
 
 <div class="arta" id="arta" data-pesan="{{ $adaPesan ? '1' : '0' }}">
 
     <div class="arta-progress" id="artaProgress" aria-hidden="true"></div>
 
-    {{-- LAYAR LOADING (muncul saat import diproses, posisi layar tidak berubah) --}}
+    {{-- LAYAR LOADING (muncul saat file dibaca / import diproses, posisi layar tidak berubah) --}}
     <div class="arta-veil" id="artaVeil" role="status" aria-live="polite">
         <div class="arta-veil-box">
             <svg class="ic is-spin" aria-hidden="true"><use href="#i-loader"/></svg>
-            <strong>Memproses import…</strong>
+            <strong id="artaVeilTitle">Memproses…</strong>
             <span>Mohon tunggu dan jangan tutup halaman ini.</span>
         </div>
     </div>
@@ -476,8 +535,9 @@
                 <h1>Import data peserta, <span>sekali unggah.</span></h1>
 
                 <p class="arta-lead">
-                    Unggah file Excel, isi informasi pelatihan, lalu ARTA akan
-                    mencatat data peserta dan riwayat pelatihannya secara otomatis.
+                    Unggah file Excel, periksa pratinjaunya, lalu ARTA akan mencatat
+                    data peserta dan riwayat pelatihannya. Kabupaten/Kota dibaca
+                    otomatis dari setiap baris peserta.
                 </p>
 
                 <div class="arta-hero-actions">
@@ -498,7 +558,7 @@
             <div class="arta-check" aria-live="polite">
                 <div class="arta-check-head">
                     <span id="cekLabel">Lengkapi data wajib</span>
-                    <b id="cekCount">0/3</b>
+                    <b id="cekCount">0/2</b>
                 </div>
                 <div class="arta-check-bar"><i id="cekBar"></i></div>
                 <ul>
@@ -506,13 +566,13 @@
                         <span class="arta-tick"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
                         File Excel dipilih
                     </li>
-                    <li data-cek="wilayah">
-                        <span class="arta-tick"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
-                        Wilayah atau mitra dipilih
-                    </li>
                     <li data-cek="dana">
                         <span class="arta-tick"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>
                         Sumber dana dipilih
+                    </li>
+                    <li class="is-opt">
+                        <span class="arta-tick"></span>
+                        Kabupaten/Kota dibaca otomatis dari file Excel
                     </li>
                     <li class="is-opt">
                         <span class="arta-tick"></span>
@@ -523,7 +583,7 @@
         </div>
     </header>
 
-    {{-- ===================== PESAN: ERROR VALIDASI & HASIL IMPORT ===================== --}}
+    {{-- ===================== PESAN: ERROR VALIDASI, PRATINJAU & HASIL IMPORT ===================== --}}
     @if ($adaPesan)
         <div id="hasil">
 
@@ -545,6 +605,237 @@
                 </div>
             @endif
 
+            {{-- PRATINJAU (belum ada data yang disimpan) --}}
+            @isset($preview)
+                @php
+                    $pvTotal   = (int) $preview['total_rows'];
+                    $pvValid   = (int) $preview['valid_rows'];
+                    $pvInvalid = (int) $preview['invalid_rows'];
+                    $pvDistricts = $preview['district_summary'];
+                    $pvUnrecognized = $preview['unrecognized_districts'];
+                    $pvProblemDistrict = (int) $preview['empty_district_rows'] + array_sum($pvUnrecognized);
+                @endphp
+
+                <div class="arta-feedback is-preview" role="status">
+                    <div class="arta-fb-head">
+                        <svg class="ic" aria-hidden="true"><use href="#i-eye"/></svg>
+
+                        <div class="arta-fb-body">
+                            <h2 class="arta-fb-title">Pratinjau hasil pembacaan file</h2>
+                            <div class="arta-meta">Belum ada data yang disimpan. Periksa tabel di bawah, lalu konfirmasi untuk menyimpan.</div>
+
+                            <div class="arta-meta">File: <b>{{ $preview['file_name'] }}</b></div>
+                            <div class="arta-meta">Pelatihan: <b>{{ $preview['training_name'] }}</b></div>
+
+                            @if (!empty($preview['organizer']))
+                                <div class="arta-meta">Kerja sama: <b>{{ $preview['organizer'] }}</b></div>
+                            @endif
+
+                            <div class="arta-meta">
+                                Tanggal:
+                                <b>{{ \Carbon\Carbon::parse($preview['start_date'])->format('d-m-Y') }}</b>
+                                s.d.
+                                <b>{{ \Carbon\Carbon::parse($preview['end_date'])->format('d-m-Y') }}</b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arta-stats">
+                        <div class="arta-stat arta-stat--main">
+                            <div class="arta-stat-num">{{ $pvValid }}</div>
+                            <div class="arta-stat-label">Baris siap diimport</div>
+                        </div>
+
+                        <div class="arta-stat">
+                            <div class="arta-stat-num">{{ $pvInvalid }}</div>
+                            <div class="arta-stat-label">Baris bermasalah (tidak diimport)</div>
+                        </div>
+
+                        <div class="arta-stat">
+                            <div class="arta-stat-num">{{ $pvTotal }}</div>
+                            <div class="arta-stat-label">Total baris peserta dibaca</div>
+                        </div>
+
+                        <div class="arta-stat">
+                            <div class="arta-stat-num">{{ (int) $preview['new_rows'] }}</div>
+                            <div class="arta-stat-label">Peserta baru</div>
+                        </div>
+
+                        <div class="arta-stat">
+                            <div class="arta-stat-num">{{ (int) $preview['update_rows'] }}</div>
+                            <div class="arta-stat-label">Peserta diperbarui</div>
+                        </div>
+
+                        <div class="arta-stat">
+                            <div class="arta-stat-num">{{ count($pvDistricts) }}</div>
+                            <div class="arta-stat-label">Kabupaten/Kota terbaca</div>
+                        </div>
+
+                        <div class="arta-stat">
+                            <div class="arta-stat-num">{{ $pvProblemDistrict }}</div>
+                            <div class="arta-stat-label">Baris Kabupaten/Kota kosong atau tidak dikenali</div>
+                        </div>
+                    </div>
+
+                    {{-- Ringkasan per Kabupaten/Kota --}}
+                    <h3 class="arta-sub">Jumlah peserta per Kabupaten/Kota</h3>
+                    <p class="arta-subhelp">Dihitung dari baris yang siap diimport, sesuai isi file Excel.</p>
+
+                    @if (count($pvDistricts) > 0)
+                        <div class="arta-dist-wrap">
+                            <table class="arta-dist-table">
+                                <thead>
+                                    <tr>
+                                        <th>Kabupaten/Kota</th>
+                                        <th>Jumlah Peserta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($pvDistricts as $districtName => $districtCount)
+                                        <tr>
+                                            <td>{{ $districtName }}</td>
+                                            <td>{{ $districtCount }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>Total</td>
+                                        <td>{{ array_sum($pvDistricts) }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    @else
+                        <div class="arta-notes">Belum ada baris dengan Kabupaten/Kota yang valid.</div>
+                    @endif
+
+                    {{-- Kabupaten/Kota yang tidak dikenali --}}
+                    @if (count($pvUnrecognized) > 0)
+                        <h3 class="arta-sub">Kabupaten/Kota tidak dikenali</h3>
+                        <p class="arta-subhelp">
+                            Nama berikut tidak cocok dengan Master Data ARTA. Perbaiki penulisannya di Excel,
+                            atau tambahkan wilayah tersebut di Master Data, lalu unggah ulang.
+                        </p>
+
+                        <div class="arta-dist-wrap">
+                            <table class="arta-dist-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tertulis di Excel</th>
+                                        <th>Jumlah Baris</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($pvUnrecognized as $rawName => $rawCount)
+                                        <tr>
+                                            <td class="arta-error-value">{{ $rawName }}</td>
+                                            <td>{{ $rawCount }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+
+                    {{-- Detail per baris --}}
+                    <h3 class="arta-sub">Detail per baris</h3>
+                    <p class="arta-subhelp">Setiap peserta memakai Kabupaten/Kota dari barisnya sendiri.</p>
+
+                    <div class="arta-ptable-wrap">
+                        <table class="arta-ptable">
+                            <thead>
+                                <tr>
+                                    <th>Baris Excel</th>
+                                    <th>Nama peserta</th>
+                                    <th>NIP / NIK</th>
+                                    <th>Kab/Kota di Excel</th>
+                                    <th>Kab/Kota terbaca</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($preview['rows'] as $pvRow)
+                                    <tr class="{{ $pvRow['status'] === 'ok' ? '' : 'is-error' }}">
+                                        <td class="n">{{ $pvRow['row'] }}</td>
+                                        <td>{{ $pvRow['name'] }}</td>
+                                        <td class="mono">{{ $pvRow['identity'] }}</td>
+                                        <td class="{{ $pvRow['status'] === 'ok' ? '' : 'raw' }}">
+                                            {{ $pvRow['district_raw'] !== '' ? $pvRow['district_raw'] : '(kosong)' }}
+                                        </td>
+                                        <td>{{ $pvRow['district'] ?? '-' }}</td>
+                                        <td>
+                                            @if ($pvRow['status'] === 'ok')
+                                                @if ($pvRow['action'] === 'update')
+                                                    <span class="arta-badge arta-badge-upd">Siap · perbarui</span>
+                                                @else
+                                                    <span class="arta-badge arta-badge-new">Siap · baru</span>
+                                                @endif
+                                            @else
+                                                <span class="arta-badge arta-badge-err">Ditolak</span>
+                                                <span class="why">{{ $pvRow['message'] }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Konfirmasi --}}
+                    <div class="arta-confirm">
+                        <p>
+                            @if ($pvValid > 0)
+                                <b>{{ $pvValid }}</b> baris akan disimpan.
+                                @if ($pvInvalid > 0)
+                                    <b>{{ $pvInvalid }}</b> baris bermasalah akan dilewati. Anda juga bisa membatalkan,
+                                    memperbaiki file Excel, lalu mengunggahnya kembali.
+                                @endif
+                            @else
+                                Tidak ada baris yang dapat diimport. Perbaiki file Excel sesuai keterangan di atas,
+                                lalu unggah kembali.
+                            @endif
+                        </p>
+
+                        <div class="arta-confirm-actions">
+                            <form action="{{ route('imports.cancel') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="token" value="{{ $preview['token'] }}">
+                                <button type="submit" class="arta-btn arta-btn--ghost">
+                                    <svg class="ic" aria-hidden="true"><use href="#i-x"/></svg>
+                                    <span>Batalkan</span>
+                                </button>
+                            </form>
+
+                            <form
+                                id="confirmForm"
+                                action="{{ route('imports.store') }}"
+                                method="POST"
+                                data-veil="Menyimpan data…"
+                            >
+                                @csrf
+                                <input type="hidden" name="token" value="{{ $preview['token'] }}">
+                                <input type="hidden" name="angkatan" value="{{ $preview['params']['angkatan'] }}">
+                                <input type="hidden" name="sumber_dana" value="{{ $preview['params']['sumber_dana'] }}">
+                                <input type="hidden" name="training_category_id" value="{{ $preview['params']['training_category_id'] }}">
+                                <input type="hidden" name="jpl" value="{{ $preview['params']['jpl'] }}">
+
+                                <button
+                                    type="submit"
+                                    class="arta-btn arta-btn--primary"
+                                    id="confirmButton"
+                                    data-kosong="{{ $pvValid === 0 ? '1' : '0' }}"
+                                    @disabled($pvValid === 0)
+                                >
+                                    <svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>
+                                    <span>Import {{ $pvValid }} baris</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endisset
+
             {{-- HASIL IMPORT --}}
             @if (session('import_result'))
                 @php
@@ -552,6 +843,9 @@
 
                     $importErrors = $result['errors'] ?? [];
                     $importErrors = is_array($importErrors) ? $importErrors : [];
+
+                    $districtSummary = $result['district_summary'] ?? [];
+                    $districtSummary = is_array($districtSummary) ? $districtSummary : [];
 
                     $createdParticipants = (int) ($result['created_participants'] ?? 0);
                     $updatedParticipants = (int) ($result['updated_participants'] ?? 0);
@@ -633,6 +927,36 @@
                         </div>
                     </div>
 
+                    {{-- Ringkasan peserta tersimpan per Kabupaten/Kota --}}
+                    @if (count($districtSummary) > 0)
+                        <h3 class="arta-sub">Peserta tersimpan per Kabupaten/Kota</h3>
+
+                        <div class="arta-dist-wrap">
+                            <table class="arta-dist-table">
+                                <thead>
+                                    <tr>
+                                        <th>Kabupaten/Kota</th>
+                                        <th>Jumlah Peserta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($districtSummary as $districtName => $districtCount)
+                                        <tr>
+                                            <td>{{ $districtName }}</td>
+                                            <td>{{ $districtCount }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>Total</td>
+                                        <td>{{ array_sum($districtSummary) }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    @endif
+
                     @if (count($importErrors) > 0)
                         <div class="arta-notes">
                             <strong>Detail data yang gagal diimpor</strong>
@@ -703,9 +1027,10 @@
     {{-- ===================== FORM IMPORT ===================== --}}
     <form
         id="importForm"
-        action="{{ route('imports.store') }}"
+        action="{{ route('imports.preview') }}"
         method="POST"
         enctype="multipart/form-data"
+        data-veil="Membaca file Excel…"
     >
         @csrf
 
@@ -754,6 +1079,19 @@
                     </div>
                 </div>
 
+                {{-- Kabupaten/Kota dibaca otomatis --}}
+                <div class="arta-full arta-auto">
+                    <svg class="ic" aria-hidden="true"><use href="#i-info"/></svg>
+                    <div>
+                        <strong>Kabupaten/Kota dibaca otomatis dari Excel</strong>
+                        <p>
+                            Pastikan file memiliki kolom <code>KABUPATEN/KOTA</code> pada baris header peserta.
+                            Setiap peserta disimpan dengan Kabupaten/Kota pada barisnya masing-masing,
+                            jadi satu file boleh berisi banyak wilayah. Nama wilayah harus sesuai Master Data ARTA.
+                        </p>
+                    </div>
+                </div>
+
                 {{-- Template: diambil dari storage/app/templates/Template_Arta.xlsx --}}
                 <div class="arta-full arta-template">
                     <p>
@@ -773,7 +1111,7 @@
             <div class="arta-section-head">
                 <span class="arta-num">02</span>
                 <h2 id="artaPenyelenggaraan">Penyelenggaraan pelatihan</h2>
-                <p>Angkatan, wilayah, dan sumber dana untuk seluruh data dalam file.</p>
+                <p>Angkatan dan sumber dana untuk seluruh data dalam file.</p>
             </div>
 
             <div class="arta-grid">
@@ -800,38 +1138,8 @@
                     </small>
                 </div>
 
-                {{-- WILAYAH --}}
-                <div class="arta-field">
-                    <label for="kabupaten_kota_mitra">
-                        Kabupaten/Kota/Mitra/Mandiri
-                        <span class="arta-req" aria-hidden="true">*</span>
-                    </label>
-
-                    <select
-                        name="kabupaten_kota_mitra"
-                        id="kabupaten_kota_mitra"
-                        class="arta-control"
-                        required
-                    >
-                        <option value="">-- Pilih wilayah atau mitra --</option>
-
-                        @foreach ($districts as $district)
-                            <option
-                                value="{{ $district->name }}"
-                                @selected(old('kabupaten_kota_mitra') === $district->name)
-                            >
-                                {{ $district->name }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <small class="arta-help">
-                        Pilihan mengikuti Master Data ARTA.
-                    </small>
-                </div>
-
                 {{-- SUMBER DANA --}}
-                <div class="arta-field arta-full">
+                <div class="arta-field">
                     <label for="sumber_dana">
                         Sumber Dana
                         <span class="arta-req" aria-hidden="true">*</span>
@@ -937,8 +1245,9 @@
             <div class="arta-note">
                 <svg class="ic" aria-hidden="true"><use href="#i-info"/></svg>
                 <span>
-                    Kolom bertanda <b>*</b> wajib diisi. Pastikan data sudah
-                    benar sebelum diimport.
+                    Kolom bertanda <b>*</b> wajib diisi. File akan dibaca dan ditampilkan
+                    sebagai pratinjau terlebih dahulu; data baru disimpan setelah Anda
+                    mengonfirmasi.
                 </span>
             </div>
 
@@ -949,8 +1258,8 @@
                 </button>
 
                 <button type="submit" class="arta-btn arta-btn--primary" id="submitButton">
-                    <svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>
-                    <span>Import Excel</span>
+                    <svg class="ic" aria-hidden="true"><use href="#i-eye"/></svg>
+                    <span>Baca &amp; Pratinjau</span>
                 </button>
             </div>
 
@@ -966,9 +1275,11 @@
             <strong>Informasi penting</strong>
             <p>
                 Peserta yang sudah terdaftar dapat diperbarui berdasarkan
-                NIP atau NIK. Riwayat pelatihan yang sama tidak dibuat
-                berulang. Kategori Pelatihan dan JPL boleh dikosongkan
-                jika informasinya belum tersedia.
+                NIP atau NIK, termasuk Kabupaten/Kota sesuai baris Excel-nya.
+                Baris yang Kabupaten/Kota-nya kosong atau tidak dikenali tidak
+                diimport dan akan ditandai pada pratinjau. Riwayat pelatihan yang
+                sama tidak dibuat berulang. Kategori Pelatihan dan JPL boleh
+                dikosongkan jika informasinya belum tersedia.
             </p>
         </div>
     </aside>
@@ -980,8 +1291,8 @@
 
     /* =====================================================
        PENGATURAN (silakan ubah di sini)
-       true  = setelah import selesai, layar otomatis menuju
-               kotak hasil/error supaya pesan langsung terlihat.
+       true  = setelah proses selesai, layar otomatis menuju
+               kotak pratinjau/hasil/error supaya pesan langsung terlihat.
        false = layar tetap di posisi terakhir (persis di tempat
                tombol ditekan), pesan ada di bagian atas halaman.
     ===================================================== */
@@ -998,18 +1309,21 @@
 
         /* ---------- Ambil elemen penting ---------- */
         var form         = halaman.querySelector('#importForm');
+        var formKonfirm  = halaman.querySelector('#confirmForm');
         var inputFile    = halaman.querySelector('#file');
         var zonaDrop     = halaman.querySelector('#dropZone');
         var kotakFile    = halaman.querySelector('#selectedFile');
         var namaFile     = halaman.querySelector('#selectedFileName');
-        var pilihWilayah = halaman.querySelector('#kabupaten_kota_mitra');
         var pilihDana    = halaman.querySelector('#sumber_dana');
         var tombolKirim  = halaman.querySelector('#submitButton');
+        var tombolKonfirm = halaman.querySelector('#confirmButton');
         var tombolReset  = halaman.querySelector('#resetButton');
         var layarLoading = halaman.querySelector('#artaVeil');
+        var judulLoading = halaman.querySelector('#artaVeilTitle');
         var batang       = halaman.querySelector('#artaProgress');
 
         var isiAwalTombol = tombolKirim ? tombolKirim.innerHTML : '';
+        var isiAwalKonfirm = tombolKonfirm ? tombolKonfirm.innerHTML : '';
 
         /* ---------- 1. POSISI LAYAR: JANGAN LOMPAT KE ATAS ---------- */
         // Browser biasanya mengembalikan layar ke atas setelah form dikirim.
@@ -1132,16 +1446,16 @@
             });
         }
 
-        /* ---------- 8. CHECKLIST KESIAPAN DI HERO ---------- */
+        /* ---------- 8. CHECKLIST KESIAPAN DI HERO (2 data wajib) ---------- */
         var teksHitung = halaman.querySelector('#cekCount');
         var batangCek  = halaman.querySelector('#cekBar');
         var teksLabel  = halaman.querySelector('#cekLabel');
+        var TOTAL_WAJIB = 2;
 
         function perbaruiChecklist() {
             var status = {
-                file:    !!(inputFile && inputFile.files && inputFile.files.length),
-                wilayah: !!(pilihWilayah && pilihWilayah.value),
-                dana:    !!(pilihDana && pilihDana.value)
+                file: !!(inputFile && inputFile.files && inputFile.files.length),
+                dana: !!(pilihDana && pilihDana.value)
             };
             var jumlah = 0;
 
@@ -1151,9 +1465,9 @@
                 if (status[kunci]) jumlah++;
             });
 
-            if (teksHitung) teksHitung.textContent = jumlah + '/3';
-            if (batangCek)  batangCek.style.transform = 'scaleX(' + (jumlah / 3) + ')';
-            if (teksLabel)  teksLabel.textContent = jumlah === 3 ? 'Siap diimport' : 'Lengkapi data wajib';
+            if (teksHitung) teksHitung.textContent = jumlah + '/' + TOTAL_WAJIB;
+            if (batangCek)  batangCek.style.transform = 'scaleX(' + (jumlah / TOTAL_WAJIB) + ')';
+            if (teksLabel)  teksLabel.textContent = jumlah === TOTAL_WAJIB ? 'Siap dibaca' : 'Lengkapi data wajib';
         }
 
         if (form) {
@@ -1162,14 +1476,16 @@
         }
         perbaruiChecklist();
 
-        /* ---------- 9. SAAT FORM DIKIRIM ---------- */
-        if (form && tombolKirim) {
-            form.addEventListener('submit', function (event) {
+        /* ---------- 9. SAAT FORM DIKIRIM (form utama & form konfirmasi) ---------- */
+        function pasangPengiriman(formEl, tombol, teksTombol) {
+            if (!formEl || !tombol) return;
+
+            formEl.addEventListener('submit', function (event) {
                 // Jika ada isian wajib yang kosong, biarkan browser menampilkan pesannya.
-                if (!form.checkValidity()) return;
+                if (!formEl.checkValidity()) return;
 
                 // Cegah klik ganda
-                if (tombolKirim.disabled) {
+                if (tombol.disabled) {
                     event.preventDefault();
                     return;
                 }
@@ -1177,15 +1493,24 @@
                 // Simpan posisi layar agar bisa dipulihkan setelah halaman dimuat ulang
                 try { sessionStorage.setItem(KUNCI_SCROLL, String(window.scrollY)); } catch (e) {}
 
-                tombolKirim.disabled = true;
-                tombolKirim.innerHTML =
-                    '<svg class="ic is-spin" aria-hidden="true"><use href="#i-loader"/></svg>' +
-                    '<span>Memproses…</span>';
+                // Tombol dinonaktifkan setelah event submit selesai,
+                // supaya isi form tetap ikut terkirim.
+                window.setTimeout(function () {
+                    tombol.disabled = true;
+                    tombol.innerHTML =
+                        '<svg class="ic is-spin" aria-hidden="true"><use href="#i-loader"/></svg>' +
+                        '<span>' + teksTombol + '</span>';
+                }, 0);
+
+                if (judulLoading) judulLoading.textContent = formEl.dataset.veil || 'Memproses…';
 
                 // Layar loading bersifat fixed, jadi tidak menggeser posisi halaman
                 if (layarLoading) layarLoading.classList.add('is-on');
             });
         }
+
+        pasangPengiriman(form, tombolKirim, 'Membaca…');
+        pasangPengiriman(formKonfirm, tombolKonfirm, 'Menyimpan…');
 
         /* ---------- 10. TOMBOL RESET ---------- */
         if (tombolReset) {
@@ -1204,6 +1529,10 @@
             if (tombolKirim) {
                 tombolKirim.disabled = false;
                 tombolKirim.innerHTML = isiAwalTombol;
+            }
+            if (tombolKonfirm) {
+                tombolKonfirm.innerHTML = isiAwalKonfirm;
+                tombolKonfirm.disabled = tombolKonfirm.dataset.kosong === '1';
             }
             if (layarLoading) layarLoading.classList.remove('is-on');
         });
