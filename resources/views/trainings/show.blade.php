@@ -452,7 +452,7 @@
 
     .td table {
         width: 100%;
-        min-width: 1050px;
+        min-width: 900px;
         border-collapse: collapse;
     }
 
@@ -483,6 +483,10 @@
         border-bottom: 0;
     }
 
+    .td .nowrap {
+        white-space: nowrap;
+    }
+
     .td .number {
         width: 55px;
         color: var(--slate);
@@ -490,12 +494,21 @@
     }
 
     .td .participant-name {
+        min-width: 170px;
         color: var(--navy);
         font-weight: 700;
     }
 
-    .td .muted {
-        color: #94A3B8;
+    /* kolom Pangkat/Golongan: badge ringan agar mudah dibaca */
+    .td .rank {
+        display: inline-flex;
+        padding: 4px 10px;
+        border-radius: 8px;
+        color: var(--royal);
+        background: var(--soft);
+        font-size: 11.5px;
+        font-weight: 700;
+        white-space: nowrap;
     }
 
     .td .status {
@@ -699,7 +712,7 @@
 
     $formatDate = function ($date) {
         if (!$date) {
-            return '-';
+            return null;
         }
 
         try {
@@ -709,9 +722,51 @@
         }
     };
 
-    $formatValue = function ($value) {
-        return filled($value) ? $value : '-';
-    };
+    /*
+     | Informasi pelatihan: item yang kosong TIDAK ditampilkan
+     | (tidak ada lagi tanda "-").
+     */
+    $details = collect([
+        ['Nama Pelatihan',     $training->name],
+        ['Kategori Pelatihan', $training->category?->name],
+        ['Penyelenggara',      $training->organizer],
+        ['Angkatan',           $training->batch_number ?: $training->angkatan],
+        ['Sumber Dana',        $training->funding_source ?: $training->sumber_dana],
+        ['Jumlah JPL',         $training->jpl !== null ? $training->jpl . ' JPL' : null],
+        ['Durasi',             $training->duration_days !== null ? $training->duration_days . ' Hari' : null],
+        ['Tanggal Mulai',      $formatDate($training->start_date)],
+        ['Tanggal Selesai',    $formatDate($training->end_date)],
+        ['Kabupaten/Kota',     $training->district],
+    ])->filter(fn ($row) => filled($row[1]))->values();
+
+    /*
+     | Kolom tabel peserta. Judul kolom sekarang SAMA PERSIS dengan isi sel
+     | (sebelumnya judul "Pangkat" tertukar dengan isi Jabatan).
+     | Kolom yang seluruh barisnya kosong di halaman ini disembunyikan.
+     */
+    $columns = [
+        ['key' => 'nip',                  'label' => 'NIP',            'class' => 'nowrap'],
+        ['key' => 'nik',                  'label' => 'NIK',            'class' => 'nowrap'],
+        ['key' => 'gender',               'label' => 'Jenis Kelamin',  'class' => 'nowrap'],
+        ['key' => 'profession',           'label' => 'Profesi',        'class' => ''],
+        ['key' => 'position',             'label' => 'Jabatan',        'class' => ''],
+        ['key' => 'rank',                 'label' => 'Pangkat',        'class' => 'rank'],
+        ['key' => 'institution',          'label' => 'Instansi',       'class' => ''],
+        ['key' => 'unit',                 'label' => 'Unit Kerja',     'class' => ''],
+        ['key' => 'participant_district', 'label' => 'Kabupaten/Kota', 'class' => ''],
+        ['key' => 'province',             'label' => 'Provinsi',       'class' => ''],
+        ['key' => 'certificate_number',   'label' => 'No. Sertifikat', 'class' => 'nowrap'],
+    ];
+
+    $pageRows = $participants->getCollection();
+
+    $visibleColumns = collect($columns)
+        ->filter(fn ($col) => $pageRows->contains(fn ($p) => filled($p->{$col['key']})))
+        ->values();
+
+    $showStatus = $pageRows->contains(fn ($p) => filled($p->participation_status ?? null));
+
+    $colspan = 2 + $visibleColumns->count() + ($showStatus ? 1 : 0);
 @endphp
 
 <div class="td">
@@ -835,75 +890,12 @@
 
             <div class="detail-grid">
 
-                <div class="detail-item">
-                    <div class="detail-label">Nama Pelatihan</div>
-                    <div class="detail-value">
-                        {{ $formatValue($training->name) }}
+                @foreach ($details as $row)
+                    <div class="detail-item">
+                        <div class="detail-label">{{ $row[0] }}</div>
+                        <div class="detail-value">{{ $row[1] }}</div>
                     </div>
-                </div>
-
-                <div class="detail-item">
-                    <div class="detail-label">Kategori Pelatihan</div>
-                    <div class="detail-value">
-                        {{ $training->category?->name ?? '-' }}
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <div class="detail-label">Penyelenggara</div>
-                    <div class="detail-value">
-                        {{ $formatValue($training->organizer) }}
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <div class="detail-label">Angkatan</div>
-                    <div class="detail-value">
-                        {{ $formatValue($training->batch_number ?: $training->angkatan) }}
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <div class="detail-label">Sumber Dana</div>
-                    <div class="detail-value">
-                        {{ $formatValue($training->funding_source ?: $training->sumber_dana) }}
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <div class="detail-label">Jumlah JPL</div>
-                    <div class="detail-value">
-                        {{ $training->jpl !== null ? $training->jpl . ' JPL' : '-' }}
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <div class="detail-label">Durasi</div>
-                    <div class="detail-value">
-                        {{ $training->duration_days !== null ? $training->duration_days . ' Hari' : '-' }}
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <div class="detail-label">Tanggal Mulai</div>
-                    <div class="detail-value">
-                        {{ $formatDate($training->start_date) }}
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <div class="detail-label">Tanggal Selesai</div>
-                    <div class="detail-value">
-                        {{ $formatDate($training->end_date) }}
-                    </div>
-                </div>
-
-                <div class="detail-item">
-                    <div class="detail-label">Kabupaten/Kota</div>
-                    <div class="detail-value">
-                        {{ $formatValue($training->district) }}
-                    </div>
-                </div>
+                @endforeach
 
             </div>
 
@@ -997,15 +989,14 @@
                     <tr>
                         <th>No.</th>
                         <th>Nama Peserta</th>
-                        <th>NIP</th>
-                        <th>NIK</th>
-                        <th>Jenis Kelamin</th>
-                        <th>Profesi</th>
-                        <th>Pangkat</th>
-                        <th>Instansi</th>
-                        <th>Kabupaten/Kota</th>
-                        <th>Provinsi</th>
-                        <th>Status</th>
+
+                        @foreach ($visibleColumns as $col)
+                            <th>{{ $col['label'] }}</th>
+                        @endforeach
+
+                        @if ($showStatus)
+                            <th>Status</th>
+                        @endif
                     </tr>
                 </thead>
 
@@ -1019,56 +1010,42 @@
                             </td>
 
                             <td class="participant-name">
-                                {{ $participant->participant_name ?: '-' }}
+                                {{ $participant->participant_name }}
                             </td>
 
-                            <td>{{ $participant->nip ?: '-' }}</td>
+                            @foreach ($visibleColumns as $col)
+                                @php $cell = $participant->{$col['key']}; @endphp
 
-                            <td>{{ $participant->nik ?: '-' }}</td>
+                                <td class="{{ $col['class'] === 'rank' ? '' : $col['class'] }}">
+                                    @if (filled($cell))
+                                        @if ($col['class'] === 'rank')
+                                            <span class="rank">{{ $cell }}</span>
+                                        @else
+                                            {{ $cell }}
+                                        @endif
+                                    @endif
+                                </td>
+                            @endforeach
 
-                            <td>{{ $participant->gender ?: '-' }}</td>
+                            @if ($showStatus)
+                                <td>
+                                    @php
+                                        $participantStatus = $participant->participation_status ?? '';
+                                    @endphp
 
-                            <td>{{ $participant->profession ?: '-' }}</td>
-
-                            <td>{{ $participant->position ?: '-' }}</td>
-
-                            <td>{{ $participant->rank ?: '-' }}</td>
-
-                            <td>{{ $participant->institution ?: '-' }}</td>
-
-                            <td>{{ $participant->unit ?: '-' }}</td>
-
-                            <td>{{ $participant->participant_district ?: '-' }}</td>
-
-                            <td>{{ $participant->province ?: '-' }}</td>
-
-                            <td>
-                                {{ $participant->certificate_number ?: '-' }}
-                            </td>
-
-                            <td>
-                                @php
-                                    $participantStatus = $participant->participation_status ?? '';
-                                @endphp
-
-                                @if (strtolower($participantStatus) === 'selesai')
-                                    <span class="status">
-                                        {{ $participantStatus }}
-                                    </span>
-                                @elseif ($participantStatus !== '')
-                                    <span class="status status-other">
-                                        {{ $participantStatus }}
-                                    </span>
-                                @else
-                                    <span class="muted">-</span>
-                                @endif
-                            </td>
+                                    @if (strtolower($participantStatus) === 'selesai')
+                                        <span class="status">{{ $participantStatus }}</span>
+                                    @elseif ($participantStatus !== '')
+                                        <span class="status status-other">{{ $participantStatus }}</span>
+                                    @endif
+                                </td>
+                            @endif
                         </tr>
 
                     @empty
 
                         <tr>
-                            <td colspan="14">
+                            <td colspan="{{ $colspan }}">
                                 <div class="empty">
                                     <div class="empty-icon">
                                         <svg class="i" viewBox="0 0 24 24" aria-hidden="true">

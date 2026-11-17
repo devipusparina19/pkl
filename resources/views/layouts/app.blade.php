@@ -44,6 +44,11 @@
 
     $avatarInitial = strtoupper(mb_substr(trim((string) $displayName), 0, 1));
 
+    /* [PROFIL] Foto profil (accessor avatar_url di model User) & route halaman akun */
+    $avatarUrl       = $currentUser?->avatar_url;
+    $accountRoute    = Route::has('account.edit') ? route('account.edit') : null;
+    $isAccountActive = request()->routeIs('account.*');
+
     /* Route dashboard sesuai role */
     $dashRoute = ($isSuperAdmin && Route::has('super-admin.dashboard'))
         ? 'super-admin.dashboard'
@@ -448,8 +453,14 @@
 
         .session-card {
             display: flex; align-items: center; gap: 13px; margin-bottom: 12px; padding: 12px;
+            color: inherit;
             background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 18px;
+            transition: background var(--transition), border-color var(--transition), transform var(--transition);
         }
+        /* [PROFIL] kartu sesi di sidebar kini menjadi tautan ke halaman akun */
+        a.session-card:hover { background: rgba(255,255,255,.1); border-color: rgba(120,170,255,.4); }
+        a.session-card:active { transform: scale(.99); }
+        a.session-card.active { background: rgba(52,120,246,.22); border-color: rgba(120,170,255,.45); }
         .session-card .user-avatar { width: 46px; height: 46px; flex-basis: 46px; }
         .session-meta { min-width: 0; }
         .session-meta strong {
@@ -549,10 +560,13 @@
 
         .user-info {
             display: flex; align-items: center; gap: 12px; padding: 6px 20px 6px 6px;
+            color: inherit;
             background: #fff; border: 1px solid var(--border); border-radius: 999px;
-            transition: box-shadow var(--transition), transform var(--transition);
+            transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
         }
-        .user-info:hover { box-shadow: var(--shadow-soft); transform: translateY(-1px); }
+        .user-info:hover { box-shadow: var(--shadow-soft); transform: translateY(-1px); border-color: #b9cfec; }
+        /* [PROFIL] penanda aktif saat berada di halaman akun */
+        .user-info.active { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(36,87,214,.12); }
 
         .user-avatar {
             position: relative; display: grid; place-items: center;
@@ -560,6 +574,11 @@
             color: #fff; background: linear-gradient(145deg, var(--blue), var(--navy));
             border-radius: 50%;
             font-family: var(--font-display); font-size: 16px; font-weight: 700;
+        }
+        /* [PROFIL] foto profil di dalam avatar */
+        .user-avatar img {
+            display: block; width: 100%; height: 100%;
+            object-fit: cover; border-radius: 50%;
         }
         .user-avatar.online::after {
             content: ""; position: absolute; right: 0; bottom: 0; width: 12px; height: 12px;
@@ -699,6 +718,7 @@
 
         .form-help { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; }
         .field-error { display: block; margin-top: 6px; color: #b91c1c; font-size: 13px; }
+        .field-error:empty { display: none; }
         .input-error { border-color: #dc2626; }
 
         .form-actions, .filter-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
@@ -914,6 +934,8 @@
     <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5M12 3v12"/></symbol>
     <symbol id="icon-report" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></symbol>
     <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    {{-- [PROFIL] ikon kartu identitas untuk menu Pengaturan Akun --}}
+    <symbol id="icon-account" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 17a3.5 3.5 0 0 1 7 0M15 9h4M15 13h4"/></symbol>
     <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
     <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></symbol>
     <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
@@ -1030,13 +1052,30 @@
 
             {{-- SESI + KELUAR --}}
             <div class="sidebar-bottom">
-                <div class="session-card">
-                    <div class="user-avatar online" aria-hidden="true">{{ $avatarInitial }}</div>
+                {{-- [PROFIL] kartu sesi = tautan ke halaman Pengaturan Akun (route yang sama dengan header) --}}
+                @if ($accountRoute)
+                    <a href="{{ $accountRoute }}" class="session-card {{ $isAccountActive ? 'active' : '' }}"
+                       aria-label="Buka pengaturan akun {{ $displayName }}"
+                       @if ($isAccountActive) aria-current="page" @endif>
+                @else
+                    <div class="session-card">
+                @endif
+                    <div class="user-avatar online" aria-hidden="true">
+                        @if ($avatarUrl)
+                            <img src="{{ $avatarUrl }}" alt="" width="46" height="46" decoding="async">
+                        @else
+                            {{ $avatarInitial }}
+                        @endif
+                    </div>
                     <div class="session-meta">
                         <strong>{{ $displayName }}</strong>
                         <span>{{ $roleLabel }}</span>
                     </div>
-                </div>
+                @if ($accountRoute)
+                    </a>
+                @else
+                    </div>
+                @endif
 
                 <form action="{{ route('logout') }}" method="POST" data-no-loading>
                     @csrf
@@ -1089,14 +1128,31 @@
                     </div>
                 </div>
 
-                <div class="user-info">
-                    <div class="user-avatar online" aria-hidden="true">{{ $avatarInitial }}</div>
+                {{-- [PROFIL] kartu pengguna di header = tautan ke halaman Pengaturan Akun --}}
+                @if ($accountRoute)
+                    <a href="{{ $accountRoute }}" class="user-info {{ $isAccountActive ? 'active' : '' }}"
+                       aria-label="Buka pengaturan akun {{ $displayName }}"
+                       @if ($isAccountActive) aria-current="page" @endif>
+                @else
+                    <div class="user-info">
+                @endif
+                    <div class="user-avatar online" aria-hidden="true">
+                        @if ($avatarUrl)
+                            <img src="{{ $avatarUrl }}" alt="" width="46" height="46" decoding="async">
+                        @else
+                            {{ $avatarInitial }}
+                        @endif
+                    </div>
 
                     <div class="user-details">
                         <span class="user-name">{{ $displayName }}</span>
                         <span class="role-label">{{ $roleLabel }}</span>
                     </div>
-                </div>
+                @if ($accountRoute)
+                    </a>
+                @else
+                    </div>
+                @endif
             </div>
 
         </header>

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ParticipantController;
@@ -126,6 +127,42 @@ Route::middleware('auth')->group(function () {
 
 
     /*
+    | PROFIL / PENGATURAN AKUN (BARU)
+    |
+    | Dapat diakses SEMUA role yang sudah login (super admin, admin,
+    | pimpinan) untuk mengelola akunnya SENDIRI. Sengaja tanpa middleware
+    | role. Controller selalu memakai $request->user(), bukan ID dari input.
+    | Dipakai oleh tautan Profil di Sidebar dan Header (route: account.edit).
+    */
+
+    Route::prefix('akun')
+        ->name('account.')
+        ->group(function () {
+
+            Route::get('/', [AccountController::class, 'edit'])
+                ->name('edit');
+
+            Route::put('/informasi', [AccountController::class, 'update'])
+                ->name('update');
+
+            Route::get('/foto/{user}', [AccountController::class, 'showPhoto'])
+                ->whereNumber('user')
+                ->name('photo.show');
+
+            Route::post('/foto', [AccountController::class, 'updatePhoto'])
+                ->middleware('throttle:20,1')
+                ->name('photo.update');
+
+            Route::delete('/foto', [AccountController::class, 'destroyPhoto'])
+                ->name('photo.destroy');
+
+            Route::put('/password', [AccountController::class, 'updatePassword'])
+                ->middleware('throttle:10,1')
+                ->name('password.update');
+        });
+
+
+    /*
     | DATA PESERTA: ADMIN
     */
 
@@ -200,11 +237,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/imports', [ImportController::class, 'index'])
             ->name('imports.index');
 
-        // BARU: membaca file dan menampilkan pratinjau (tanpa menyimpan data).
+        // Membaca file dan menampilkan pratinjau (tanpa menyimpan data).
         Route::post('/imports/preview', [ImportController::class, 'preview'])
             ->name('imports.preview');
 
-        // BARU: membatalkan pratinjau dan membuang file sementara.
+        // Membatalkan pratinjau dan membuang file sementara.
         Route::post('/imports/cancel', [ImportController::class, 'cancel'])
             ->name('imports.cancel');
 
