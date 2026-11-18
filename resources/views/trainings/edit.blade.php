@@ -17,6 +17,7 @@
         --electric: #3478f6; --soft: #eaf2ff; --ice: #f3f7fc;
         --slate: #64748b; --ink: #14243a; --line: #e1e9f2; --cyan: #38c6e8;
         --red: #b42333; --red-soft: #fef2f2; --red-line: #fecaca;
+        --warning: #946200; --warning-bg: #fff7e6; --warning-line: #f5dca6;
         --f-display: 'Sora', system-ui, sans-serif;
         --f-body: 'Plus Jakarta Sans', system-ui, sans-serif;
         --ease: cubic-bezier(.2, .7, .3, 1);
@@ -184,6 +185,35 @@
     .tr-error svg { width: 16px; height: 16px; margin-top: 2px; }
 
     /* =====================================================
+       DURASI MANUAL
+    ===================================================== */
+    .tr-duration-box {
+        padding: 22px; border: 1.5px solid var(--line); border-radius: 18px;
+        background: var(--ice);
+    }
+    .tr-duration-box.is-manual { border-color: var(--warning-line); background: var(--warning-bg); }
+
+    .tr-duration-row { display: grid; gap: 22px 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .tr-badge {
+        display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px;
+        border-radius: 999px; background: var(--warning-bg); color: var(--warning);
+        border: 1px solid var(--warning-line); font-size: 12px; font-weight: 700;
+    }
+    .tr-badge svg { width: 13px; height: 13px; }
+
+    .tr-hint { margin: 8px 0 0; color: var(--slate); font-size: 13px; line-height: 1.6; }
+    .tr-hint b { color: var(--navy); }
+
+    .tr-reset {
+        margin-top: 10px; padding: 0; border: 0; background: none; cursor: pointer;
+        color: var(--royal); font-size: 13px; font-weight: 700; text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+    .tr-reset:hover { color: var(--navy); }
+    .tr-reset[hidden] { display: none; }
+
+    /* =====================================================
        AKSI
     ===================================================== */
     .tr-footer {
@@ -230,6 +260,7 @@
     @media (max-width: 640px) {
         .tr-hero { border-radius: 18px; }
         .tr-grid { grid-template-columns: 1fr; gap: 20px; }
+        .tr-duration-row { grid-template-columns: 1fr; gap: 20px; }
         .tr-full { grid-column: auto; }
         .tr .tr-control { height: 54px; }
         .tr-footer { flex-direction: column; align-items: stretch; }
@@ -245,6 +276,16 @@
         .tr.is-js [data-reveal] { opacity: 1; transform: none; }
     }
 </style>
+
+@php
+    // Durasi hasil import Excel (tidak pernah diubah oleh form ini)
+    $importedDuration = $training->duration_days;
+
+    // Nilai awal input: manual jika ada, selain itu nilai dari Excel
+    $durationValue = old('duration_manual', $training->effective_duration);
+
+    $isManual = $training->is_duration_manual;
+@endphp
 
 <div class="tr" id="tr">
 
@@ -510,7 +551,7 @@
             <div class="tr-section-head">
                 <span class="tr-num">03</span>
                 <h2 id="trTime">Waktu &amp; Durasi</h2>
-                <p>Atur jadwal pelaksanaan dan jumlah jam pelajaran.</p>
+                <p>Atur jadwal pelaksanaan, durasi hari, dan jumlah jam pelajaran.</p>
             </div>
 
             <div class="tr-grid">
@@ -552,6 +593,65 @@
                     @error('end_date')
                         <p class="tr-error">{{ $message }}</p>
                     @enderror
+                </div>
+
+                {{-- DURASI (EDIT MANUAL) --}}
+                <div class="tr-field tr-full">
+                    <div class="tr-duration-box {{ $isManual ? 'is-manual' : '' }}" id="durationBox">
+
+                        <div class="tr-duration-row">
+
+                            <div class="tr-field">
+                                <label for="duration_manual">
+                                    Durasi (Hari)
+                                </label>
+
+                                <div class="tr-suffix-wrap">
+                                    <input
+                                        id="duration_manual"
+                                        type="number"
+                                        name="duration_manual"
+                                        value="{{ $durationValue }}"
+                                        min="0"
+                                        max="365"
+                                        step="1"
+                                        data-original="{{ $importedDuration }}"
+                                        class="tr-control @error('duration_manual') input-error @enderror"
+                                        placeholder="Contoh: 5"
+                                        @error('duration_manual') aria-invalid="true" @enderror
+                                    >
+                                    <span class="tr-suffix" aria-hidden="true">Hari</span>
+                                </div>
+
+                                @error('duration_manual')
+                                    <p class="tr-error">{{ $message }}</p>
+                                @enderror
+
+                                <p class="tr-hint">
+                                    @if ($importedDuration !== null)
+                                        Durasi dari Excel: <b>{{ $importedDuration }} hari</b>.
+                                    @else
+                                        Belum ada durasi dari Excel.
+                                    @endif
+                                    Ubah jika ada hari libur, tanggal merah, atau hari nonaktif.
+                                    Tanggal mulai &amp; selesai tidak ikut berubah.
+                                </p>
+
+                                @if ($importedDuration !== null)
+                                    <button
+                                        type="button"
+                                        class="tr-reset"
+                                        id="resetDuration"
+                                        @unless ($isManual) hidden @endunless
+                                    >
+                                        Kembalikan ke durasi Excel ({{ $importedDuration }} hari)
+                                    </button>
+                                @endif
+                            </div>
+
+                        </div>
+
+                    </div>
                 </div>
 
                 {{-- JPL --}}
@@ -666,6 +766,39 @@
         }, { passive: true });
 
         update();
+
+        /* Durasi manual: penanda & tombol kembalikan */
+        const durationInput = page.querySelector('#duration_manual');
+        const durationBox   = page.querySelector('#durationBox');
+        const durationBadge = page.querySelector('#durationBadge');
+        const resetButton   = page.querySelector('#resetDuration');
+
+        function refreshDurationState() {
+            if (!durationInput) {
+                return;
+            }
+
+            const original = durationInput.dataset.original;
+            const current  = durationInput.value;
+            const isManual = current !== '' && original !== '' && current !== original;
+
+            if (durationBox)   durationBox.classList.toggle('is-manual', isManual);
+            if (durationBadge) durationBadge.hidden = !isManual;
+            if (resetButton)   resetButton.hidden = !isManual;
+        }
+
+        if (durationInput) {
+            durationInput.addEventListener('input', refreshDurationState);
+            refreshDurationState();
+        }
+
+        if (resetButton && durationInput) {
+            resetButton.addEventListener('click', function () {
+                durationInput.value = durationInput.dataset.original;
+                refreshDurationState();
+                durationInput.focus();
+            });
+        }
 
         /* Cegah pengiriman berulang */
         const form = page.querySelector('#trainingForm');

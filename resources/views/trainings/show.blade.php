@@ -28,6 +28,7 @@
         --ok-bg: #E8F6EF;
         --warning: #946200;
         --warning-bg: #FFF7E6;
+        --warning-line: #F5DCA6;
         --font-display: "Sora", "Segoe UI", Arial, sans-serif;
         --font-body: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
         --ease: cubic-bezier(.2, .7, .2, 1);
@@ -229,6 +230,11 @@
         box-shadow: 0 8px 25px rgba(8,27,51,.035);
     }
 
+    .td .stat.is-manual {
+        border-color: var(--warning-line);
+        background: var(--warning-bg);
+    }
+
     .td .stat-icon {
         display: grid;
         place-items: center;
@@ -239,6 +245,11 @@
         color: var(--royal);
         background: var(--soft);
         font-size: 22px;
+    }
+
+    .td .stat.is-manual .stat-icon {
+        color: var(--warning);
+        background: white;
     }
 
     .td .stat small {
@@ -256,6 +267,38 @@
         font-size: 23px;
         font-weight: 800;
         line-height: 1.3;
+    }
+
+    /* PENANDA DURASI MANUAL */
+
+    .td .badge-manual {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-left: 8px;
+        padding: 2px 9px;
+        border: 1px solid var(--warning-line);
+        border-radius: 999px;
+        color: var(--warning);
+        background: var(--warning-bg);
+        font-family: var(--font-body);
+        font-size: 11px;
+        font-weight: 700;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .td .badge-manual svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .td .detail-sub {
+        margin-top: 4px;
+        color: var(--slate);
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1.5;
     }
 
     /* PANEL */
@@ -723,6 +766,13 @@
     };
 
     /*
+     | Durasi: nilai efektif = manual (jika ada) atau hasil import Excel.
+     */
+    $effectiveDuration = $training->effective_duration;
+    $isDurationManual  = $training->is_duration_manual;
+    $importedDuration  = $training->duration_days;
+
+    /*
      | Informasi pelatihan: item yang kosong TIDAK ditampilkan
      | (tidak ada lagi tanda "-").
      */
@@ -733,16 +783,15 @@
         ['Angkatan',           $training->batch_number ?: $training->angkatan],
         ['Sumber Dana',        $training->funding_source ?: $training->sumber_dana],
         ['Jumlah JPL',         $training->jpl !== null ? $training->jpl . ' JPL' : null],
-        ['Durasi',             $training->duration_days !== null ? $training->duration_days . ' Hari' : null],
+        ['Durasi',             $effectiveDuration !== null ? $effectiveDuration . ' Hari' : null],
         ['Tanggal Mulai',      $formatDate($training->start_date)],
         ['Tanggal Selesai',    $formatDate($training->end_date)],
         ['Kabupaten/Kota',     $training->district],
     ])->filter(fn ($row) => filled($row[1]))->values();
 
     /*
-     | Kolom tabel peserta. Judul kolom sekarang SAMA PERSIS dengan isi sel
-     | (sebelumnya judul "Pangkat" tertukar dengan isi Jabatan).
-     | Kolom yang seluruh barisnya kosong di halaman ini disembunyikan.
+     | Kolom tabel peserta. Kolom yang seluruh barisnya kosong
+     | di halaman ini disembunyikan.
      */
     $columns = [
         ['key' => 'nip',                  'label' => 'NIP',            'class' => 'nowrap'],
@@ -800,6 +849,14 @@
                 Kembali
             </a>
 
+            <a href="{{ route('trainings.edit', $training) }}#duration_manual" class="btn btn-outline">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                Edit Durasi
+            </a>
+
             <a href="{{ route('trainings.edit', $training) }}" class="btn btn-light">
                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 20h9"/>
@@ -813,7 +870,7 @@
     {{-- STATISTIK --}}
     <section class="stats">
 
-        <div class="stat">
+        <div class="stat {{ $isDurationManual ? 'is-manual' : '' }}">
             <div class="stat-icon">
                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
                     <rect x="3" y="4" width="18" height="17" rx="2"/>
@@ -822,9 +879,15 @@
             </div>
 
             <div>
-                <small>Durasi Pelatihan</small>
-                <strong>{{ $training->duration_days ?? 0 }}</strong>
-                <small>Hari</small>
+                <small>
+                    Durasi Pelatihan
+                    @if ($isDurationManual)
+                    @endif
+                </small>
+                <strong>{{ $effectiveDuration ?? 0 }}</strong>
+                <small>
+                    Hari pelatihan dilaksanakan
+                </small>
             </div>
         </div>
 
@@ -893,7 +956,23 @@
                 @foreach ($details as $row)
                     <div class="detail-item">
                         <div class="detail-label">{{ $row[0] }}</div>
-                        <div class="detail-value">{{ $row[1] }}</div>
+
+                        <div class="detail-value">
+                            {{ $row[1] }}
+
+                            @if ($row[0] === 'Durasi' && $isDurationManual)
+                            @endif
+                        </div>
+
+                        @if ($row[0] === 'Durasi' && $isDurationManual)
+                            <div class="detail-sub">
+                                @if ($importedDuration !== null)
+                                    pelatihan dilaksanakan
+                                @endif
+                                @if (filled($training->duration_note))
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 @endforeach
 

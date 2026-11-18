@@ -339,6 +339,19 @@ class TrainingController extends Controller
                 'nullable',
                 'string',
             ],
+
+            // [BARU] Penyesuaian durasi manual.
+            'duration_manual' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:365',
+            ],
+            'duration_note' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
         ], [
             'name.required' => 'Nama pelatihan wajib diisi.',
             'training_category_id.required' => 'Kategori pelatihan wajib dipilih.',
@@ -347,13 +360,64 @@ class TrainingController extends Controller
             'end_date.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
             'jpl.integer' => 'JPL harus berupa angka.',
             'jpl.min' => 'JPL tidak boleh kurang dari 0.',
+            'duration_manual.integer' => 'Durasi harus berupa angka bulat.',
+            'duration_manual.min' => 'Durasi tidak boleh kurang dari 0 hari.',
+            'duration_manual.max' => 'Durasi tidak boleh lebih dari 365 hari.',
         ]);
 
-        // Menghitung ulang durasi pelatihan.
-        $validated['duration_days'] = $this->calculateDuration(
-            $validated['start_date'],
-            $validated['end_date'] ?? null
-        );
+        // [DIUBAH] Durasi dari Excel hanya dihitung ulang jika tanggal
+        // berubah atau nilainya belum ada. Jika tidak, nilai Excel dibiarkan.
+        $newStart = Carbon::parse($validated['start_date']);
+        $newEnd = !empty($validated['end_date'])
+            ? Carbon::parse($validated['end_date'])
+            : null;
+
+        $startChanged = !$training->start_date
+            || !$training->start_date->isSameDay($newStart);
+
+        $endChanged = ($training->end_date === null) !== ($newEnd === null)
+            || ($newEnd !== null && !$training->end_date->isSameDay($newEnd));
+
+        if ($startChanged || $endChanged || $training->duration_days === null) {
+            $validated['duration_days'] = $this->calculateDuration(
+                $validated['start_date'],
+                $validated['end_date'] ?? null
+            );
+        }
+
+        // Nilai dasar (Excel / hitungan otomatis) sebagai pembanding.
+        $baseDuration = $validated['duration_days'] ?? $training->duration_days;
+
+        // [BARU] Proses durasi manual.
+        $manual = $request->filled('duration_manual')
+            ? (int) $request->input('duration_manual')
+            : null;
+
+        $note = $request->input('duration_note');
+
+        unset($validated['duration_manual'], $validated['duration_note']);
+
+        // Jika sama dengan durasi dasar, anggap tidak ada penyesuaian.
+        if ($manual !== null && $manual === (int) $baseDuration) {
+            $manual = null;
+        }
+
+        if ($manual !== null) {
+            $validated['duration_manual'] = $manual;
+            $validated['duration_note'] = filled($note) ? $note : null;
+
+            // Catat waktu & admin hanya jika nilainya benar-benar berubah.
+            if ($manual !== $training->duration_manual) {
+                $validated['duration_adjusted_at'] = now();
+                $validated['duration_adjusted_by'] = auth()->id();
+            }
+        } else {
+            // Kembali ke durasi dasar (Excel).
+            $validated['duration_manual'] = null;
+            $validated['duration_note'] = null;
+            $validated['duration_adjusted_at'] = null;
+            $validated['duration_adjusted_by'] = null;
+        }
 
         $training->update($validated);
 

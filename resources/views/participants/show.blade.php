@@ -16,6 +16,7 @@
         --navy: #081b33; --midnight: #0b2545; --royal: #2457d6;
         --electric: #3478f6; --soft: #eaf2ff; --ice: #f3f7fc;
         --slate: #64748b; --ink: #14243a; --line: #e1e9f2; --cyan: #38c6e8;
+        --warning: #946200; --warning-bg: #fff7e6; --warning-line: #f5dca6;
         --f-display: 'Sora', system-ui, sans-serif;
         --f-body: 'Plus Jakarta Sans', system-ui, sans-serif;
         --ease: cubic-bezier(.2, .7, .3, 1);
@@ -226,6 +227,19 @@
     .pf-meta dd { margin: 0; color: var(--ink); font-size: 14px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
     .pf-meta .wide { grid-column: span 2; }
 
+    /* Penanda durasi diubah manual */
+    .pf-badge-manual {
+        display: inline-flex; align-items: center; gap: 4px;
+        margin-left: 6px; padding: 1px 8px;
+        border: 1px solid var(--warning-line); border-radius: 999px;
+        background: var(--warning-bg); color: var(--warning);
+        font-size: 11px; font-weight: 700; white-space: nowrap;
+        vertical-align: middle;
+    }
+    .pf-badge-manual svg { width: 11px; height: 11px; }
+
+    .pf-sub { display: block; margin-top: 2px; color: var(--slate); font-size: 12px; font-weight: 500; }
+
     /* Kosong */
     .pf-empty {
         padding: 44px 22px; border: 1.5px dashed #a6bddb; border-radius: 18px;
@@ -275,8 +289,10 @@
 
     $totalHistories = $participant->histories->count();
 
+    // [DIUBAH] Total hari memakai durasi efektif:
+    // durasi manual (hasil edit pelatihan) jika ada, selain itu durasi Excel.
     $totalTrainingDays = $participant->histories->sum(
-        fn ($history) => $history->training?->duration_days ?? 0
+        fn ($history) => $history->training?->effective_duration ?? 0
     );
 
     $initials = collect(
@@ -439,6 +455,10 @@
 
                         @php
                             $training = $history->training;
+
+                            // [BARU] Durasi efektif + penanda manual per pelatihan.
+                            $effectiveDuration = $training?->effective_duration ?? 0;
+                            $isDurationManual  = (bool) $training?->is_duration_manual;
                         @endphp
 
                         <li class="pf-item" data-reveal>
@@ -488,7 +508,17 @@
                                     </div>
                                     <div>
                                         <dt>Durasi</dt>
-                                        <dd>{{ $training?->duration_days ?? 0 }} hari</dd>
+                                        <dd>
+                                            {{ $effectiveDuration }} hari
+
+                                            @if ($isDurationManual)
+                                            
+
+                                                @if ($training?->duration_days !== null)
+                                                    <span class="pf-sub">pelatihan dilaksanakan</span>
+                                                @endif
+                                            @endif
+                                        </dd>
                                     </div>
                                 </dl>
 
