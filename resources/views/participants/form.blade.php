@@ -16,7 +16,7 @@
         --navy: #081b33; --midnight: #0b2545; --royal: #2457d6;
         --electric: #3478f6; --soft: #eaf2ff; --ice: #f3f7fc;
         --slate: #64748b; --ink: #14243a; --line: #e1e9f2; --cyan: #38c6e8;
-        --red: #b42333; --red-soft: #fef2f2;
+        --red: #b42333; --red-soft: #fef2f2; --red-line: #fecaca;
         --f-display: 'Sora', system-ui, sans-serif;
         --f-body: 'Plus Jakarta Sans', system-ui, sans-serif;
         --ease: cubic-bezier(.2, .7, .3, 1);
@@ -126,6 +126,18 @@
     .fm-notice strong { display: block; color: var(--navy); font-size: 15px; }
     .fm-notice p { margin: 4px 0 0; color: #40536a; font-size: 14px; line-height: 1.7; }
 
+    /* Alert error (ringkasan validasi) */
+    .fm-alert {
+        display: flex; align-items: flex-start; gap: 14px; margin-bottom: 28px;
+        padding: 18px 20px; color: var(--red);
+        border: 1px solid var(--red-line); border-left: 4px solid #d74747;
+        border-radius: 14px; background: var(--red-soft); font-size: 14px; line-height: 1.7;
+    }
+    .fm-alert > svg { width: 22px; height: 22px; margin-top: 2px; }
+    .fm-alert strong { display: block; font-family: var(--f-display); font-size: 16px; font-weight: 700; }
+    .fm-alert ul { margin: 8px 0 0; padding-left: 20px; }
+    .fm-alert li { overflow-wrap: anywhere; }
+
     /* =====================================================
        FORM — SECTION SPLIT
     ===================================================== */
@@ -153,6 +165,7 @@
 
     .fm-grid { display: grid; gap: 22px 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .fm-field { min-width: 0; }
+    .fm-full { grid-column: 1 / -1; }
 
     .fm-field label {
         display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
@@ -173,6 +186,8 @@
     .fm .fm-control[aria-invalid="true"] { border-color: #e48a93; background: var(--red-soft); }
 
     .fm select.fm-control { padding-right: 40px; cursor: pointer; }
+
+    .fm-hint { display: block; margin-top: 8px; color: var(--slate); font-size: 12px; line-height: 1.6; }
 
     .fm-error {
         display: flex; align-items: flex-start; gap: 7px;
@@ -225,6 +240,7 @@
     @media (max-width: 640px) {
         .fm-hero { border-radius: 18px; }
         .fm-grid { grid-template-columns: 1fr; gap: 20px; }
+        .fm-full { grid-column: auto; }
         .fm .fm-control { height: 54px; }
         .fm-footer { flex-direction: column; align-items: stretch; }
         .fm-actions { flex-direction: column-reverse; align-items: stretch; }
@@ -275,7 +291,7 @@
                 <ul class="fm-guide">
                     @foreach ([
                         'Gunakan nama lengkap sesuai identitas resmi.',
-                        'Pastikan NIP tidak salah ketik.',
+                        'Pastikan NIK tidak salah ketik.',
                         'Gunakan alamat email yang masih aktif.',
                         'Pilih Kabupaten/Kota/Mitra/Mandiri sesuai asal atau wilayah kerja peserta.',
                     ] as $tip)
@@ -307,12 +323,38 @@
             </svg>
 
             <div>
-                <strong>Informasi identitas akun peserta</strong>
+                <strong>Informasi identitas peserta</strong>
                 <p>
-                    Nama lengkap dan NIP digunakan sebagai identitas peserta.
+                    Nama lengkap dan NIK digunakan sebagai identitas peserta.
                     Pastikan kedua informasi tersebut ditulis dengan benar
                     sebelum menyimpan data.
                 </p>
+            </div>
+        </div>
+    @endif
+
+    {{-- =================================================
+         RINGKASAN ERROR VALIDASI
+    ================================================== --}}
+    @if ($errors->any())
+        <div class="fm-alert" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4"/>
+                <path d="M12 16h.01"/>
+            </svg>
+
+            <div>
+                <strong>Data belum dapat disimpan.</strong>
+                <span>Periksa kembali bagian berikut:</span>
+
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         </div>
     @endif
@@ -343,13 +385,14 @@
 
             <div class="fm-grid">
 
+                {{-- Nama (WAJIB) --}}
                 <div class="fm-field">
                     <label for="name">Nama Lengkap <span class="fm-req" aria-hidden="true">*</span></label>
                     <input
                         class="fm-control" id="name" name="name" type="text"
                         value="{{ old('name', $participant->name) }}"
                         maxlength="255" placeholder="Masukkan nama lengkap"
-                        autocomplete="name" required
+                        autocomplete="name" required aria-required="true"
                         @error('name') aria-invalid="true" @enderror
                     >
                     @error('name')
@@ -357,12 +400,14 @@
                     @enderror
                 </div>
 
+                {{-- NIK (WAJIB) --}}
                 <div class="fm-field">
-                    <label for="nik">NIK <span class="fm-opt">Opsional</span></label>
+                    <label for="nik">NIK <span class="fm-req" aria-hidden="true">*</span></label>
                     <input
                         class="fm-control" id="nik" name="nik" type="text"
                         value="{{ old('nik', $participant->nik) }}"
                         maxlength="30" inputmode="numeric" placeholder="Masukkan NIK"
+                        required aria-required="true"
                         @error('nik') aria-invalid="true" @enderror
                     >
                     @error('nik')
@@ -370,12 +415,13 @@
                     @enderror
                 </div>
 
+                {{-- NIP (OPSIONAL) --}}
                 <div class="fm-field">
-                    <label for="nip">NIP <span class="fm-req" aria-hidden="true">*</span></label>
+                    <label for="nip">NIP <span class="fm-opt">Opsional</span></label>
                     <input
                         class="fm-control" id="nip" name="nip" type="text"
                         value="{{ old('nip', $participant->nip) }}"
-                        maxlength="30" placeholder="Masukkan NIP" required
+                        maxlength="30" placeholder="Masukkan NIP"
                         @error('nip') aria-invalid="true" @enderror
                     >
                     @error('nip')
@@ -383,10 +429,12 @@
                     @enderror
                 </div>
 
+                {{-- Jenis Kelamin (WAJIB) --}}
                 <div class="fm-field">
-                    <label for="gender">Jenis Kelamin <span class="fm-opt">Opsional</span></label>
+                    <label for="gender">Jenis Kelamin <span class="fm-req" aria-hidden="true">*</span></label>
                     <select
                         class="fm-control" id="gender" name="gender"
+                        required aria-required="true"
                         @error('gender') aria-invalid="true" @enderror
                     >
                         <option value="">-- Pilih Jenis Kelamin --</option>
@@ -411,6 +459,7 @@
 
             <div class="fm-grid">
 
+                {{-- Pangkat (OPSIONAL) --}}
                 <div class="fm-field">
                     <label for="rank">Pangkat/Golongan <span class="fm-opt">Opsional</span></label>
                     <input
@@ -424,6 +473,7 @@
                     @enderror
                 </div>
 
+                {{-- Profesi (OPSIONAL) --}}
                 <div class="fm-field">
                     <label for="profession">Profesi Tenaga Kesehatan <span class="fm-opt">Opsional</span></label>
                     <input
@@ -437,12 +487,14 @@
                     @enderror
                 </div>
 
+                {{-- Instansi (WAJIB) --}}
                 <div class="fm-field">
-                    <label for="institution">Instansi/Unit Kerja <span class="fm-opt">Opsional</span></label>
+                    <label for="institution">Instansi/Unit Kerja <span class="fm-req" aria-hidden="true">*</span></label>
                     <input
                         class="fm-control" id="institution" name="institution" type="text"
                         value="{{ old('institution', $participant->institution) }}"
                         maxlength="255" placeholder="Masukkan nama instansi"
+                        required aria-required="true"
                         @error('institution') aria-invalid="true" @enderror
                     >
                     @error('institution')
@@ -450,10 +502,12 @@
                     @enderror
                 </div>
 
+                {{-- Kabupaten/Kota (WAJIB) --}}
                 <div class="fm-field">
                     <label for="district">Kabupaten/Kota/Mitra/Mandiri <span class="fm-req" aria-hidden="true">*</span></label>
                     <select
-                        class="fm-control" id="district" name="district" required
+                        class="fm-control" id="district" name="district"
+                        required aria-required="true"
                         @error('district') aria-invalid="true" @enderror
                     >
                         <option value="">-- Pilih wilayah --</option>
@@ -468,12 +522,15 @@
                             >
                                 {{ $district }}
                             </option>
-                            <small style="display:block; margin-top:8px; color:#64748b; font-size:12px;">
-    Wilayah ini merupakan data asal/wilayah kerja peserta.
-    Perubahan akan memperbarui data peserta dan menjadi acuan rekapitulasi laporan serta dashboard.
-</small>
                         @endforeach
                     </select>
+
+                    <small class="fm-hint">
+                        Wilayah ini merupakan data asal/wilayah kerja peserta.
+                        Perubahan akan memperbarui data peserta dan menjadi acuan
+                        rekapitulasi laporan serta dashboard.
+                    </small>
+
                     @error('district')
                         <small class="fm-error">{{ $message }}</small>
                     @enderror
@@ -492,13 +549,15 @@
 
             <div class="fm-grid">
 
+                {{-- Email (WAJIB) --}}
                 <div class="fm-field">
                     <label for="email">Alamat Email <span class="fm-req" aria-hidden="true">*</span></label>
                     <input
                         class="fm-control" id="email" name="email" type="email"
                         value="{{ old('email', $participant->email) }}"
                         maxlength="255" autocomplete="email"
-                        placeholder="nama@email.com" required
+                        placeholder="nama@email.com"
+                        required aria-required="true"
                         @error('email') aria-invalid="true" @enderror
                     >
                     @error('email')
@@ -506,6 +565,7 @@
                     @enderror
                 </div>
 
+                {{-- Telepon (OPSIONAL) --}}
                 <div class="fm-field">
                     <label for="phone">Nomor Telepon <span class="fm-opt">Opsional</span></label>
                     <input
@@ -535,8 +595,8 @@
                 </svg>
 
                 <span>
-                    Kolom bertanda <b>*</b> wajib diisi. Periksa kembali data
-                    sebelum menyimpan.
+                    Kolom bertanda <b>*</b> wajib diisi. Kolom <b style="color:#7a8aa0;">Opsional</b>
+                    boleh dikosongkan. Periksa kembali data sebelum menyimpan.
                 </span>
             </div>
 
@@ -618,7 +678,6 @@
 
         update();
 
-        /* Kirim form: cegah klik ganda */
         const form = page.querySelector('#participantForm');
         const submitButton = page.querySelector('#saveParticipantButton');
 
@@ -626,6 +685,41 @@
             return;
         }
 
+        /* Pesan validasi browser dalam bahasa Indonesia */
+        const labels = {
+            name: 'Nama lengkap',
+            nik: 'NIK',
+            gender: 'Jenis kelamin',
+            institution: 'Instansi/Unit kerja',
+            district: 'Kabupaten/Kota/Mitra/Mandiri',
+            email: 'Alamat email'
+        };
+
+        function applyMessage(field) {
+            field.setCustomValidity('');
+
+            if (field.validity.valueMissing) {
+                const label = labels[field.name] || 'Kolom ini';
+                const verb = field.tagName === 'SELECT' ? 'wajib dipilih.' : 'wajib diisi.';
+                field.setCustomValidity(label + ' ' + verb);
+            } else if (field.validity.typeMismatch && field.type === 'email') {
+                field.setCustomValidity('Format email tidak valid. Contoh: nama@email.com.');
+            }
+        }
+
+        form.querySelectorAll('input, select').forEach(function (field) {
+            field.addEventListener('invalid', function () { applyMessage(field); });
+            field.addEventListener('input', function () {
+                field.setCustomValidity('');
+                field.removeAttribute('aria-invalid');
+            });
+            field.addEventListener('change', function () {
+                field.setCustomValidity('');
+                field.removeAttribute('aria-invalid');
+            });
+        });
+
+        /* Kirim form: cegah klik ganda */
         const originalButtonContent = submitButton.innerHTML;
 
         form.addEventListener('submit', function (event) {
