@@ -10,9 +10,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 /*
- | Catatan: kolom `avatar` sengaja TIDAK dimasukkan ke Fillable.
- | Kolom itu hanya diisi langsung oleh AccountController (foto profil),
- | sehingga tidak bisa dimanipulasi lewat mass assignment dari form lain.
+ | Catatan: kolom `avatar` dan `must_change_password` sengaja TIDAK dimasukkan
+ | ke Fillable. Keduanya hanya diisi langsung lewat forceFill() oleh
+ | AccountController / alur reset password, sehingga tidak bisa dimanipulasi
+ | lewat mass assignment dari form lain.
  */
 #[Fillable([
     'name',
@@ -36,6 +37,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'must_change_password' => 'boolean',
+            'password_changed_at' => 'datetime',
         ];
     }
 

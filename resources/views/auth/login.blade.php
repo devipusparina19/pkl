@@ -490,6 +490,19 @@
         .toggle-password:hover { background: var(--soft); color: var(--royal); }
         .toggle-password svg { width: 21px; height: 21px; }
 
+        /* Tautan Lupa password */
+        .forgot-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+        .forgot-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 4px;
+            color: var(--royal);
+            font-size: 14px;
+            font-weight: 700;
+            transition: color .25s;
+        }
+        .forgot-link:hover { color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+
         /* Submit */
         .btn-login {
             position: relative;
@@ -823,6 +836,10 @@
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
                         </button>
+                    </div>
+
+                    <div class="forgot-row">
+                        <a class="forgot-link" href="{{ route('password.forgot') }}">Lupa password?</a>
                     </div>
                 </div>
 

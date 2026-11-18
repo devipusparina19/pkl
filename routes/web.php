@@ -14,6 +14,8 @@ use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\MasterDataController;
 use App\Http\Controllers\PublicTrainingHistoryController;
 use App\Http\Controllers\TrainingHistoryExportController;
+use App\Http\Controllers\PasswordRecoveryController;
+use App\Http\Controllers\SuperAdmin\PasswordResetRequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,6 +110,13 @@ Route::middleware('guest')->group(function () {
         ->whereIn('role', ['super-admin', 'admin', 'pimpinan'])
         ->middleware('throttle:5,1')
         ->name('login.store');
+
+            Route::get('/lupa-password', [PasswordRecoveryController::class, 'create'])
+        ->name('password.forgot');
+
+    Route::post('/lupa-password', [PasswordRecoveryController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('password.forgot.store');
 });
 
 
@@ -117,7 +126,7 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'password.changed'])->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
@@ -327,6 +336,18 @@ Route::middleware('auth')->group(function () {
             Route::delete('/users/{user}', [SuperAdminController::class, 'destroyUser'])
                 ->whereNumber('user')
                 ->name('users.destroy');
+
+                        Route::get('/password-resets', [PasswordResetRequestController::class, 'index'])
+                ->name('password-resets.index');
+
+            Route::post('/password-resets/{passwordReset}/approve', [PasswordResetRequestController::class, 'approve'])
+                ->whereNumber('passwordReset')
+                ->middleware('throttle:20,1')
+                ->name('password-resets.approve');
+
+            Route::post('/password-resets/{passwordReset}/reject', [PasswordResetRequestController::class, 'reject'])
+                ->whereNumber('passwordReset')
+                ->name('password-resets.reject');
         });
 
 

@@ -74,6 +74,7 @@
                 ['type' => 'group', 'route' => 'super-admin.master-data.index', 'pattern' => 'super-admin.master-data.*', 'icon' => 'icon-settings', 'label' => 'Master Data'],
                 ['type' => 'link',  'route' => 'roles.index',                   'pattern' => 'roles.*',              'icon' => 'icon-shield',   'label' => 'Role dan Hak Akses'],
                 ['type' => 'link',  'route' => 'activity-logs.index',           'pattern' => 'activity-logs.*',      'icon' => 'icon-activity', 'label' => 'Log Aktivitas'],
+                ['type' => 'link',  'route' => 'super-admin.password-resets.index', 'pattern' => 'super-admin.password-resets.*', 'icon' => 'icon-shield', 'label' => 'Reset Password'],
             ],
         ];
     }
