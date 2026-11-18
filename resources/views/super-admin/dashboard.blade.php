@@ -202,7 +202,7 @@
 
             <p>
                 Pusat kendali akun pengguna dan konfigurasi data master.
-                Kelola akses serta referensi sistem SIRAPIK dalam satu
+                Kelola akses serta referensi sistem ARTA dalam satu
                 ruang pengelolaan yang terintegrasi.
             </p>
         </div>
@@ -339,7 +339,7 @@
 
                 <p class="sa-desc">
                     Kelola data referensi yang digunakan sebagai pilihan dan
-                    acuan pada berbagai fitur SIRAPIK.
+                    acuan pada berbagai fitur ARTA.
                 </p>
 
                 <p class="sa-detail">

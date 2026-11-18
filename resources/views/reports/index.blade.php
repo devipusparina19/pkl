@@ -86,19 +86,13 @@ html.rp-lock{overflow:hidden}
 .rp-lead{max-width:760px;margin:0;font-size:17px;line-height:1.75;color:rgba(255,255,255,.88)}
 .rp-head-actions{display:flex;flex-wrap:wrap;gap:10px}
 
-/* filter aktif + pengubah filter */
-.rp-filterbox{margin-top:16px;border:1px solid var(--border);border-radius:20px;background:#fff;box-shadow:0 10px 30px rgba(8,27,51,.05)}
-.rp-filterbox>summary{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;padding:14px 20px;cursor:pointer;list-style:none;border-radius:20px}
-.rp-filterbox>summary::-webkit-details-marker{display:none}
-.rp-filterbox>summary::marker{content:""}
-.rp-fb-title{display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-size:14.5px;font-weight:700;color:var(--navy)}
+/* FILTER: selalu tampil (tidak bisa dilipat) */
+.rp-filterbox{margin-top:16px;border:1px solid var(--border);border-radius:20px;background:#fff;box-shadow:0 10px 30px rgba(8,27,51,.05);overflow:hidden}
+.rp-fb-head{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--ice)}
+.rp-fb-title{display:inline-flex;align-items:center;gap:8px;margin:0;font-family:var(--display);font-size:14.5px;font-weight:700;color:var(--navy)}
 .rp-fb-title .i{font-size:18px;color:var(--royal)}
 .rp-fb-chips{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0}
 .rp-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--soft);color:var(--royal);font-size:13.5px;font-weight:700}
-.rp-fb-toggle{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:7px 14px;border-radius:10px;background:var(--ice);color:var(--royal);font-size:14px;font-weight:700}
-.rp-fb-toggle .i{font-size:16px;transition:transform .25s var(--ease)}
-.rp-filterbox[open] .rp-fb-toggle .i{transform:rotate(180deg)}
-.rp-filterbox[open]>summary{border-bottom:1px solid var(--border);border-radius:20px 20px 0 0}
 .rp-filter{padding:clamp(16px,2.4vw,24px)}
 .rp-filter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:end}
 .rp-field{min-width:0}
@@ -371,7 +365,6 @@ html.rp-lock{overflow:hidden}
 }
 @media (max-width:760px){
     .rp-notes{grid-template-columns:1fr}
-    .rp-fb-toggle{margin-left:0}
 }
 @media (max-width:700px){
     .rp-kpis{grid-template-columns:1fr}
@@ -636,27 +629,22 @@ html.rp-lock{overflow:hidden}
             </div>
         </header>
 
-        {{-- FILTER: filter aktif selalu terlihat, formulir dibuka lewat tombol --}}
-        <details class="rp-filterbox" id="filter" @if ($errors->any()) open @endif>
-            <summary>
-                <span class="rp-fb-title">
+        {{-- FILTER: selalu tampil, tidak disembunyikan --}}
+        <section class="rp-filterbox" id="filter" aria-labelledby="rpFilterTitle">
+            <div class="rp-fb-head">
+                <h2 class="rp-fb-title" id="rpFilterTitle">
                     <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>
                     Filter laporan
-                </span>
+                </h2>
 
-                <span class="rp-fb-chips">
+                <span class="rp-fb-chips" aria-label="Filter yang sedang aktif">
                     <span class="rp-chip">Tahun {{ $year }}</span>
                     <span class="rp-chip">{{ $minimumLabel }}</span>
                     @if ($districtFilter !== '') <span class="rp-chip">{{ $districtFilter }}</span> @endif
                     @if ($institutionFilter !== '') <span class="rp-chip">{{ $institutionFilter }}</span> @endif
                     @if ($search !== '') <span class="rp-chip">Kata kunci: {{ $search }}</span> @endif
                 </span>
-
-                <span class="rp-fb-toggle">
-                    Ubah filter
-                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-                </span>
-            </summary>
+            </div>
 
             <div class="rp-filter">
                 <form method="GET" action="{{ route('reports.index') }}" data-keep-scroll>
@@ -723,7 +711,7 @@ html.rp-lock{overflow:hidden}
                     </div>
                 </form>
             </div>
-        </details>
+        </section>
 
         {{-- INDIKATOR UTAMA --}}
         <div class="rp-kpis" role="list" aria-label="Indikator utama">

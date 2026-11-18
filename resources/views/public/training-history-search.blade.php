@@ -407,7 +407,7 @@
                         <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                     </span>
                     <div>
-                        <strong>Isi dua kolom</strong>
+                        <strong>Isi kolom</strong>
                         <span class="d">Tidak perlu membuat akun atau masuk terlebih dahulu.</span>
                     </div>
                 </li>
@@ -442,7 +442,7 @@
                 <span class="eyebrow">Untuk Peserta Pelatihan</span>
                 <h2 id="form-title">Cari riwayat <em>pelatihan</em></h2>
                 <p>
-                    Isi kedua kolom sesuai identitas pada KTP. NIK harus
+                    Isi kolom sesuai identitas pada KTP. NIK harus
                     cocok dengan data peserta yang terdaftar.
                 </p>
             </div>
