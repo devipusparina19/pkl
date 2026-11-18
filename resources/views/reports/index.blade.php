@@ -178,7 +178,7 @@ html.rp-lock{overflow:hidden}
 .rp-time-go .i{font-size:15px;transition:transform .2s var(--ease)}
 .rp-time:hover .rp-time-go .i{transform:translate(2px,-2px)}
 
-/* GENDER */
+/* GENDER (diagram pie penuh) */
 .rp-gender-wrap{display:grid;grid-template-columns:1fr;gap:22px;justify-items:center}
 .rp-chart-box{position:relative;width:100%;max-width:250px;height:250px}
 .rp-gender-info{width:100%}
@@ -240,7 +240,7 @@ html.rp-lock{overflow:hidden}
 .rp-fund-ico{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:var(--soft);color:var(--royal);font-size:20px;flex:none}
 .rp-fund h3{margin:0;font-family:var(--display);font-size:1.1rem;font-weight:700;line-height:1.3;color:var(--navy);overflow-wrap:anywhere}
 .rp-fund-badge{margin-left:auto;padding:2px 10px;border-radius:999px;background:var(--royal);color:#fff;font-size:12.5px;font-weight:700;white-space:nowrap}
-.rp-fund-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.rp-fund-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .rp-stat{display:flex;flex-direction:column;gap:2px;min-width:0}
 .rp-stat>span{font-size:13.5px;font-weight:600;color:var(--slate)}
 .rp-fund-foot{margin-top:auto;display:grid;gap:12px}
@@ -372,7 +372,7 @@ html.rp-lock{overflow:hidden}
     .rp-filter-actions{display:grid;grid-template-columns:1fr;height:auto}
     .rp-filter-actions .rp-btn,.rp-head-actions .rp-btn{width:100%}
     .rp-pager .rp-btn{width:auto}
-    .rp-fund-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .rp-fund-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
     .rp-gender-wrap{grid-template-columns:1fr}
     .rp-seg{width:100%}
     .rp-seg button{flex:1;padding:0 8px}
@@ -400,7 +400,7 @@ html.rp-lock{overflow:hidden}
 }
 @media (max-width:420px){
     .rp-times{grid-template-columns:1fr}
-    .rp-fund-stats{grid-template-columns:1fr}
+    .rp-fund-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion:reduce){
     .report-page *,.report-page *::before,.report-page *::after,.rp-drawer *{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
@@ -428,6 +428,17 @@ html.rp-lock{overflow:hidden}
     $participants = $participants ?? collect();
 
     $year = $year ?? now()->year;
+
+    /*
+     * PALET WARNA DIAGRAM PIE
+     * Sama persis dengan ReportExportSupport::PALETTE (Excel & PDF).
+     */
+    $piePalette = array_map(
+        fn ($c) => '#' . $c,
+        class_exists(\App\Exports\ReportExportSupport::class)
+            ? \App\Exports\ReportExportSupport::PALETTE
+            : ['1F4FD8', 'E02424', '16A34A', 'F59E0B', '7C3AED', '06B6D4', '374151', 'EC4899']
+    );
 
     /*
      * FILTER KEIKUTSERTAAN: dibaca langsung dari URL agar pilihan
@@ -544,10 +555,11 @@ html.rp-lock{overflow:hidden}
         ->filter(fn ($r) => (int) data_get($r, 'times', 0) >= 2)
         ->sum(fn ($r) => (int) data_get($r, 'total_participants', 0));
 
+    // Teks "N kali keikutsertaan" dihapus dari ringkasan.
     $conclusion = $totalTrainings > 0
         ? 'Sesuai filter yang dipilih, tahun ' . $year . ' tercatat ' . $formatNumber($totalTrainings)
             . ' kegiatan pelatihan yang diikuti ' . $formatNumber($totalTrainedParticipants)
-            . ' peserta (' . $formatNumber($totalParticipations) . ' kali keikutsertaan).'
+            . ' peserta.'
             . ($fundingTop
                 ? ' Sumber dana terbesar adalah ' . data_get($fundingTop, 'funding_source') . ' dengan ' . $fundingTopShare . '% dari seluruh kegiatan.'
                 : '')
@@ -858,7 +870,7 @@ html.rp-lock{overflow:hidden}
                         <div class="rp-gender-wrap">
                             <div class="rp-chart-box">
                                 <canvas id="reportGenderChart" role="img"
-                                    aria-label="Diagram peserta laki-laki {{ $maleCount }} orang dan perempuan {{ $femaleCount }} orang"></canvas>
+                                    aria-label="Diagram pie peserta laki-laki {{ $maleCount }} orang dan perempuan {{ $femaleCount }} orang"></canvas>
                             </div>
 
                             <div class="rp-gender-info">
@@ -867,12 +879,12 @@ html.rp-lock{overflow:hidden}
 
                                 <ul class="rp-gender-list">
                                     <li>
-                                        <span class="rp-dot" style="background:#2457D6" aria-hidden="true"></span>
+                                        <span class="rp-dot" style="background:{{ $piePalette[0] }}" aria-hidden="true"></span>
                                         <div><b>Laki-laki</b><span>{{ $formatNumber($maleCount) }} orang</span></div>
                                         <em>{{ number_format($malePercent, 1, ',', '.') }}%</em>
                                     </li>
                                     <li>
-                                        <span class="rp-dot" style="background:#0E8FB3" aria-hidden="true"></span>
+                                        <span class="rp-dot" style="background:{{ $piePalette[1] }}" aria-hidden="true"></span>
                                         <div><b>Perempuan</b><span>{{ $formatNumber($femaleCount) }} orang</span></div>
                                         <em>{{ number_format($femalePercent, 1, ',', '.') }}%</em>
                                     </li>
@@ -939,7 +951,7 @@ html.rp-lock{overflow:hidden}
     <section class="rp-section rp-reveal" id="sumber-dana" aria-labelledby="rp-fund-title">
         <div class="rp-section-head">
             <h2 id="rp-fund-title">Dari mana pembiayaannya?</h2>
-            <p>Jumlah kegiatan, peserta, dan keikutsertaan untuk setiap sumber dana tahun {{ $year }}.</p>
+            <p>Jumlah kegiatan dan peserta untuk setiap sumber dana tahun {{ $year }}.</p>
             @if ($hasDetailRoute)
                 <span class="rp-hint">
                     <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
@@ -972,7 +984,6 @@ html.rp-lock{overflow:hidden}
                         <div class="rp-fund-stats">
                             <div class="rp-stat"><span>Kegiatan</span>{{ $count($funding->total_trainings, '', 'lg') }}</div>
                             <div class="rp-stat"><span>Peserta</span>{{ $count($funding->total_participants, '', 'lg') }}</div>
-                            <div class="rp-stat"><span>Keikutsertaan</span>{{ $count($funding->total_participations, '', 'lg') }}</div>
                         </div>
 
                         <div class="rp-fund-foot">
@@ -1165,7 +1176,7 @@ html.rp-lock{overflow:hidden}
     </section>
 
     {{-- ============================================================
-         8. DAFTAR PESERTA
+         8. DAFTAR PESERTA (kolom Keikutsertaan tetap dipertahankan)
          ============================================================ --}}
     <section class="rp-section rp-reveal" id="peserta" aria-labelledby="rp-freq-title">
         <div class="rp-section-head">
@@ -1582,6 +1593,8 @@ html.rp-lock{overflow:hidden}
 
 /* ======================================================================
    PANEL RINCIAN
+   Informasi "Keikutsertaan" tidak ditampilkan di panel ini, kecuali pada
+   rincian satu peserta yang dibuka dari Daftar Peserta (view = participant).
    ====================================================================== */
 (function () {
     var root = document.getElementById('reportPage');
@@ -1632,6 +1645,11 @@ html.rp-lock{overflow:hidden}
         if (cls) node.className = cls;
         if (text !== undefined && text !== null) node.textContent = text;
         return node;
+    }
+
+    // Label/keterangan yang menyangkut keikutsertaan
+    function isParticipation(label) {
+        return /ikut\s*serta|keikutsertaan/i.test(String(label || ''));
     }
 
     var nf = new Intl.NumberFormat('id-ID');
@@ -1820,7 +1838,8 @@ html.rp-lock{overflow:hidden}
         return b;
     }
 
-    function participantItem(r, showCount) {
+    // Daftar peserta di panel rincian: tanpa jumlah keikutsertaan.
+    function participantItem(r) {
         var b = el('button', 'rp-li');
         b.type = 'button';
         b.setAttribute('data-q', [r.name, r.nik, r.nip, r.institution, r.district, r.profession].join(' ').toLowerCase());
@@ -1837,13 +1856,6 @@ html.rp-lock{overflow:hidden}
         if (r.district) meta.appendChild(el('span', '', r.district));
         main.appendChild(meta);
         b.appendChild(main);
-
-        if (showCount) {
-            var count = el('span', 'rp-li-count');
-            count.appendChild(el('b', '', nf.format(r.participations) + '×'));
-            count.appendChild(el('small', '', 'ikut'));
-            b.appendChild(count);
-        }
 
         var go = el('span', 'rp-li-go');
         go.innerHTML = ICON_GO;
@@ -1863,21 +1875,30 @@ html.rp-lock{overflow:hidden}
         var data = entry.data;
         setHeader(KICKERS[data.view] || 'Rincian', data.title, data.subtitle, entry);
 
+        // Keikutsertaan disembunyikan di semua rincian, kecuali rincian satu peserta.
+        var hideTimes = data.view !== 'participant';
+
+        var summaryItems = (data.summary || []).filter(function (item) {
+            return !(hideTimes && isParticipation(item.label));
+        });
+
         elSummary.textContent = '';
-        (data.summary || []).forEach(function (item) {
+        summaryItems.forEach(function (item) {
             var box = el('div', 'rp-sum-item');
             box.appendChild(el('b', '', nf.format(item.value)));
             box.appendChild(el('span', '', item.label));
             elSummary.appendChild(box);
         });
-        elSummary.hidden = !(data.summary && data.summary.length);
+        elSummary.hidden = !summaryItems.length;
         elNote.hidden = !filtersActive;
 
         elBody.textContent = '';
         elBody.scrollTop = 0;
 
         // Keterangan yang kosong tidak ditampilkan (tanpa tanda "-").
-        var infoItems = (data.info || []).filter(function (item) { return item.value; });
+        var infoItems = (data.info || []).filter(function (item) {
+            return item.value && !(hideTimes && isParticipation(item.label));
+        });
         if (infoItems.length) {
             var dl = el('dl', 'rp-info');
             infoItems.forEach(function (item) {
@@ -1911,7 +1932,7 @@ html.rp-lock{overflow:hidden}
             if (data.view === 'trainings' || data.view === 'participant') {
                 item = trainingItem(r, data.view === 'trainings');
             } else {
-                item = participantItem(r, data.view === 'participants');
+                item = participantItem(r);
             }
 
             list.appendChild(item);
@@ -2142,7 +2163,7 @@ html.rp-lock{overflow:hidden}
 })();
 </script>
 
-{{-- DIAGRAM DONAT JENIS KELAMIN --}}
+{{-- DIAGRAM PIE PENUH JENIS KELAMIN --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
 <script>
@@ -2155,44 +2176,54 @@ document.addEventListener('DOMContentLoaded', function () {
     var total = male + female;
     if (total <= 0) return;
 
-    // Total peserta di tengah donat
-    var centerText = {
-        id: 'centerText',
-        afterDraw: function (chart) {
-            var area = chart.chartArea;
+    // Palet sama dengan Excel & PDF (ReportExportSupport::PALETTE)
+    var palette = @json($piePalette);
+
+    // Persentase di dalam irisan
+    var percentLabel = {
+        id: 'percentLabel',
+        afterDatasetsDraw: function (chart) {
             var ctx = chart.ctx;
-            var cx = (area.left + area.right) / 2;
-            var cy = (area.top + area.bottom) / 2;
+            var meta = chart.getDatasetMeta(0);
+            var values = chart.data.datasets[0].data;
 
             ctx.save();
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#081B33';
-            ctx.font = '800 28px "Sora","Segoe UI",Arial,sans-serif';
-            ctx.fillText(total.toLocaleString('id-ID'), cx, cy - 8);
-            ctx.fillStyle = '#56657A';
-            ctx.font = '600 13px "Plus Jakarta Sans","Segoe UI",Arial,sans-serif';
-            ctx.fillText('peserta', cx, cy + 16);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '700 14px "Plus Jakarta Sans","Segoe UI",Arial,sans-serif';
+
+            meta.data.forEach(function (arc, i) {
+                var value = Number(values[i]) || 0;
+                if (value <= 0) return;
+
+                var pos = arc.tooltipPosition();
+                var pct = (value / total * 100).toFixed(1).replace('.', ',') + '%';
+                ctx.fillText(pct, pos.x, pos.y);
+            });
+
             ctx.restore();
         }
     };
 
     new Chart(canvas, {
-        type: 'doughnut',
+        type: 'pie',
         data: {
             labels: ['Laki-laki', 'Perempuan'],
             datasets: [{
                 data: [male, female],
-                backgroundColor: ['#2457D6', '#0E8FB3'],
+                backgroundColor: [palette[0], palette[1]],
                 borderColor: '#FFFFFF',
-                borderWidth: 3,
+                borderWidth: 2,
                 hoverOffset: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '64%',
+            rotation: 0,
+            circumference: 360,
+            layout: { padding: 8 },
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -2206,7 +2237,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         },
-        plugins: [centerText]
+        plugins: [percentLabel]
     });
 });
 </script>
