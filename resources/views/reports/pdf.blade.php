@@ -143,6 +143,9 @@
 @php
     $sistem = 'ARTA - Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan';
 
+    /* Hapus kolom Keikutsertaan (Rincian Sumber Dana) + judul pie baru (sama dengan Excel) */
+    $report = \App\Exports\ReportExportSupport::normalize($report ?? []);
+
     $meta     = $report['meta'] ?? [];
     $kpis     = $report['kpis'] ?? [];
     $tables   = $report['tables'] ?? [];
@@ -173,8 +176,8 @@
         };
     };
 
-    /* Warna irisan pie (sama dengan Excel) */
-    $palette = ['#2457D6', '#0E8FB3', '#38C6E8', '#173D86', '#3478F6', '#64748B', '#081B33', '#9DB7E8'];
+    /* Warna irisan pie: sumber yang sama persis dengan Excel */
+    $palette = array_map(fn ($c) => '#' . $c, \App\Exports\ReportExportSupport::PALETTE);
 
     /* Pie penuh sebagai SVG */
     $makePie = function (array $slices, float $sum) {
@@ -217,7 +220,7 @@
         }
 
         $slices = [];
-        foreach ($t['rows'] as $i => $row) {
+        foreach (array_values($t['rows']) as $i => $row) {
             $slices[] = [
                 'label' => (string) ($row['cells'][$t['pie']['label']] ?? '-'),
                 'value' => (float) ($row['cells'][$t['pie']['value']] ?? 0),

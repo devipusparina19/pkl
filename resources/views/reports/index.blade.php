@@ -735,15 +735,6 @@ html.rp-lock{overflow:hidden}
 
             <div class="rp-kpi" role="listitem">
                 <div class="rp-kpi-top">
-                    <span class="rp-kpi-ico" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
-                    <span class="rp-kpi-label">Total Keikutsertaan</span>
-                </div>
-                <div class="rp-kpi-value"><span class="rp-counter" data-target="{{ $totalParticipations }}">{{ $formatNumber($totalParticipations) }}</span><small>kali</small></div>
-                <p class="rp-kpi-desc">Jumlah seluruh keikutsertaan. Satu orang bisa ikut lebih dari satu pelatihan.</p>
-            </div>
-
-            <div class="rp-kpi" role="listitem">
-                <div class="rp-kpi-top">
                     <span class="rp-kpi-ico" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg></span>
                     <span class="rp-kpi-label">Jenis Pelatihan</span>
                 </div>

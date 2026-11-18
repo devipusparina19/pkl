@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithCharts;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use Maatwebsite\Excel\Concerns\WithDrawings;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Events\AfterSheet;
@@ -23,6 +24,7 @@ use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
@@ -31,7 +33,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
  * Dipakai untuk dua jenis ekspor:
  *  - Ringkasan : statistik + rekap frekuensi, tanpa identitas peserta (details kosong)
  *  - Lengkap   : semua isi ringkasan + daftar peserta + rincian (details terisi)
- * Tanpa kop surat dan tanpa logo.
+ * Kop surat dan logo sama dengan hasil ekspor PDF.
  *
  * Payload (disiapkan ReportController::workbookPayload):
  *  meta     : year, minimum, minimum_label?, district, institution, search,
@@ -49,6 +51,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
     WithTitle,
     WithEvents,
     WithCharts,
+    WithDrawings,
     WithCustomValueBinder
 {
     private const SHEET = 'Laporan';
@@ -57,13 +60,12 @@ class ReportWorkbookExport extends DefaultValueBinder implements
     private const BLACK = '000000';
     private const SYSTEM = 'ARTA - Aplikasi Rekam Riwayat Pelatihan Tenaga Kesehatan';
     private const DEFAULT_TITLE = 'LAPORAN EKSEKUTIF RIWAYAT PELATIHAN';
+    private const LOGO = 'images/LOGO PROVINSI KALIMANTAN SELATAN.png';
 
     /** Lebar kolom A..L */
     private const WIDTHS = [5, 20, 18, 13, 17, 13, 24, 11, 11, 11, 14, 13];
 
-    /** Warna irisan pie */
-    private const PALETTE = ['2457D6', '0E8FB3', '38C6E8', '173D86', '3478F6', '64748B', '081B33', '9DB7E8'];
-
+    private array $report = [];
     private array $grid = [];
     private array $merges = [];
     private array $styles = [];
@@ -80,8 +82,10 @@ class ReportWorkbookExport extends DefaultValueBinder implements
     private int $lastRow = 1;
     private int $letter = 0;
 
-    public function __construct(private array $report)
+    public function __construct(array $report)
     {
+        // Hapus kolom Keikutsertaan (Rincian Sumber Dana) + judul pie baru
+        $this->report = ReportExportSupport::normalize($report);
         $this->build();
     }
 
@@ -116,6 +120,27 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         }
 
         return parent::bindValue($cell, $value);
+    }
+
+    /** Logo di kop (posisi kiri, sama seperti PDF). */
+    public function drawings(): array
+    {
+        $path = public_path(self::LOGO);
+
+        if (!is_file($path)) {
+            return [];
+        }
+
+        $logo = new Drawing();
+        $logo->setName('Logo Provinsi Kalimantan Selatan');
+        $logo->setDescription('Logo Provinsi Kalimantan Selatan');
+        $logo->setPath($path);
+        $logo->setHeight(82);
+        $logo->setCoordinates('A1');
+        $logo->setOffsetX(12);
+        $logo->setOffsetY(14);
+
+        return [$logo];
     }
 
     public function charts(): array
@@ -179,7 +204,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
     }
 
     /** Semua font selalu hitam. */
-    private function font(int $size = 10, bool $bold = false, bool $italic = false, bool $underline = false): array
+    private function font(int|float $size = 10, bool $bold = false, bool $italic = false, bool $underline = false): array
     {
         $font = [
             'name' => 'Arial',
@@ -280,6 +305,7 @@ class ReportWorkbookExport extends DefaultValueBinder implements
 
     private function build(): void
     {
+        $this->kop();
         $this->heading();
         $this->info();
 
@@ -332,7 +358,56 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         $this->finish();
     }
 
-    /** Judul laporan saja (tanpa kop surat, logo, dan tanggal surat). */
+    /**
+     * Kop surat: sama dengan PDF (logo kiri via drawings(), teks di tengah,
+     * garis pemisah, dan tanggal "Banjarbaru, ...").
+     */
+    private function kop(): void
+    {
+        $lines = [
+            ['PEMERINTAH PROVINSI KALIMANTAN SELATAN', 13, true, 19],
+            ['DINAS KESEHATAN', 13, true, 19],
+            ['UPTD BALAI PELATIHAN KESEHATAN', 15, true, 22],
+            ['Jalan H. Mistar Tjokrokusumo No. 5A Banjarbaru Kode Pos 70714', 8, false, 12],
+            ['Telepon : (0511) 477201', 8, false, 12],
+            ['Email : info@bapelkes.kalselprov.go.id     Website : www.bapelkes.kalselprov.go.id', 8, false, 12],
+        ];
+
+        foreach ($lines as [$text, $size, $bold, $height]) {
+            $r = $this->cursor;
+            $this->cell($r, 1, $text);
+            $this->merge($r, 1, self::COLS);
+            $this->style($r, 1, $r, self::COLS, [
+                'font' => $this->font($size, $bold),
+                'alignment' => $this->align(Alignment::HORIZONTAL_CENTER, false),
+            ]);
+            $this->heights[$r] = $height;
+            $this->cursor++;
+        }
+
+        // Garis kop
+        $r = $this->cursor;
+        $this->merge($r, 1, self::COLS);
+        $this->style($r, 1, $r, self::COLS, [
+            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => self::BLACK]]],
+        ]);
+        $this->heights[$r] = 5;
+        $this->cursor++;
+
+        // Tanggal surat (rata kanan)
+        $tanggal = Carbon::now('Asia/Makassar')->locale('id')->translatedFormat('d F Y');
+        $r = $this->cursor;
+        $this->cell($r, 1, 'Banjarbaru, ' . $tanggal);
+        $this->merge($r, 1, self::COLS);
+        $this->style($r, 1, $r, self::COLS, [
+            'font' => $this->font(10),
+            'alignment' => $this->align(Alignment::HORIZONTAL_RIGHT, false),
+        ]);
+        $this->heights[$r] = 20;
+        $this->cursor += 2;
+    }
+
+    /** Judul laporan. */
     private function heading(): void
     {
         $year = (string) ($this->report['meta']['year'] ?? '');
@@ -596,6 +671,15 @@ class ReportWorkbookExport extends DefaultValueBinder implements
         }
 
         if (!empty($t['pie'])) {
+            // Nilai disimpan juga agar warna tiap irisan pasti tertulis di file Excel
+            $labels = [];
+            $values = [];
+            foreach (array_values($rows) as $row) {
+                $lv = $row['cells'][$t['pie']['label']] ?? '';
+                $labels[] = ($lv === null || $lv === '') ? '-' : (string) $lv;
+                $values[] = (float) ($row['cells'][$t['pie']['value']] ?? 0);
+            }
+
             $this->chartSpecs[] = [
                 'name' => $t['pie']['name'] ?? ('chart' . (count($this->chartSpecs) + 1)),
                 'title' => $t['pie']['title'] ?? 'Diagram',
@@ -604,6 +688,8 @@ class ReportWorkbookExport extends DefaultValueBinder implements
                 'first' => $first,
                 'last' => $last,
                 'header' => $header,
+                'labels' => $labels,
+                'values' => $values,
             ];
         }
 
@@ -687,12 +773,28 @@ class ReportWorkbookExport extends DefaultValueBinder implements
             null,
             1
         )];
-        $categories = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, $ref($s['labelCol'], $s['first'], $s['last']), null, $n)];
-        $values = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, $ref($s['valueCol'], $s['first'], $s['last']), null, $n)];
 
+        $categories = [new DataSeriesValues(
+            DataSeriesValues::DATASERIES_TYPE_STRING,
+            $ref($s['labelCol'], $s['first'], $s['last']),
+            null,
+            $n,
+            $s['labels']
+        )];
+
+        $values = [new DataSeriesValues(
+            DataSeriesValues::DATASERIES_TYPE_NUMBER,
+            $ref($s['valueCol'], $s['first'], $s['last']),
+            null,
+            $n,
+            $s['values']
+        )];
+
+        // Warna per irisan: palet yang sama dengan PDF (ReportExportSupport::PALETTE)
+        $palette = ReportExportSupport::PALETTE;
         $colors = [];
         for ($i = 0; $i < $n; $i++) {
-            $colors[] = self::PALETTE[$i % count(self::PALETTE)];
+            $colors[] = $palette[$i % count($palette)];
         }
         $values[0]->setFillColor($colors);
 
