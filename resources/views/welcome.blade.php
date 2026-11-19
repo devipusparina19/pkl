@@ -1051,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', function () {
         labels: ['Laki-laki', 'Perempuan'],
         datasets: [{
           data: [maleCount, femaleCount],
-          backgroundColor: ['#2457D6', '#38C6E8'],
+          backgroundColor: ['#2457D6', '#E04255'],
           borderColor: '#ffffff',
           borderWidth: 4,
           hoverOffset: 10

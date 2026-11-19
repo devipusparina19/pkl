@@ -176,7 +176,8 @@
         };
     };
 
-    /* Warna irisan pie: sumber yang sama persis dengan Excel */
+    /* Warna irisan pie: sumber yang sama persis dengan Excel.
+       Laki-laki biru dan perempuan merah (sama dengan dashboard). */
     $palette = array_map(fn ($c) => '#' . $c, \App\Exports\ReportExportSupport::PALETTE);
 
     /* Pie penuh sebagai SVG */
@@ -221,10 +222,12 @@
 
         $slices = [];
         foreach (array_values($t['rows']) as $i => $row) {
+            $sliceLabel = (string) ($row['cells'][$t['pie']['label']] ?? '-');
+
             $slices[] = [
-                'label' => (string) ($row['cells'][$t['pie']['label']] ?? '-'),
+                'label' => $sliceLabel,
                 'value' => (float) ($row['cells'][$t['pie']['value']] ?? 0),
-                'fill'  => $palette[$i % count($palette)],
+                'fill'  => '#' . \App\Exports\ReportExportSupport::colorFor($sliceLabel, $i),
             ];
         }
 

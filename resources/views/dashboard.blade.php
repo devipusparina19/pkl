@@ -182,6 +182,8 @@
 .da-leg b{display:block;font:700 15px/1.4 var(--f-display);color:var(--navy)}
 .da-leg .pct{font:800 clamp(24px,2.6vw,32px)/1 var(--f-display);letter-spacing:-.04em;color:var(--navy);font-variant-numeric:tabular-nums}
 .da-leg .da-bar{grid-column:1/-1;margin-top:-2px}
+.da-leg.female .da-bar{background:#fde8eb}
+.da-leg.female .da-bar i{background:linear-gradient(90deg,#C22F43,#F0707F)}
 .da-stage{position:relative;display:grid;place-items:center;padding:clamp(16px,3vw,36px);border-radius:var(--r-lg);background:#fff;border:1px solid var(--border);box-shadow:0 20px 50px rgba(8,27,51,.06)}
 .da-chart{position:relative;width:100%;max-width:440px;aspect-ratio:1}
 .da-chart canvas{display:block;width:100%!important;height:100%!important}
@@ -505,8 +507,8 @@
                                 <span class="da-bar"><i style="--w: {{ $malePercent }}%"></i></span>
                             </div>
 
-                            <div class="da-leg" data-idx="1">
-                                <i style="background:#38c6e8"></i>
+                            <div class="da-leg female" data-idx="1">
+                                <i style="background:#E04255"></i>
                                 <div>
                                     <small>Perempuan</small>
                                     <b>{{ number_format($femaleCount, 0, ',', '.') }} peserta</b>
@@ -1009,7 +1011,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var total = maleCount + femaleCount;
     if (total <= 0) return;
 
-    var labelColors = ['#FFFFFF', '#081B33'];
+    var labelColors = ['#FFFFFF', '#FFFFFF'];
 
     // persentase di dalam irisan
     var pctLabels = {
@@ -1040,8 +1042,8 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: ['Laki-laki', 'Perempuan'],
             datasets: [{
                 data: [maleCount, femaleCount],
-                backgroundColor: ['#2457D6', '#38C6E8'],
-                hoverBackgroundColor: ['#1B45B0', '#1FB0D3'],
+                backgroundColor: ['#2457D6', '#E04255'],
+                hoverBackgroundColor: ['#1B45B0', '#C22F43'],
                 borderColor: '#FFFFFF',
                 borderWidth: 4,
                 hoverOffset: 14

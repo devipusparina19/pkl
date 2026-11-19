@@ -432,13 +432,23 @@ html.rp-lock{overflow:hidden}
     /*
      * PALET WARNA DIAGRAM PIE
      * Sama persis dengan ReportExportSupport::PALETTE (Excel & PDF).
+     * Dua warna pertama sama dengan dashboard admin & publik.
      */
     $piePalette = array_map(
         fn ($c) => '#' . $c,
         class_exists(\App\Exports\ReportExportSupport::class)
             ? \App\Exports\ReportExportSupport::PALETTE
-            : ['1F4FD8', 'E02424', '16A34A', 'F59E0B', '7C3AED', '06B6D4', '374151', 'EC4899']
+            : ['2457D6', 'E04255', '16A34A', 'F59E0B', '7C3AED', '06B6D4', '374151', 'EC4899']
     );
+
+    /*
+     * WARNA JENIS KELAMIN: sama dengan dashboard admin, dashboard publik,
+     * Excel, dan PDF. Laki-laki biru, perempuan merah.
+     */
+    $genderMaleColor = '#' . (class_exists(\App\Exports\ReportExportSupport::class)
+        ? \App\Exports\ReportExportSupport::GENDER_MALE : '2457D6');
+    $genderFemaleColor = '#' . (class_exists(\App\Exports\ReportExportSupport::class)
+        ? \App\Exports\ReportExportSupport::GENDER_FEMALE : 'E04255');
 
     /*
      * FILTER KEIKUTSERTAAN: dibaca langsung dari URL agar pilihan
@@ -879,12 +889,12 @@ html.rp-lock{overflow:hidden}
 
                                 <ul class="rp-gender-list">
                                     <li>
-                                        <span class="rp-dot" style="background:{{ $piePalette[0] }}" aria-hidden="true"></span>
+                                        <span class="rp-dot" style="background:{{ $genderMaleColor }}" aria-hidden="true"></span>
                                         <div><b>Laki-laki</b><span>{{ $formatNumber($maleCount) }} orang</span></div>
                                         <em>{{ number_format($malePercent, 1, ',', '.') }}%</em>
                                     </li>
                                     <li>
-                                        <span class="rp-dot" style="background:{{ $piePalette[1] }}" aria-hidden="true"></span>
+                                        <span class="rp-dot" style="background:{{ $genderFemaleColor }}" aria-hidden="true"></span>
                                         <div><b>Perempuan</b><span>{{ $formatNumber($femaleCount) }} orang</span></div>
                                         <em>{{ number_format($femalePercent, 1, ',', '.') }}%</em>
                                     </li>
@@ -2176,8 +2186,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var total = male + female;
     if (total <= 0) return;
 
-    // Palet sama dengan Excel & PDF (ReportExportSupport::PALETTE)
-    var palette = @json($piePalette);
+    // Warna sama dengan dashboard admin & publik, Excel, dan PDF:
+    // laki-laki biru, perempuan merah
+    var genderColors = @json([$genderMaleColor, $genderFemaleColor]);
 
     // Persentase di dalam irisan
     var percentLabel = {
@@ -2212,7 +2223,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: ['Laki-laki', 'Perempuan'],
             datasets: [{
                 data: [male, female],
-                backgroundColor: [palette[0], palette[1]],
+                backgroundColor: genderColors,
                 borderColor: '#FFFFFF',
                 borderWidth: 2,
                 hoverOffset: 6

@@ -790,11 +790,11 @@ class ReportWorkbookExport extends DefaultValueBinder implements
             $s['values']
         )];
 
-        // Warna per irisan: palet yang sama dengan PDF (ReportExportSupport::PALETTE)
-        $palette = ReportExportSupport::PALETTE;
+        // Warna per irisan: sama dengan PDF, halaman laporan, dan dashboard
+        // (laki-laki biru, perempuan merah; selain itu mengikuti palet).
         $colors = [];
         for ($i = 0; $i < $n; $i++) {
-            $colors[] = $palette[$i % count($palette)];
+            $colors[] = ReportExportSupport::colorFor($s['labels'][$i] ?? '', $i);
         }
         $values[0]->setFillColor($colors);
 

@@ -4,20 +4,27 @@ namespace App\Exports;
 
 /**
  * Pendukung bersama untuk ekspor Excel dan PDF laporan riwayat pelatihan.
- *  - Palet warna pie satu sumber (Excel dan PDF memakai konstanta yang sama)
+ *  - Palet warna pie satu sumber (Excel, PDF, dan halaman laporan memakai konstanta yang sama)
+ *  - Warna jenis kelamin sama dengan dashboard admin & publik:
+ *    laki-laki biru, perempuan merah
  *  - Penyesuaian payload: hapus kolom "Keikutsertaan" pada tabel
  *    "Rincian Sumber Dana" dan ubah judul pie.
  * Data, perhitungan, dan fungsi lain tidak diubah.
  */
 class ReportExportSupport
 {
+    /** Warna jenis kelamin (sama dengan dashboard admin & publik). */
+    public const GENDER_MALE = '2457D6';   // biru
+    public const GENDER_FEMALE = 'E04255'; // merah
+
     /**
      * Warna irisan pie (urutan = urutan baris tabel), kontras tinggi:
      * biru, merah, hijau, oranye, ungu, cyan, abu gelap, pink.
+     * Dua warna pertama sama dengan warna jenis kelamin.
      */
     public const PALETTE = [
-        '1F4FD8', // biru
-        'E02424', // merah
+        '2457D6', // biru  (sama dengan laki-laki)
+        'E04255', // merah (sama dengan perempuan)
         '16A34A', // hijau
         'F59E0B', // oranye
         '7C3AED', // ungu
@@ -31,6 +38,28 @@ class ReportExportSupport
 
     public const TABLE_KEY = 'Rincian Sumber Dana';
     public const COLUMN_REMOVED = 'Keikutsertaan';
+
+    /**
+     * Warna satu irisan pie (tanpa tanda #).
+     * Label jenis kelamin selalu memakai warna tetapnya; selain itu
+     * memakai palet berdasarkan urutan irisan.
+     */
+    public static function colorFor(string $label, int $index): string
+    {
+        $text = mb_strtolower(trim($label));
+
+        if ($text !== '') {
+            if (str_contains($text, 'laki')) {
+                return self::GENDER_MALE;
+            }
+
+            if (str_contains($text, 'perempuan') || str_contains($text, 'wanita')) {
+                return self::GENDER_FEMALE;
+            }
+        }
+
+        return self::PALETTE[$index % count(self::PALETTE)];
+    }
 
     public static function normalize(array $report): array
     {
