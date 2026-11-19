@@ -10,6 +10,7 @@ use App\Models\District;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Throwable;
 
 class TrainingController extends Controller
 {
@@ -445,24 +446,51 @@ class TrainingController extends Controller
     }
 
     /**
-     * Menghapus pelatihan jika belum memiliki riwayat peserta.
+     * Menghapus pelatihan beserta SELURUH riwayat peserta pada pelatihan tersebut.
+     *
+     * - Hanya baris training_histories milik pelatihan ini yang dihapus.
+     * - Data peserta (participants) dan akun pengguna TIDAK disentuh.
+     * - Riwayat peserta pada pelatihan lain tetap aman.
+     * - Semua dalam satu transaksi: gagal satu, batal semua.
      */
-    public function destroy(Training $training)
+    public function destroy(Request $request, Training $training)
     {
-        if ($training->histories()->exists()) {
+        $trainingName = $training->name;
+        $deletedHistories = 0;
+
+        try {
+            DB::transaction(function () use ($training, &$deletedHistories) {
+                // Hapus dulu riwayat peserta pada pelatihan ini
+                // agar tidak terhalang foreign key & tidak ada data yatim.
+                $deletedHistories = $training->histories()->delete();
+
+                // Setelah itu hapus pelatihannya.
+                $training->delete();
+            });
+        } catch (Throwable $e) {
+            report($e);
+
             return redirect()
-                ->route('trainings.index')
+                ->route('trainings.index', array_filter([
+                    'search' => $request->query('search'),
+                    'year' => $request->query('year'),
+                ]))
                 ->with(
                     'error',
-                    'Pelatihan tidak dapat dihapus karena sudah memiliki riwayat peserta.'
+                    'Pelatihan gagal dihapus. Tidak ada data yang berubah, silakan coba lagi.'
                 );
         }
 
-        $training->delete();
+        $message = $deletedHistories > 0
+            ? "Pelatihan \"{$trainingName}\" dan {$deletedHistories} riwayat peserta terkait berhasil dihapus."
+            : "Pelatihan \"{$trainingName}\" berhasil dihapus.";
 
         return redirect()
-            ->route('trainings.index')
-            ->with('success', 'Data pelatihan berhasil dihapus.');
+            ->route('trainings.index', array_filter([
+                'search' => $request->query('search'),
+                'year' => $request->query('year'),
+            ]))
+            ->with('success', $message);
     }
 
     /**
