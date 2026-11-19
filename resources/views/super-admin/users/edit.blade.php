@@ -198,20 +198,8 @@
         margin: 8px 0 0; color: var(--red); font-size: 13px; font-weight: 600; line-height: 1.5;
     }
 
-    /* Password */
-    .ua-pw { position: relative; }
-    .ua-pw .ua-control { padding-right: 60px; }
-    .ua-toggle {
-        position: absolute; top: 50%; right: 6px; display: grid; place-items: center;
-        width: 44px; height: 44px; padding: 0; border: 0; border-radius: 10px;
-        background: transparent; color: #8394aa; cursor: pointer; transform: translateY(-50%);
-        transition: background .25s, color .25s;
-    }
-    .ua-toggle:hover { background: var(--soft); color: var(--royal); }
-    .ua-toggle svg { width: 21px; height: 21px; }
-
     .ua-notice {
-        display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px;
+        display: flex; align-items: flex-start; gap: 14px;
         padding: 16px 18px; border: 1px solid #cfe0fb; border-left: 4px solid var(--royal);
         border-radius: 14px; background: var(--ice); color: #40536a; font-size: 14px; line-height: 1.7;
     }
@@ -326,7 +314,7 @@
                 <h1>Edit Akun <span>Pengguna</span></h1>
 
                 <p>
-                    Perbarui informasi identitas, hak akses, dan keamanan
+                    Perbarui informasi identitas dan hak akses
                     akun pengguna SIRAPIK.
                 </p>
             </div>
@@ -501,125 +489,25 @@
                     </small>
                 </div>
 
-            </div>
-        </section>
+                {{-- Catatan password --}}
+                <div class="ua-full">
+                    <div class="ua-notice">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4"/>
+                            <path d="M12 8h.01"/>
+                        </svg>
 
-        {{-- 02 KEAMANAN --}}
-        <section class="ua-section" data-reveal aria-labelledby="uaKeamanan">
-            <div class="ua-section-head">
-                <span class="ua-num">02</span>
-                <h2 id="uaKeamanan">Keamanan Akun</h2>
-                <p>Perbarui password jika diperlukan.</p>
-            </div>
-
-            <div>
-                <div class="ua-notice">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 16v-4"/>
-                        <path d="M12 8h.01"/>
-                    </svg>
-
-                    <span>
-                        Password bersifat opsional. Kosongkan kedua kolom
-                        password apabila tidak ingin mengubah password
-                        akun ini.
-                    </span>
+                        <span>
+                            Password tidak diubah melalui halaman ini. Jika
+                            pengguna lupa atau perlu mengganti password, arahkan
+                            pengguna memakai fitur <strong>Lupa Password</strong>
+                            pada halaman login.
+                        </span>
+                    </div>
                 </div>
 
-                <div class="ua-grid">
-
-                    {{-- New password --}}
-                    <div class="ua-field">
-                        <label for="password">Password Baru</label>
-
-                        <div class="ua-pw">
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                class="ua-control @error('password') input-error @enderror"
-                                placeholder="Minimal 8 karakter"
-                                minlength="8"
-                                autocomplete="new-password"
-                                @error('password') aria-invalid="true" @enderror
-                            >
-
-                            <button
-                                type="button"
-                                class="ua-toggle"
-                                data-password-target="password"
-                                aria-label="Tampilkan password baru"
-                                aria-pressed="false"
-                            >
-                                <svg data-eye="closed" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2"
-                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M3 3l18 18"/>
-                                    <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/>
-                                    <path d="M9.9 5.1A10.9 10.9 0 0 1 12 4.9c5 0 8.3 4.1 9 7.1a9.7 9.7 0 0 1-2 3.7"/>
-                                    <path d="M6.6 6.6A11.8 11.8 0 0 0 3 12c.7 3 4 7.1 9 7.1a9.8 9.8 0 0 0 5.4-1.6"/>
-                                </svg>
-
-                                <svg data-eye="open" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2"
-                                     stroke-linecap="round" stroke-linejoin="round"
-                                     aria-hidden="true" hidden>
-                                    <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        @error('password')
-                            <div class="ua-error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    {{-- Confirmation --}}
-                    <div class="ua-field">
-                        <label for="password_confirmation">Konfirmasi Password Baru</label>
-
-                        <div class="ua-pw">
-                            <input
-                                type="password"
-                                name="password_confirmation"
-                                id="password_confirmation"
-                                class="ua-control"
-                                placeholder="Ulangi password baru"
-                                minlength="8"
-                                autocomplete="new-password"
-                            >
-
-                            <button
-                                type="button"
-                                class="ua-toggle"
-                                data-password-target="password_confirmation"
-                                aria-label="Tampilkan konfirmasi password"
-                                aria-pressed="false"
-                            >
-                                <svg data-eye="closed" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2"
-                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M3 3l18 18"/>
-                                    <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/>
-                                    <path d="M9.9 5.1A10.9 10.9 0 0 1 12 4.9c5 0 8.3 4.1 9 7.1a9.7 9.7 0 0 1-2 3.7"/>
-                                    <path d="M6.6 6.6A11.8 11.8 0 0 0 3 12c.7 3 4 7.1 9 7.1a9.8 9.8 0 0 0 5.4-1.6"/>
-                                </svg>
-
-                                <svg data-eye="open" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2"
-                                     stroke-linecap="round" stroke-linejoin="round"
-                                     aria-hidden="true" hidden>
-                                    <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
             </div>
         </section>
 
@@ -714,30 +602,6 @@
         }, { passive: true });
 
         update();
-
-        /* Tampilkan / sembunyikan password */
-        page.querySelectorAll('.ua-toggle').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const input = document.getElementById(
-                    button.getAttribute('data-password-target')
-                );
-
-                if (!input) return;
-
-                const show = input.type === 'password';
-
-                input.type = show ? 'text' : 'password';
-
-                button.querySelector('[data-eye="closed"]').hidden = show;
-                button.querySelector('[data-eye="open"]').hidden = !show;
-
-                button.setAttribute('aria-pressed', show ? 'true' : 'false');
-                button.setAttribute(
-                    'aria-label',
-                    show ? 'Sembunyikan password' : 'Tampilkan password'
-                );
-            });
-        });
 
         /* Cegah pengiriman berulang */
         const form = page.querySelector('#userForm');
