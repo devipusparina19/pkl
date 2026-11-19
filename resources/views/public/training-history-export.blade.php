@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    {{-- Cegah browser menyimpan salinan lama halaman ini --}}
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>Ekspor Riwayat Pelatihan - {{ $participant->name }} | ARTA</title>
 
     <style>
@@ -499,35 +504,43 @@
 
                 <tbody>
                     @forelse ($histories as $history)
+                        @php
+                            $training = $history->training;
+
+                            // Durasi memakai nilai efektif: hasil edit manual jika ada,
+                            // jika tidak ada maka nilai dari Excel. Sama persis dengan halaman utama.
+                            $duration = $training?->effective_duration;
+                        @endphp
+
                         <tr>
                             <td class="center">{{ $loop->iteration }}</td>
 
                             <td>
-                                {{ $history->training?->name ?? 'Nama pelatihan tidak tersedia' }}
+                                {{ $training?->name ?? 'Nama pelatihan tidak tersedia' }}
                             </td>
 
-                            <td class="center">{{ $history->training?->batch_number ?: '-' }}</td>
+                            <td class="center">{{ $training?->batch_number ?: '-' }}</td>
 
                             <td class="center">
-                                @if ($history->training?->start_date)
-                                    {{ \Carbon\Carbon::parse($history->training->start_date)->format('d-m-Y') }}
+                                @if ($training?->start_date)
+                                    {{ \Carbon\Carbon::parse($training->start_date)->format('d-m-Y') }}
                                 @else
                                     -
                                 @endif
 
-                                @if ($history->training?->end_date)
+                                @if ($training?->end_date)
                                     <br>s.d.<br>
-                                    {{ \Carbon\Carbon::parse($history->training->end_date)->format('d-m-Y') }}
+                                    {{ \Carbon\Carbon::parse($training->end_date)->format('d-m-Y') }}
                                 @endif
                             </td>
 
                             <td class="center">
-                                {{ $history->training?->duration_days ? $history->training->duration_days . ' hari' : '-' }}
+                                {{ ($duration !== null && $duration !== '') ? $duration . ' hari' : '-' }}
                             </td>
 
-                            <td class="center">{{ $history->training?->jpl ?: '-' }}</td>
+                            <td class="center">{{ $training?->jpl ?: '-' }}</td>
 
-                            <td class="center">{{ $history->training?->funding_source ?: '-' }}</td>
+                            <td class="center">{{ $training?->funding_source ?: '-' }}</td>
 
                             <td class="center">{{ $history->status ? ucfirst($history->status) : '-' }}</td>
                         </tr>

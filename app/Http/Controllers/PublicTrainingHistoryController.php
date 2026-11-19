@@ -3,11 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Models\Participant;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 
 class PublicTrainingHistoryController extends Controller
 {
+    private const SESSION_KEY = 'public_training_history_participant_id';
+
+    /**
+     * Header agar browser, proxy, atau CDN tidak menyimpan halaman lama.
+     */
+    private function noCache(Response $response): Response
+    {
+        return $response
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
+    }
+
+    /**
+     * Ambil peserta + riwayat langsung dari database (selalu data terbaru).
+     * Dipakai bersama oleh halaman hasil dan halaman ekspor.
+     */
+    private function freshParticipant(int $participantId): ?Participant
+    {
+        return Participant::query()
+            ->with([
+                'histories' => function ($query) {
+                    $query->with('training')
+                        ->orderByDesc('created_at');
+                },
+            ])
+            ->find($participantId);
+    }
+
     /**
      * Menampilkan halaman pencarian riwayat pelatihan.
      */
@@ -60,9 +91,9 @@ class PublicTrainingHistoryController extends Controller
                 );
         }
 
-        // Simpan ID peserta untuk dibuka pada halaman hasil.
+        // Hanya ID yang disimpan di session; datanya selalu dibaca ulang dari database.
         session([
-            'public_training_history_participant_id' => $participant->id,
+            self::SESSION_KEY => $participant->id,
         ]);
 
         return redirect()->route('public.training-history.result');
@@ -73,9 +104,7 @@ class PublicTrainingHistoryController extends Controller
      */
     public function result()
     {
-        $participantId = session(
-            'public_training_history_participant_id'
-        );
+        $participantId = session(self::SESSION_KEY);
 
         if (!$participantId) {
             return redirect()
@@ -86,19 +115,10 @@ class PublicTrainingHistoryController extends Controller
                 );
         }
 
-        $participant = Participant::query()
-            ->with([
-                'histories' => function ($query) {
-                    $query->with('training')
-                        ->orderByDesc('created_at');
-                },
-            ])
-            ->find($participantId);
+        $participant = $this->freshParticipant((int) $participantId);
 
         if (!$participant) {
-            session()->forget(
-                'public_training_history_participant_id'
-            );
+            session()->forget(self::SESSION_KEY);
 
             return redirect()
                 ->route('public.training-history')
@@ -108,9 +128,50 @@ class PublicTrainingHistoryController extends Controller
                 );
         }
 
-        return view('public.training-history', [
-            'participant' => $participant,
-            'searched' => true,
-        ]);
+        return $this->noCache(
+            response()->view('public.training-history', [
+                'participant' => $participant,
+                'searched' => true,
+            ])
+        );
+    }
+
+    /**
+     * Halaman ekspor / cetak PDF publik.
+     * Data dibaca ulang dari database setiap kali halaman dibuka.
+     */
+    public function export()
+    {
+        $participantId = session(self::SESSION_KEY);
+
+        if (!$participantId) {
+            return redirect()
+                ->route('public.training-history')
+                ->with(
+                    'lookup_error',
+                    'Silakan cari riwayat pelatihan terlebih dahulu.'
+                );
+        }
+
+        $participant = $this->freshParticipant((int) $participantId);
+
+        if (!$participant) {
+            session()->forget(self::SESSION_KEY);
+
+            return redirect()
+                ->route('public.training-history')
+                ->with(
+                    'lookup_error',
+                    'Data peserta tidak ditemukan atau sudah tidak tersedia.'
+                );
+        }
+
+        return $this->noCache(
+            response()->view('public.training-history-export', [   // sesuaikan dengan nama file Blade ekspor Anda
+                'participant' => $participant,
+                'histories' => $participant->histories,
+                'printedAt' => Carbon::now(),
+            ])
+        );
     }
 }
