@@ -65,11 +65,13 @@
         background: var(--royal); opacity: .45; filter: blur(60px);
         animation: up-drift 24s ease-in-out infinite alternate;
     }
+    /* Judul "Kelola akun pengguna." — seluruhnya putih */
     .users-page .page-title {
         margin: 0 0 14px; font-family: var(--font-display); font-weight: 800;
         font-size: clamp(2.2rem, 5.2vw, 4rem); line-height: 1.06; letter-spacing: -.035em;
+        color: #fff !important;
     }
-    .users-page .page-title span { display: block; color: var(--cyan); }
+    .users-page .page-title span { display: block; color: var(--cyan) !important; }
     .users-page .page-description { max-width: 560px; margin: 0; font-size: 15px; line-height: 1.8; color: rgba(255,255,255,.82); }
     .users-page .hero-side { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; justify-self: end; }
     .users-page .hero-total small { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.78); }

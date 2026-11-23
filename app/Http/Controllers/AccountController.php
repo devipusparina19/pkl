@@ -62,9 +62,9 @@ class AccountController extends Controller
                     ->ignore($user->getKey(), $user->getKeyName()),
             ],
         ], [
-            'name.required'      => 'Nama lengkap wajib diisi.',
-            'name.min'           => 'Nama lengkap minimal :min karakter.',
-            'name.max'           => 'Nama lengkap maksimal :max karakter.',
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'name.min'      => 'Nama lengkap minimal :min karakter.',
+            'name.max'      => 'Nama lengkap maksimal :max karakter.',
 
             'username.required' => 'Username wajib diisi.',
             'username.min'      => 'Username minimal :min karakter.',
@@ -108,7 +108,12 @@ class AccountController extends Controller
     ===================================================== */
 
     /**
-     * Menampilkan foto profil.
+     * Menampilkan foto profil lewat controller.
+     *
+     * Dengan cara ini foto tetap tampil walau `php artisan storage:link`
+     * belum dijalankan atau APP_URL salah. URL-nya diberi versi (?v=...)
+     * oleh accessor User::avatar_url, jadi cache browser tidak membuat
+     * foto lama terus tampil setelah foto diganti.
      */
     public function showPhoto(User $user)
     {
@@ -120,7 +125,8 @@ class AccountController extends Controller
         );
 
         return Storage::disk('public')->response($path, null, [
-            'Cache-Control' => 'private, max-age=86400',
+            'Cache-Control'          => 'private, max-age=86400',
+            'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 
@@ -141,6 +147,7 @@ class AccountController extends Controller
             ],
         ], [
             'photo.required'   => 'Pilih foto terlebih dahulu.',
+            'photo.file'       => 'Foto gagal diunggah. Periksa ukuran file (maks. 2 MB) lalu coba lagi.',
             'photo.image'      => 'File harus berupa gambar.',
             'photo.mimes'      => 'Format foto harus JPG, JPEG, PNG, atau WEBP.',
             'photo.mimetypes'  => 'Isi file bukan gambar JPG, PNG, atau WEBP yang valid.',
@@ -152,7 +159,14 @@ class AccountController extends Controller
         $user    = $request->user();
         $oldPath = $user->avatar;
 
+        // Simpan file ke storage/app/public/avatars
         $newPath = $request->file('photo')->store('avatars', 'public');
+
+        if (! $newPath) {
+            return redirect()
+                ->route('account.edit', ['tab' => 'info'])
+                ->with('photo_error', 'Foto gagal disimpan ke server. Pastikan folder storage bisa ditulis.');
+        }
 
         try {
             $user->avatar = $newPath;
@@ -160,22 +174,24 @@ class AccountController extends Controller
 
         } catch (\Throwable $e) {
 
+            // Simpan ke database gagal: buang file yang barusan diunggah.
             Storage::disk('public')->delete($newPath);
 
             report($e);
 
             return redirect()
                 ->route('account.edit', ['tab' => 'info'])
-                ->with('error', 'Foto gagal disimpan. Silakan coba lagi.');
+                ->with('photo_error', 'Foto gagal disimpan ke database. Pastikan kolom "avatar" sudah ada di tabel users.');
         }
 
+        // Hapus foto lama setelah yang baru sukses tersimpan.
         if ($oldPath && $oldPath !== $newPath) {
             Storage::disk('public')->delete($oldPath);
         }
 
         return redirect()
             ->route('account.edit', ['tab' => 'info'])
-            ->with('success', 'Foto profil berhasil diperbarui.');
+            ->with('photo_success', 'Foto profil berhasil diperbarui.');
     }
 
     /**
@@ -195,7 +211,7 @@ class AccountController extends Controller
 
         return redirect()
             ->route('account.edit', ['tab' => 'info'])
-            ->with('success', 'Foto profil berhasil dihapus.');
+            ->with('photo_success', 'Foto profil berhasil dihapus.');
     }
 
     /* =====================================================
@@ -229,29 +245,15 @@ class AccountController extends Controller
                 Password::min(8)->letters()->numbers(),
             ],
         ], [
-            'current_password.required' =>
-                'Password lama wajib diisi.',
+            'current_password.required'         => 'Password lama wajib diisi.',
+            'current_password.current_password' => 'Password lama tidak sesuai.',
 
-            'current_password.current_password' =>
-                'Password lama tidak sesuai.',
-
-            'password.required' =>
-                'Password baru wajib diisi.',
-
-            'password.confirmed' =>
-                'Konfirmasi password baru tidak sama.',
-
-            'password.different' =>
-                'Password baru harus berbeda dari password lama.',
-
-            'password.min' =>
-                'Password baru minimal :min karakter.',
-
-            'password.letters' =>
-                'Password baru harus mengandung huruf.',
-
-            'password.numbers' =>
-                'Password baru harus mengandung angka.',
+            'password.required'  => 'Password baru wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password baru tidak sama.',
+            'password.different' => 'Password baru harus berbeda dari password lama.',
+            'password.min'       => 'Password baru minimal :min karakter.',
+            'password.letters'   => 'Password baru harus mengandung huruf.',
+            'password.numbers'   => 'Password baru harus mengandung angka.',
         ]);
 
         $user = $request->user();
@@ -260,13 +262,9 @@ class AccountController extends Controller
         DB::transaction(function () use ($user, $request) {
 
             $user->forceFill([
-                'password' => Hash::make(
-                    $request->input('password')
-                ),
-
+                'password'             => Hash::make($request->input('password')),
                 'must_change_password' => false,
-
-                'password_changed_at' => now(),
+                'password_changed_at'  => now(),
             ])->save();
 
             // Hapus sesi pengguna lain jika menggunakan database session.
@@ -276,11 +274,7 @@ class AccountController extends Controller
 
                 DB::table($sessionTable)
                     ->where('user_id', $user->getKey())
-                    ->where(
-                        'id',
-                        '!=',
-                        $request->session()->getId()
-                    )
+                    ->where('id', '!=', $request->session()->getId())
                     ->delete();
             }
         });
@@ -297,9 +291,6 @@ class AccountController extends Controller
 
         return redirect()
             ->route('account.edit', ['tab' => 'security'])
-            ->with(
-                'success',
-                'Password berhasil diubah. Keamanan akun Anda telah diperbarui.'
-            );
+            ->with('success', 'Password berhasil diubah. Keamanan akun Anda telah diperbarui.');
     }
 }
