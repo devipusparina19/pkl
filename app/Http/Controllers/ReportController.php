@@ -187,16 +187,19 @@ class ReportController extends Controller
      | DATA LAPORAN
      | Digunakan halaman, Excel, dan PDF.
      | Semua angka berasal dari historyQuery() sehingga ikut filter
-     | (termasuk filter jumlah keikutsertaan) dan selalu sinkron.
+     | (kabupaten/kota, instansi, pencarian, dan jumlah keikutsertaan)
+     | dan selalu sinkron.
      * ============================================================ */
 
     private function summaryData(array $filters): array
     {
         $year = $filters['year'];
 
-        // Total kegiatan: bila filter jumlah keikutsertaan aktif,
+        // Total kegiatan: bila SALAH SATU filter peserta aktif
+        // (kabupaten/kota, instansi, pencarian, jumlah keikutsertaan),
         // hitung hanya kegiatan yang diikuti peserta yang lolos filter.
-        $totalTrainings = $filters['minimum'] !== null
+        // Tanpa filter peserta: semua kegiatan pada tahun terpilih.
+        $totalTrainings = $this->hasParticipantFilter($filters)
             ? (int) $this->historyQuery($filters)->distinct()->count('trainings.id')
             : Training::query()->whereYear('start_date', $year)->count();
 
@@ -1405,6 +1408,20 @@ class ReportController extends Controller
     }
 
     /**
+     * Apakah ada filter yang menyempitkan PESERTA
+     * (kabupaten/kota, instansi, pencarian, atau jumlah keikutsertaan).
+     * Dipakai agar semua angka laporan, termasuk total kegiatan,
+     * mengikuti filter yang sama.
+     */
+    private function hasParticipantFilter(array $filters): bool
+    {
+        return ($filters['search'] ?? '') !== ''
+            || ($filters['district'] ?? '') !== ''
+            || ($filters['institution'] ?? '') !== ''
+            || ($filters['minimum'] ?? null) !== null;
+    }
+
+    /**
      * Subquery dasar: tiap peserta + berapa KEGIATAN berbeda yang ia ikuti
      * pada tahun terpilih (sesuai filter wilayah/instansi/pencarian).
      * COUNT(DISTINCT trainings.id) mencegah hitung ganda pada kegiatan sama.
@@ -1458,11 +1475,7 @@ class ReportController extends Controller
     ) {
         $minimum = $filters['minimum'] ?? null;
 
-        $hasParticipantFilter =
-            $filters['search'] !== ''
-            || $filters['district'] !== ''
-            || $filters['institution'] !== ''
-            || $minimum !== null;
+        $hasParticipantFilter = $this->hasParticipantFilter($filters);
 
         $query = DB::table('trainings')
             ->whereYear('trainings.start_date', $filters['year']);
