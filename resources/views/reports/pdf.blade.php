@@ -108,6 +108,7 @@
         background: #D9D9D9;
         font-size: 9.5px; font-weight: bold;
         text-align: center; vertical-align: middle;
+        word-wrap: break-word;
     }
     .data-table td {
         padding: 3px 5px; border: 1px solid #000;
@@ -116,6 +117,9 @@
     }
     .data-table.small th,
     .data-table.small td { padding: 3px 3px; font-size: 7.5px; }
+
+    /* Angka panjang (NIK/NIP) tidak boleh terpotong ke baris kedua */
+    .data-table td.nowrap { white-space: nowrap; }
 
     .center { text-align: center; }
     .left   { text-align: left; }
@@ -265,12 +269,44 @@
         $info[] = ['Kata Kunci Pencarian', $meta['search']];
     }
 
+    /* Lebar minimum (persen) kolom tabel kecil agar judul dan angka tidak saling tabrak */
+    $minWidthByLabel = [
+        'NIK'              => 16,
+        'NIP'              => 17,
+        'Kabupaten/Kota'   => 13,
+        'Keikutsertaan'    => 12,
+    ];
+
+    /* Kolom angka panjang yang tidak boleh dipotong */
+    $noWrapLabels = ['NIK', 'NIP'];
+
     /* Render satu tabel generik (sama dengan Excel) */
-    $renderTable = function (array $t, int $index, bool $small) use ($cellText) {
+    $renderTable = function (array $t, int $index, bool $small) use ($cellText, $minWidthByLabel, $noWrapLabels) {
         $cols = $t['columns'];
         $rows = $t['rows'] ?? [];
         $sumW = max(1, array_sum(array_column($cols, 'w')));
         $letter = chr(65 + $index);
+
+        /* Hitung lebar kolom (persen) */
+        $widths = [];
+        foreach ($cols as $i => $c) {
+            $widths[$i] = $c['w'] / $sumW * 100;
+        }
+
+        if ($small) {
+            foreach ($cols as $i => $c) {
+                $label = trim((string) $c['label']);
+                if (isset($minWidthByLabel[$label])) {
+                    $widths[$i] = max($widths[$i], $minWidthByLabel[$label]);
+                }
+            }
+
+            /* Normalisasi supaya total tetap 100% */
+            $totalW = max(1, array_sum($widths));
+            foreach ($widths as $i => $w) {
+                $widths[$i] = $w / $totalW * 100;
+            }
+        }
 
         $html = '<div class="tbl-title">' . e($letter . '. ' . $t['title']) . '</div>';
 
@@ -279,8 +315,15 @@
         }
 
         $html .= '<table class="data-table' . ($small ? ' small' : '') . '"><thead><tr>';
-        foreach ($cols as $c) {
-            $html .= '<th style="width:' . number_format($c['w'] / $sumW * 100, 2, '.', '') . '%">' . e($c['label']) . '</th>';
+        foreach ($cols as $i => $c) {
+            $headLabel = (string) $c['label'];
+
+            /* Beri titik pemisah agar "Kabupaten/Kota" bisa turun baris setelah "/" */
+            if ($small) {
+                $headLabel = str_replace('/', '/ ', $headLabel);
+            }
+
+            $html .= '<th style="width:' . number_format($widths[$i], 2, '.', '') . '%">' . e($headLabel) . '</th>';
         }
         $html .= '</tr></thead><tbody>';
 
@@ -293,6 +336,11 @@
                     $v = $row['cells'][$i] ?? '';
                     $text = ($v === null || $v === '') ? '-' : $cellText($v, $c['format'] ?? null);
                     $cls = ($c['align'] ?? 'c') === 'l' ? 'left' : 'center';
+
+                    if ($small && in_array(trim((string) $c['label']), $noWrapLabels, true)) {
+                        $cls .= ' nowrap';
+                    }
+
                     $html .= '<td class="' . $cls . '">' . e($text) . '</td>';
                 }
                 $html .= '</tr>';

@@ -217,7 +217,7 @@
 
         table.history th,
         table.history td {
-            padding: 5px 4px;
+            padding: 5px 3px;
             border: 1px solid #000;
             font-size: 9pt;
             line-height: 1.3;
@@ -229,18 +229,27 @@
         table.history th {
             font-weight: 700;
             text-align: center;
+            /* Header tidak boleh terpotong di tengah kata */
+            overflow-wrap: normal;
+            word-break: keep-all;
+            white-space: nowrap;
+        }
+
+        /* Header yang terdiri dari dua kata boleh turun baris antar kata */
+        table.history th.th-wrap {
+            white-space: normal;
         }
 
         table.history td.center {
             text-align: center;
         }
 
-        .col-no       { width: 8mm; }
-        .col-angkatan { width: 16mm; }
+        .col-no       { width: 9mm; }
+        .col-angkatan { width: 19mm; }
         .col-tanggal  { width: 23mm; }
         .col-durasi   { width: 15mm; }
         .col-jpl      { width: 11mm; }
-        .col-dana     { width: 22mm; }
+        .col-dana     { width: 21mm; }
         .col-status   { width: 17mm; }
 
         .empty-row {
@@ -497,7 +506,7 @@
                         <th>Tanggal</th>
                         <th>Durasi</th>
                         <th>JPL</th>
-                        <th>Sumber Dana</th>
+                        <th class="th-wrap">Sumber Dana</th>
                         <th>Status</th>
                     </tr>
                 </thead>
