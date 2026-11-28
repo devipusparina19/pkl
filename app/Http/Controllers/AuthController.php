@@ -16,33 +16,28 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
-        return view('auth.login', [
-            'loginRole' => 'admin',
-            'loginRoleLabel' => 'Admin',
-        ]);
+        return view('auth.login');
     }
 
     /**
-     * Halaman login berdasarkan role.
+     * Halaman login berdasarkan role (route lama tetap didukung).
+     * Pilihan role sudah tidak dipakai, semua menampilkan form yang sama.
      */
-    public function showRoleLogin(string $role)
+    public function showRoleLogin(?string $role = null)
     {
-        $this->validateRolePath($role);
-
-        return view('auth.login', [
-            'loginRole' => $role,
-            'loginRoleLabel' => $this->roleLabel($role),
-        ]);
+        return view('auth.login');
     }
 
     /**
      * Proses autentikasi pengguna.
+     *
+     * Role TIDAK dipilih pengguna. Sistem membaca role langsung dari
+     * data akun yang diatur Super Admin, lalu mengarahkan ke dashboard
+     * yang sesuai. Parameter $role hanya ada agar kompatibel dengan
+     * route lama (/login/{role}) dan sengaja diabaikan.
      */
-    public function login(Request $request, string $role)
+    public function login(Request $request, ?string $role = null)
     {
-        $this->validateRolePath($role);
-
-        // Validasi sesuai name input pada halaman login.
         $validated = $request->validate([
             'username' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
@@ -60,15 +55,15 @@ class AuthController extends Controller
          * Cari pengguna berdasarkan email.
          * Jika kolom username tersedia, cari berdasarkan username juga.
          */
-        $userQuery = User::query()->where(function ($query) use ($identifier) {
-            $query->where('email', $identifier);
+        $user = User::query()
+            ->where(function ($query) use ($identifier) {
+                $query->where('email', $identifier);
 
-            if (Schema::hasColumn('users', 'username')) {
-                $query->orWhere('username', $identifier);
-            }
-        });
-
-        $user = $userQuery->first();
+                if (Schema::hasColumn('users', 'username')) {
+                    $query->orWhere('username', $identifier);
+                }
+            })
+            ->first();
 
         /*
          * Jangan membuat sesi jika pengguna tidak ditemukan
@@ -94,27 +89,28 @@ class AuthController extends Controller
         }
 
         /*
-         * Normalisasi role:
+         * Baca role dari database dan normalisasi:
          * super-admin menjadi super_admin.
          */
-        $normalizeRole = static function (?string $value): string {
-            return str_replace(
-                '-',
-                '_',
-                strtolower(trim((string) $value))
-            );
-        };
-
-        $expectedRole = $normalizeRole($role);
-        $actualRole = $normalizeRole($user->role);
+        $actualRole = str_replace(
+            '-',
+            '_',
+            strtolower(trim((string) $user->role))
+        );
 
         /*
-         * Pastikan role pilihan pada halaman login cocok
-         * dengan role yang tersimpan di database.
+         * Tentukan dashboard tujuan berdasarkan role akun.
+         * Role yang tidak dikenal ditolak dan tidak dibuatkan sesi.
          */
-        if ($actualRole !== $expectedRole) {
+        $destination = match ($actualRole) {
+            'super_admin' => 'super-admin.dashboard',
+            'admin', 'pimpinan' => 'dashboard',
+            default => null,
+        };
+
+        if ($destination === null) {
             throw ValidationException::withMessages([
-                'username' => 'Jenis akun tidak sesuai dengan role akun yang terdaftar.',
+                'username' => 'Role akun Anda tidak dikenali. Silakan hubungi Super Admin.',
             ]);
         }
 
@@ -124,60 +120,23 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        /*
-         * Tentukan dashboard tujuan berdasarkan role.
-         */
-        $destination = match ($actualRole) {
-            'super_admin' => 'super-admin.dashboard',
-            'admin', 'pimpinan' => 'dashboard',
-            default => 'public.dashboard',
-        };
-
         return redirect()
             ->route($destination)
             ->with('success', 'Selamat datang, ' . $user->name . '!');
     }
 
     /**
- * Logout pengguna.
- */
-public function logout(Request $request)
-{
-    Auth::logout();
-
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect()
-        ->route('login')
-        ->with('success', 'Anda berhasil keluar dari sistem.');
-}
-
-    /**
-     * Batasi role yang diperbolehkan pada URL login.
+     * Logout pengguna.
      */
-    private function validateRolePath(string $role): void
+    public function logout(Request $request)
     {
-        abort_unless(
-            in_array($role, [
-                'super-admin',
-                'admin',
-                'pimpinan',
-            ], true),
-            404
-        );
-    }
+        Auth::logout();
 
-    /**
-     * Label role untuk halaman login.
-     */
-    private function roleLabel(string $role): string
-    {
-        return match ($role) {
-            'super-admin' => 'Super Admin',
-            'admin' => 'Admin',
-            'pimpinan' => 'Pimpinan',
-            default => 'Internal',
-        };
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()
+            ->route('login')
+            ->with('success', 'Anda berhasil keluar dari sistem.');
     }
 }

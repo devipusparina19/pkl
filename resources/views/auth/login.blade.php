@@ -378,64 +378,13 @@
 
         /* Form */
         .form-group { margin-bottom: 22px; }
-        .form-group > label, .group-label {
+        .form-group > label {
             display: block;
             margin-bottom: 9px;
             color: #40536a;
             font-size: 14px;
             font-weight: 700;
         }
-
-        /* Role: segmented control dengan indikator geser */
-        .role-switch {
-            position: relative;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0;
-            padding: 5px;
-            border: 1px solid var(--border);
-            border-radius: var(--r);
-            background: var(--ice);
-        }
-        .role-indicator {
-            position: absolute;
-            top: 5px;
-            bottom: 5px;
-            left: 5px;
-            width: calc((100% - 10px) / 3);
-            border-radius: 10px;
-            background: #fff;
-            box-shadow: 0 4px 14px rgba(8,27,51,.12);
-            transform: translateX(calc(var(--idx, 0) * 100%));
-            transition: transform .4s var(--ease);
-        }
-        .role-switch label { position: relative; z-index: 1; margin: 0; cursor: pointer; }
-        .role-switch input {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-        .role-switch span {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 46px;
-            padding: 8px 6px;
-            border-radius: 10px;
-            color: #506176;
-            font-size: 14px;
-            font-weight: 700;
-            text-align: center;
-            line-height: 1.3;
-            transition: color .25s;
-        }
-        .role-switch label:hover span { color: var(--royal); }
-        .role-switch input:checked + span { color: var(--royal); }
-        .role-switch input:focus-visible + span { outline: 3px solid rgba(52,120,246,.55); outline-offset: 2px; }
 
         /* Inputs */
         .input-wrap { position: relative; display: flex; align-items: center; }
@@ -590,7 +539,6 @@
             .brand-orbit { right: -260px; bottom: -260px; }
             .login-heading { margin-bottom: 26px; }
             .login-heading p { font-size: 16px; }
-            .role-switch span { min-height: 48px; font-size: 13px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -720,6 +668,12 @@
                 </div>
             @endif
 
+            {{--
+                Tidak ada pilihan role. Role dibaca otomatis dari data akun
+                yang diatur Super Admin. Segmen terakhir URL (/admin) hanya
+                dipakai agar cocok dengan route yang sudah ada dan diabaikan
+                oleh controller.
+            --}}
             <form
                 id="loginForm"
                 method="POST"
@@ -727,37 +681,7 @@
             >
                 @csrf
 
-                @php
-                    $selectedRole = old('role', $loginRole ?? 'admin');
-                @endphp
-
                 <div class="form-group reveal" style="--i:1">
-                    <span class="group-label" id="roleLabel">Masuk Sebagai</span>
-
-                    <div class="role-switch" id="roleSwitch" role="radiogroup" aria-labelledby="roleLabel">
-                        <span class="role-indicator" aria-hidden="true" style="display:block;min-height:0;padding:0"></span>
-
-                        <label>
-                            <input type="radio" name="role" value="admin"
-                                {{ $selectedRole === 'admin' ? 'checked' : '' }} required>
-                            <span>Admin</span>
-                        </label>
-
-                        <label>
-                            <input type="radio" name="role" value="super-admin"
-                                {{ $selectedRole === 'super-admin' ? 'checked' : '' }}>
-                            <span>Super Admin</span>
-                        </label>
-
-                        <label>
-                            <input type="radio" name="role" value="pimpinan"
-                                {{ $selectedRole === 'pimpinan' ? 'checked' : '' }}>
-                            <span>Pimpinan</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group reveal" style="--i:2">
                     <label for="username">Username atau Email</label>
 
                     <div class="input-wrap">
@@ -784,7 +708,7 @@
                     </div>
                 </div>
 
-                <div class="form-group reveal" style="--i:3">
+                <div class="form-group reveal" style="--i:2">
                     <label for="password">Password</label>
 
                     <div class="input-wrap">
@@ -843,7 +767,7 @@
                     </div>
                 </div>
 
-                <div class="reveal" style="--i:4">
+                <div class="reveal" style="--i:3">
                     <button class="btn-login" type="submit" id="loginSubmit">
                         <span class="spinner" id="loginSpinner" hidden aria-hidden="true"></span>
                         <span id="loginSubmitText">Masuk ke Sistem</span>
@@ -860,7 +784,7 @@
                 </div>
             </form>
 
-            <footer class="login-bottom reveal" style="--i:5">
+            <footer class="login-bottom reveal" style="--i:4">
                 <a href="{{ route('public.dashboard') }}">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 24 24" fill="none"
@@ -898,21 +822,6 @@
         } catch (e) {}
 
         const loginForm = document.getElementById('loginForm');
-        const roleInputs = Array.from(document.querySelectorAll('input[name="role"]'));
-        const roleSwitch = document.getElementById('roleSwitch');
-        const loginBaseUrl = @json(url('/login'));
-
-        /* Tujuan form + indikator geser mengikuti role terpilih */
-        function updateRole() {
-            const checked = document.querySelector('input[name="role"]:checked');
-            const role = checked ? checked.value : 'admin';
-
-            loginForm.action = loginBaseUrl + '/' + encodeURIComponent(role);
-            roleSwitch.style.setProperty('--idx', Math.max(0, roleInputs.indexOf(checked)));
-        }
-
-        roleInputs.forEach((input) => input.addEventListener('change', updateRole));
-        updateRole();
 
         /* Fokus awal tanpa melompat/scroll (hanya layar lebar) */
         const username = document.getElementById('username');
